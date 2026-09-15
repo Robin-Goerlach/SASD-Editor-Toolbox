@@ -5,24 +5,11 @@ using Sasd.Editor.Windows;
 namespace Sasd.Editor.Commands;
 
 /// <summary>
-/// Implements the small amount of adapter logic needed to preserve FIRST-ED's
-/// user-visible command semantics without contaminating the general editing
-/// engine with 1985-specific conventions such as one-based line numbers and
-/// modulo window numbers.
+/// Preserves FIRST-ED's user-visible command semantics without leaking 1985
+/// screen, pointer and one-based conventions into the general editing engine.
 /// </summary>
-/// <remarks>
-/// Text mutation remains in <see cref="EditorEngine"/>. This processor is for
-/// navigation, window selection/linking and option commands whose historical
-/// behavior is primarily about translating user-visible values into the modern
-/// document/view model.
-/// </remarks>
 internal static class FirstEdCompatibilityProcessor
 {
-    /// <summary>
-    /// Historical EditBeginningEndLine semantics: from any non-first column go
-    /// to column one; from column one go immediately after the last nonblank
-    /// character.
-    /// </summary>
     public static void MoveBeginningOrEndOfLine(EditorSession session)
     {
         var window = RequireWindow(session);
@@ -35,11 +22,6 @@ internal static class FirstEdCompatibilityProcessor
         MoveEndOfLine(session);
     }
 
-    /// <summary>
-    /// Moves immediately after the last nonblank character, matching the
-    /// historical EditEndLine command rather than a modern physical-line-end
-    /// convention that would include trailing blanks.
-    /// </summary>
     public static void MoveEndOfLine(EditorSession session)
     {
         var window = RequireWindow(session);
@@ -48,10 +30,169 @@ internal static class FirstEdCompatibilityProcessor
     }
 
     /// <summary>
-    /// Moves to a one-based line number. Values below one are rejected; values
-    /// beyond the text stream select its last line. The column is deliberately
-    /// preserved, including a virtual column beyond a shorter target line.
+    /// FIRST-ED EditUpLine behavior. The cursor moves one logical line upward;
+    /// when it was already on the top displayed row, the viewport scrolls up as
+    /// well so the cursor remains visible.
     /// </summary>
+    public static bool MoveUpLine(EditorSession session, int visibleLines)
+    {
+        ValidateVisibleLines(visibleLines);
+        var window = RequireWindow(session);
+        if (window.Cursor.Line <= 0)
+        {
+            return false;
+        }
+
+        if (window.Cursor.Line == window.TopLine)
+        {
+            window.TopLine = Math.Max(0, window.TopLine - 1);
+        }
+
+        window.Cursor = window.Cursor with { Line = window.Cursor.Line - 1 };
+        return true;
+    }
+
+    /// <summary>
+    /// FIRST-ED EditDownLine behavior. If the cursor is on the last displayed
+    /// row, the viewport follows it downward by one line.
+    /// </summary>
+    public static bool MoveDownLine(EditorSession session, int visibleLines)
+    {
+        ValidateVisibleLines(visibleLines);
+        var window = RequireWindow(session);
+        var lastDocumentLine = window.Document.Buffer.LineCount - 1;
+        if (window.Cursor.Line >= lastDocumentLine)
+        {
+            return false;
+        }
+
+        var lastDisplayedLine = Math.Min(lastDocumentLine, window.TopLine + visibleLines - 1);
+        if (window.Cursor.Line == lastDisplayedLine)
+        {
+            window.TopLine = Math.Min(lastDocumentLine, window.TopLine + 1);
+        }
+
+        window.Cursor = window.Cursor with { Line = window.Cursor.Line + 1 };
+        return true;
+    }
+
+    /// <summary>
+    /// Slides the viewport up by one logical line. If the cursor occupied the
+    /// last displayed row, it also moves up by one line as described by the
+    /// historical EditScrollUp command.
+    /// </summary>
+    public static bool ScrollUp(EditorSession session, int visibleLines)
+    {
+        ValidateVisibleLines(visibleLines);
+        var window = RequireWindow(session);
+        if (window.TopLine <= 0)
+        {
+            return false;
+        }
+
+        var lastDocumentLine = window.Document.Buffer.LineCount - 1;
+        var lastDisplayedLine = Math.Min(lastDocumentLine, window.TopLine + visibleLines - 1);
+        if (window.Cursor.Line == lastDisplayedLine)
+        {
+            window.Cursor = window.Cursor with { Line = Math.Max(0, window.Cursor.Line - 1) };
+        }
+
+        window.TopLine--;
+        return true;
+    }
+
+    /// <summary>
+    /// Slides the viewport down by one logical line. If the cursor occupied the
+    /// top displayed row, it also moves down by one line as described by the
+    /// historical EditScrollDown command.
+    /// </summary>
+    public static bool ScrollDown(EditorSession session, int visibleLines)
+    {
+        ValidateVisibleLines(visibleLines);
+        var window = RequireWindow(session);
+        var lastDocumentLine = window.Document.Buffer.LineCount - 1;
+        if (window.TopLine >= lastDocumentLine)
+        {
+            return false;
+        }
+
+        if (window.Cursor.Line == window.TopLine)
+        {
+            window.Cursor = window.Cursor with { Line = Math.Min(lastDocumentLine, window.Cursor.Line + 1) };
+        }
+
+        window.TopLine++;
+        return true;
+    }
+
+    /// <summary>
+    /// Slides the viewport upward by one page, where a page is one less than the
+    /// number of displayed text rows. The handbook specifies the viewport
+    /// displacement but not a separate cursor-row rule; SASD therefore preserves
+    /// the cursor's relative visible row as a host-neutral invariant.
+    /// </summary>
+    public static bool PageUp(EditorSession session, int visibleLines)
+    {
+        ValidateVisibleLines(visibleLines);
+        var window = RequireWindow(session);
+        if (window.TopLine <= 0)
+        {
+            return false;
+        }
+
+        var relativeRow = VisibleCursorRow(window, visibleLines);
+        var step = Math.Max(1, visibleLines - 1);
+        window.TopLine = Math.Max(0, window.TopLine - step);
+        var lastDocumentLine = window.Document.Buffer.LineCount - 1;
+        window.Cursor = window.Cursor with { Line = Math.Min(lastDocumentLine, window.TopLine + relativeRow) };
+        return true;
+    }
+
+    /// <summary>
+    /// Slides the viewport downward by one page, where a page is one less than
+    /// the number of displayed text rows. The cursor keeps its relative visible
+    /// row unless the end of the document forces clamping.
+    /// </summary>
+    public static bool PageDown(EditorSession session, int visibleLines)
+    {
+        ValidateVisibleLines(visibleLines);
+        var window = RequireWindow(session);
+        var lastDocumentLine = window.Document.Buffer.LineCount - 1;
+        if (window.TopLine >= lastDocumentLine)
+        {
+            return false;
+        }
+
+        var relativeRow = VisibleCursorRow(window, visibleLines);
+        var step = Math.Max(1, visibleLines - 1);
+        window.TopLine = Math.Min(lastDocumentLine, window.TopLine + step);
+        window.Cursor = window.Cursor with { Line = Math.Min(lastDocumentLine, window.TopLine + relativeRow) };
+        return true;
+    }
+
+    /// <summary>
+    /// Historical EditWindowTopFile semantics: first text line, first column,
+    /// with the first text line at the top of the viewport.
+    /// </summary>
+    public static void MoveWindowTopFile(EditorSession session)
+    {
+        var window = RequireWindow(session);
+        window.TopLine = 0;
+        window.Cursor = new TextPosition(0, 0);
+    }
+
+    /// <summary>
+    /// Historical EditWindowBottomFile semantics: last text line, first column,
+    /// and the last line itself becomes the viewport's top line.
+    /// </summary>
+    public static void MoveWindowBottomFile(EditorSession session)
+    {
+        var window = RequireWindow(session);
+        var lastLine = window.Document.Buffer.LineCount - 1;
+        window.TopLine = lastLine;
+        window.Cursor = new TextPosition(lastLine, 0);
+    }
+
     public static bool GoToLine(EditorSession session, int oneBasedLine)
     {
         if (oneBasedLine < 1)
@@ -65,11 +206,6 @@ internal static class FirstEdCompatibilityProcessor
         return true;
     }
 
-    /// <summary>
-    /// Moves to a one-based column number. FIRST-ED permits the cursor to be
-    /// positioned beyond the current text, so this command intentionally does
-    /// not clamp to the current line length.
-    /// </summary>
     public static bool GoToColumn(EditorSession session, int oneBasedColumn)
     {
         if (oneBasedColumn < 1)
@@ -82,11 +218,6 @@ internal static class FirstEdCompatibilityProcessor
         return true;
     }
 
-    /// <summary>
-    /// Moves to the first or last line of the active whole-line block. If the
-    /// block belongs to another displayed document, a window showing that
-    /// document becomes current while retaining that window's own column.
-    /// </summary>
     public static bool GoToBlockBoundary(EditorSession session, bool end)
     {
         var block = session.Block;
@@ -106,10 +237,6 @@ internal static class FirstEdCompatibilityProcessor
         return true;
     }
 
-    /// <summary>
-    /// Selects the window immediately above the current one and wraps from the
-    /// first window to the last.
-    /// </summary>
     public static bool PreviousWindow(EditorSession session)
     {
         if (session.Windows.Count == 0)
@@ -123,10 +250,6 @@ internal static class FirstEdCompatibilityProcessor
         return true;
     }
 
-    /// <summary>
-    /// Selects a one-based window number using modulo addressing, preserving
-    /// each window's independent cursor/scroll state.
-    /// </summary>
     public static bool GoToWindow(EditorSession session, int oneBasedWindowNumber)
     {
         var window = ResolveWindow(session, oneBasedWindowNumber);
@@ -139,13 +262,6 @@ internal static class FirstEdCompatibilityProcessor
         return true;
     }
 
-    /// <summary>
-    /// Re-links an existing destination window to the source window's document.
-    /// The two windows then share text while retaining independent view state.
-    /// The abandoned destination document naturally becomes collectible when no
-    /// other window references it, replacing the manual memory destruction that
-    /// the Pascal implementation required.
-    /// </summary>
     public static bool LinkWindows(EditorSession session, int destinationNumber, int sourceNumber)
     {
         var destination = ResolveWindow(session, destinationNumber);
@@ -165,10 +281,6 @@ internal static class FirstEdCompatibilityProcessor
         return true;
     }
 
-    /// <summary>
-    /// Deletes a numbered window. SASD deliberately keeps at least one window
-    /// alive because the modern session API requires a current view.
-    /// </summary>
     public static bool DeleteWindow(EditorSession session, int oneBasedWindowNumber)
     {
         if (session.Windows.Count <= 1)
@@ -236,6 +348,17 @@ internal static class FirstEdCompatibilityProcessor
 
         session.Undo.Limit = limit;
         return true;
+    }
+
+    private static int VisibleCursorRow(EditorWindow window, int visibleLines) =>
+        Math.Clamp(window.Cursor.Line - window.TopLine, 0, visibleLines - 1);
+
+    private static void ValidateVisibleLines(int visibleLines)
+    {
+        if (visibleLines < 1)
+        {
+            throw new ArgumentOutOfRangeException(nameof(visibleLines), "At least one visible text line is required.");
+        }
     }
 
     private static int LastNonBlankEnd(string text)

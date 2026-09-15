@@ -2,6 +2,7 @@ using Sasd.Editor.Document;
 using Sasd.Editor.Hooks;
 using Sasd.Editor.IO;
 using Sasd.Editor.Model;
+using Sasd.Editor.Scheduling;
 using Sasd.Editor.Search;
 using Sasd.Editor.Undo;
 using Sasd.Editor.Windows;
@@ -24,6 +25,8 @@ public sealed class EditorSession
         Engine = new EditorEngine(this);
         Search = new EditorSearchService(this);
         Files = new EditorFileService(this, fileCodec);
+        Scheduler = new EditorScheduler(this);
+        SystemLoop = new EditorSystemLoop(this, Scheduler);
     }
 
     public IEditorHooks Hooks { get; }
@@ -31,9 +34,25 @@ public sealed class EditorSession
     public EditorEngine Engine { get; }
     public EditorSearchService Search { get; }
     public EditorFileService Files { get; }
+    public EditorScheduler Scheduler { get; }
+    public EditorSystemLoop SystemLoop { get; }
     public IReadOnlyList<EditorWindow> Windows => _windows;
     public EditorWindow CurrentWindow { get; private set; } = null!;
     public EditorBlock? Block { get; private set; }
+
+    /// <summary>
+    /// Modern equivalent of the historical global Rundown flag. The editor loop
+    /// exits after the flag becomes true. Requesting rundown never saves files.
+    /// </summary>
+    public bool RundownRequested { get; private set; }
+
+    public void RequestRundown() => RundownRequested = true;
+
+    /// <summary>
+    /// Allows a host or test harness to reuse a session after a completed run.
+    /// Normal interactive hosts usually never need to call this method.
+    /// </summary>
+    public void ResetRundown() => RundownRequested = false;
 
     public EditorWindow CreateDocument(string? text = null)
     {

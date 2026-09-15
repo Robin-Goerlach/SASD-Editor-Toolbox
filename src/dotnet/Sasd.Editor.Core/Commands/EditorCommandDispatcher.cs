@@ -11,6 +11,8 @@ namespace Sasd.Editor.Commands;
 /// </summary>
 public sealed class EditorCommandDispatcher(EditorSession session)
 {
+    private const int DefaultVisibleLines = 20;
+
     public async ValueTask<bool> ExecuteAsync(EditorCommandRequest request, CancellationToken cancellationToken = default)
     {
         ArgumentNullException.ThrowIfNull(request);
@@ -18,21 +20,24 @@ public sealed class EditorCommandDispatcher(EditorSession session)
 
         try
         {
+            var visibleLines = command.PageSize ?? DefaultVisibleLines;
             switch (command.Id)
             {
                 case EditorCommandId.CursorLeft: session.Engine.MoveLeft(); break;
                 case EditorCommandId.CursorRight: session.Engine.MoveRight(); break;
-                case EditorCommandId.CursorUp: session.Engine.MoveUp(); break;
-                case EditorCommandId.CursorDown: session.Engine.MoveDown(); break;
-                case EditorCommandId.PageUp: session.Engine.MovePageUp(command.PageSize ?? 20); break;
-                case EditorCommandId.PageDown: session.Engine.MovePageDown(command.PageSize ?? 20); break;
+                case EditorCommandId.CursorUp: FirstEdCompatibilityProcessor.MoveUpLine(session, visibleLines); break;
+                case EditorCommandId.CursorDown: FirstEdCompatibilityProcessor.MoveDownLine(session, visibleLines); break;
+                case EditorCommandId.PageUp: FirstEdCompatibilityProcessor.PageUp(session, visibleLines); break;
+                case EditorCommandId.PageDown: FirstEdCompatibilityProcessor.PageDown(session, visibleLines); break;
+                case EditorCommandId.ScrollUp: FirstEdCompatibilityProcessor.ScrollUp(session, visibleLines); break;
+                case EditorCommandId.ScrollDown: FirstEdCompatibilityProcessor.ScrollDown(session, visibleLines); break;
                 case EditorCommandId.WordLeft: session.Engine.MoveLeftWord(); break;
                 case EditorCommandId.WordRight: session.Engine.MoveRightWord(); break;
                 case EditorCommandId.BeginningOfLine: session.Engine.MoveBeginningOfLine(); break;
                 case EditorCommandId.EndOfLine: FirstEdCompatibilityProcessor.MoveEndOfLine(session); break;
                 case EditorCommandId.BeginningOrEndOfLine: FirstEdCompatibilityProcessor.MoveBeginningOrEndOfLine(session); break;
-                case EditorCommandId.TopOfFile: session.Engine.MoveTopOfFile(); break;
-                case EditorCommandId.BottomOfFile: session.Engine.MoveBottomOfFile(); break;
+                case EditorCommandId.TopOfFile: FirstEdCompatibilityProcessor.MoveWindowTopFile(session); break;
+                case EditorCommandId.BottomOfFile: FirstEdCompatibilityProcessor.MoveWindowBottomFile(session); break;
                 case EditorCommandId.TopOfBlock: return FirstEdCompatibilityProcessor.GoToBlockBoundary(session, end: false);
                 case EditorCommandId.BottomOfBlock: return FirstEdCompatibilityProcessor.GoToBlockBoundary(session, end: true);
                 case EditorCommandId.GoToLine: return FirstEdCompatibilityProcessor.GoToLine(session, RequireNumber(command));
@@ -100,6 +105,12 @@ public sealed class EditorCommandDispatcher(EditorSession session)
                     return true;
                 case EditorCommandId.SaveFile:
                     return await session.Files.SaveCurrentWindowAsync(command.Text, cancellationToken).ConfigureAwait(false);
+                case EditorCommandId.Exit:
+                    // Direct EditExit semantics: request rundown only. FIRST-ED's
+                    // Ctrl-K X binding already declares that the host must obtain
+                    // confirmation before it dispatches this semantic command.
+                    session.RequestRundown();
+                    return true;
                 default: return false;
             }
 
