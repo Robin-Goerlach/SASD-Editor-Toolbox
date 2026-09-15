@@ -1,0 +1,53 @@
+namespace Sasd.Editor.Commands;
+
+public enum EditorCommandId
+{
+    CursorLeft,
+    CursorRight,
+    CursorUp,
+    CursorDown,
+    PageUp,
+    PageDown,
+    WordLeft,
+    WordRight,
+    BeginningOfLine,
+    EndOfLine,
+    TopOfFile,
+    BottomOfFile,
+    InsertText,
+    InsertLine,
+    InsertControlCharacter,
+    Tab,
+    DeleteLeftCharacter,
+    DeleteRightCharacter,
+    DeleteRightWord,
+    DeleteLine,
+    DeleteToEndOfLine,
+    ChangeCase,
+    CenterLine,
+    ReformatParagraph,
+    ToggleInsert,
+    ToggleWordWrap,
+    ToggleAutoIndent,
+    Undo,
+    BeginBlock,
+    EndBlock,
+    CopyBlock,
+    MoveBlock,
+    DeleteBlock,
+    HideBlock,
+    CreateWindow,
+    LinkWindow,
+    NextWindow,
+    DeleteWindow,
+    SetMarker,
+    JumpMarker,
+    FindNext,
+    ReplaceNext
+}
+
+public sealed record EditorCommandRequest(
+    EditorCommandId Id,
+    string? Text = null,
+    int? Number = null,
+    int? PageSize = null);

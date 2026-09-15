@@ -1,0 +1,5 @@
+<Solution>
+  <Project Path="src/dotnet/Sasd.Editor.Core/Sasd.Editor.Core.csproj" />
+  <Project Path="tests/dotnet/Sasd.Editor.Core.Tests/Sasd.Editor.Core.Tests.csproj" />
+  <Project Path="samples/dotnet/Sasd.Editor.FirstEd.Sample/Sasd.Editor.FirstEd.Sample.csproj" />
+</Solution>
