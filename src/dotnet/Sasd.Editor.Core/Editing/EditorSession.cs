@@ -22,6 +22,7 @@ public sealed class EditorSession
     {
         Hooks = hooks ?? new DefaultEditorHooks();
         Undo = new EditorUndoManager();
+        WindowLayout = new EditorWindowLayout(this);
         Engine = new EditorEngine(this);
         Search = new EditorSearchService(this);
         Files = new EditorFileService(this, fileCodec);
@@ -31,6 +32,7 @@ public sealed class EditorSession
 
     public IEditorHooks Hooks { get; }
     public EditorUndoManager Undo { get; }
+    public EditorWindowLayout WindowLayout { get; }
     public EditorEngine Engine { get; }
     public EditorSearchService Search { get; }
     public EditorFileService Files { get; }
@@ -56,8 +58,7 @@ public sealed class EditorSession
 
     public EditorWindow CreateDocument(string? text = null)
     {
-        var lines = SplitLogicalLines(text ?? string.Empty).Select(static line => new EditorLineSnapshot(line));
-        var document = new EditorDocument(new LinkedLineTextBuffer(lines));
+        var document = CreateDocumentModel(text);
         return CreateWindow(document);
     }
 
@@ -66,6 +67,26 @@ public sealed class EditorSession
         ArgumentNullException.ThrowIfNull(document);
         var window = new EditorWindow(document, options);
         _windows.Add(window);
+        CurrentWindow = window;
+        return window;
+    }
+
+    /// <summary>
+    /// Creates a new blank document/view immediately below an existing displayed
+    /// window. The compatibility layer uses this to reproduce EditWindowCreate's
+    /// linked-list insertion order without exposing list mutation to hosts.
+    /// </summary>
+    internal EditorWindow CreateDocumentAfter(EditorWindow anchor)
+    {
+        ArgumentNullException.ThrowIfNull(anchor);
+        var anchorIndex = _windows.FindIndex(window => window.WindowId == anchor.WindowId);
+        if (anchorIndex < 0)
+        {
+            throw new ArgumentException("The anchor window is not part of this session.", nameof(anchor));
+        }
+
+        var window = new EditorWindow(CreateDocumentModel(string.Empty));
+        _windows.Insert(anchorIndex + 1, window);
         CurrentWindow = window;
         return window;
     }
@@ -87,6 +108,9 @@ public sealed class EditorSession
         {
             return false;
         }
+
+        var target = _windows[index];
+        WindowLayout.OnWindowRemoving(target, index);
 
         var wasCurrent = CurrentWindow?.WindowId == windowId;
         _windows.RemoveAt(index);
@@ -222,6 +246,12 @@ public sealed class EditorSession
             var snapshot = document.Buffer.GetLine(line);
             document.Buffer.SetFlags(line, snapshot.Flags | EditorLineFlags.InBlock);
         }
+    }
+
+    private static EditorDocument CreateDocumentModel(string? text)
+    {
+        var lines = SplitLogicalLines(text ?? string.Empty).Select(static line => new EditorLineSnapshot(line));
+        return new EditorDocument(new LinkedLineTextBuffer(lines));
     }
 
     private static IEnumerable<string> SplitLogicalLines(string text)

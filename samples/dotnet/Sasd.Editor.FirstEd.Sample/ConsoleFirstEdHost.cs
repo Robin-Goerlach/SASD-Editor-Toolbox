@@ -7,8 +7,8 @@ namespace Sasd.Editor.FirstEd.Sample;
 
 /// <summary>
 /// Interactive terminal adapter that wires normalized console input, the
-/// FIRST-ED key map, host prompts, semantic commands and viewport rendering
-/// into the reusable editor system loop.
+/// FIRST-ED key map, host prompts, semantic commands and stacked-window viewport
+/// rendering into the reusable editor system loop.
 /// </summary>
 internal sealed class ConsoleFirstEdHost : IEditorInputPump
 {
@@ -38,8 +38,6 @@ internal sealed class ConsoleFirstEdHost : IEditorInputPump
     {
         if (!Console.KeyAvailable)
         {
-            // Avoid a hot polling loop while still returning quickly enough for
-            // the cooperative background scheduler to make progress.
             await Task.Delay(15, cancellationToken).ConfigureAwait(false);
             return false;
         }
@@ -90,17 +88,7 @@ internal sealed class ConsoleFirstEdHost : IEditorInputPump
                 }
 
                 var executed = await _dispatcher.ExecuteAsync(request, cancellationToken).ConfigureAwait(false);
-                if (!executed)
-                {
-                    return "Command was not executed.";
-                }
-
-                if (request.Id == EditorCommandId.CreateWindow)
-                {
-                    return "Window created. Physical stacked-window sizing is the next compatibility milestone.";
-                }
-
-                return null;
+                return executed ? null : "Command was not executed.";
             }
 
             default:

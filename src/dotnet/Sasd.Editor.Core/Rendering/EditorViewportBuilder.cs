@@ -1,19 +1,27 @@
 using Sasd.Editor.Editing;
+using Sasd.Editor.Windows;
 
 namespace Sasd.Editor.Rendering;
 
 /// <summary>
-/// Builds a platform-neutral projection of the visible editor region. Hosts
-/// decide how to render colors, cursor shapes and status chrome.
+/// Builds platform-neutral projections of visible editor regions. Hosts decide
+/// how to render colors, cursor shapes, status chrome and physical placement.
 /// </summary>
 public sealed class EditorViewportBuilder(EditorSession session)
 {
-    public EditorViewport Build(int height, int width)
+    public EditorViewport Build(int height, int width) => Build(session.CurrentWindow, height, width);
+
+    /// <summary>
+    /// Builds a viewport for a specific displayed window. This overload allows a
+    /// stacked-window host to render all windows while preserving one shared core
+    /// rendering model.
+    /// </summary>
+    public EditorViewport Build(EditorWindow window, int height, int width)
     {
+        ArgumentNullException.ThrowIfNull(window);
         if (height <= 0) throw new ArgumentOutOfRangeException(nameof(height));
         if (width <= 0) throw new ArgumentOutOfRangeException(nameof(width));
 
-        var window = session.CurrentWindow;
         var document = window.Document;
         var firstLine = Math.Clamp(window.TopLine, 0, document.Buffer.LineCount - 1);
         var lastExclusive = Math.Min(document.Buffer.LineCount, firstLine + height);

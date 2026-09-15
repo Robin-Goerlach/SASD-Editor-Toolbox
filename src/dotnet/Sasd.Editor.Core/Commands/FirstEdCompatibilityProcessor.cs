@@ -76,11 +76,6 @@ internal static class FirstEdCompatibilityProcessor
         return true;
     }
 
-    /// <summary>
-    /// Slides the viewport up by one logical line. If the cursor occupied the
-    /// last displayed row, it also moves up by one line as described by the
-    /// historical EditScrollUp command.
-    /// </summary>
     public static bool ScrollUp(EditorSession session, int visibleLines)
     {
         ValidateVisibleLines(visibleLines);
@@ -101,11 +96,6 @@ internal static class FirstEdCompatibilityProcessor
         return true;
     }
 
-    /// <summary>
-    /// Slides the viewport down by one logical line. If the cursor occupied the
-    /// top displayed row, it also moves down by one line as described by the
-    /// historical EditScrollDown command.
-    /// </summary>
     public static bool ScrollDown(EditorSession session, int visibleLines)
     {
         ValidateVisibleLines(visibleLines);
@@ -125,12 +115,6 @@ internal static class FirstEdCompatibilityProcessor
         return true;
     }
 
-    /// <summary>
-    /// Slides the viewport upward by one page, where a page is one less than the
-    /// number of displayed text rows. The handbook specifies the viewport
-    /// displacement but not a separate cursor-row rule; SASD therefore preserves
-    /// the cursor's relative visible row as a host-neutral invariant.
-    /// </summary>
     public static bool PageUp(EditorSession session, int visibleLines)
     {
         ValidateVisibleLines(visibleLines);
@@ -148,11 +132,6 @@ internal static class FirstEdCompatibilityProcessor
         return true;
     }
 
-    /// <summary>
-    /// Slides the viewport downward by one page, where a page is one less than
-    /// the number of displayed text rows. The cursor keeps its relative visible
-    /// row unless the end of the document forces clamping.
-    /// </summary>
     public static bool PageDown(EditorSession session, int visibleLines)
     {
         ValidateVisibleLines(visibleLines);
@@ -170,10 +149,6 @@ internal static class FirstEdCompatibilityProcessor
         return true;
     }
 
-    /// <summary>
-    /// Historical EditWindowTopFile semantics: first text line, first column,
-    /// with the first text line at the top of the viewport.
-    /// </summary>
     public static void MoveWindowTopFile(EditorSession session)
     {
         var window = RequireWindow(session);
@@ -181,10 +156,6 @@ internal static class FirstEdCompatibilityProcessor
         window.Cursor = new TextPosition(0, 0);
     }
 
-    /// <summary>
-    /// Historical EditWindowBottomFile semantics: last text line, first column,
-    /// and the last line itself becomes the viewport's top line.
-    /// </summary>
     public static void MoveWindowBottomFile(EditorSession session)
     {
         var window = RequireWindow(session);
@@ -262,6 +233,37 @@ internal static class FirstEdCompatibilityProcessor
         return true;
     }
 
+    /// <summary>
+    /// Modern clean-room transfer of EditWindowCreate(Size, Win). The new view
+    /// receives the lower requested rows of the selected donor window and is
+    /// inserted directly after it in display order.
+    /// </summary>
+    public static bool CreateWindow(EditorSession session, int size, int donorWindowNumber)
+    {
+        var donor = ResolveWindow(session, donorWindowNumber);
+        if (donor is null || !session.WindowLayout.CanSplit(donor, size))
+        {
+            return false;
+        }
+
+        var donorFrame = session.WindowLayout.GetFrame(donor.WindowId)!;
+        var newDonorTextRows = donorFrame.Height - size - EditorWindowFrame.StatusRowCount;
+
+        // The Pascal implementation moves Curline backwards when the compressed
+        // visible span would otherwise leave the cursor below the new boundary.
+        if (newDonorTextRows > 0 && donor.Cursor.Line - donor.TopLine >= newDonorTextRows)
+        {
+            var lastVisibleDocumentLine = Math.Min(
+                donor.Document.Buffer.LineCount - 1,
+                donor.TopLine + newDonorTextRows - 1);
+            donor.Cursor = donor.Cursor with { Line = lastVisibleDocumentLine };
+        }
+
+        var newWindow = session.CreateDocumentAfter(donor);
+        session.WindowLayout.Split(donor, newWindow, size);
+        return true;
+    }
+
     public static bool LinkWindows(EditorSession session, int destinationNumber, int sourceNumber)
     {
         var destination = ResolveWindow(session, destinationNumber);
@@ -289,7 +291,19 @@ internal static class FirstEdCompatibilityProcessor
         }
 
         var window = ResolveWindow(session, oneBasedWindowNumber);
-        return window is not null && session.CloseWindow(window.WindowId);
+        if (window is null)
+        {
+            return false;
+        }
+
+        // The historical command drops the active block when the deleted window
+        // contains it, even when another linked window keeps the text stream.
+        if (session.Block?.DocumentId == window.Document.DocumentId)
+        {
+            session.ClearBlock();
+        }
+
+        return session.CloseWindow(window.WindowId);
     }
 
     public static bool SetLeftMargin(EditorSession session, int oneBasedColumn)

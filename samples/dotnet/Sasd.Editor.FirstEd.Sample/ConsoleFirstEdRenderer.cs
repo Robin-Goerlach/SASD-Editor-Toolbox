@@ -1,54 +1,76 @@
 using Sasd.Editor.Editing;
 using Sasd.Editor.Rendering;
+using Sasd.Editor.Windows;
 
 namespace Sasd.Editor.FirstEd.Sample;
 
 /// <summary>
-/// Simple terminal renderer for the FIRST-ED reference sample. It intentionally
-/// lives outside Sasd.Editor.Core so console concerns never leak into the
-/// reusable editor library.
+/// Terminal renderer for the FIRST-ED reference sample. It renders every
+/// displayed window from host-neutral <see cref="EditorWindowFrame"/> geometry;
+/// console APIs remain outside the reusable editor core.
 /// </summary>
 internal sealed class ConsoleFirstEdRenderer(EditorSession session)
 {
     private readonly EditorViewportBuilder _viewportBuilder = new(session);
 
-    public int VisibleTextRows => Math.Max(1, Console.WindowHeight - 2);
+    public int VisibleTextRows
+    {
+        get
+        {
+            EnsureLayout();
+            return session.WindowLayout.GetFrame(session.CurrentWindow.WindowId)?.TextRows
+                   ?? Math.Max(1, Console.WindowHeight - 2);
+        }
+    }
 
     public void Render(string? message = null)
     {
         var width = Math.Max(1, Console.WindowWidth - 1);
         var height = Math.Max(3, Console.WindowHeight);
-        var visibleRows = Math.Max(1, height - 2);
-
-        EnsureCursorVisible(visibleRows, width);
-        var viewport = _viewportBuilder.Build(visibleRows, width);
-        var windowNumber = GetCurrentWindowNumber();
 
         Console.CursorVisible = false;
         Console.Clear();
 
-        var mode = viewport.Status.InsertMode ? "INS" : "OVR";
-        var dirty = viewport.Status.IsDirty ? " *" : string.Empty;
-        WriteRow(
-            0,
-            $"W{windowNumber} {viewport.Status.FileName}  Ln {viewport.Status.Line}  Col {viewport.Status.Column}  {mode}" +
-            $"  WW:{OnOff(viewport.Status.WordWrap)} AI:{OnOff(viewport.Status.AutoIndent)}{dirty}",
-            width);
-
-        for (var row = 0; row < visibleRows; row++)
+        if (!EnsureLayout())
         {
-            var text = row < viewport.Lines.Count ? viewport.Lines[row].Text : string.Empty;
-            WriteRow(row + 1, text, width);
+            WriteRow(0, "Terminal is too small for the current FIRST-ED window layout.", width);
+            WriteRow(height - 1, "Resize the terminal to at least three rows per editor window.", width);
+            Console.CursorVisible = true;
+            return;
+        }
+
+        foreach (var frame in session.WindowLayout.Frames)
+        {
+            var window = session.Windows.First(candidate => candidate.WindowId == frame.WindowId);
+            EnsureCursorVisible(window, frame.TextRows, width);
+            var viewport = _viewportBuilder.Build(window, frame.TextRows, width);
+            var windowNumber = GetWindowNumber(window.WindowId);
+            var current = window.WindowId == session.CurrentWindow.WindowId;
+
+            var mode = viewport.Status.InsertMode ? "INS" : "OVR";
+            var dirty = viewport.Status.IsDirty ? " *" : string.Empty;
+            var active = current ? ">" : " ";
+            WriteRow(
+                frame.TopRow,
+                $"{active}W{windowNumber} {viewport.Status.FileName}  Ln {viewport.Status.Line}  Col {viewport.Status.Column}  {mode}" +
+                $"  WW:{OnOff(viewport.Status.WordWrap)} AI:{OnOff(viewport.Status.AutoIndent)}{dirty}",
+                width);
+
+            for (var row = 0; row < frame.TextRows; row++)
+            {
+                var text = row < viewport.Lines.Count ? viewport.Lines[row].Text : string.Empty;
+                WriteRow(frame.TopRow + EditorWindowFrame.StatusRowCount + row, text, width);
+            }
         }
 
         WriteRow(
             height - 1,
             string.IsNullOrWhiteSpace(message)
-                ? "Ctrl-K X Exit | Esc Undo | Ctrl-Q F Find | Ctrl-K S Save | arrows also work"
+                ? "Ctrl-O O New window | Ctrl-O Y Delete | Ctrl-K X Exit | Esc Undo | Ctrl-Q F Find"
                 : message,
             width);
 
-        PositionCursor(width, visibleRows);
+        PositionCursor(width);
         Console.CursorVisible = true;
     }
 
@@ -87,9 +109,19 @@ internal sealed class ConsoleFirstEdRenderer(EditorSession session)
         }
     }
 
-    private void EnsureCursorVisible(int visibleRows, int width)
+    private bool EnsureLayout()
     {
-        var window = session.CurrentWindow;
+        var workspaceRows = Math.Max(0, Console.WindowHeight - 1);
+        return session.WindowLayout.ResizeWorkspace(workspaceRows);
+    }
+
+    private static void EnsureCursorVisible(EditorWindow window, int visibleRows, int width)
+    {
+        if (visibleRows < 1)
+        {
+            return;
+        }
+
         if (window.Cursor.Line < window.TopLine)
         {
             window.TopLine = window.Cursor.Line;
@@ -109,19 +141,26 @@ internal sealed class ConsoleFirstEdRenderer(EditorSession session)
         }
     }
 
-    private void PositionCursor(int width, int visibleRows)
+    private void PositionCursor(int width)
     {
         var window = session.CurrentWindow;
-        var row = 1 + Math.Clamp(window.Cursor.Line - window.TopLine, 0, visibleRows - 1);
+        var frame = session.WindowLayout.GetFrame(window.WindowId);
+        if (frame is null || frame.TextRows < 1)
+        {
+            return;
+        }
+
+        var visibleRow = Math.Clamp(window.Cursor.Line - window.TopLine, 0, frame.TextRows - 1);
+        var row = frame.TopRow + EditorWindowFrame.StatusRowCount + visibleRow;
         var column = Math.Clamp(window.Cursor.Column - window.LeftColumn, 0, width - 1);
-        Console.SetCursorPosition(column, row);
+        Console.SetCursorPosition(column, Math.Min(row, Console.WindowHeight - 2));
     }
 
-    private int GetCurrentWindowNumber()
+    private int GetWindowNumber(Guid windowId)
     {
         for (var index = 0; index < session.Windows.Count; index++)
         {
-            if (session.Windows[index].WindowId == session.CurrentWindow.WindowId)
+            if (session.Windows[index].WindowId == windowId)
             {
                 return index + 1;
             }

@@ -64,7 +64,11 @@ public sealed class EditorCommandDispatcher(EditorSession session)
                 case EditorCommandId.MoveBlock: session.Engine.MoveBlockToCursor(); break;
                 case EditorCommandId.DeleteBlock: session.Engine.DeleteBlock(); break;
                 case EditorCommandId.HideBlock: session.ToggleBlockHidden(); break;
-                case EditorCommandId.CreateWindow: session.CreateDocument(); break;
+                case EditorCommandId.CreateWindow:
+                    return FirstEdCompatibilityProcessor.CreateWindow(
+                        session,
+                        RequireNumber(command),
+                        RequireSecondNumber(command));
                 case EditorCommandId.LinkWindow:
                     return FirstEdCompatibilityProcessor.LinkWindows(
                         session,
@@ -76,7 +80,7 @@ public sealed class EditorCommandDispatcher(EditorSession session)
                 case EditorCommandId.DeleteWindow:
                     return command.Number.HasValue
                         ? FirstEdCompatibilityProcessor.DeleteWindow(session, command.Number.Value)
-                        : session.Windows.Count > 1 && session.CloseWindow(session.CurrentWindow.WindowId);
+                        : FirstEdCompatibilityProcessor.DeleteWindow(session, CurrentWindowNumber(session));
                 case EditorCommandId.SetLeftMargin: return FirstEdCompatibilityProcessor.SetLeftMargin(session, RequireNumber(command));
                 case EditorCommandId.SetRightMargin: return FirstEdCompatibilityProcessor.SetRightMargin(session, RequireNumber(command));
                 case EditorCommandId.SetTabWidth: return FirstEdCompatibilityProcessor.SetTabWidth(session, RequireNumber(command));
@@ -106,9 +110,6 @@ public sealed class EditorCommandDispatcher(EditorSession session)
                 case EditorCommandId.SaveFile:
                     return await session.Files.SaveCurrentWindowAsync(command.Text, cancellationToken).ConfigureAwait(false);
                 case EditorCommandId.Exit:
-                    // Direct EditExit semantics: request rundown only. FIRST-ED's
-                    // Ctrl-K X binding already declares that the host must obtain
-                    // confirmation before it dispatches this semantic command.
                     session.RequestRundown();
                     return true;
                 default: return false;
@@ -140,4 +141,17 @@ public sealed class EditorCommandDispatcher(EditorSession session)
 
     private static int RequireSecondNumber(EditorCommandRequest command) =>
         command.Number2 ?? throw new ArgumentException($"Command {command.Id} requires a second numeric value.");
+
+    private static int CurrentWindowNumber(EditorSession session)
+    {
+        for (var index = 0; index < session.Windows.Count; index++)
+        {
+            if (session.Windows[index].WindowId == session.CurrentWindow.WindowId)
+            {
+                return index + 1;
+            }
+        }
+
+        throw new InvalidOperationException("The current window is not part of the editor session.");
+    }
 }
