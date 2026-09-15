@@ -29,9 +29,14 @@ public sealed class EditorCommandDispatcher(EditorSession session)
                 case EditorCommandId.WordLeft: session.Engine.MoveLeftWord(); break;
                 case EditorCommandId.WordRight: session.Engine.MoveRightWord(); break;
                 case EditorCommandId.BeginningOfLine: session.Engine.MoveBeginningOfLine(); break;
-                case EditorCommandId.EndOfLine: session.Engine.MoveEndOfLine(); break;
+                case EditorCommandId.EndOfLine: FirstEdCompatibilityProcessor.MoveEndOfLine(session); break;
+                case EditorCommandId.BeginningOrEndOfLine: FirstEdCompatibilityProcessor.MoveBeginningOrEndOfLine(session); break;
                 case EditorCommandId.TopOfFile: session.Engine.MoveTopOfFile(); break;
                 case EditorCommandId.BottomOfFile: session.Engine.MoveBottomOfFile(); break;
+                case EditorCommandId.TopOfBlock: return FirstEdCompatibilityProcessor.GoToBlockBoundary(session, end: false);
+                case EditorCommandId.BottomOfBlock: return FirstEdCompatibilityProcessor.GoToBlockBoundary(session, end: true);
+                case EditorCommandId.GoToLine: return FirstEdCompatibilityProcessor.GoToLine(session, RequireNumber(command));
+                case EditorCommandId.GoToColumn: return FirstEdCompatibilityProcessor.GoToColumn(session, RequireNumber(command));
                 case EditorCommandId.InsertText: session.Engine.InsertText(command.Text ?? string.Empty); break;
                 case EditorCommandId.InsertLine: session.Engine.InsertNewLine(); break;
                 case EditorCommandId.InsertControlCharacter: session.Engine.InsertControlCharacter(RequireText(command)[0]); break;
@@ -55,9 +60,22 @@ public sealed class EditorCommandDispatcher(EditorSession session)
                 case EditorCommandId.DeleteBlock: session.Engine.DeleteBlock(); break;
                 case EditorCommandId.HideBlock: session.ToggleBlockHidden(); break;
                 case EditorCommandId.CreateWindow: session.CreateDocument(); break;
-                case EditorCommandId.LinkWindow: session.LinkWindow(session.CurrentWindow); break;
+                case EditorCommandId.LinkWindow:
+                    return FirstEdCompatibilityProcessor.LinkWindows(
+                        session,
+                        RequireNumber(command),
+                        RequireSecondNumber(command));
+                case EditorCommandId.PreviousWindow: return FirstEdCompatibilityProcessor.PreviousWindow(session);
                 case EditorCommandId.NextWindow: return session.NextWindow() is not null;
-                case EditorCommandId.DeleteWindow: return session.CloseWindow(session.CurrentWindow.WindowId);
+                case EditorCommandId.GoToWindow: return FirstEdCompatibilityProcessor.GoToWindow(session, RequireNumber(command));
+                case EditorCommandId.DeleteWindow:
+                    return command.Number.HasValue
+                        ? FirstEdCompatibilityProcessor.DeleteWindow(session, command.Number.Value)
+                        : session.Windows.Count > 1 && session.CloseWindow(session.CurrentWindow.WindowId);
+                case EditorCommandId.SetLeftMargin: return FirstEdCompatibilityProcessor.SetLeftMargin(session, RequireNumber(command));
+                case EditorCommandId.SetRightMargin: return FirstEdCompatibilityProcessor.SetRightMargin(session, RequireNumber(command));
+                case EditorCommandId.SetTabWidth: return FirstEdCompatibilityProcessor.SetTabWidth(session, RequireNumber(command));
+                case EditorCommandId.SetUndoLimit: return FirstEdCompatibilityProcessor.SetUndoLimit(session, RequireNumber(command));
                 case EditorCommandId.SetMarker: session.SetMarker(RequireNumber(command)); break;
                 case EditorCommandId.JumpMarker: return session.JumpToMarker(RequireNumber(command));
                 case EditorCommandId.FindNext: return session.Search.FindNext(RequireText(command), new SearchOptions()) is not null;
@@ -93,4 +111,7 @@ public sealed class EditorCommandDispatcher(EditorSession session)
 
     private static int RequireNumber(EditorCommandRequest command) =>
         command.Number ?? throw new ArgumentException($"Command {command.Id} requires a numeric value.");
+
+    private static int RequireSecondNumber(EditorCommandRequest command) =>
+        command.Number2 ?? throw new ArgumentException($"Command {command.Id} requires a second numeric value.");
 }

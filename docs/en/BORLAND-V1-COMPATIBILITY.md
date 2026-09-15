@@ -15,21 +15,24 @@ The goal is behavioral coverage, not source-level or public-name identity.
 | Word-wrap | `EditorWindowOptions.WordWrap`, engine wrap logic | Implemented |
 | Auto-indent | `EditorWindowOptions.AutoIndent` | Implemented |
 | Left/right margins and tab width | `EditorWindowOptions` | Implemented |
-| Cursor movement | `EditorEngine` navigation methods | Implemented |
+| Cursor movement | `EditorEngine` plus compatibility navigation processors | Implemented |
+| Historical begin/end/goto navigation details | `FirstEdCompatibilityProcessor` | Implemented |
 | Character/word/line deletion | `EditorEngine` delete methods | Implemented |
 | Change case / center line / paragraph reformat | `EditorEngine` | Implemented |
 | Whole-line block begin/end | `EditorBlock`, `EditorSession` | Implemented |
 | Block copy/move/delete/hide | `EditorEngine` / `EditorSession` | Implemented |
+| Top/bottom of active block commands | compatibility processor | Implemented |
 | Markers | `EditorMarker`, markers 1..20 | Implemented |
-| Undo limit and undo operation | `EditorUndoManager` | Foundation |
+| Undo limit and undo operation | `EditorUndoManager` + command binding | Implemented (snapshot backend) |
 | Find / replace | `EditorSearchService` | Foundation |
 | Read/write files | `ITextStorage`, `FileTextStorage` | Foundation |
 | Dirty/change flag | `EditorDocument.IsDirty` | Implemented |
-| General command dispatcher | `EditorCommandDispatcher` | Foundation |
+| General command dispatcher | `EditorCommandDispatcher` | Foundation / expanding |
 | Normalized host-independent keystrokes | `EditorKeyStroke` | Implemented |
 | Prefixed Ctrl-K / Ctrl-O / Ctrl-Q dispatchers | `FirstEdKeyMap` prefix state machine | Implemented (mapping) |
 | FIRST-ED / WordStar-compatible command map | `FirstEdKeyMap`, `EditorCommandBinding` | Implemented (mapping) |
 | Prompt metadata for parameterized commands | `EditorCommandArgumentKind` | Implemented |
+| Window up/down/goto and stream linking | compatibility processor + `EditorWindow.AttachDocument` | Implemented |
 | `UserCommand` concept | `IEditorHooks.FilterCommand` | Implemented |
 | `UserError` concept | `IEditorHooks.OnErrorAsync` | Implemented |
 | `UserStatusLine` concept | `IEditorHooks.TransformStatus` | Implemented |
@@ -47,4 +50,4 @@ The goal is behavioral coverage, not source-level or public-name identity.
 
 ## V1 release gate
 
-The compatibility input map is now present and independently testable. V1 should not be called complete until the remaining command processors behind prompt-driven bindings, an interactive FIRST-ED-style host, remaining file/block/search semantics, compatibility tests and documentation are present. MicroStar-specific demonstration features may be shipped as samples rather than core dependencies.
+The input map and a substantial set of its historical command processors are now independently testable. V1 should not be called complete until the remaining search/file/lifecycle processors, interactive FIRST-ED-style host, exact display-dependent scrolling semantics, compatibility tests and documentation are present. MicroStar-specific demonstration features may be shipped as samples rather than core dependencies.

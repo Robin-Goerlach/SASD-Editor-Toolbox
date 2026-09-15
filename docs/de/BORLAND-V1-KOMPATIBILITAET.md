@@ -15,21 +15,24 @@ Ziel ist funktionale Abdeckung, nicht eine identische Quellcode- oder API-Strukt
 | Word-Wrap | `EditorWindowOptions.WordWrap` | Implementiert |
 | Auto-Indent | `EditorWindowOptions.AutoIndent` | Implementiert |
 | Ränder / Tabulatorbreite | `EditorWindowOptions` | Implementiert |
-| Cursorbewegung | `EditorEngine` | Implementiert |
+| Cursorbewegung | `EditorEngine` plus Kompatibilitäts-Navigation | Implementiert |
+| Historische Begin/End/Goto-Details | `FirstEdCompatibilityProcessor` | Implementiert |
 | Zeichen-/Wort-/Zeilenlöschen | `EditorEngine` | Implementiert |
 | Groß-/Kleinschreibung, Zentrieren, Absatzformatierung | `EditorEngine` | Implementiert |
 | Ganze-Zeilen-Blöcke | `EditorBlock`, `EditorSession` | Implementiert |
 | Block kopieren/verschieben/löschen/verbergen | Engine/Session | Implementiert |
+| Blockanfang/-ende anspringen | Compatibility Processor | Implementiert |
 | Marker | Marker 1..20 | Implementiert |
-| Undo | `EditorUndoManager` | Grundlage |
+| Undo inkl. Limit | `EditorUndoManager` + Command Binding | Implementiert (Snapshot-Backend) |
 | Suchen/Ersetzen | `EditorSearchService` | Grundlage |
 | Datei lesen/schreiben | `ITextStorage`, `FileTextStorage` | Grundlage |
 | Dirty-/Change-Flag | `EditorDocument.IsDirty` | Implementiert |
-| Allgemeiner Command Dispatcher | `EditorCommandDispatcher` | Grundlage |
+| Allgemeiner Command Dispatcher | `EditorCommandDispatcher` | Grundlage / wird erweitert |
 | UI-unabhängige normalisierte Tasten | `EditorKeyStroke` | Implementiert |
 | Ctrl-K/Ctrl-O/Ctrl-Q Prefix-Dispatcher | Prefix-Zustandsautomat in `FirstEdKeyMap` | Implementiert (Zuordnung) |
 | FIRST-ED-/WordStar-kompatible Tasten | `FirstEdKeyMap`, `EditorCommandBinding` | Implementiert (Zuordnung) |
 | Abfrage-Metadaten für parametrisierte Befehle | `EditorCommandArgumentKind` | Implementiert |
+| Fenster hoch/runter/goto und Stream-Linking | Compatibility Processor + `EditorWindow.AttachDocument` | Implementiert |
 | UserCommand-Idee | `IEditorHooks.FilterCommand` | Implementiert |
 | UserError-Idee | `IEditorHooks.OnErrorAsync` | Implementiert |
 | UserStatusLine-Idee | `IEditorHooks.TransformStatus` | Implementiert |
@@ -43,4 +46,4 @@ Ziel ist funktionale Abdeckung, nicht eine identische Quellcode- oder API-Strukt
 | DOS-/Videospeicher-Routinen | bewusst durch Host-Rendering ersetzt | Ersetzt |
 | Overlays | auf modernen Plattformen nicht erforderlich | Entfällt |
 
-Die Compatibility-Keymap ist jetzt vorhanden und unabhängig testbar. V1 ist erst fertig, wenn die noch fehlenden Command-Prozessoren hinter den abfragepflichtigen Bindings, ein interaktiver FIRST-ED-artiger Host, die verbleibenden Such-/Datei-/Blockdetails, weitere Kompatibilitätstests und Dokumentation abgeschlossen sind.
+Eingabemapping und ein großer Teil der historischen Command-Prozessoren sind jetzt getrennt testbar. V1 ist erst fertig, wenn insbesondere die verbleibenden Search-/File-/Lifecycle-Prozessoren, ein interaktiver FIRST-ED-artiger Host, exakte bildschirmabhängige Scroll-Semantik, weitere Kompatibilitätstests und Dokumentation abgeschlossen sind.

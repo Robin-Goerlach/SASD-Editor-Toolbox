@@ -17,7 +17,12 @@ public sealed class EditorWindow
 
     public Guid WindowId { get; } = Guid.NewGuid();
 
-    public EditorDocument Document { get; }
+    /// <summary>
+    /// Document currently displayed by this view. The setter is private because
+    /// changing the text stream is a session/compatibility operation, not an
+    /// arbitrary UI mutation.
+    /// </summary>
+    public EditorDocument Document { get; private set; }
 
     public EditorWindowOptions Options { get; }
 
@@ -26,6 +31,15 @@ public sealed class EditorWindow
     public int TopLine { get; set; }
 
     public int LeftColumn { get; set; }
+
+    /// <summary>
+    /// Reattaches this existing view to another document. This is the modern
+    /// equivalent of changing the historical window descriptor's stream.
+    /// </summary>
+    internal void AttachDocument(EditorDocument document)
+    {
+        Document = document ?? throw new ArgumentNullException(nameof(document));
+    }
 
     public void ClampCursor()
     {

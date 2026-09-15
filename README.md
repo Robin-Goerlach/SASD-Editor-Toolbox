@@ -38,24 +38,26 @@ The current foundation contains:
 - a line-oriented text-buffer abstraction with a linked-line implementation;
 - document and multi-window/session models, including linked windows over one document;
 - cursor movement, insertion/overtype, newline, auto-indent, word-wrap and tab handling;
+- historical FIRST-ED begin/end/goto navigation semantics isolated behind a compatibility processor;
 - deletion commands, change-case, centering and paragraph reformatting;
-- whole-line block begin/end/copy/move/delete/hide operations;
+- whole-line block begin/end/copy/move/delete/hide operations plus block-boundary navigation;
 - numbered markers;
-- snapshot-based undo with a replaceable undo boundary;
+- snapshot-based undo with a configurable limit and replaceable backend boundary;
 - literal find/replace services with case, whole-word and wrap options;
 - asynchronous file load/save through a storage abstraction;
 - semantic command requests and a dispatcher separated from editing primitives;
 - a UI-neutral key-stroke model plus the complete FIRST-ED Ctrl-K/Ctrl-O/Ctrl-Q and primary-key **mapping contract**;
 - typed prompt metadata so keyboard mapping remains independent of UI prompting;
+- window up/down/goto semantics and historical stream linking by reattaching an existing view to a shared document;
 - extension hooks inspired by the historical `UserCommand`, `UserError`, `UserStatusLine`, `UserReplace` and `UserTask` integration points;
 - a cooperative idle scheduler for background work;
 - a UI-neutral viewport/status model rather than direct screen-memory access;
 - English and German architecture/compatibility documentation;
 - automated unit tests and a small FIRST-ED-style sample.
 
-The command map is intentionally one layer ahead of some command processors: file/window/search prompts are represented semantically now and are transferred behind those bindings step by step.
+The command map is intentionally one layer ahead of some command processors: file/search/lifecycle prompts are represented semantically now and are transferred behind those bindings step by step.
 
-See [`docs/en/BORLAND-V1-COMPATIBILITY.md`](docs/en/BORLAND-V1-COMPATIBILITY.md) for the V1 matrix and [`docs/en/FIRST-ED-COMMAND-MAP.md`](docs/en/FIRST-ED-COMMAND-MAP.md) for the compatibility key map. A German command-map document is available at [`docs/de/FIRST-ED-BEFEHLE.md`](docs/de/FIRST-ED-BEFEHLE.md).
+See [`docs/en/BORLAND-V1-COMPATIBILITY.md`](docs/en/BORLAND-V1-COMPATIBILITY.md) for the V1 matrix, [`docs/en/FIRST-ED-COMMAND-MAP.md`](docs/en/FIRST-ED-COMMAND-MAP.md) for the compatibility key map and [`docs/en/COMMAND-PROCESSOR-TRANSFER.md`](docs/en/COMMAND-PROCESSOR-TRANSFER.md) for the current Pascal-to-C# processor transfer. German counterparts are under [`docs/de/`](docs/de/).
 
 ## Build
 
@@ -72,6 +74,7 @@ Target framework: **.NET 10**.
 - Core editing logic has no WinForms, WPF, console, terminal or browser dependency.
 - A document and its views/windows are separate concepts; multiple windows may share one document.
 - Mutation APIs own dirty-state and undo integration.
+- Historical input/value conventions live in the compatibility layer instead of leaking into the general text engine.
 - Historical names are documented as compatibility references, not copied as a 1:1 public API.
 - Platform-specific rendering stays outside the core; keyboard events are normalized before entering the compatibility key map.
 - Key maps declare required prompt arguments but never display prompts themselves.
@@ -86,6 +89,8 @@ Target framework: **.NET 10**.
 - Deutsche V1-Matrix: [`docs/de/BORLAND-V1-KOMPATIBILITAET.md`](docs/de/BORLAND-V1-KOMPATIBILITAET.md)
 - FIRST-ED command map: [`docs/en/FIRST-ED-COMMAND-MAP.md`](docs/en/FIRST-ED-COMMAND-MAP.md)
 - FIRST-ED-Befehle: [`docs/de/FIRST-ED-BEFEHLE.md`](docs/de/FIRST-ED-BEFEHLE.md)
+- Command-processor transfer: [`docs/en/COMMAND-PROCESSOR-TRANSFER.md`](docs/en/COMMAND-PROCESSOR-TRANSFER.md)
+- Command-Prozessor-Übertragung: [`docs/de/COMMAND-PROCESSOR-UEBERTRAGUNG.md`](docs/de/COMMAND-PROCESSOR-UEBERTRAGUNG.md)
 - Language-neutral V1 contract: [`spec/editor-v1.md`](spec/editor-v1.md)
 
 ## License
