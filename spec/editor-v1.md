@@ -16,9 +16,13 @@ This document defines behavior that every language implementation should preserv
 - Multiple windows may reference the same document; edits are immediately visible in every linked view.
 - Views may independently use insert/overtype, word-wrap and auto-indent modes.
 
-## 3. Editing primitives
+## 3. Editing and viewport primitives
 
 V1 includes character/word/line movement, page movement, beginning/end/top/bottom navigation, text insertion, newline, tab, control-character insertion, left/right deletion, word deletion, line deletion, delete-to-end-of-line, case change, centering and paragraph reformatting.
+
+Display-dependent commands receive the number of visible text rows from the host. Line-up/down and scroll-up/down keep the cursor visible according to the historical edge rules. Page-up/down move the viewport by `visibleRows - 1`. Because the handbook does not separately specify the cursor's post-page screen row, implementations must document their cursor policy; the .NET implementation preserves the relative visible row when possible.
+
+Top-of-file selects the first line and first column. Bottom-of-file selects the last line and first column and places that last line at the top of the viewport.
 
 ## 4. Blocks and markers
 
@@ -54,15 +58,25 @@ V1 includes character/word/line movement, page movement, beginning/end/top/botto
 - The engine itself must remain callable directly by application code.
 - Hosts may add modern aliases (for example arrow keys) without removing the historical command sequences.
 
-## 8. Host hooks
+## 8. Lifecycle and cooperative scheduling
+
+- The session exposes a rundown state equivalent to the historical `Rundown` variable.
+- Direct Exit requests rundown and does not save files.
+- Confirmation before interactive exit is a host/prompt responsibility declared by the input binding.
+- A scheduler cycle first offers the host one opportunity to process pending input. If input is processed, background work is skipped for that cycle.
+- If no input is available, one cooperative background slice runs.
+- The system loop repeats scheduler cycles until rundown is requested or external cancellation occurs.
+- Background tasks must keep their own resumable state and return after a bounded unit of work.
+
+## 9. Host hooks
 
 Equivalent extension points must exist for command filtering, error handling, status transformation, replace confirmation and cooperative idle/background work.
 
-## 9. Rendering
+## 10. Rendering
 
 The core does not write directly to console/video memory. It exposes a viewport/status projection from which WPF, WinForms, terminal, web and other hosts can render.
 
-## 10. Persistence and compatibility file I/O
+## 11. Persistence and compatibility file I/O
 
 - Modern document persistence is abstracted. The first .NET `ITextStorage` provider supports UTF-8 files and preserves the detected newline convention for subsequent saves.
 - Compatibility file commands use a separate file-codec boundary so historical formats do not become mandatory modern storage formats.
@@ -70,6 +84,6 @@ The core does not write directly to console/video memory. It exposes a viewport/
 - The FIRST-ED-compatible read operation inserts decoded lines after the current line and preserves the current cursor position.
 - Hosts collect filenames; core file services receive resolved paths and perform no UI prompting.
 
-## 11. Compatibility policy
+## 12. Compatibility policy
 
 The Borland handbook is a requirements/reference source only. Implementations must be independently written and must not copy historical source code.

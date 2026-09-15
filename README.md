@@ -38,7 +38,8 @@ The current foundation contains:
 - a line-oriented text-buffer abstraction with a linked-line implementation;
 - document and multi-window/session models, including linked windows over one document;
 - cursor movement, insertion/overtype, newline, auto-indent, word-wrap and tab handling;
-- historical FIRST-ED begin/end/goto navigation semantics isolated behind a compatibility processor;
+- historical FIRST-ED begin/end/goto, top/bottom-file and viewport-aware movement semantics isolated behind a compatibility processor;
+- display-row-aware line scrolling and page movement supplied with a host-visible row count;
 - deletion commands, change-case, centering and paragraph reformatting;
 - whole-line block begin/end/copy/move/delete/hide operations plus block-boundary navigation;
 - numbered markers;
@@ -51,13 +52,15 @@ The current foundation contains:
 - a UI-neutral key-stroke model plus the FIRST-ED Ctrl-K/Ctrl-O/Ctrl-Q and primary-key mapping contract;
 - typed prompt metadata so keyboard mapping remains independent of UI prompting;
 - window up/down/goto semantics and historical stream linking by reattaching an existing view to a shared document;
+- an explicit rundown state corresponding to the historical `Rundown` flag;
+- `EditorScheduler` and `EditorSystemLoop` implementing input-first cooperative scheduling and the repeated schedule-until-rundown main-loop model;
+- `IEditorInputPump` as the host boundary for keyboard, terminal, scripted or other input sources;
 - extension hooks inspired by the historical `UserCommand`, `UserError`, `UserStatusLine`, `UserReplace` and `UserTask` integration points;
-- a cooperative idle scheduler for background work;
 - a UI-neutral viewport/status model rather than direct screen-memory access;
 - English and German architecture/compatibility documentation;
 - automated unit tests and a small FIRST-ED-style sample.
 
-The command map is intentionally one layer ahead only where behavior still belongs to later host/lifecycle work, notably exit/rundown and physical window layout. Search and historical file commands now have executable core processors behind their bindings.
+The command map is intentionally one layer ahead only where behavior still belongs to later host/layout work, especially physical window sizing and interactive prompt presentation. Search, file, lifecycle and viewport movement commands now have executable core processors behind their bindings.
 
 ## Build
 
@@ -79,6 +82,7 @@ Target framework: **.NET 10**.
 - Platform-specific rendering stays outside the core; keyboard events are normalized before entering the compatibility key map.
 - Key maps declare required prompt arguments but never display prompts themselves.
 - Historical byte-level file compatibility is isolated behind a codec and does not replace modern UTF-8 storage.
+- Scheduler/background work remains cooperative and bounded; platform input stays behind `IEditorInputPump`.
 - Expensive optimizations (rope/piece-table buffers, SIMD search, native backends) are introduced only behind stable interfaces and after profiling.
 - The first implementation favors correctness, reviewability and tests over premature micro-optimization.
 
@@ -94,6 +98,8 @@ Target framework: **.NET 10**.
 - Command-Prozessor-Übertragung: [`docs/de/COMMAND-PROCESSOR-UEBERTRAGUNG.md`](docs/de/COMMAND-PROCESSOR-UEBERTRAGUNG.md)
 - Search and file commands: [`docs/en/SEARCH-AND-FILE-COMMANDS.md`](docs/en/SEARCH-AND-FILE-COMMANDS.md)
 - Suchen und Datei-Befehle: [`docs/de/SUCHEN-UND-DATEI-BEFEHLE.md`](docs/de/SUCHEN-UND-DATEI-BEFEHLE.md)
+- Lifecycle and scrolling: [`docs/en/LIFECYCLE-AND-SCROLLING.md`](docs/en/LIFECYCLE-AND-SCROLLING.md)
+- Lifecycle und Scrollen: [`docs/de/LIFECYCLE-UND-SCROLLEN.md`](docs/de/LIFECYCLE-UND-SCROLLEN.md)
 - Language-neutral V1 contract: [`spec/editor-v1.md`](spec/editor-v1.md)
 
 ## License

@@ -17,6 +17,10 @@ The goal is behavioral coverage, not source-level or public-name identity.
 | Left/right margins and tab width | `EditorWindowOptions` | Implemented |
 | Cursor movement | `EditorEngine` plus compatibility navigation processors | Implemented |
 | Historical begin/end/goto navigation details | `FirstEdCompatibilityProcessor` | Implemented |
+| Up/down line viewport-follow behavior | `FirstEdCompatibilityProcessor` + host visible-row count | Implemented |
+| Scroll up/down edge-cursor behavior | `FirstEdCompatibilityProcessor` | Implemented |
+| Page up/down documented viewport displacement | compatibility processor, `visibleLines - 1` | Implemented |
+| Top/bottom file viewport placement | compatibility processor | Implemented |
 | Character/word/line deletion | `EditorEngine` delete methods | Implemented |
 | Change case / center line / paragraph reformat | `EditorEngine` | Implemented |
 | Whole-line block begin/end | `EditorBlock`, `EditorSession` | Implemented |
@@ -36,6 +40,9 @@ The goal is behavioral coverage, not source-level or public-name identity.
 | Prefixed Ctrl-K / Ctrl-O / Ctrl-Q dispatchers | `FirstEdKeyMap` prefix state machine | Implemented (mapping) |
 | FIRST-ED / WordStar-compatible command map | `FirstEdKeyMap`, `EditorCommandBinding` | Implemented (mapping) |
 | Window up/down/goto and stream linking | compatibility processor + `EditorWindow.AttachDocument` | Implemented |
+| `EditExit` / `Rundown` | `EditorCommandId.Exit`, `EditorSession.RundownRequested` | Implemented |
+| `EditSchedule` input-first behavior | `EditorScheduler.RunCycleAsync`, `IEditorInputPump` | Implemented |
+| `EditSystem` loop-until-rundown | `EditorSystemLoop` | Implemented |
 | `UserCommand` concept | `IEditorHooks.FilterCommand` | Implemented |
 | `UserError` concept | `IEditorHooks.OnErrorAsync` | Implemented |
 | `UserStatusLine` concept | `IEditorHooks.TransformStatus` | Implemented |
@@ -44,8 +51,7 @@ The goal is behavioral coverage, not source-level or public-name identity.
 | Screen image/update routines | `EditorViewportBuilder`; renderer is host-specific | Foundation |
 | Text/status/block/special display attributes | line flags + host renderer | Foundation |
 | FIRST-ED demonstration editor | console sample now; interactive host later | Foundation |
-| Exit / editor rundown | lifecycle service | Planned |
-| Exact display-dependent scroll/page semantics | host-aware navigation | Planned |
+| Physical create-window screen geometry | host/layout integration | Planned |
 | MicroStar pull-down menus | host sample | Planned |
 | MicroStar pop-up helpers | host sample | Planned |
 | Background printing | scheduler sample | Planned |
@@ -53,6 +59,10 @@ The goal is behavioral coverage, not source-level or public-name identity.
 | DOS/video-memory assembly routines | intentionally not reproduced | Replaced by host rendering |
 | Overlay support | obsolete on modern platforms | Not applicable |
 
+## Page cursor policy
+
+The handbook states that page movement slides the window by one less than the number of displayed text lines, but it does not separately specify the cursor's resulting screen row. SASD preserves the cursor's relative visible row when possible and documents this as a modern host-neutral policy rather than claiming it as historical behavior.
+
 ## V1 release gate
 
-Input mapping, a substantial set of command processors, remembered search and the compatibility file path are now independently testable. V1 should not be called complete until lifecycle/exit behavior, exact display-dependent scrolling, an interactive FIRST-ED-style host, remaining compatibility tests and documentation are present. MicroStar-specific demonstration features may be shipped as samples rather than core dependencies.
+Input mapping, a substantial set of command processors, search/file compatibility, lifecycle and display-row-aware navigation are independently testable. V1 should not be called complete until the interactive FIRST-ED-style host, physical create-window/layout integration, remaining compatibility audits/tests and documentation are complete. MicroStar-specific demonstration features may ship as samples rather than core dependencies.

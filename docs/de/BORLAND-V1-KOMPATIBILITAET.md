@@ -17,6 +17,10 @@ Ziel ist funktionale Abdeckung, nicht eine identische Quellcode- oder API-Strukt
 | Ränder / Tabulatorbreite | `EditorWindowOptions` | Implementiert |
 | Cursorbewegung | `EditorEngine` plus Kompatibilitäts-Navigation | Implementiert |
 | Historische Begin/End/Goto-Details | `FirstEdCompatibilityProcessor` | Implementiert |
+| Up/Down-Line mit Viewport-Nachführung | Compatibility Processor + sichtbare Zeilenzahl | Implementiert |
+| Scroll Up/Down mit Cursor-Randverhalten | `FirstEdCompatibilityProcessor` | Implementiert |
+| Page Up/Down, dokumentierte Viewport-Verschiebung | Compatibility Processor, `visibleLines - 1` | Implementiert |
+| Top/Bottom File inklusive Viewport-Platzierung | Compatibility Processor | Implementiert |
 | Zeichen-/Wort-/Zeilenlöschen | `EditorEngine` | Implementiert |
 | Groß-/Kleinschreibung, Zentrieren, Absatzformatierung | `EditorEngine` | Implementiert |
 | Ganze-Zeilen-Blöcke | `EditorBlock`, `EditorSession` | Implementiert |
@@ -36,6 +40,9 @@ Ziel ist funktionale Abdeckung, nicht eine identische Quellcode- oder API-Strukt
 | Ctrl-K/Ctrl-O/Ctrl-Q Prefix-Dispatcher | Prefix-Zustandsautomat in `FirstEdKeyMap` | Implementiert (Zuordnung) |
 | FIRST-ED-/WordStar-kompatible Tasten | `FirstEdKeyMap`, `EditorCommandBinding` | Implementiert (Zuordnung) |
 | Fenster hoch/runter/goto und Stream-Linking | Compatibility Processor + `EditorWindow.AttachDocument` | Implementiert |
+| `EditExit` / `Rundown` | `EditorCommandId.Exit`, `EditorSession.RundownRequested` | Implementiert |
+| `EditSchedule` mit Eingabepriorität | `EditorScheduler.RunCycleAsync`, `IEditorInputPump` | Implementiert |
+| `EditSystem` bis Rundown | `EditorSystemLoop` | Implementiert |
 | UserCommand-Idee | `IEditorHooks.FilterCommand` | Implementiert |
 | UserError-Idee | `IEditorHooks.OnErrorAsync` | Implementiert |
 | UserStatusLine-Idee | `IEditorHooks.TransformStatus` | Implementiert |
@@ -43,12 +50,15 @@ Ziel ist funktionale Abdeckung, nicht eine identische Quellcode- oder API-Strukt
 | UserTask-Idee | Hooks + `EditorScheduler` | Implementiert |
 | Bildschirm-Update | `EditorViewportBuilder`, Renderer im Host | Grundlage |
 | FIRST-ED-Demo | zunächst Konsolenbeispiel | Grundlage |
-| Exit / Editor-Rundown | Lifecycle-Service | Geplant |
-| Exakte bildschirmabhängige Scroll-/Page-Semantik | Host-aware Navigation | Geplant |
+| Physische Create-Window-Bildschirmgeometrie | Host-/Layout-Integration | Geplant |
 | MicroStar-Menüs/Pop-ups | Host-Beispiele | Geplant |
 | Hintergrunddruck | Scheduler-Beispiel | Geplant |
 | Historischer Fehlertext-Katalog | typisierte Fehlercodes/Ressourcen | Geplant |
 | DOS-/Videospeicher-Routinen | bewusst durch Host-Rendering ersetzt | Ersetzt |
 | Overlays | auf modernen Plattformen nicht erforderlich | Entfällt |
 
-Eingabemapping, ein großer Teil der Command-Prozessoren, gemerkte Suche und der Kompatibilitäts-Dateipfad sind jetzt getrennt testbar. V1 ist erst fertig, wenn insbesondere Lifecycle/Exit, exaktes bildschirmabhängiges Scrollen, ein interaktiver FIRST-ED-artiger Host, weitere Kompatibilitätstests und Dokumentation abgeschlossen sind.
+## Cursor-Regel bei Page-Befehlen
+
+Das Handbuch legt fest, dass Page-Bewegungen das Fenster um eine Zeile weniger als die Zahl sichtbarer Textzeilen verschieben. Es legt aber nicht separat fest, auf welcher Bildschirmzeile der Cursor danach stehen soll. SASD erhält deshalb nach Möglichkeit die relative sichtbare Cursorzeile und dokumentiert dies ausdrücklich als moderne Host-Regel statt als historische Aussage.
+
+Eingabemapping, ein großer Teil der Command-Prozessoren, Suche/Dateikompatibilität, Lifecycle und bildschirmzeilenabhängige Navigation sind jetzt getrennt testbar. V1 ist erst fertig, wenn insbesondere der interaktive FIRST-ED-artige Host, die physische Create-Window-/Layout-Integration, verbleibende Kompatibilitätsaudits/-tests und die Dokumentation abgeschlossen sind.

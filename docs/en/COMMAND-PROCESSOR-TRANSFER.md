@@ -4,9 +4,9 @@
 
 The Turbo Editor Toolbox handbook separates keyboard dispatch from the procedures that actually perform editor operations. SASD follows the same boundary, but keeps historical input conventions out of the general editing engine.
 
-`FirstEdKeyMap` answers **which** semantic command a key sequence means. `EditorCommandDispatcher` decides **which processor** to call. `FirstEdCompatibilityProcessor` contains translation rules that are specifically historical, while `EditorSearchService` and `EditorFileService` own their respective stateful services.
+`FirstEdKeyMap` answers **which** semantic command a key sequence means. `EditorCommandDispatcher` decides **which processor** to call. `FirstEdCompatibilityProcessor` contains translation rules that are specifically historical, while `EditorSearchService`, `EditorFileService` and the scheduling/lifecycle services own their respective stateful concerns.
 
-This arrangement is intentional for the later C++, Java and JavaScript implementations: language-neutral behavior can be reproduced without inheriting DOS keyboard or screen assumptions.
+This arrangement is intentional for later C++, Java and JavaScript implementations: language-neutral behavior can be reproduced without inheriting DOS keyboard or screen assumptions.
 
 ## Transferred command semantics
 
@@ -20,11 +20,18 @@ This arrangement is intentional for the later C++, Java and JavaScript implement
 | `EditWindowUp` / `EditWindowDown` | compatibility/session window navigation | wraps at first/last window |
 | `EditWindowGoto` | `GoToWindow` | one-based window number interpreted modulo displayed windows |
 | `EditWindowLink` | `LinkWindows` | existing destination view is attached to source document |
+| `EditWindowTopFile` / `EditWindowBottomFile` | compatibility processor | includes the documented cursor-column and top-line placement |
+| `EditUpLine` / `EditDownLine` | compatibility processor | viewport follows the cursor at display edges |
+| `EditScrollUp` / `EditScrollDown` | compatibility processor | one-row viewport slide plus documented edge-cursor adjustment |
+| `EditUpPage` / `EditDownPage` | compatibility processor | viewport moves by displayed rows minus one |
 | margin/tab/undo settings | compatibility processor | user-visible values translated to modern internal state |
 | `EditFind` repeat behavior | `EditorSearchService.FindAgain` | remembers the prior pattern and resumes after the previous match |
 | `EditReatxtfil` insertion | `EditorFileService.ReadIntoCurrentWindowAsync` | inserts after current line and preserves cursor |
 | `EditFileWrite` | `EditorFileService.WriteCurrentWindowAsync` | writes current stream to an explicit path |
 | wrapped file lines | `FirstEdLegacyFileCodec` | high-bit CR (`0x8D`) maps to `EditorLineFlags.Wrapped` |
+| `EditExit` / `Rundown` | `RequestRundown`, `RundownRequested` | exit requests loop termination and does not save |
+| `EditSchedule` | `EditorScheduler.RunCycleAsync` | pending input wins over background work |
+| `EditSystem` | `EditorSystemLoop.RunAsync` | repeats scheduler cycles until rundown |
 
 ## Important modern replacement: window linking
 
@@ -34,14 +41,15 @@ The Pascal implementation had to splice pointers and explicitly destroy an aband
 
 `FileTextStorage` remains the modern UTF-8 whole-document provider. The historical byte convention is isolated behind `IEditorFileCodec` / `FirstEdLegacyFileCodec`. This prevents a compatibility requirement from becoming the storage format of every future SASD application.
 
-See `SEARCH-AND-FILE-COMMANDS.md` for the detailed mapping.
+## Lifecycle and page-policy note
+
+The host owns the confirmation UI for Ctrl-K X; the core owns the direct exit/rundown action. The handbook specifies page displacement but not a separate post-page cursor screen row. SASD therefore preserves the relative visible cursor row as an explicit modern policy. See `LIFECYCLE-AND-SCROLLING.md`.
 
 ## Still deliberately pending
 
-- interactive exit confirmation and editor-loop rundown state;
-- physical window sizing for Create Window, which belongs to a host/layout layer;
-- exact scrolling/page-display behavior, because the historical code couples these operations to displayed rows;
+- physical window sizing/compression for Create Window, which belongs to a host/layout layer;
 - the interactive FIRST-ED host;
+- the remaining V1 compatibility audit and historical error-resource work;
 - MicroStar-specific menu, popup and background-print examples.
 
 Keeping these concerns separate is more important than making a large monolithic port quickly.
