@@ -3,11 +3,9 @@ namespace Sasd.Editor.Commands;
 /// <summary>
 /// Semantic editor commands understood by the reusable editor layer.
 ///
-/// The enum intentionally contains a few commands whose execution still belongs
-/// to a later V1 milestone (for example host-driven file prompts). Keeping the
-/// semantic vocabulary complete allows keyboard maps, menus and future language
-/// implementations to share one stable command contract while command processors
-/// are transferred incrementally.
+/// The semantic vocabulary is intentionally independent of keyboard mappings so
+/// historical compatibility hosts, modern menus and automation can invoke the
+/// same operations without coupling the engine to a UI framework.
 /// </summary>
 public enum EditorCommandId
 {
@@ -58,6 +56,7 @@ public enum EditorCommandId
     NextWindow,
     GoToWindow,
     DeleteWindow,
+    DeleteWindowText,
     SetLeftMargin,
     SetRightMargin,
     SetTabWidth,

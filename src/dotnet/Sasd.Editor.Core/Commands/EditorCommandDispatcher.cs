@@ -81,6 +81,8 @@ public sealed class EditorCommandDispatcher(EditorSession session)
                     return command.Number.HasValue
                         ? FirstEdCompatibilityProcessor.DeleteWindow(session, command.Number.Value)
                         : FirstEdCompatibilityProcessor.DeleteWindow(session, CurrentWindowNumber(session));
+                case EditorCommandId.DeleteWindowText:
+                    return session.DeleteCurrentWindowText();
                 case EditorCommandId.SetLeftMargin: return FirstEdCompatibilityProcessor.SetLeftMargin(session, RequireNumber(command));
                 case EditorCommandId.SetRightMargin: return FirstEdCompatibilityProcessor.SetRightMargin(session, RequireNumber(command));
                 case EditorCommandId.SetTabWidth: return FirstEdCompatibilityProcessor.SetTabWidth(session, RequireNumber(command));

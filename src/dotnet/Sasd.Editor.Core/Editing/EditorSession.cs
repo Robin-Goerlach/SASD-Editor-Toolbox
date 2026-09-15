@@ -1,6 +1,7 @@
 using Sasd.Editor.Document;
 using Sasd.Editor.Hooks;
 using Sasd.Editor.IO;
+using Sasd.Editor.Input;
 using Sasd.Editor.Model;
 using Sasd.Editor.Scheduling;
 using Sasd.Editor.Search;
@@ -22,6 +23,7 @@ public sealed class EditorSession
     {
         Hooks = hooks ?? new DefaultEditorHooks();
         Undo = new EditorUndoManager();
+        Typeahead = new EditorTypeaheadBuffer();
         WindowLayout = new EditorWindowLayout(this);
         Engine = new EditorEngine(this);
         Search = new EditorSearchService(this);
@@ -32,6 +34,7 @@ public sealed class EditorSession
 
     public IEditorHooks Hooks { get; }
     public EditorUndoManager Undo { get; }
+    public EditorTypeaheadBuffer Typeahead { get; }
     public EditorWindowLayout WindowLayout { get; }
     public EditorEngine Engine { get; }
     public EditorSearchService Search { get; }
@@ -147,6 +150,45 @@ public sealed class EditorSession
     public EditorDocument? FindDocument(Guid documentId) =>
         _windows.Select(static window => window.Document)
             .FirstOrDefault(document => document.DocumentId == documentId);
+
+    /// <summary>
+    /// Destructively clears the text stream displayed by the current window,
+    /// reproducing the observable behavior of EditWindowDeleteText.
+    /// </summary>
+    /// <remarks>
+    /// This operation intentionally does not create an undo entry. Every window
+    /// currently linked to the same document is detached and receives its own new
+    /// blank NONAME document, which destroys the historical link relationship as
+    /// well as the text. Block and marker state referring to the destroyed stream
+    /// is discarded so no dangling document references remain.
+    /// </remarks>
+    public bool DeleteCurrentWindowText()
+    {
+        EnsureWindow();
+        var documentId = CurrentWindow.Document.DocumentId;
+
+        if (Block?.DocumentId == documentId)
+        {
+            ClearBlock();
+        }
+
+        Undo.DiscardDocument(documentId);
+        RemoveMarkersForDocument(documentId);
+
+        var affectedWindows = _windows
+            .Where(window => window.Document.DocumentId == documentId)
+            .ToArray();
+
+        foreach (var window in affectedWindows)
+        {
+            window.AttachDocument(CreateDocumentModel(string.Empty));
+            window.Cursor = default;
+            window.TopLine = 0;
+            window.LeftColumn = 0;
+        }
+
+        return true;
+    }
 
     public void BeginBlock()
     {
@@ -266,6 +308,19 @@ public sealed class EditorSession
         {
             var snapshot = document.Buffer.GetLine(line);
             document.Buffer.SetFlags(line, snapshot.Flags & ~EditorLineFlags.InBlock);
+        }
+    }
+
+    private void RemoveMarkersForDocument(Guid documentId)
+    {
+        var markerNumbers = _markers
+            .Where(pair => pair.Value.DocumentId == documentId)
+            .Select(static pair => pair.Key)
+            .ToArray();
+
+        foreach (var markerNumber in markerNumbers)
+        {
+            _markers.Remove(markerNumber);
         }
     }
 

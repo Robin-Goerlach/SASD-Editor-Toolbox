@@ -77,6 +77,26 @@ public sealed class EditorUndoManager
         return true;
     }
 
+    /// <summary>
+    /// Removes all undo snapshots belonging to a document whose text stream has
+    /// been intentionally destroyed. This prevents a destructive compatibility
+    /// command from leaving stale snapshots that could later be resurrected.
+    /// </summary>
+    public void DiscardDocument(Guid documentId)
+    {
+        var node = _entries.First;
+        while (node is not null)
+        {
+            var next = node.Next;
+            if (node.Value.DocumentId == documentId)
+            {
+                _entries.Remove(node);
+            }
+
+            node = next;
+        }
+    }
+
     public void Clear() => _entries.Clear();
 
     private void Trim()

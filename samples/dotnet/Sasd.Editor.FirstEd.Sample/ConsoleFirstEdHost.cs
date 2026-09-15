@@ -36,21 +36,47 @@ internal sealed class ConsoleFirstEdHost : IEditorInputPump
         EditorSession session,
         CancellationToken cancellationToken = default)
     {
-        if (!Console.KeyAvailable)
+        // The historical kernel consumed the editor's own typeahead buffer before
+        // doing background work. Macro-injected input therefore has exactly the
+        // same path through the key map and command dispatcher as keyboard input.
+        if (!session.Typeahead.TryRead(out var keyStroke))
         {
-            await Task.Delay(15, cancellationToken).ConfigureAwait(false);
-            return false;
+            if (!Console.KeyAvailable)
+            {
+                await Task.Delay(15, cancellationToken).ConfigureAwait(false);
+                return false;
+            }
+
+            var keyInfo = Console.ReadKey(intercept: true);
+            var translated = ConsoleKeyTranslator.Translate(keyInfo);
+            if (!translated.HasValue)
+            {
+                Render("This terminal key could not be normalized.");
+                return true;
+            }
+
+            var writeResult = session.Typeahead.EnqueueFromHost(translated.Value);
+            if (writeResult == EditorTypeaheadWriteResult.Aborted)
+            {
+                _keyMap.Reset();
+                Render("Ctrl-U: pending typeahead input aborted.");
+                return true;
+            }
+
+            if (writeResult == EditorTypeaheadWriteResult.Overflow)
+            {
+                _keyMap.Reset();
+                Render("Typeahead buffer overflow: pending input was cleared.");
+                return true;
+            }
+
+            if (!session.Typeahead.TryRead(out keyStroke))
+            {
+                return true;
+            }
         }
 
-        var keyInfo = Console.ReadKey(intercept: true);
-        var keyStroke = ConsoleKeyTranslator.Translate(keyInfo);
-        if (!keyStroke.HasValue)
-        {
-            Render("This terminal key could not be normalized.");
-            return true;
-        }
-
-        var action = _keyMap.Translate(keyStroke.Value);
+        var action = _keyMap.Translate(keyStroke);
         var message = await ExecuteActionAsync(action, cancellationToken).ConfigureAwait(false);
         message = _hooks.TakeMessage() ?? message;
         Render(message);
