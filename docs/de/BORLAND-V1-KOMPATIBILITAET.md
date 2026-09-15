@@ -11,6 +11,9 @@ Ziel ist funktionale Abdeckung, nicht eine identische Quellcode- oder API-Strukt
 | Zeilenflags Block / Wrapped / Sonderfarbe | `EditorLineFlags` | Implementiert |
 | Mehrere Fenster | `EditorSession`, `EditorWindow` | Implementiert |
 | Verknüpfte Fenster auf denselben Text | mehrere Fenster auf einem `EditorDocument` | Implementiert |
+| Physische gestapelte Fensterzeilen | `EditorWindowLayout`, `EditorWindowFrame` | Implementiert |
+| `EditWindowCreate(Size, Win)` Split-/Komprimierungsregeln | Compatibility Processor + Layout | Implementiert |
+| `EditWindowDelete(Wno)` Übernahme freier Zeilen | Compatibility Processor + Layout | Implementiert |
 | Insert / Overtype | `EditorWindowOptions.InsertMode` | Implementiert |
 | Word-Wrap | `EditorWindowOptions.WordWrap` | Implementiert |
 | Auto-Indent | `EditorWindowOptions.AutoIndent` | Implementiert |
@@ -51,9 +54,10 @@ Ziel ist funktionale Abdeckung, nicht eine identische Quellcode- oder API-Strukt
 | UserStatusLine-Idee | `IEditorHooks.TransformStatus` | Implementiert |
 | UserReplace-Idee | `IEditorHooks.BeforeReplaceAsync` | Implementiert |
 | UserTask-Idee | Hooks + `EditorScheduler` | Implementiert |
-| Bildschirm-Update | `EditorViewportBuilder`, Renderer im Host | Grundlage |
+| Bildschirmprojektion | `EditorViewportBuilder` inkl. Build pro Fenster | Implementierte Grundlage |
+| Gleichzeitiges gestapeltes Terminal-Rendering | `ConsoleFirstEdRenderer` + Layout Frames | Implementiertes Beispiel |
+| Text-/Status-/Block-/Sonderattribute | Zeilenflags + Host-Renderer | Grundlage |
 | Interaktiver FIRST-ED-Demohost | Terminalhost in `Sasd.Editor.FirstEd.Sample` | Implementiertes Beispiel |
-| Physische gestapelte Fenstergeometrie | Host-/Layout-Integration | Geplant |
 | MicroStar-Menüs/Pop-ups | Host-Beispiele | Geplant |
 | Hintergrunddruck | Scheduler-Beispiel | Geplant |
 | Historischer Fehlertext-Katalog | typisierte Fehlercodes/Ressourcen | Geplant |
@@ -64,4 +68,10 @@ Ziel ist funktionale Abdeckung, nicht eine identische Quellcode- oder API-Strukt
 
 Das Handbuch legt fest, dass Page-Bewegungen das Fenster um eine Zeile weniger als die Zahl sichtbarer Textzeilen verschieben. Es legt aber nicht separat fest, auf welcher Bildschirmzeile der Cursor danach stehen soll. SASD erhält deshalb nach Möglichkeit die relative sichtbare Cursorzeile und dokumentiert dies ausdrücklich als moderne Host-Regel statt als historische Aussage.
 
-Der interaktive Terminal-Referenzhost führt Keymap, Abfragen, Scheduler, Command Dispatcher und Viewport jetzt Ende-zu-Ende zusammen. V1 ist erst fertig, wenn die physische gestapelte Fensteraufteilung inklusive Zeilen-Splitting/Komprimierung, gleichzeitiges Multi-Window-Rendering, die verbleibenden Kompatibilitätsaudits/-tests und historische Fehlerressourcen abgeschlossen sind.
+## Moderne Resize-Regel
+
+Der historische Bildschirm hatte eine feste Größe. Die Größenänderung eines modernen Terminals ist deshalb keine historische Kompatibilitätsregel. Die .NET-Referenzimplementierung gibt zusätzliche Zeilen an das unterste Fenster und entzieht freie Zeilen von unten nach oben, ohne das Drei-Zeilen-Minimum zu unterschreiten. Diese Policy ist getrennt von der Kompatibilitätssemantik von `EditWindowCreate`/`EditWindowDelete` dokumentiert.
+
+## V1-Abschlusskriterium
+
+Die C#/.NET-Implementierung deckt jetzt die großen strukturellen FIRST-ED-Bereiche ausführbar ab, einschließlich gestapelter Fenstergeometrie und gleichzeitigem Multi-Window-Terminalhost. Vor V1 folgt ein Prozedur-für-Prozedur-Kompatibilitätsaudit, das Schließen verbleibender Verhaltens-/Testlücken sowie die Entscheidung, welcher Teil des historischen Fehlertext-Katalogs als typisierte Core-Ressourcen sinnvoll ist. MicroStar-spezifische Demonstrationen können als Samples statt als Core-Abhängigkeiten geliefert werden.

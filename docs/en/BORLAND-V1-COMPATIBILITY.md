@@ -11,6 +11,9 @@ The goal is behavioral coverage, not source-level or public-name identity.
 | Line flags: block / wrapped / special color | `EditorLineFlags` | Implemented |
 | Multiple windows | `EditorSession`, `EditorWindow` | Implemented |
 | Linked windows sharing one stream | multiple `EditorWindow` objects over one `EditorDocument` | Implemented |
+| Physical stacked-window row geometry | `EditorWindowLayout`, `EditorWindowFrame` | Implemented |
+| `EditWindowCreate(Size, Win)` split/compression rules | compatibility processor + layout | Implemented |
+| `EditWindowDelete(Wno)` freed-row ownership | compatibility processor + layout | Implemented |
 | Insert / overtype | `EditorWindowOptions.InsertMode` | Implemented |
 | Word-wrap | `EditorWindowOptions.WordWrap`, engine wrap logic | Implemented |
 | Auto-indent | `EditorWindowOptions.AutoIndent` | Implemented |
@@ -51,10 +54,10 @@ The goal is behavioral coverage, not source-level or public-name identity.
 | `UserStatusLine` concept | `IEditorHooks.TransformStatus` | Implemented |
 | `UserReplace` concept | `IEditorHooks.BeforeReplaceAsync` | Implemented |
 | `UserTask` concept | `IEditorHooks.OnIdleAsync`, `EditorScheduler` | Implemented |
-| Screen image/update routines | `EditorViewportBuilder`; renderer is host-specific | Foundation |
+| Screen image/update projection | `EditorViewportBuilder` incl. per-window build | Implemented foundation |
+| Simultaneous stacked terminal rendering | `ConsoleFirstEdRenderer` + layout frames | Implemented sample |
 | Text/status/block/special display attributes | line flags + host renderer | Foundation |
 | Interactive FIRST-ED demonstration host | `Sasd.Editor.FirstEd.Sample` terminal host | Implemented sample |
-| Physical stacked-window screen geometry | host/layout integration | Planned |
 | MicroStar pull-down menus | host sample | Planned |
 | MicroStar pop-up helpers | host sample | Planned |
 | Background printing | scheduler sample | Planned |
@@ -66,6 +69,10 @@ The goal is behavioral coverage, not source-level or public-name identity.
 
 The handbook states that page movement slides the window by one less than the number of displayed text lines, but it does not separately specify the cursor's resulting screen row. SASD preserves the cursor's relative visible row when possible and documents this as a modern host-neutral policy rather than claiming it as historical behavior.
 
+## Modern resize policy
+
+The historical screen was fixed-size. Resizing a modern terminal is therefore not a historical compatibility rule. The .NET reference implementation gives growth to the bottom window and removes spare rows from bottom to top while preserving the three-row minimum. This policy is documented separately from `EditWindowCreate`/`EditWindowDelete` compatibility semantics.
+
 ## V1 release gate
 
-The interactive terminal reference host now exercises the core key map, prompts, scheduler, command dispatcher and viewport end to end. V1 should not be called complete until physical stacked-window row splitting/compression, simultaneous multi-window rendering, the remaining compatibility audit/tests and historical error resources are complete. MicroStar-specific demonstration features may ship as samples rather than core dependencies.
+The C#/.NET implementation now has executable coverage for the major FIRST-ED structural areas, including stacked window geometry and a simultaneous multi-window terminal reference host. Before calling V1 complete, perform a procedure-by-procedure compatibility audit, close remaining behavior/test gaps, and decide how much of the historical error-message catalog belongs in typed core resources. MicroStar-specific demonstrations may ship as samples rather than core dependencies.

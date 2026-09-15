@@ -4,7 +4,7 @@
 
 The Turbo Editor Toolbox handbook separates keyboard dispatch from the procedures that actually perform editor operations. SASD follows the same boundary, but keeps historical input conventions out of the general editing engine.
 
-`FirstEdKeyMap` answers **which** semantic command a key sequence means. `EditorCommandDispatcher` decides **which processor** to call. `FirstEdCompatibilityProcessor` contains translation rules that are specifically historical, while `EditorSearchService`, `EditorFileService` and the scheduling/lifecycle services own their respective stateful concerns.
+`FirstEdKeyMap` answers **which** semantic command a key sequence means. `EditorCommandDispatcher` decides **which processor** to call. `FirstEdCompatibilityProcessor` contains translation rules that are specifically historical, while `EditorSearchService`, `EditorFileService`, the window-layout service and scheduling/lifecycle services own their respective stateful concerns.
 
 This arrangement is intentional for later C++, Java and JavaScript implementations: language-neutral behavior can be reproduced without inheriting DOS keyboard or screen assumptions.
 
@@ -20,6 +20,8 @@ This arrangement is intentional for later C++, Java and JavaScript implementatio
 | `EditWindowUp` / `EditWindowDown` | compatibility/session window navigation | wraps at first/last window |
 | `EditWindowGoto` | `GoToWindow` | one-based window number interpreted modulo displayed windows |
 | `EditWindowLink` | `LinkWindows` | existing destination view is attached to source document |
+| `EditWindowCreate` | `CreateWindow` + `EditorWindowLayout.Split` | requested lower rows become a new blank window; both windows retain the three-row minimum |
+| `EditWindowDelete` | `DeleteWindow` + layout reclamation | first window gives space to second; otherwise the window above receives it |
 | `EditWindowTopFile` / `EditWindowBottomFile` | compatibility processor | includes the documented cursor-column and top-line placement |
 | `EditUpLine` / `EditDownLine` | compatibility processor | viewport follows the cursor at display edges |
 | `EditScrollUp` / `EditScrollDown` | compatibility processor | one-row viewport slide plus documented edge-cursor adjustment |
@@ -33,9 +35,11 @@ This arrangement is intentional for later C++, Java and JavaScript implementatio
 | `EditSchedule` | `EditorScheduler.RunCycleAsync` | pending input wins over background work |
 | `EditSystem` | `EditorSystemLoop.RunAsync` | repeats scheduler cycles until rundown |
 
-## Important modern replacement: window linking
+## Important modern replacement: window and stream ownership
 
-The Pascal implementation had to splice pointers and explicitly destroy an abandoned text stream. In C#, an `EditorWindow` safely reattaches to another `EditorDocument`. If the old document has no remaining references, normal garbage collection owns its lifetime. Linked windows share text but retain independent cursor and scrolling state.
+The Pascal implementation had to splice pointers, adjust screen coordinates and explicitly destroy abandoned text streams. SASD keeps screen-row allocation in `EditorWindowLayout` and represents shared text by several `EditorWindow` objects referencing one `EditorDocument`. Deleting one linked view therefore cannot accidentally free text still shown elsewhere; normal garbage collection owns document lifetime once references disappear.
+
+The historical minimum of one status row plus two text rows is preserved as `EditorWindowFrame.MinimumHeight == 3`. The terminal-resize policy is modern and explicitly separate from the historical Create/Delete rules; see `WINDOW-GEOMETRY.md`.
 
 ## Compatibility file I/O versus modern persistence
 
@@ -47,9 +51,8 @@ The host owns the confirmation UI for Ctrl-K X; the core owns the direct exit/ru
 
 ## Still deliberately pending
 
-- physical window sizing/compression for Create Window, which belongs to a host/layout layer;
-- the interactive FIRST-ED host;
-- the remaining V1 compatibility audit and historical error-resource work;
+- the final procedure-by-procedure V1 compatibility audit and remaining edge-case tests;
+- typed historical error resources where they add compatibility value without coupling normal applications to legacy wording;
 - MicroStar-specific menu, popup and background-print examples.
 
 Keeping these concerns separate is more important than making a large monolithic port quickly.

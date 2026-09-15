@@ -37,6 +37,8 @@ The current foundation contains:
 
 - a line-oriented text-buffer abstraction with a linked-line implementation;
 - document and multi-window/session models, including linked windows over one document;
+- host-neutral stacked-window geometry through `EditorWindowLayout` / `EditorWindowFrame`;
+- historical Create Window compression/splitting and Delete Window row-reclamation rules with a three-row minimum per displayed window;
 - cursor movement, insertion/overtype, newline, auto-indent, word-wrap and tab handling;
 - historical FIRST-ED begin/end/goto, top/bottom-file and viewport-aware movement semantics isolated behind a compatibility processor;
 - display-row-aware line scrolling and page movement supplied with a host-visible row count;
@@ -56,12 +58,12 @@ The current foundation contains:
 - `EditorScheduler` and `EditorSystemLoop` implementing input-first cooperative scheduling and the repeated schedule-until-rundown main-loop model;
 - `IEditorInputPump` as the host boundary for keyboard, terminal, scripted or other input sources;
 - extension hooks inspired by the historical `UserCommand`, `UserError`, `UserStatusLine`, `UserReplace` and `UserTask` integration points;
-- a UI-neutral viewport/status model rather than direct screen-memory access;
-- an **interactive FIRST-ED terminal reference host** with normalized console input, historical prefix commands, host-owned prompts, status rendering, file/search prompts and YES-confirmed Ctrl-K X exit;
+- a UI-neutral viewport/status model with a specific-window projection for simultaneous multi-window rendering;
+- an **interactive stacked FIRST-ED terminal reference host** with normalized console input, historical prefix commands, host-owned prompts, per-window status rows, file/search prompts and YES-confirmed Ctrl-K X exit;
 - English and German architecture/compatibility documentation;
 - automated unit tests.
 
-The remaining V1 work is concentrated rather than broad: the historical physical stacked-window geometry still needs exact row splitting/compression and simultaneous multi-window rendering, followed by a final compatibility audit and error-resource pass.
+The remaining V1 work is now mainly a compatibility audit rather than a structural build-out: complete the remaining historical command/details audit, introduce typed historical error resources where useful, strengthen edge-case tests and decide which MicroStar-specific features belong in V1 samples rather than the reusable core.
 
 ## Run the interactive FIRST-ED sample
 
@@ -69,7 +71,7 @@ The remaining V1 work is concentrated rather than broad: the historical physical
 dotnet run --project samples/dotnet/Sasd.Editor.FirstEd.Sample/Sasd.Editor.FirstEd.Sample.csproj
 ```
 
-The sample starts with Window 1 editing `NONAME`. Historical Ctrl-K / Ctrl-O / Ctrl-Q sequences are accepted alongside modern cursor keys. Use **Ctrl-K X**, then type **YES**, to exit.
+The sample starts with Window 1 editing `NONAME`. Historical Ctrl-K / Ctrl-O / Ctrl-Q sequences are accepted alongside modern cursor keys. **Ctrl-O O** creates a stacked window by asking for its screen-row count and donor window number; **Ctrl-O Y** deletes a window. Use **Ctrl-K X**, then type **YES**, to exit.
 
 ## Build
 
@@ -85,6 +87,7 @@ Target framework: **.NET 10**.
 
 - Core editing logic has no WinForms, WPF, console, terminal or browser dependency.
 - A document and its views/windows are separate concepts; multiple windows may share one document.
+- Physical row allocation is kept in a host-neutral layout service rather than embedded in a console renderer.
 - Mutation APIs own dirty-state and undo integration.
 - Historical input/value conventions live in the compatibility layer instead of leaking into the general text engine.
 - Historical names are documented as compatibility references, not copied as a 1:1 public API.
@@ -111,6 +114,8 @@ Target framework: **.NET 10**.
 - Lifecycle und Scrollen: [`docs/de/LIFECYCLE-UND-SCROLLEN.md`](docs/de/LIFECYCLE-UND-SCROLLEN.md)
 - Interactive FIRST-ED host: [`docs/en/INTERACTIVE-FIRST-ED-HOST.md`](docs/en/INTERACTIVE-FIRST-ED-HOST.md)
 - Interaktiver FIRST-ED-Host: [`docs/de/INTERAKTIVER-FIRST-ED-HOST.md`](docs/de/INTERAKTIVER-FIRST-ED-HOST.md)
+- Window geometry: [`docs/en/WINDOW-GEOMETRY.md`](docs/en/WINDOW-GEOMETRY.md)
+- Fenstergeometrie: [`docs/de/FENSTER-GEOMETRIE.md`](docs/de/FENSTER-GEOMETRIE.md)
 - Language-neutral V1 contract: [`spec/editor-v1.md`](spec/editor-v1.md)
 
 ## License
