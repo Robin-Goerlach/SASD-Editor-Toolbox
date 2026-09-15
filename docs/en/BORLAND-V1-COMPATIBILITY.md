@@ -26,7 +26,10 @@ The goal is behavioral coverage, not source-level or public-name identity.
 | Read/write files | `ITextStorage`, `FileTextStorage` | Foundation |
 | Dirty/change flag | `EditorDocument.IsDirty` | Implemented |
 | General command dispatcher | `EditorCommandDispatcher` | Foundation |
-| Prefixed Ctrl-K / Ctrl-O / Ctrl-Q dispatchers | host/keymap layer | Planned |
+| Normalized host-independent keystrokes | `EditorKeyStroke` | Implemented |
+| Prefixed Ctrl-K / Ctrl-O / Ctrl-Q dispatchers | `FirstEdKeyMap` prefix state machine | Implemented (mapping) |
+| FIRST-ED / WordStar-compatible command map | `FirstEdKeyMap`, `EditorCommandBinding` | Implemented (mapping) |
+| Prompt metadata for parameterized commands | `EditorCommandArgumentKind` | Implemented |
 | `UserCommand` concept | `IEditorHooks.FilterCommand` | Implemented |
 | `UserError` concept | `IEditorHooks.OnErrorAsync` | Implemented |
 | `UserStatusLine` concept | `IEditorHooks.TransformStatus` | Implemented |
@@ -38,11 +41,10 @@ The goal is behavioral coverage, not source-level or public-name identity.
 | MicroStar pull-down menus | host sample | Planned |
 | MicroStar pop-up helpers | host sample | Planned |
 | Background printing | scheduler sample | Planned |
-| WordStar-compatible command map | compatibility keymap package | Planned |
 | Historical error-message catalog | typed error codes/resources | Planned |
 | DOS/video-memory assembly routines | intentionally not reproduced | Replaced by host rendering |
 | Overlay support | obsolete on modern platforms | Not applicable |
 
 ## V1 release gate
 
-V1 should not be called complete until the planned compatibility keymap, interactive FIRST-ED-style host, remaining file/block/search semantics, compatibility tests and documentation are present. MicroStar-specific demonstration features may be shipped as samples rather than core dependencies.
+The compatibility input map is now present and independently testable. V1 should not be called complete until the remaining command processors behind prompt-driven bindings, an interactive FIRST-ED-style host, remaining file/block/search semantics, compatibility tests and documentation are present. MicroStar-specific demonstration features may be shipped as samples rather than core dependencies.

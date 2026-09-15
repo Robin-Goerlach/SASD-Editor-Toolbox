@@ -39,11 +39,16 @@ V1 includes character/word/line movement, page movement, beginning/end/top/botto
 - Successful persistence clears dirty state.
 - Undo is a replaceable service. Correctness is more important than storage efficiency in the first implementation.
 
-## 7. Command dispatch
+## 7. Command dispatch and input mapping
 
+- Host-specific keyboard events are normalized before compatibility mapping.
 - User input is translated to semantic commands outside the editing engine.
+- The FIRST-ED compatibility map is stateful because Ctrl-K, Ctrl-O and Ctrl-Q introduce a second keystroke.
+- A key map never prompts the user directly. Instead it declares whether a command requires text, a number, two numbers, a character, a file path, find/replace values or confirmation.
+- Numbered prefix commands may carry their number directly in the binding.
 - A command-filter hook may rewrite a semantic command before dispatch.
 - The engine itself must remain callable directly by application code.
+- Hosts may add modern aliases (for example arrow keys) without removing the historical command sequences.
 
 ## 8. Host hooks
 

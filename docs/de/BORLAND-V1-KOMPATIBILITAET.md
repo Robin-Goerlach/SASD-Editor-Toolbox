@@ -26,7 +26,10 @@ Ziel ist funktionale Abdeckung, nicht eine identische Quellcode- oder API-Strukt
 | Datei lesen/schreiben | `ITextStorage`, `FileTextStorage` | Grundlage |
 | Dirty-/Change-Flag | `EditorDocument.IsDirty` | Implementiert |
 | Allgemeiner Command Dispatcher | `EditorCommandDispatcher` | Grundlage |
-| Ctrl-K/Ctrl-O/Ctrl-Q Prefix-Dispatcher | Host-/Keymap-Schicht | Geplant |
+| UI-unabhängige normalisierte Tasten | `EditorKeyStroke` | Implementiert |
+| Ctrl-K/Ctrl-O/Ctrl-Q Prefix-Dispatcher | Prefix-Zustandsautomat in `FirstEdKeyMap` | Implementiert (Zuordnung) |
+| FIRST-ED-/WordStar-kompatible Tasten | `FirstEdKeyMap`, `EditorCommandBinding` | Implementiert (Zuordnung) |
+| Abfrage-Metadaten für parametrisierte Befehle | `EditorCommandArgumentKind` | Implementiert |
 | UserCommand-Idee | `IEditorHooks.FilterCommand` | Implementiert |
 | UserError-Idee | `IEditorHooks.OnErrorAsync` | Implementiert |
 | UserStatusLine-Idee | `IEditorHooks.TransformStatus` | Implementiert |
@@ -36,8 +39,8 @@ Ziel ist funktionale Abdeckung, nicht eine identische Quellcode- oder API-Strukt
 | FIRST-ED-Demo | zunächst Konsolenbeispiel | Grundlage |
 | MicroStar-Menüs/Pop-ups | Host-Beispiele | Geplant |
 | Hintergrunddruck | Scheduler-Beispiel | Geplant |
-| WordStar-kompatible Tasten | Compatibility-Keymap | Geplant |
+| Historischer Fehlertext-Katalog | typisierte Fehlercodes/Ressourcen | Geplant |
 | DOS-/Videospeicher-Routinen | bewusst durch Host-Rendering ersetzt | Ersetzt |
 | Overlays | auf modernen Plattformen nicht erforderlich | Entfällt |
 
-V1 ist erst fertig, wenn insbesondere die vollständige Compatibility-Keymap, ein interaktiver FIRST-ED-artiger Host, die noch fehlenden Such-/Datei-/Blockdetails, Tests und Dokumentation abgeschlossen sind.
+Die Compatibility-Keymap ist jetzt vorhanden und unabhängig testbar. V1 ist erst fertig, wenn die noch fehlenden Command-Prozessoren hinter den abfragepflichtigen Bindings, ein interaktiver FIRST-ED-artiger Host, die verbleibenden Such-/Datei-/Blockdetails, weitere Kompatibilitätstests und Dokumentation abgeschlossen sind.
