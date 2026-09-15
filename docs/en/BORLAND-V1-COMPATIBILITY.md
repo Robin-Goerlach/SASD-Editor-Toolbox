@@ -14,6 +14,7 @@ The goal is behavioral coverage, not source-level or public-name identity.
 | Physical stacked-window row geometry | `EditorWindowLayout`, `EditorWindowFrame` | Implemented |
 | `EditWindowCreate(Size, Win)` split/compression rules | compatibility processor + layout | Implemented |
 | `EditWindowDelete(Wno)` freed-row ownership | compatibility processor + layout | Implemented |
+| `EditWindowDeleteText` destructive stream reset | `DeleteCurrentWindowText`, distinct blank replacement documents | Implemented |
 | Insert / overtype | `EditorWindowOptions.InsertMode` | Implemented |
 | Word-wrap | `EditorWindowOptions.WordWrap`, engine wrap logic | Implemented |
 | Auto-indent | `EditorWindowOptions.AutoIndent` | Implemented |
@@ -31,6 +32,7 @@ The goal is behavioral coverage, not source-level or public-name identity.
 | Top/bottom of active block commands | compatibility processor | Implemented |
 | Markers | `EditorMarker`, markers 1..20 | Implemented |
 | Undo limit and undo operation | `EditorUndoManager` + command binding | Implemented (snapshot backend) |
+| Destructive-document undo cleanup | `EditorUndoManager.DiscardDocument` | Implemented |
 | Forward find / remembered Find Again | `EditorSearchService` | Implemented |
 | Replace-next + replace hook | `EditorSearchService`, `IEditorHooks` | Implemented |
 | Modern UTF-8 document storage | `ITextStorage`, `FileTextStorage` | Implemented foundation |
@@ -41,7 +43,15 @@ The goal is behavioral coverage, not source-level or public-name identity.
 | Dirty/change flag | `EditorDocument.IsDirty` | Implemented |
 | General command dispatcher | `EditorCommandDispatcher` | Foundation / expanding |
 | Normalized host-independent keystrokes | `EditorKeyStroke` | Implemented |
+| Historical default typeahead capacity | `EditorTypeaheadBuffer.DefaultCapacity = 500` | Implemented |
+| `Pokechr` queue-style host insertion | `EditorTypeaheadBuffer.EnqueueFromHost` | Implemented |
+| `EditPushtbf` front insertion | `EditorTypeaheadBuffer.PushNext` | Implemented |
+| `EditUserpush` ordered sequence/macro insertion | `PushSequence`, `PushText` | Implemented |
+| Typeahead overflow clears pending input | bounded buffer write results | Implemented |
+| Immediate host Ctrl-U / `EditAbort` buffer semantics | clear queue + `AbortRequested` | Implemented foundation |
+| Ctrl-U polling inside every interruptible long operation | abort state + modern cancellation boundary | Planned audit |
 | Console key normalization | `ConsoleKeyTranslator` | Implemented sample |
+| Terminal input through editor-owned typeahead | `ConsoleFirstEdHost` | Implemented sample |
 | Prefixed Ctrl-K / Ctrl-O / Ctrl-Q dispatchers | `FirstEdKeyMap` prefix state machine | Implemented (mapping) |
 | FIRST-ED / WordStar-compatible command map | `FirstEdKeyMap`, `EditorCommandBinding` | Implemented (mapping) |
 | Window up/down/goto and stream linking | compatibility processor + `EditorWindow.AttachDocument` | Implemented |
@@ -65,6 +75,10 @@ The goal is behavioral coverage, not source-level or public-name identity.
 | DOS/video-memory assembly routines | intentionally not reproduced | Replaced by host rendering |
 | Overlay support | obsolete on modern platforms | Not applicable |
 
+## Typeahead modernization policy
+
+Behavioral ordering and the historical 500-entry default are retained, but raw DOS bytes, circular-buffer indices and scan codes are deliberately not part of the portable V1 contract. Macro input and physical input are normalized to `EditorKeyStroke` first. A host-originated Ctrl-U takes the immediate abort path; front-injected macro input does not silently become physical input.
+
 ## Page cursor policy
 
 The handbook states that page movement slides the window by one less than the number of displayed text lines, but it does not separately specify the cursor's resulting screen row. SASD preserves the cursor's relative visible row when possible and documents this as a modern host-neutral policy rather than claiming it as historical behavior.
@@ -75,4 +89,4 @@ The historical screen was fixed-size. Resizing a modern terminal is therefore no
 
 ## V1 release gate
 
-The C#/.NET implementation now has executable coverage for the major FIRST-ED structural areas, including stacked window geometry and a simultaneous multi-window terminal reference host. Before calling V1 complete, perform a procedure-by-procedure compatibility audit, close remaining behavior/test gaps, and decide how much of the historical error-message catalog belongs in typed core resources. MicroStar-specific demonstrations may ship as samples rather than core dependencies.
+The C#/.NET implementation now has executable coverage for the major FIRST-ED structural areas, including stacked window geometry, buffered/macro input and destructive window-text deletion. Before calling V1 complete, perform the remaining procedure-by-procedure audit, close behavior/test gaps (including where Ctrl-U should interrupt long-running compatibility operations), and decide how much of the historical error-message catalog belongs in typed core resources. MicroStar-specific demonstrations may ship as samples rather than core dependencies.

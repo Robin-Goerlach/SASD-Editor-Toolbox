@@ -16,7 +16,7 @@ This document defines behavior that every language implementation should preserv
 - Multiple windows may reference the same document; edits are immediately visible in every linked view.
 - Views may independently use insert/overtype, word-wrap and auto-indent modes.
 
-## 3. Displayed-window geometry
+## 3. Displayed-window geometry and destructive stream reset
 
 - Displayed windows have host-neutral vertical frames separate from document/view state.
 - A V1 compatibility frame height includes one status row and must be at least three rows total, leaving at least two text rows.
@@ -26,6 +26,8 @@ This document defines behavior that every language implementation should preserv
 - Delete Window rejects deletion of the sole displayed window. Deleting window 1 gives the freed rows to the following window; deleting another window gives the freed rows to the displayed window immediately above it.
 - Deleting a window containing the active block clears that block.
 - Shared-document lifetime must not depend on explicit pointer/free-list manipulation: deleting one linked view must leave a document alive while another view references it.
+- Delete Window Text is deliberately destructive and non-undoable. It removes the current stream, resets affected views to blank `NONAME` documents, and destroys links between views that had shared that stream.
+- A block belonging to a destructively removed stream is cleared. Implementations must also invalidate any modern navigation state that would otherwise point at a document identity no longer reachable by a view.
 - Dynamic host-resize behavior is implementation policy, not historical V1 behavior, and must be documented separately from compatibility Create/Delete rules.
 
 ## 4. Editing and viewport primitives
@@ -54,12 +56,13 @@ Top-of-file selects the first line and first column. Bottom-of-file selects the 
 
 ## 7. Undo and dirty state
 
-- Every text mutation marks the document dirty.
+- Every ordinary text mutation marks the document dirty.
 - Successful persistence clears dirty state when the operation is semantically a save.
 - A direct compatibility Write File operation does not implicitly change document identity.
 - Undo is a replaceable service. Correctness is more important than storage efficiency in the first implementation.
+- Historical destructive operations explicitly documented as not entering undo must not be made reversible merely because a modern undo backend exists. Obsolete snapshots for a destroyed document must not remain usable.
 
-## 8. Command dispatch and input mapping
+## 8. Command dispatch, normalized input and typeahead
 
 - Host-specific keyboard events are normalized before compatibility mapping.
 - User input is translated to semantic commands outside the editing engine.
@@ -69,16 +72,23 @@ Top-of-file selects the first line and first column. Bottom-of-file selects the 
 - A command-filter hook may rewrite a semantic command before dispatch.
 - The engine itself must remain callable directly by application code.
 - Hosts may add modern aliases (for example arrow keys) without removing the historical command sequences.
+- V1 provides an editor-owned bounded typeahead abstraction with a default capacity of 500 logical input units.
+- Physical/host input appends at the back in FIFO order. Macro/user-pushed input can be inserted at the front, including a sequence whose subsequent read order matches the caller's sequence order.
+- Typeahead overflow clears pending typeahead instead of keeping an ambiguous partial command sequence.
+- A host-originated Ctrl-U clears pending typeahead immediately and raises an abort state instead of being queued behind existing commands.
+- Front-injected macro input does not acquire physical-input Ctrl-U semantics merely because it contains a Ctrl-U key stroke.
+- Raw DOS scan codes, circular-buffer indices and byte-layout details are not part of the portable V1 contract.
 
 ## 9. Lifecycle and cooperative scheduling
 
 - The session exposes a rundown state equivalent to the historical `Rundown` variable.
 - Direct Exit requests rundown and does not save files.
 - Confirmation before interactive exit is a host/prompt responsibility declared by the input binding.
-- A scheduler cycle first offers the host one opportunity to process pending input. If input is processed, background work is skipped for that cycle.
+- A scheduler cycle first offers the host one opportunity to process pending editor/host input. If input is processed, background work is skipped for that cycle.
 - If no input is available, one cooperative background slice runs.
 - The system loop repeats scheduler cycles until rundown is requested or external cancellation occurs.
 - Background tasks must keep their own resumable state and return after a bounded unit of work.
+- Long-running compatibility operations may observe the editor abort state in addition to the target platform's normal cancellation primitive. Exact procedure coverage is audited separately.
 
 ## 10. Host hooks
 
@@ -98,4 +108,4 @@ The core does not write directly to console/video memory. It exposes viewport/st
 
 ## 13. Compatibility policy
 
-The Borland handbook is a requirements/reference source only. Implementations must be independently written and must not copy historical source code.
+The Borland handbook is a requirements/reference source only. Implementations must be independently written and must not copy historical source code. When the handbook leaves behavior unspecified, modern policy must be documented as such instead of being presented as historical behavior.

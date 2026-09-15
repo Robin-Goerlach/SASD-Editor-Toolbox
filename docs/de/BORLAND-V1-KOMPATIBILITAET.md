@@ -14,6 +14,7 @@ Ziel ist funktionale Abdeckung, nicht eine identische Quellcode- oder API-Strukt
 | Physische gestapelte Fensterzeilen | `EditorWindowLayout`, `EditorWindowFrame` | Implementiert |
 | `EditWindowCreate(Size, Win)` Split-/Komprimierungsregeln | Compatibility Processor + Layout | Implementiert |
 | `EditWindowDelete(Wno)` Übernahme freier Zeilen | Compatibility Processor + Layout | Implementiert |
+| `EditWindowDeleteText` destruktives Zurücksetzen | `DeleteCurrentWindowText`, getrennte neue Leerdokumente | Implementiert |
 | Insert / Overtype | `EditorWindowOptions.InsertMode` | Implementiert |
 | Word-Wrap | `EditorWindowOptions.WordWrap` | Implementiert |
 | Auto-Indent | `EditorWindowOptions.AutoIndent` | Implementiert |
@@ -31,6 +32,7 @@ Ziel ist funktionale Abdeckung, nicht eine identische Quellcode- oder API-Strukt
 | Blockanfang/-ende anspringen | Compatibility Processor | Implementiert |
 | Marker | Marker 1..20 | Implementiert |
 | Undo inkl. Limit | `EditorUndoManager` + Command Binding | Implementiert (Snapshot-Backend) |
+| Undo-Bereinigung zerstörter Dokumente | `EditorUndoManager.DiscardDocument` | Implementiert |
 | Vorwärtssuche / gemerktes Find Again | `EditorSearchService` | Implementiert |
 | Replace Next + Replace-Hook | `EditorSearchService`, `IEditorHooks` | Implementiert |
 | Moderne UTF-8-Dokumentpersistenz | `ITextStorage`, `FileTextStorage` | Implementierte Grundlage |
@@ -41,7 +43,15 @@ Ziel ist funktionale Abdeckung, nicht eine identische Quellcode- oder API-Strukt
 | Dirty-/Change-Flag | `EditorDocument.IsDirty` | Implementiert |
 | Allgemeiner Command Dispatcher | `EditorCommandDispatcher` | Grundlage / wird erweitert |
 | UI-unabhängige normalisierte Tasten | `EditorKeyStroke` | Implementiert |
+| Historische Typeahead-Standardkapazität | `EditorTypeaheadBuffer.DefaultCapacity = 500` | Implementiert |
+| `Pokechr`-artige Queue-Eingabe | `EditorTypeaheadBuffer.EnqueueFromHost` | Implementiert |
+| `EditPushtbf` Front-Einfügen | `EditorTypeaheadBuffer.PushNext` | Implementiert |
+| `EditUserpush` Sequenz-/Makro-Eingabe | `PushSequence`, `PushText` | Implementiert |
+| Typeahead-Overflow leert wartende Eingabe | begrenzter Puffer + Write-Result | Implementiert |
+| Sofortiges Host-Ctrl-U / `EditAbort` für den Puffer | Queue leeren + `AbortRequested` | Implementierte Grundlage |
+| Ctrl-U-Polling in allen unterbrechbaren Langläufern | Abort-State + moderne Cancellation-Grenze | Geplanter Audit |
 | Console-Tastennormalisierung | `ConsoleKeyTranslator` | Implementiertes Beispiel |
+| Terminaleingabe durch editor-eigenen Typeahead | `ConsoleFirstEdHost` | Implementiertes Beispiel |
 | Ctrl-K/Ctrl-O/Ctrl-Q Prefix-Dispatcher | Prefix-Zustandsautomat in `FirstEdKeyMap` | Implementiert (Zuordnung) |
 | FIRST-ED-/WordStar-kompatible Tasten | `FirstEdKeyMap`, `EditorCommandBinding` | Implementiert (Zuordnung) |
 | Fenster hoch/runter/goto und Stream-Linking | Compatibility Processor + `EditorWindow.AttachDocument` | Implementiert |
@@ -64,6 +74,10 @@ Ziel ist funktionale Abdeckung, nicht eine identische Quellcode- oder API-Strukt
 | DOS-/Videospeicher-Routinen | bewusst durch Host-Rendering ersetzt | Ersetzt |
 | Overlays | auf modernen Plattformen nicht erforderlich | Entfällt |
 
+## Modernisierung des Typeahead-Puffers
+
+Die Reihenfolge und die historische Standardgröße 500 bleiben erhalten. Rohe DOS-Bytes, Ringpuffer-Indizes und Scan-Codes gehören jedoch bewusst nicht zum portablen V1-Vertrag. Makro- und physische Eingaben werden zuerst in `EditorKeyStroke` normalisiert. Ein vom Host stammendes Ctrl-U nimmt den unmittelbaren Abort-Pfad; eine vorne eingeschobene Makro-Eingabe wird nicht stillschweigend zu physischer Tastatureingabe umgedeutet.
+
 ## Cursor-Regel bei Page-Befehlen
 
 Das Handbuch legt fest, dass Page-Bewegungen das Fenster um eine Zeile weniger als die Zahl sichtbarer Textzeilen verschieben. Es legt aber nicht separat fest, auf welcher Bildschirmzeile der Cursor danach stehen soll. SASD erhält deshalb nach Möglichkeit die relative sichtbare Cursorzeile und dokumentiert dies ausdrücklich als moderne Host-Regel statt als historische Aussage.
@@ -74,4 +88,4 @@ Der historische Bildschirm hatte eine feste Größe. Die Größenänderung eines
 
 ## V1-Abschlusskriterium
 
-Die C#/.NET-Implementierung deckt jetzt die großen strukturellen FIRST-ED-Bereiche ausführbar ab, einschließlich gestapelter Fenstergeometrie und gleichzeitigem Multi-Window-Terminalhost. Vor V1 folgt ein Prozedur-für-Prozedur-Kompatibilitätsaudit, das Schließen verbleibender Verhaltens-/Testlücken sowie die Entscheidung, welcher Teil des historischen Fehlertext-Katalogs als typisierte Core-Ressourcen sinnvoll ist. MicroStar-spezifische Demonstrationen können als Samples statt als Core-Abhängigkeiten geliefert werden.
+Die C#/.NET-Implementierung deckt die großen strukturellen FIRST-ED-Bereiche jetzt inklusive Fenstergeometrie, gepufferter/Makro-Eingabe und destruktiver Fenstertext-Löschung ausführbar ab. Vor V1 folgt der verbleibende Prozedur-für-Prozedur-Audit, das Schließen von Verhaltens-/Testlücken - darunter die Frage, welche historischen Langläufer über Ctrl-U unterbrechbar sein sollen - sowie die Entscheidung über typisierte historische Fehlerressourcen. MicroStar-spezifische Demonstrationen können als Samples statt als Core-Abhängigkeiten geliefert werden.

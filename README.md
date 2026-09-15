@@ -8,7 +8,7 @@ The long-term goal is broader than a stand-alone text editor: the toolbox should
 
 Version 1 uses the functional scope of Borland's historical **Turbo Editor Toolbox 1.0 (1985)** as a compatibility/reference milestone. This is a **clean-room reimplementation**: the historical handbook is treated as a behavioral requirements source; historical source code is not copied.
 
-The historical design is especially useful because it separates the editor into text streams, windows, command dispatchers/processors, hooks, file operations, screen updating and a cooperative background task mechanism. SASD keeps those responsibilities, but exposes them through modern, testable abstractions rather than DOS/video-memory-specific code.
+The historical design is especially useful because it separates the editor into text streams, windows, command dispatchers/processors, hooks, file operations, screen updating, buffered input and a cooperative background task mechanism. SASD keeps those responsibilities, but exposes them through modern, testable abstractions rather than DOS/video-memory-specific code.
 
 ## Repository architecture
 
@@ -39,6 +39,7 @@ The current foundation contains:
 - document and multi-window/session models, including linked windows over one document;
 - host-neutral stacked-window geometry through `EditorWindowLayout` / `EditorWindowFrame`;
 - historical Create Window compression/splitting and Delete Window row-reclamation rules with a three-row minimum per displayed window;
+- destructive `EditWindowDeleteText` semantics: blank `NONAME`, linked-stream detachment, block cleanup and no undo resurrection;
 - cursor movement, insertion/overtype, newline, auto-indent, word-wrap and tab handling;
 - historical FIRST-ED begin/end/goto, top/bottom-file and viewport-aware movement semantics isolated behind a compatibility processor;
 - display-row-aware line scrolling and page movement supplied with a host-visible row count;
@@ -52,6 +53,7 @@ The current foundation contains:
 - a dedicated `FirstEdLegacyFileCodec` preserving the historical `0x8D` wrapped-line marker without imposing that format on modern storage;
 - semantic command requests and a dispatcher separated from editing primitives;
 - a UI-neutral key-stroke model plus the FIRST-ED Ctrl-K/Ctrl-O/Ctrl-Q and primary-key mapping contract;
+- a bounded 500-entry `EditorTypeaheadBuffer` with host FIFO input, front injection for macros, overflow clearing and the historical immediate host Ctrl-U abort boundary;
 - typed prompt metadata so keyboard mapping remains independent of UI prompting;
 - window up/down/goto semantics and historical stream linking by reattaching an existing view to a shared document;
 - an explicit rundown state corresponding to the historical `Rundown` flag;
@@ -59,11 +61,11 @@ The current foundation contains:
 - `IEditorInputPump` as the host boundary for keyboard, terminal, scripted or other input sources;
 - extension hooks inspired by the historical `UserCommand`, `UserError`, `UserStatusLine`, `UserReplace` and `UserTask` integration points;
 - a UI-neutral viewport/status model with a specific-window projection for simultaneous multi-window rendering;
-- an **interactive stacked FIRST-ED terminal reference host** with normalized console input, historical prefix commands, host-owned prompts, per-window status rows, file/search prompts and YES-confirmed Ctrl-K X exit;
+- an **interactive stacked FIRST-ED terminal reference host** whose physical and macro input now share the editor-owned typeahead path before key mapping and dispatch;
 - English and German architecture/compatibility documentation;
 - automated unit tests.
 
-The remaining V1 work is now mainly a compatibility audit rather than a structural build-out: complete the remaining historical command/details audit, introduce typed historical error resources where useful, strengthen edge-case tests and decide which MicroStar-specific features belong in V1 samples rather than the reusable core.
+The remaining V1 work is mainly a procedure-by-procedure compatibility audit: close remaining behavior/test gaps, connect the exposed abort state to any historical long-running operation where that compatibility is useful, introduce typed historical error resources, and decide which MicroStar-specific features belong in V1 samples rather than the reusable core.
 
 ## Run the interactive FIRST-ED sample
 
@@ -88,14 +90,15 @@ Target framework: **.NET 10**.
 - Core editing logic has no WinForms, WPF, console, terminal or browser dependency.
 - A document and its views/windows are separate concepts; multiple windows may share one document.
 - Physical row allocation is kept in a host-neutral layout service rather than embedded in a console renderer.
-- Mutation APIs own dirty-state and undo integration.
-- Historical input/value conventions live in the compatibility layer instead of leaking into the general text engine.
+- Mutation APIs own dirty-state and undo integration; deliberately destructive compatibility commands explicitly discard obsolete undo state.
+- Historical input/value conventions live in compatibility services instead of leaking DOS details into the general text engine.
+- The typeahead compatibility layer stores normalized key strokes, not DOS bytes or raw scan codes.
 - Historical names are documented as compatibility references, not copied as a 1:1 public API.
-- Platform-specific rendering stays outside the core; keyboard events are normalized before entering the compatibility key map.
+- Platform-specific rendering stays outside the core; keyboard events are normalized before entering typeahead/key mapping.
 - Key maps declare required prompt arguments but never display prompts themselves.
 - Historical byte-level file compatibility is isolated behind a codec and does not replace modern UTF-8 storage.
 - Scheduler/background work remains cooperative and bounded; platform input stays behind `IEditorInputPump`.
-- Expensive optimizations (rope/piece-table buffers, SIMD search, native backends) are introduced only behind stable interfaces and after profiling.
+- Expensive optimizations (rope/piece-table buffers, lock-free queues, SIMD search, native backends) are introduced only behind stable interfaces and after profiling.
 - The first implementation favors correctness, reviewability and tests over premature micro-optimization.
 
 ## Documentation
@@ -116,6 +119,8 @@ Target framework: **.NET 10**.
 - Interaktiver FIRST-ED-Host: [`docs/de/INTERAKTIVER-FIRST-ED-HOST.md`](docs/de/INTERAKTIVER-FIRST-ED-HOST.md)
 - Window geometry: [`docs/en/WINDOW-GEOMETRY.md`](docs/en/WINDOW-GEOMETRY.md)
 - Fenstergeometrie: [`docs/de/FENSTER-GEOMETRIE.md`](docs/de/FENSTER-GEOMETRIE.md)
+- Typeahead and window-text deletion: [`docs/en/TYPEAHEAD-AND-WINDOW-TEXT.md`](docs/en/TYPEAHEAD-AND-WINDOW-TEXT.md)
+- Typeahead und Fenstertext-Löschung: [`docs/de/TYPEAHEAD-UND-FENSTERTEXT.md`](docs/de/TYPEAHEAD-UND-FENSTERTEXT.md)
 - Language-neutral V1 contract: [`spec/editor-v1.md`](spec/editor-v1.md)
 
 ## License
