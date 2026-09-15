@@ -29,14 +29,18 @@ V1 includes character/word/line movement, page movement, beginning/end/top/botto
 ## 5. Search and replace
 
 - Literal forward search is required.
-- Case-sensitive, case-insensitive, whole-word and wrap-around behavior are explicit options.
+- The compatibility search remembers the most recent non-empty pattern for a Find Again operation.
+- Find Again resumes after the previous match when the cursor is still positioned on that match.
+- FIRST-ED-compatible forward search does not wrap by default. Wrap-around remains an explicit option for hosts that want it.
+- Case-sensitive, case-insensitive and whole-word behavior are explicit options.
 - Replace-next and replace-all are services above the buffer layer.
 - Hosts may intercept a replacement decision.
 
 ## 6. Undo and dirty state
 
 - Every text mutation marks the document dirty.
-- Successful persistence clears dirty state.
+- Successful persistence clears dirty state when the operation is semantically a save.
+- A direct compatibility Write File operation does not implicitly change document identity.
 - Undo is a replaceable service. Correctness is more important than storage efficiency in the first implementation.
 
 ## 7. Command dispatch and input mapping
@@ -58,9 +62,13 @@ Equivalent extension points must exist for command filtering, error handling, st
 
 The core does not write directly to console/video memory. It exposes a viewport/status projection from which WPF, WinForms, terminal, web and other hosts can render.
 
-## 10. Persistence
+## 10. Persistence and compatibility file I/O
 
-Text storage is abstracted. The first .NET provider supports UTF-8 files and preserves the detected newline convention for subsequent saves.
+- Modern document persistence is abstracted. The first .NET `ITextStorage` provider supports UTF-8 files and preserves the detected newline convention for subsequent saves.
+- Compatibility file commands use a separate file-codec boundary so historical formats do not become mandatory modern storage formats.
+- The Turbo Editor Toolbox wrapped-line marker is a high-bit carriage return (`0x8D`, decimal 141). Decoding it marks the preceding logical line as wrapped; encoding a wrapped separator emits it again.
+- The FIRST-ED-compatible read operation inserts decoded lines after the current line and preserves the current cursor position.
+- Hosts collect filenames; core file services receive resolved paths and perform no UI prompting.
 
 ## 11. Compatibility policy
 

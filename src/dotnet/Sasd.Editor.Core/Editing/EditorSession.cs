@@ -1,5 +1,6 @@
 using Sasd.Editor.Document;
 using Sasd.Editor.Hooks;
+using Sasd.Editor.IO;
 using Sasd.Editor.Model;
 using Sasd.Editor.Search;
 using Sasd.Editor.Undo;
@@ -16,18 +17,20 @@ public sealed class EditorSession
     private readonly List<EditorWindow> _windows = [];
     private readonly Dictionary<int, EditorMarker> _markers = [];
 
-    public EditorSession(IEditorHooks? hooks = null)
+    public EditorSession(IEditorHooks? hooks = null, IEditorFileCodec? fileCodec = null)
     {
         Hooks = hooks ?? new DefaultEditorHooks();
         Undo = new EditorUndoManager();
         Engine = new EditorEngine(this);
         Search = new EditorSearchService(this);
+        Files = new EditorFileService(this, fileCodec);
     }
 
     public IEditorHooks Hooks { get; }
     public EditorUndoManager Undo { get; }
     public EditorEngine Engine { get; }
     public EditorSearchService Search { get; }
+    public EditorFileService Files { get; }
     public IReadOnlyList<EditorWindow> Windows => _windows;
     public EditorWindow CurrentWindow { get; private set; } = null!;
     public EditorBlock? Block { get; private set; }

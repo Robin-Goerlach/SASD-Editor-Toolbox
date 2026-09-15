@@ -43,10 +43,12 @@ The current foundation contains:
 - whole-line block begin/end/copy/move/delete/hide operations plus block-boundary navigation;
 - numbered markers;
 - snapshot-based undo with a configurable limit and replaceable backend boundary;
-- literal find/replace services with case, whole-word and wrap options;
-- asynchronous file load/save through a storage abstraction;
+- literal forward find/replace services plus remembered FIRST-ED Find Again state;
+- modern asynchronous UTF-8 document persistence through `ITextStorage` / `FileTextStorage`;
+- historical read/write command semantics through `EditorFileService`;
+- a dedicated `FirstEdLegacyFileCodec` preserving the historical `0x8D` wrapped-line marker without imposing that format on modern storage;
 - semantic command requests and a dispatcher separated from editing primitives;
-- a UI-neutral key-stroke model plus the complete FIRST-ED Ctrl-K/Ctrl-O/Ctrl-Q and primary-key **mapping contract**;
+- a UI-neutral key-stroke model plus the FIRST-ED Ctrl-K/Ctrl-O/Ctrl-Q and primary-key mapping contract;
 - typed prompt metadata so keyboard mapping remains independent of UI prompting;
 - window up/down/goto semantics and historical stream linking by reattaching an existing view to a shared document;
 - extension hooks inspired by the historical `UserCommand`, `UserError`, `UserStatusLine`, `UserReplace` and `UserTask` integration points;
@@ -55,9 +57,7 @@ The current foundation contains:
 - English and German architecture/compatibility documentation;
 - automated unit tests and a small FIRST-ED-style sample.
 
-The command map is intentionally one layer ahead of some command processors: file/search/lifecycle prompts are represented semantically now and are transferred behind those bindings step by step.
-
-See [`docs/en/BORLAND-V1-COMPATIBILITY.md`](docs/en/BORLAND-V1-COMPATIBILITY.md) for the V1 matrix, [`docs/en/FIRST-ED-COMMAND-MAP.md`](docs/en/FIRST-ED-COMMAND-MAP.md) for the compatibility key map and [`docs/en/COMMAND-PROCESSOR-TRANSFER.md`](docs/en/COMMAND-PROCESSOR-TRANSFER.md) for the current Pascal-to-C# processor transfer. German counterparts are under [`docs/de/`](docs/de/).
+The command map is intentionally one layer ahead only where behavior still belongs to later host/lifecycle work, notably exit/rundown and physical window layout. Search and historical file commands now have executable core processors behind their bindings.
 
 ## Build
 
@@ -78,6 +78,7 @@ Target framework: **.NET 10**.
 - Historical names are documented as compatibility references, not copied as a 1:1 public API.
 - Platform-specific rendering stays outside the core; keyboard events are normalized before entering the compatibility key map.
 - Key maps declare required prompt arguments but never display prompts themselves.
+- Historical byte-level file compatibility is isolated behind a codec and does not replace modern UTF-8 storage.
 - Expensive optimizations (rope/piece-table buffers, SIMD search, native backends) are introduced only behind stable interfaces and after profiling.
 - The first implementation favors correctness, reviewability and tests over premature micro-optimization.
 
@@ -91,6 +92,8 @@ Target framework: **.NET 10**.
 - FIRST-ED-Befehle: [`docs/de/FIRST-ED-BEFEHLE.md`](docs/de/FIRST-ED-BEFEHLE.md)
 - Command-processor transfer: [`docs/en/COMMAND-PROCESSOR-TRANSFER.md`](docs/en/COMMAND-PROCESSOR-TRANSFER.md)
 - Command-Prozessor-Übertragung: [`docs/de/COMMAND-PROCESSOR-UEBERTRAGUNG.md`](docs/de/COMMAND-PROCESSOR-UEBERTRAGUNG.md)
+- Search and file commands: [`docs/en/SEARCH-AND-FILE-COMMANDS.md`](docs/en/SEARCH-AND-FILE-COMMANDS.md)
+- Suchen und Datei-Befehle: [`docs/de/SUCHEN-UND-DATEI-BEFEHLE.md`](docs/de/SUCHEN-UND-DATEI-BEFEHLE.md)
 - Language-neutral V1 contract: [`spec/editor-v1.md`](spec/editor-v1.md)
 
 ## License

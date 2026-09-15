@@ -78,7 +78,10 @@ public sealed class EditorCommandDispatcher(EditorSession session)
                 case EditorCommandId.SetUndoLimit: return FirstEdCompatibilityProcessor.SetUndoLimit(session, RequireNumber(command));
                 case EditorCommandId.SetMarker: session.SetMarker(RequireNumber(command)); break;
                 case EditorCommandId.JumpMarker: return session.JumpToMarker(RequireNumber(command));
-                case EditorCommandId.FindNext: return session.Search.FindNext(RequireText(command), new SearchOptions()) is not null;
+                case EditorCommandId.FindNext:
+                    return session.Search.FindNext(RequireText(command), new SearchOptions()) is not null;
+                case EditorCommandId.FindAgain:
+                    return session.Search.FindAgain() is not null;
                 case EditorCommandId.ReplaceNext:
                 {
                     var parts = RequireText(command).Split('\0', 2);
@@ -89,12 +92,24 @@ public sealed class EditorCommandDispatcher(EditorSession session)
 
                     return await session.Search.ReplaceNextAsync(parts[0], parts[1], cancellationToken: cancellationToken).ConfigureAwait(false);
                 }
+                case EditorCommandId.ReadFile:
+                    await session.Files.ReadIntoCurrentWindowAsync(RequireText(command), cancellationToken).ConfigureAwait(false);
+                    return true;
+                case EditorCommandId.WriteFile:
+                    await session.Files.WriteCurrentWindowAsync(RequireText(command), cancellationToken).ConfigureAwait(false);
+                    return true;
+                case EditorCommandId.SaveFile:
+                    return await session.Files.SaveCurrentWindowAsync(command.Text, cancellationToken).ConfigureAwait(false);
                 default: return false;
             }
 
             return true;
         }
-        catch (Exception exception) when (exception is ArgumentException or InvalidOperationException)
+        catch (Exception exception) when (exception is ArgumentException
+                                          or InvalidOperationException
+                                          or IOException
+                                          or UnauthorizedAccessException
+                                          or NotSupportedException)
         {
             await session.Hooks.OnErrorAsync(
                 session,

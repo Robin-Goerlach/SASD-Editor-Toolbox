@@ -24,14 +24,17 @@ Ziel ist funktionale Abdeckung, nicht eine identische Quellcode- oder API-Strukt
 | Blockanfang/-ende anspringen | Compatibility Processor | Implementiert |
 | Marker | Marker 1..20 | Implementiert |
 | Undo inkl. Limit | `EditorUndoManager` + Command Binding | Implementiert (Snapshot-Backend) |
-| Suchen/Ersetzen | `EditorSearchService` | Grundlage |
-| Datei lesen/schreiben | `ITextStorage`, `FileTextStorage` | Grundlage |
+| Vorwärtssuche / gemerktes Find Again | `EditorSearchService` | Implementiert |
+| Replace Next + Replace-Hook | `EditorSearchService`, `IEditorHooks` | Implementiert |
+| Moderne UTF-8-Dokumentpersistenz | `ITextStorage`, `FileTextStorage` | Implementierte Grundlage |
+| Historische Read-/Write-Command-Prozessoren | `EditorFileService` | Implementiert |
+| High-Bit-CR-Konvention für Wrapped-Zeilen | `FirstEdLegacyFileCodec` | Implementiert |
+| Host-Abfragen für Datei-/Suchparameter | `EditorCommandArgumentKind` | Implementierter Vertrag |
 | Dirty-/Change-Flag | `EditorDocument.IsDirty` | Implementiert |
 | Allgemeiner Command Dispatcher | `EditorCommandDispatcher` | Grundlage / wird erweitert |
 | UI-unabhängige normalisierte Tasten | `EditorKeyStroke` | Implementiert |
 | Ctrl-K/Ctrl-O/Ctrl-Q Prefix-Dispatcher | Prefix-Zustandsautomat in `FirstEdKeyMap` | Implementiert (Zuordnung) |
 | FIRST-ED-/WordStar-kompatible Tasten | `FirstEdKeyMap`, `EditorCommandBinding` | Implementiert (Zuordnung) |
-| Abfrage-Metadaten für parametrisierte Befehle | `EditorCommandArgumentKind` | Implementiert |
 | Fenster hoch/runter/goto und Stream-Linking | Compatibility Processor + `EditorWindow.AttachDocument` | Implementiert |
 | UserCommand-Idee | `IEditorHooks.FilterCommand` | Implementiert |
 | UserError-Idee | `IEditorHooks.OnErrorAsync` | Implementiert |
@@ -40,10 +43,12 @@ Ziel ist funktionale Abdeckung, nicht eine identische Quellcode- oder API-Strukt
 | UserTask-Idee | Hooks + `EditorScheduler` | Implementiert |
 | Bildschirm-Update | `EditorViewportBuilder`, Renderer im Host | Grundlage |
 | FIRST-ED-Demo | zunächst Konsolenbeispiel | Grundlage |
+| Exit / Editor-Rundown | Lifecycle-Service | Geplant |
+| Exakte bildschirmabhängige Scroll-/Page-Semantik | Host-aware Navigation | Geplant |
 | MicroStar-Menüs/Pop-ups | Host-Beispiele | Geplant |
 | Hintergrunddruck | Scheduler-Beispiel | Geplant |
 | Historischer Fehlertext-Katalog | typisierte Fehlercodes/Ressourcen | Geplant |
 | DOS-/Videospeicher-Routinen | bewusst durch Host-Rendering ersetzt | Ersetzt |
 | Overlays | auf modernen Plattformen nicht erforderlich | Entfällt |
 
-Eingabemapping und ein großer Teil der historischen Command-Prozessoren sind jetzt getrennt testbar. V1 ist erst fertig, wenn insbesondere die verbleibenden Search-/File-/Lifecycle-Prozessoren, ein interaktiver FIRST-ED-artiger Host, exakte bildschirmabhängige Scroll-Semantik, weitere Kompatibilitätstests und Dokumentation abgeschlossen sind.
+Eingabemapping, ein großer Teil der Command-Prozessoren, gemerkte Suche und der Kompatibilitäts-Dateipfad sind jetzt getrennt testbar. V1 ist erst fertig, wenn insbesondere Lifecycle/Exit, exaktes bildschirmabhängiges Scrollen, ein interaktiver FIRST-ED-artiger Host, weitere Kompatibilitätstests und Dokumentation abgeschlossen sind.

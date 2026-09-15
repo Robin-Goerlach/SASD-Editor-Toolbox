@@ -4,31 +4,66 @@ using Sasd.Editor.Model;
 namespace Sasd.Editor.Search;
 
 /// <summary>
-/// Literal search and replace service. Regex and backwards search can be added
-/// behind this service without coupling them to the editor engine.
+/// Literal search and replace service. It also owns the remembered search state
+/// required by the historical Find Again command. Regex and backwards search
+/// can be added later without coupling them to the editor engine.
 /// </summary>
 public sealed class EditorSearchService
 {
     private readonly Editing.EditorSession _session;
+    private string? _lastPattern;
+    private SearchOptions _lastOptions = new();
+    private TextPosition? _lastMatch;
+    private Guid? _lastDocumentId;
 
     internal EditorSearchService(Editing.EditorSession session)
     {
         _session = session;
     }
 
+    public string? LastPattern => _lastPattern;
+
     public TextPosition? FindNext(string pattern, SearchOptions? options = null)
     {
-        ArgumentException.ThrowIfNullOrWhiteSpace(pattern);
+        ValidatePattern(pattern);
         options ??= new SearchOptions();
-        var window = _session.CurrentWindow;
-        var buffer = window.Document.Buffer;
-        var comparison = options.CaseSensitive ? StringComparison.Ordinal : StringComparison.OrdinalIgnoreCase;
 
-        var match = FindInRange(window.Cursor.Line, buffer.LineCount - 1, window.Cursor.Column, pattern, options, comparison);
-        if (match is null && options.WrapAround)
+        var window = _session.CurrentWindow;
+        var start = window.Cursor;
+        var match = FindFrom(start, pattern, options);
+        Remember(pattern, options, match, window.Document.DocumentId);
+
+        if (match is not null)
         {
-            match = FindInRange(0, window.Cursor.Line, 0, pattern, options, comparison, stopColumnExclusive: window.Cursor.Column);
+            window.Cursor = match.Value;
         }
+
+        return match;
+    }
+
+    /// <summary>
+    /// Repeats the most recent search. When the cursor is still on the previous
+    /// match, scanning resumes after that match instead of returning it again.
+    /// </summary>
+    public TextPosition? FindAgain()
+    {
+        if (string.IsNullOrEmpty(_lastPattern))
+        {
+            return null;
+        }
+
+        var window = _session.CurrentWindow;
+        var start = window.Cursor;
+
+        if (_lastDocumentId == window.Document.DocumentId
+            && _lastMatch.HasValue
+            && _lastMatch.Value == window.Cursor)
+        {
+            start = AdvancePastMatch(window.Cursor, _lastPattern.Length);
+        }
+
+        var match = FindFrom(start, _lastPattern, _lastOptions);
+        Remember(_lastPattern, _lastOptions, match, window.Document.DocumentId);
 
         if (match is not null)
         {
@@ -60,10 +95,7 @@ public sealed class EditorSearchService
 
         if (decision == ReplaceDecision.Skip)
         {
-            _session.CurrentWindow.Cursor = _session.CurrentWindow.Cursor with
-            {
-                Column = _session.CurrentWindow.Cursor.Column + Math.Max(1, pattern.Length)
-            };
+            _session.CurrentWindow.Cursor = AdvancePastMatch(match.Value, Math.Max(1, pattern.Length));
             return false;
         }
 
@@ -73,7 +105,7 @@ public sealed class EditorSearchService
 
     public int ReplaceAll(string pattern, string replacement, SearchOptions? options = null)
     {
-        ArgumentException.ThrowIfNullOrWhiteSpace(pattern);
+        ValidatePattern(pattern);
         ArgumentNullException.ThrowIfNull(replacement);
         options ??= new SearchOptions();
 
@@ -127,6 +159,46 @@ public sealed class EditorSearchService
         return replacements;
     }
 
+    private TextPosition? FindFrom(TextPosition start, string pattern, SearchOptions options)
+    {
+        var window = _session.CurrentWindow;
+        var buffer = window.Document.Buffer;
+        var comparison = options.CaseSensitive ? StringComparison.Ordinal : StringComparison.OrdinalIgnoreCase;
+        var startLine = Math.Clamp(start.Line, 0, buffer.LineCount - 1);
+        var startColumn = Math.Max(0, start.Column);
+
+        var match = FindInRange(
+            startLine,
+            buffer.LineCount - 1,
+            startColumn,
+            pattern,
+            options,
+            comparison);
+
+        if (match is null && options.WrapAround)
+        {
+            match = FindInRange(
+                0,
+                startLine,
+                0,
+                pattern,
+                options,
+                comparison,
+                stopColumnExclusive: startColumn);
+        }
+
+        return match;
+    }
+
+    private TextPosition AdvancePastMatch(TextPosition position, int length)
+    {
+        var buffer = _session.CurrentWindow.Document.Buffer;
+        var line = Math.Clamp(position.Line, 0, buffer.LineCount - 1);
+        var text = buffer.GetLine(line).Text;
+        var column = Math.Clamp(position.Column + Math.Max(1, length), 0, text.Length);
+        return new TextPosition(line, column);
+    }
+
     private TextPosition? FindInRange(
         int startLine,
         int endLine,
@@ -163,6 +235,22 @@ public sealed class EditorSearchService
         }
 
         return null;
+    }
+
+    private void Remember(string pattern, SearchOptions options, TextPosition? match, Guid documentId)
+    {
+        _lastPattern = pattern;
+        _lastOptions = options;
+        _lastMatch = match;
+        _lastDocumentId = documentId;
+    }
+
+    private static void ValidatePattern(string pattern)
+    {
+        if (string.IsNullOrEmpty(pattern))
+        {
+            throw new ArgumentException("Search pattern cannot be empty.", nameof(pattern));
+        }
     }
 
     private static bool IsWholeWord(string text, int index, int length)
