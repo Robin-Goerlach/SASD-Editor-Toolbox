@@ -33,14 +33,17 @@ Ziel ist funktionale Abdeckung, nicht eine identische Quellcode- oder API-Strukt
 | Moderne UTF-8-Dokumentpersistenz | `ITextStorage`, `FileTextStorage` | Implementierte Grundlage |
 | Historische Read-/Write-Command-Prozessoren | `EditorFileService` | Implementiert |
 | High-Bit-CR-Konvention für Wrapped-Zeilen | `FirstEdLegacyFileCodec` | Implementiert |
-| Host-Abfragen für Datei-/Suchparameter | `EditorCommandArgumentKind` | Implementierter Vertrag |
+| Host-Abfragevertrag | `EditorCommandArgumentKind` | Implementiert |
+| Terminal-Abfragen | `ConsoleFirstEdPromptService` | Implementiertes Beispiel |
 | Dirty-/Change-Flag | `EditorDocument.IsDirty` | Implementiert |
 | Allgemeiner Command Dispatcher | `EditorCommandDispatcher` | Grundlage / wird erweitert |
 | UI-unabhängige normalisierte Tasten | `EditorKeyStroke` | Implementiert |
+| Console-Tastennormalisierung | `ConsoleKeyTranslator` | Implementiertes Beispiel |
 | Ctrl-K/Ctrl-O/Ctrl-Q Prefix-Dispatcher | Prefix-Zustandsautomat in `FirstEdKeyMap` | Implementiert (Zuordnung) |
 | FIRST-ED-/WordStar-kompatible Tasten | `FirstEdKeyMap`, `EditorCommandBinding` | Implementiert (Zuordnung) |
 | Fenster hoch/runter/goto und Stream-Linking | Compatibility Processor + `EditorWindow.AttachDocument` | Implementiert |
 | `EditExit` / `Rundown` | `EditorCommandId.Exit`, `EditorSession.RundownRequested` | Implementiert |
+| Ctrl-K X Bestätigung | Host-Abfrage + semantisches `Exit` | Implementiertes Beispiel |
 | `EditSchedule` mit Eingabepriorität | `EditorScheduler.RunCycleAsync`, `IEditorInputPump` | Implementiert |
 | `EditSystem` bis Rundown | `EditorSystemLoop` | Implementiert |
 | UserCommand-Idee | `IEditorHooks.FilterCommand` | Implementiert |
@@ -49,8 +52,8 @@ Ziel ist funktionale Abdeckung, nicht eine identische Quellcode- oder API-Strukt
 | UserReplace-Idee | `IEditorHooks.BeforeReplaceAsync` | Implementiert |
 | UserTask-Idee | Hooks + `EditorScheduler` | Implementiert |
 | Bildschirm-Update | `EditorViewportBuilder`, Renderer im Host | Grundlage |
-| FIRST-ED-Demo | zunächst Konsolenbeispiel | Grundlage |
-| Physische Create-Window-Bildschirmgeometrie | Host-/Layout-Integration | Geplant |
+| Interaktiver FIRST-ED-Demohost | Terminalhost in `Sasd.Editor.FirstEd.Sample` | Implementiertes Beispiel |
+| Physische gestapelte Fenstergeometrie | Host-/Layout-Integration | Geplant |
 | MicroStar-Menüs/Pop-ups | Host-Beispiele | Geplant |
 | Hintergrunddruck | Scheduler-Beispiel | Geplant |
 | Historischer Fehlertext-Katalog | typisierte Fehlercodes/Ressourcen | Geplant |
@@ -61,4 +64,4 @@ Ziel ist funktionale Abdeckung, nicht eine identische Quellcode- oder API-Strukt
 
 Das Handbuch legt fest, dass Page-Bewegungen das Fenster um eine Zeile weniger als die Zahl sichtbarer Textzeilen verschieben. Es legt aber nicht separat fest, auf welcher Bildschirmzeile der Cursor danach stehen soll. SASD erhält deshalb nach Möglichkeit die relative sichtbare Cursorzeile und dokumentiert dies ausdrücklich als moderne Host-Regel statt als historische Aussage.
 
-Eingabemapping, ein großer Teil der Command-Prozessoren, Suche/Dateikompatibilität, Lifecycle und bildschirmzeilenabhängige Navigation sind jetzt getrennt testbar. V1 ist erst fertig, wenn insbesondere der interaktive FIRST-ED-artige Host, die physische Create-Window-/Layout-Integration, verbleibende Kompatibilitätsaudits/-tests und die Dokumentation abgeschlossen sind.
+Der interaktive Terminal-Referenzhost führt Keymap, Abfragen, Scheduler, Command Dispatcher und Viewport jetzt Ende-zu-Ende zusammen. V1 ist erst fertig, wenn die physische gestapelte Fensteraufteilung inklusive Zeilen-Splitting/Komprimierung, gleichzeitiges Multi-Window-Rendering, die verbleibenden Kompatibilitätsaudits/-tests und historische Fehlerressourcen abgeschlossen sind.

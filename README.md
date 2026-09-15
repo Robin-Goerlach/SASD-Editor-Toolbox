@@ -21,7 +21,7 @@ SASD-Editor-Toolbox/
 │   └── dotnet/
 ├── samples/
 │   └── dotnet/
-│       └── Sasd.Editor.FirstEd.Sample/
+│       └── Sasd.Editor.FirstEd.Sample/ # interactive terminal reference host
 ├── spec/                              # language-neutral contracts
 ├── docs/
 │   ├── en/                            # primary documentation
@@ -57,10 +57,19 @@ The current foundation contains:
 - `IEditorInputPump` as the host boundary for keyboard, terminal, scripted or other input sources;
 - extension hooks inspired by the historical `UserCommand`, `UserError`, `UserStatusLine`, `UserReplace` and `UserTask` integration points;
 - a UI-neutral viewport/status model rather than direct screen-memory access;
+- an **interactive FIRST-ED terminal reference host** with normalized console input, historical prefix commands, host-owned prompts, status rendering, file/search prompts and YES-confirmed Ctrl-K X exit;
 - English and German architecture/compatibility documentation;
-- automated unit tests and a small FIRST-ED-style sample.
+- automated unit tests.
 
-The command map is intentionally one layer ahead only where behavior still belongs to later host/layout work, especially physical window sizing and interactive prompt presentation. Search, file, lifecycle and viewport movement commands now have executable core processors behind their bindings.
+The remaining V1 work is concentrated rather than broad: the historical physical stacked-window geometry still needs exact row splitting/compression and simultaneous multi-window rendering, followed by a final compatibility audit and error-resource pass.
+
+## Run the interactive FIRST-ED sample
+
+```bash
+dotnet run --project samples/dotnet/Sasd.Editor.FirstEd.Sample/Sasd.Editor.FirstEd.Sample.csproj
+```
+
+The sample starts with Window 1 editing `NONAME`. Historical Ctrl-K / Ctrl-O / Ctrl-Q sequences are accepted alongside modern cursor keys. Use **Ctrl-K X**, then type **YES**, to exit.
 
 ## Build
 
@@ -100,6 +109,8 @@ Target framework: **.NET 10**.
 - Suchen und Datei-Befehle: [`docs/de/SUCHEN-UND-DATEI-BEFEHLE.md`](docs/de/SUCHEN-UND-DATEI-BEFEHLE.md)
 - Lifecycle and scrolling: [`docs/en/LIFECYCLE-AND-SCROLLING.md`](docs/en/LIFECYCLE-AND-SCROLLING.md)
 - Lifecycle und Scrollen: [`docs/de/LIFECYCLE-UND-SCROLLEN.md`](docs/de/LIFECYCLE-UND-SCROLLEN.md)
+- Interactive FIRST-ED host: [`docs/en/INTERACTIVE-FIRST-ED-HOST.md`](docs/en/INTERACTIVE-FIRST-ED-HOST.md)
+- Interaktiver FIRST-ED-Host: [`docs/de/INTERAKTIVER-FIRST-ED-HOST.md`](docs/de/INTERAKTIVER-FIRST-ED-HOST.md)
 - Language-neutral V1 contract: [`spec/editor-v1.md`](spec/editor-v1.md)
 
 ## License

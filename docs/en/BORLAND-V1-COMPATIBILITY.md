@@ -33,14 +33,17 @@ The goal is behavioral coverage, not source-level or public-name identity.
 | Modern UTF-8 document storage | `ITextStorage`, `FileTextStorage` | Implemented foundation |
 | Historical read/write command processors | `EditorFileService` | Implemented |
 | High-bit-CR wrapped-line file convention | `FirstEdLegacyFileCodec` | Implemented |
-| Host prompting for file/search parameters | `EditorCommandArgumentKind` | Implemented contract |
+| Host prompting contract | `EditorCommandArgumentKind` | Implemented |
+| Terminal prompt implementation | `ConsoleFirstEdPromptService` | Implemented sample |
 | Dirty/change flag | `EditorDocument.IsDirty` | Implemented |
 | General command dispatcher | `EditorCommandDispatcher` | Foundation / expanding |
 | Normalized host-independent keystrokes | `EditorKeyStroke` | Implemented |
+| Console key normalization | `ConsoleKeyTranslator` | Implemented sample |
 | Prefixed Ctrl-K / Ctrl-O / Ctrl-Q dispatchers | `FirstEdKeyMap` prefix state machine | Implemented (mapping) |
 | FIRST-ED / WordStar-compatible command map | `FirstEdKeyMap`, `EditorCommandBinding` | Implemented (mapping) |
 | Window up/down/goto and stream linking | compatibility processor + `EditorWindow.AttachDocument` | Implemented |
 | `EditExit` / `Rundown` | `EditorCommandId.Exit`, `EditorSession.RundownRequested` | Implemented |
+| Ctrl-K X confirmation | host prompt + semantic `Exit` | Implemented sample |
 | `EditSchedule` input-first behavior | `EditorScheduler.RunCycleAsync`, `IEditorInputPump` | Implemented |
 | `EditSystem` loop-until-rundown | `EditorSystemLoop` | Implemented |
 | `UserCommand` concept | `IEditorHooks.FilterCommand` | Implemented |
@@ -50,8 +53,8 @@ The goal is behavioral coverage, not source-level or public-name identity.
 | `UserTask` concept | `IEditorHooks.OnIdleAsync`, `EditorScheduler` | Implemented |
 | Screen image/update routines | `EditorViewportBuilder`; renderer is host-specific | Foundation |
 | Text/status/block/special display attributes | line flags + host renderer | Foundation |
-| FIRST-ED demonstration editor | console sample now; interactive host later | Foundation |
-| Physical create-window screen geometry | host/layout integration | Planned |
+| Interactive FIRST-ED demonstration host | `Sasd.Editor.FirstEd.Sample` terminal host | Implemented sample |
+| Physical stacked-window screen geometry | host/layout integration | Planned |
 | MicroStar pull-down menus | host sample | Planned |
 | MicroStar pop-up helpers | host sample | Planned |
 | Background printing | scheduler sample | Planned |
@@ -65,4 +68,4 @@ The handbook states that page movement slides the window by one less than the nu
 
 ## V1 release gate
 
-Input mapping, a substantial set of command processors, search/file compatibility, lifecycle and display-row-aware navigation are independently testable. V1 should not be called complete until the interactive FIRST-ED-style host, physical create-window/layout integration, remaining compatibility audits/tests and documentation are complete. MicroStar-specific demonstration features may ship as samples rather than core dependencies.
+The interactive terminal reference host now exercises the core key map, prompts, scheduler, command dispatcher and viewport end to end. V1 should not be called complete until physical stacked-window row splitting/compression, simultaneous multi-window rendering, the remaining compatibility audit/tests and historical error resources are complete. MicroStar-specific demonstration features may ship as samples rather than core dependencies.
