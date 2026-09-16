@@ -25,6 +25,7 @@ public sealed class EditorSession
         Undo = new EditorUndoManager();
         Typeahead = new EditorTypeaheadBuffer();
         WindowLayout = new EditorWindowLayout(this);
+        Topology = new EditorLineTopology(this);
         Engine = new EditorEngine(this);
         Search = new EditorSearchService(this);
         Files = new EditorFileService(this, fileCodec);
@@ -44,6 +45,19 @@ public sealed class EditorSession
     public IReadOnlyList<EditorWindow> Windows => _windows;
     public EditorWindow CurrentWindow { get; private set; } = null!;
     public EditorBlock? Block { get; private set; }
+
+    /// <summary>
+    /// Internal line-topology coordinator. Structural editing code uses this
+    /// service instead of independently repairing window, marker and block line
+    /// numbers after insertions or deletions.
+    /// </summary>
+    internal EditorLineTopology Topology { get; }
+
+    /// <summary>
+    /// Internal marker table exposed only to the topology coordinator. Hosts use
+    /// SetMarker/JumpToMarker and never mutate this dictionary directly.
+    /// </summary>
+    internal IDictionary<int, EditorMarker> MarkerTable => _markers;
 
     /// <summary>
     /// Modern equivalent of the historical global Rundown flag. The editor loop
@@ -315,6 +329,12 @@ public sealed class EditorSession
         ClearBlockHighlights();
         MarkBlockHighlights();
     }
+
+    /// <summary>
+    /// Allows the topology service to replace a complete block after line-number
+    /// realignment without making the public block setter mutable.
+    /// </summary>
+    internal void ReplaceBlockForTopology(EditorBlock? block) => Block = block;
 
     private static EditorDocument CreateDocumentModel(string? text)
     {
