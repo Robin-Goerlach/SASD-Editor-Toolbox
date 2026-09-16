@@ -1,5 +1,6 @@
 using Sasd.Editor.Document;
 using Sasd.Editor.Model;
+using Sasd.Editor.Windows;
 
 namespace Sasd.Editor.Editing;
 
@@ -181,7 +182,7 @@ internal sealed class EditorLineTopology
         });
     }
 
-    private IEnumerable<Windows.EditorWindow> WindowsFor(EditorDocument document) =>
+    private IEnumerable<EditorWindow> WindowsFor(EditorDocument document) =>
         _session.Windows.Where(window => window.Document.DocumentId == document.DocumentId);
 
     private static int ShiftForInsertion(int line, int firstInsertedLine, int count) =>
