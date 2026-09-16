@@ -41,11 +41,17 @@ public sealed class EditorWindow
         Document = document ?? throw new ArgumentNullException(nameof(document));
     }
 
+    /// <summary>
+    /// Normalizes line and viewport coordinates after a structural mutation while
+    /// deliberately preserving non-negative virtual cursor columns. FIRST-ED can
+    /// move the cursor beyond the current physical line length, so clamping the
+    /// column to <c>Text.Length</c> here would silently destroy valid editor state
+    /// whenever another linked view changes the document topology.
+    /// </summary>
     public void ClampCursor()
     {
         var line = Math.Clamp(Cursor.Line, 0, Document.Buffer.LineCount - 1);
-        var text = Document.Buffer.GetLine(line).Text;
-        var column = Math.Clamp(Cursor.Column, 0, text.Length);
+        var column = Math.Max(0, Cursor.Column);
         Cursor = new TextPosition(line, column);
         TopLine = Math.Clamp(TopLine, 0, Math.Max(0, Document.Buffer.LineCount - 1));
         LeftColumn = Math.Max(0, LeftColumn);
