@@ -41,7 +41,7 @@ Ziel ist funktionale Abdeckung, nicht eine identische Quellcode- oder API-Strukt
 | `EditDeleteRightChar`: cursorpositionierter Join hinter letztem Nicht-Leerzeichen | Primitive Compatibility Processor + Topologie | Implementiert |
 | `EditDeleteRightWord`: drei Klassen, folgende Leerzeichen, cursorpositionierter Join | Primitive Compatibility Processor + Topologie | Implementiert |
 | `EditDeleteLine`: Ein-Zeilen-Regel, Marker-Ungültigkeit, Blockgrenzen | `FirstEdPrimitiveCompatibilityProcessor.DeleteLine` | Implementiert |
-| `EditDelline` / `EditRealign`: beobachtbare Fenster-/Marker-/Block-Referenzen reparieren | `EditorLineTopology` | Implementierte Grundlage; Block-Bulk-Audit offen |
+| `EditDelline` / `EditRealign`: beobachtbare Fenster-/Marker-/Block-Referenzen reparieren | `EditorLineTopology` | Implementierte Grundlage; Einzelzeilen-, Reformat- und Block-Bulk-Pfade auditiert |
 | Referenz-Realignment beim kompatiblen Datei-Insert | `EditorFileService` + `EditorLineTopology.LinesInserted` | Implementiert |
 | Realignment bei generischem Newline / automatischem Wrap | `EditorEngine` + `EditorLineTopology.LinesInserted` | Implementiert |
 | Referenz-Realignment bei Reformat-Vergrößerung/-Verkleinerung | Reformat Processor + `EditorLineTopology` | Implementiert |
@@ -50,17 +50,26 @@ Ziel ist funktionale Abdeckung, nicht eine identische Quellcode- oder API-Strukt
 | `EditLongLine` / `EditShortLine` | Push-down / Pull-up im Reformat-Plan | Implementiert |
 | `EditReformat`: Wrapped-Durchlauf / Randformatierung | `FirstEdReformatCompatibilityProcessor` | Implementiert |
 | Reformat: zu langes Wort vor Mutation erkennen | Plan-Validierung | Implementiert |
-| Ganze-Zeilen-Blöcke | `EditorBlock`, `EditorSession` | Implementiert |
-| Block kopieren/verschieben/löschen/verbergen | Engine/Session | Implementierte Grundlage; Bulk-Topologie-Audit offen |
+| Ganzzeilen-Blockmodell | `EditorBlock`, `EditorSession` | Implementierte Grundlage; Audit unabhängiger historischer Endpunktzustände bleibt |
+| `EditBlockCopy` | `FirstEdBlockCompatibilityProcessor.CopyToCursor` + Topologie | Implementiert |
+| `EditBlockMove` | Block Compatibility Processor + Topologie | Implementiert |
+| `EditBlockMove`: Cursor im Quellblock ablehnen | Validierung im Compatibility Processor | Implementiert |
+| `EditBlockDelete` | Block Compatibility Processor + Topologie | Implementiert |
+| Fenster-/dokumentübergreifende Blockoperationen | Quellblock + aktuelles Zielfenster/-dokument | Implementiert |
+| Zeilenmetadaten bei Block Copy/Move | `Wrapped`/`UserColored` erhalten; `InBlock` neu projizieren | Implementiert |
+| Block Hide/Display | `EditorSession.ToggleBlockHidden` | Implementierte Grundlage |
+| Unabhängig undefinierte `Blockfrom`-/`Blockto`-Zustände | aktuelles vollständiges `EditorBlock`-Paar | Geplanter Audit |
 | `EditOffblock`: InBlock global löschen, Grenzen behalten | `EditorSession.ClearBlockHighlights` | Implementiert |
 | `EditMarkblock`: aktiven Bereich in Flags projizieren | `EditorSession.MarkBlockHighlights` | Implementiert |
 | Blockanfang/-ende anspringen | Compatibility Processor | Implementiert |
 | Marker 1..20 | `EditorMarker` | Implementiert |
 | Marker bezeichnet Zeile; Sprung erhält Zielspalte | zeilenorientierter Marker / Session-Jump | Implementiert |
 | Marker-Realignment in auditierten Insert-/Delete-Pfaden | `EditorLineTopology` | Implementiert |
-| Stabile Anker bei Reformat-Bulk-Topologie | Reformat Processor + Topologie | Implementiert |
+| Stabile Anker bei Reformat-/Block-Bulk-Topologie | Compatibility Processor + Topologie | Implementiert |
+| Marker-Policy für aus dem Quellblock verschobene Zeilen | Quell-Löschsemantik; Block am Ziel neu erzeugt | Dokumentierte moderne Policy |
 | Undo inkl. Limit | `EditorUndoManager` + Command Binding | Implementiert (Snapshot-Backend) |
 | Undo-Bereinigung zerstörter Dokumente | `EditorUndoManager.DiscardDocument` | Implementiert |
+| Zusammengesetztes Undo bei dokumentübergreifendem Block-Move | getrennte Quell-/Ziel-Snapshots | Grundlage / Backend-Audit |
 | Vorwärtssuche / gemerktes Find Again | `EditorSearchService` | Implementiert |
 | Replace Next + Replace-Hook | `EditorSearchService`, `IEditorHooks` | Implementiert |
 | Moderne UTF-8-Dokumentpersistenz | `ITextStorage`, `FileTextStorage` | Implementierte Grundlage |
@@ -116,9 +125,11 @@ Die historische Beschreibung von `EditCompressLine` spricht ausdrücklich von Sp
 
 Die historische Implementierung erhält stabile Zeilenidentität über Deskriptor-Pointer. SASD bildet dieselben beobachtbaren Beziehungen über `DocumentId`, logische Zeilennummern und den expliziten Realignment-Dienst `EditorLineTopology` ab. Pointeradressen, manuelles Splicing und das Freigeben von Deskriptoren gehören nicht zur portablen API.
 
-Die auditierten Pfade für einzelne Zeileneinfügungen, New Line, automatischen Wrap, Datei-Insert, Löschen/Join und Absatz-Neuformatierung melden Topologieänderungen jetzt zentral. Der verbleibende Bulk-Topologie-Audit konzentriert sich auf mehrzeilige Blockoperationen Copy/Move/Delete.
+Die auditierten Pfade für einzelne Zeileneinfügungen, New Line, automatischen Wrap, Datei-Insert, Löschen/Join, Absatz-Neuformatierung und mehrzeilige Blockoperationen Copy/Move/Delete melden Topologieänderungen jetzt zentral. Die frühere Block-Bulk-Topologielücke ist geschlossen.
 
-Das erste .NET-Blockmodell speichert ein vollständiges Start-/End-Paar. Wird eine Blockgrenze gelöscht, wird deshalb der vollständige aktive Block samt Hervorhebung entfernt. Das ist eine konservative Abbildung des historischen Ergebnisses (eine Grenze wird undefiniert) und keine Behauptung, dass historisch beide Pointer auf `nil` gesetzt wurden.
+Das erste .NET-Blockmodell speichert ein vollständiges Start-/End-Paar. Historisch konnten `Blockfrom` und `Blockto` unabhängig undefiniert sein; die exakte Parität der Begin-/End-Endpunktzustände bleibt daher ein eigener Audit-Punkt. Wird bei einer gewöhnlichen Löschung eine dargestellte Blockgrenze entfernt, löscht das aktuelle Paarmodell konservativ den aktiven Block, ohne zu behaupten, historisch wären zwingend beide Pointer zurückgesetzt worden.
+
+Für Block Move legt das Handbuch nicht separat fest, ob Marker oder andere Anker innerhalb des verschobenen Quellbereichs den physischen Zeilen an den neuen Ort folgen. Die .NET-Implementierung wendet auf solche Quellanker normale Löschsemantik an und erzeugt nur den logischen Block am Ziel neu. Das ist dokumentierte moderne Policy und keine historische Behauptung.
 
 ## Policy für virtuelle Spalten
 
@@ -142,4 +153,4 @@ Der historische Bildschirm hatte eine feste Größe. Die Größenänderung eines
 
 ## V1-Abschlusskriterium
 
-Die C#/.NET-Implementierung deckt die großen strukturellen FIRST-ED-Bereiche inzwischen ausführbar ab, einschließlich Absatz-Neuformatierung und ihrer Topologieeffekte. Vor V1 schließen wir den verbleibenden mehrzeiligen Block-Topologie-Audit sowie systematische Audits für Command-Grenzen/Fehlerressourcen und Unterbrechbarkeit; anschließend folgt ein finaler Audit des Handbuch-Prozedurindexes. MicroStar-spezifische Demonstrationen können als Samples statt als Core-Abhängigkeiten geliefert werden.
+Die C#/.NET-Implementierung deckt die großen strukturellen FIRST-ED-Bereiche inzwischen ausführbar ab, einschließlich Absatz-Neuformatierung und mehrzeiliger Block-Bulk-Topologie. Vor V1 auditieren wir noch das unabhängige Block-Endpunktmodell, schließen die systematischen Audits für Command-Grenzen/Fehlerressourcen und Unterbrechbarkeit ab, prüfen zusammengesetztes Undo/Navigationszustand bei dokumentübergreifenden Mutationen und führen anschließend einen finalen Audit des Handbuch-Prozedurindexes durch. MicroStar-spezifische Demonstrationen können als Samples statt als Core-Abhängigkeiten geliefert werden.

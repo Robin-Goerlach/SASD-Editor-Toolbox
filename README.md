@@ -54,7 +54,8 @@ The current foundation contains:
 - a central `EditorLineTopology` service that realigns window cursors/top-line anchors, markers and block limits for audited structural insert/delete operations;
 - structural realignment for Insert Line, New Line, automatic word-wrap, compatibility file reads, paragraph reformatting and character/word line joins;
 - marker invalidation and block-boundary cleanup on audited line deletion paths;
-- whole-line block begin/end/copy/move/delete/hide operations plus block-boundary navigation;
+- audited whole-line block copy/move/delete with cross-window/document operation, move-inside-block rejection, line-metadata preservation and bulk topology realignment;
+- whole-line block begin/end/hide state plus block-boundary navigation;
 - `EditOffblock`/`EditMarkblock`-style separation of logical block limits from global `InBlock` highlight flags;
 - numbered line markers whose jumps preserve the selected target view's current column;
 - snapshot-based undo with a configurable limit and replaceable backend boundary;
@@ -76,7 +77,7 @@ The current foundation contains:
 - English and German architecture/compatibility documentation;
 - automated unit tests.
 
-The remaining V1 work is increasingly concentrated rather than broad. Multi-line block copy/move/delete needs a final topology/identity audit, and the general command surface still needs systematic boundary validation, complete historical long-operation abort coverage and typed historical error resources. After those items, the procedure/function index can be audited end-to-end for small omissions. MicroStar-specific UI features can remain samples rather than dependencies of the reusable core.
+The remaining V1 work is increasingly concentrated rather than broad. The multi-line block topology gap is now closed. Remaining compatibility work includes the independent historical `Blockfrom`/`Blockto` endpoint-state audit, systematic command-boundary validation, complete long-operation abort coverage, typed historical error resources and a compound-undo/navigation-state audit for cross-document mutations. After those items, the handbook procedure/function index can be audited end-to-end for small omissions. MicroStar-specific UI features can remain samples rather than dependencies of the reusable core.
 
 ## Run the interactive FIRST-ED sample
 
@@ -146,6 +147,8 @@ Target framework: **.NET 10**.
 - Zeileneinfügung und Neue Zeile: [`docs/de/ZEILENEINFUEGUNG-UND-NEUE-ZEILE.md`](docs/de/ZEILENEINFUEGUNG-UND-NEUE-ZEILE.md)
 - Reformat compatibility: [`docs/en/REFORMAT-COMPATIBILITY.md`](docs/en/REFORMAT-COMPATIBILITY.md)
 - Neuformatierungs-Kompatibilität: [`docs/de/NEUFORMATIERUNG-KOMPATIBILITAET.md`](docs/de/NEUFORMATIERUNG-KOMPATIBILITAET.md)
+- Block compatibility: [`docs/en/BLOCK-COMPATIBILITY.md`](docs/en/BLOCK-COMPATIBILITY.md)
+- Block-Kompatibilität: [`docs/de/BLOCK-KOMPATIBILITAET.md`](docs/de/BLOCK-KOMPATIBILITAET.md)
 - Language-neutral V1 contract: [`spec/editor-v1.md`](spec/editor-v1.md)
 
 ## License

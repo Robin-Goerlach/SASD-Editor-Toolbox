@@ -41,7 +41,7 @@ The goal is behavioral coverage, not source-level or public-name identity.
 | `EditDeleteRightChar` last-nonblank cursor-positioned join rule | primitive compatibility processor + topology | Implemented |
 | `EditDeleteRightWord` three classes, following blanks and cursor-positioned join | primitive compatibility processor + topology | Implemented |
 | `EditDeleteLine` single-line preservation, marker invalidation and block-boundary cleanup | `FirstEdPrimitiveCompatibilityProcessor.DeleteLine` | Implemented |
-| `EditDelline` / `EditRealign` observable window-marker-block reference repair | `EditorLineTopology` | Implemented foundation; block bulk audit remains |
+| `EditDelline` / `EditRealign` observable window-marker-block reference repair | `EditorLineTopology` | Implemented foundation; audited single-line, reformat and block-bulk paths |
 | Compatibility file insertion reference realignment | `EditorFileService` + `EditorLineTopology.LinesInserted` | Implemented |
 | Generic newline / automatic-wrap insertion realignment | `EditorEngine` + `EditorLineTopology.LinesInserted` | Implemented |
 | Reformat expansion/contraction reference realignment | reformat processor + `EditorLineTopology` | Implemented |
@@ -50,17 +50,26 @@ The goal is behavioral coverage, not source-level or public-name identity.
 | `EditLongLine` / `EditShortLine` responsibilities | reformat plan push-down / pull-up | Implemented |
 | `EditReformat` Wrapped traversal / margin reflow | `FirstEdReformatCompatibilityProcessor` | Implemented |
 | Reformat word-too-long failure before mutation | preflight plan validation | Implemented |
-| Whole-line block begin/end | `EditorBlock`, `EditorSession` | Implemented |
-| Block copy/move/delete/hide | `EditorEngine` / `EditorSession` | Implemented foundation; bulk topology audit pending |
+| Whole-line block model | `EditorBlock`, `EditorSession` | Implemented foundation; independent historical endpoint-state audit remains |
+| `EditBlockCopy` | `FirstEdBlockCompatibilityProcessor.CopyToCursor` + topology | Implemented |
+| `EditBlockMove` | block compatibility processor + topology | Implemented |
+| `EditBlockMove` cursor-inside-source rejection | compatibility processor validation | Implemented |
+| `EditBlockDelete` | block compatibility processor + topology | Implemented |
+| Cross-window/document block operations | source block + current target window/document | Implemented |
+| Block copy/move line metadata | preserve `Wrapped`/`UserColored`; regenerate `InBlock` | Implemented |
+| Block hide/display | `EditorSession.ToggleBlockHidden` | Implemented foundation |
+| Independent `Blockfrom` / `Blockto` undefined states | current complete-pair `EditorBlock` model | Planned audit |
 | `EditOffblock` global InBlock clear, limits retained | `EditorSession.ClearBlockHighlights` | Implemented |
 | `EditMarkblock` active-range flag projection | `EditorSession.MarkBlockHighlights` | Implemented |
 | Top/bottom of active block commands | compatibility processor | Implemented |
 | Markers 1..20 | `EditorMarker` | Implemented |
 | Marker identifies line; jump preserves target view column | line-only marker/session jump | Implemented |
 | Marker realignment for audited line insertion/deletion paths | `EditorLineTopology` | Implemented |
-| Stable anchors through reformat bulk topology | reformat processor + topology | Implemented |
+| Stable anchors through reformat/block bulk topology | compatibility processors + topology | Implemented |
+| Marker policy for lines moved out of source block | source deletion semantics; block recreated at target | Documented modern policy |
 | Undo limit and undo operation | `EditorUndoManager` + command binding | Implemented (snapshot backend) |
 | Destructive-document undo cleanup | `EditorUndoManager.DiscardDocument` | Implemented |
+| Cross-document block-move compound undo | separate source/target snapshots | Foundation / backend audit |
 | Forward find / remembered Find Again | `EditorSearchService` | Implemented |
 | Replace-next + replace hook | `EditorSearchService`, `IEditorHooks` | Implemented |
 | Modern UTF-8 document storage | `ITextStorage`, `FileTextStorage` | Implemented foundation |
@@ -117,9 +126,11 @@ The historical `EditCompressLine` wording names spaces specifically. The .NET re
 
 The historical implementation obtains stable line identity through descriptor pointers. SASD represents the same observable relationships through `DocumentId` plus logical line numbers and an explicit `EditorLineTopology` realignment service. Pointer addresses, splicing mechanics and manual descriptor release are not part of the portable API.
 
-The audited single-line insertion, New Line, automatic wrap, file insertion, deletion/join and paragraph-reformat paths now report topology changes centrally. The remaining bulk-topology audit is concentrated in multi-line block copy/move/delete.
+The audited single-line insertion, New Line, automatic wrap, file insertion, deletion/join, paragraph-reformat and multi-line block copy/move/delete paths now report topology changes centrally. The former block bulk-topology gap is closed.
 
-The first .NET block model stores a complete start/end pair. When a deleted line is a block boundary it therefore clears the complete active block and highlighting. This is a conservative representation of the historical result (a boundary becomes undefined), not a claim that both historical pointers were set to `nil`.
+The first .NET block model stores a complete start/end pair. Historical `Blockfrom` and `Blockto` could be independently undefined, so exact Begin/End endpoint-state parity remains a separate audit item. When an ordinary deletion removes a represented boundary, the current complete-pair model conservatively clears the active block rather than pretending both historical pointers were necessarily reset.
+
+For a block move, the handbook does not separately specify whether markers or other anchors inside the moved source range follow the physical moved lines. The .NET implementation applies normal source-deletion semantics to those anchors and explicitly recreates the logical block at the destination. This is a documented modern policy, not a historical claim.
 
 ## Virtual-column policy
 
@@ -143,4 +154,4 @@ The historical screen was fixed-size. Resizing a modern terminal is therefore no
 
 ## V1 release gate
 
-The C#/.NET implementation now has executable coverage for the major FIRST-ED structural areas, including paragraph reformatting and its topology effects. Before calling V1 complete, close the remaining multi-line block-topology gap, finish systematic command-boundary/error-resource and interruptibility audits, then run a final handbook procedure-index audit. MicroStar-specific demonstrations may ship as samples rather than core dependencies.
+The C#/.NET implementation now has executable coverage for the major FIRST-ED structural areas, including paragraph reformatting and whole-line block bulk topology. Before calling V1 complete, audit the independent block-endpoint model, finish systematic command-boundary/error-resource and interruptibility audits, review compound undo/navigation state for cross-document mutations, then run a final handbook procedure-index audit. MicroStar-specific demonstrations may ship as samples rather than core dependencies.

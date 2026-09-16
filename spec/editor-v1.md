@@ -91,7 +91,12 @@ The historical implementation's 16-bit integer ceiling is not a portable documen
 ## 5. Blocks, markers and line topology
 
 - The historical V1 compatibility block is whole-line and contiguous.
-- One active block may be begun/ended, copied, moved, deleted and hidden.
+- One active block may be begun/ended, copied, moved, deleted and hidden, and block manipulation may be initiated from another open window/document.
+- Copy inserts copies of the block lines immediately before the current cursor line and leaves the source text and logical source block unchanged.
+- Move removes the source block and inserts those lines immediately before the current cursor line. For a same-document move, the current cursor line must not lie inside the source block. The logical block follows the moved lines to their destination.
+- Delete removes every logical line in the block. If the block spans the entire stream, the implementation must still retain the text model's required single blank logical line.
+- Structural block insertions and deletions participate in the same topology contract as ordinary line mutations. A target cursor anchored to a surviving line remains attached to that line even when inserted block lines change its numeric index.
+- Copied/moved line content retains ordinary line metadata such as soft-wrap and user-highlight state, but `InBlock` is not cloned as independent text metadata; visible block flags are regenerated from the logical block definition.
 - Logical block limits and visible `InBlock` flags are distinct state. A compatibility operation equivalent to `EditOffblock` clears `InBlock` from every open text stream without deleting the logical block limits; the active block can subsequently be projected into flags again.
 - Numbered markers 1..20 identify a document and logical line, not a saved column.
 - Jumping to a marker may select a window that displays its document and changes the cursor line while preserving that target view's current column.
@@ -99,10 +104,12 @@ The historical implementation's 16-bit integer ceiling is not a portable documen
 - References to surviving logical lines after an insertion/deletion must be realigned so they continue to identify those surviving lines rather than merely retaining stale numeric indices.
 - A marker that points directly at a deleted logical line becomes undefined; markers on later surviving lines are realigned.
 - If a deletion removes a block boundary, a complete active block is no longer available for highlighting until valid boundaries are defined again. An implementation may represent this as one undefined boundary or conservatively clear its complete active block object.
-- Insert Line, New Line, automatic word-wrap insertion, compatibility file insertion and paragraph-reformat expansion/contraction are structural changes and must participate in the same realignment contract.
+- Insert Line, New Line, automatic word-wrap insertion, compatibility file insertion, paragraph-reformat expansion/contraction and block bulk mutations are structural changes and must participate in the same realignment contract.
 - Raw line-descriptor pointers are not required. A centralized anchor/topology service, buffer-native anchors or another target-language mechanism may provide the observable behavior.
 
-The current .NET V1 topology coverage includes the audited single-line insertion/deletion and paragraph-reformat paths. Multi-line block copy/move/delete remains a separate audit target before full topology parity is claimed.
+The handbook does not separately define whether markers or other non-block anchors inside a moved source range follow the physical moved lines. Implementations must document their policy instead of claiming undocumented historical behavior. The .NET V1 implementation applies ordinary deletion semantics to source anchors and explicitly recreates the logical block at the destination.
+
+The first .NET block representation stores a complete start/end pair, whereas the historical limit pointers could be independently undefined. Exact independent Begin/End endpoint-state parity remains an implementation audit item rather than a portable assumption.
 
 ## 6. Search and replace
 
@@ -123,6 +130,7 @@ The current .NET V1 topology coverage includes the audited single-line insertion
 - Historical destructive operations explicitly documented as not entering undo must not be made reversible merely because a modern undo backend exists. Obsolete snapshots for a destroyed document must not remain usable.
 - Cursor-only movement, including a documented implementation policy for movement through virtual columns, must not create a text-undo entry merely because it passed through a compatibility command.
 - A successful paragraph reformat is one logical undoable mutation. Validation failure or a no-op must not create a snapshot merely because the command was attempted.
+- Multi-document mutations must preserve recoverable pre-mutation state for each affected document. Whether a target language/backend exposes that as one compound undo item or multiple coordinated snapshots is an undo-backend concern unless a historical user-visible rule is separately established.
 
 ## 8. Command dispatch, normalized input and typeahead
 
@@ -175,6 +183,7 @@ The core does not write directly to console/video memory. It exposes viewport/st
 - Pascal pointer addresses, line-descriptor free lists, manual heap release and video-memory representation are not portable requirements.
 - Low-level operations such as historical line insertion/deletion must preserve externally visible anchor relationships without requiring target languages to expose pointer-shaped APIs.
 - Reformat helper names describe historical responsibilities; target-language implementations may combine them into a side-effect-free plan before committing structural changes.
+- Whole-line block operations may similarly use snapshots plus a centralized topology service instead of physically splicing historical descriptor pointers.
 - Where the handbook leaves behavior unspecified, a modern implementation policy must be documented as such rather than presented as historical behavior.
 
 ## 14. Compatibility source policy
