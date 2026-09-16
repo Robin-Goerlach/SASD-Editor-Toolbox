@@ -41,11 +41,14 @@ The current foundation contains:
 - historical Create Window compression/splitting and Delete Window row-reclamation rules with a three-row minimum per displayed window;
 - destructive `EditWindowDeleteText` semantics: blank `NONAME`, linked-stream detachment, block cleanup and no undo resurrection;
 - cursor movement, insertion/overtype, newline, auto-indent, word-wrap and tab handling;
-- historical FIRST-ED begin/end/goto, top/bottom-file and viewport-aware movement semantics isolated behind a compatibility processor;
+- historical FIRST-ED character-left/right behavior, including last-nonblank cross-line movement and virtual right-hand columns, isolated in a primitive compatibility adapter;
+- insert/overtype-aware historical Tab behavior: Insert mutates text, Overtype moves only the cursor;
+- historical FIRST-ED begin/end/goto, top/bottom-file and viewport-aware movement semantics isolated behind compatibility processors;
 - display-row-aware line scrolling and page movement supplied with a host-visible row count;
 - deletion commands, change-case, centering and paragraph reformatting;
 - whole-line block begin/end/copy/move/delete/hide operations plus block-boundary navigation;
-- numbered markers;
+- `EditOffblock`/`EditMarkblock`-style separation of logical block limits from global `InBlock` highlight flags;
+- numbered line markers whose jumps preserve the selected target view's current column;
 - snapshot-based undo with a configurable limit and replaceable backend boundary;
 - literal forward find/replace services plus remembered FIRST-ED Find Again state;
 - modern asynchronous UTF-8 document persistence through `ITextStorage` / `FileTextStorage`;
@@ -61,11 +64,11 @@ The current foundation contains:
 - `IEditorInputPump` as the host boundary for keyboard, terminal, scripted or other input sources;
 - extension hooks inspired by the historical `UserCommand`, `UserError`, `UserStatusLine`, `UserReplace` and `UserTask` integration points;
 - a UI-neutral viewport/status model with a specific-window projection for simultaneous multi-window rendering;
-- an **interactive stacked FIRST-ED terminal reference host** whose physical and macro input now share the editor-owned typeahead path before key mapping and dispatch;
+- an **interactive stacked FIRST-ED terminal reference host** whose physical and macro input share the editor-owned typeahead path before key mapping and dispatch;
 - English and German architecture/compatibility documentation;
 - automated unit tests.
 
-The remaining V1 work is mainly a procedure-by-procedure compatibility audit: close remaining behavior/test gaps, connect the exposed abort state to any historical long-running operation where that compatibility is useful, introduce typed historical error resources, and decide which MicroStar-specific features belong in V1 samples rather than the reusable core.
+The remaining V1 work is mainly a procedure-by-procedure compatibility audit. The next important low-level gaps are line-topology/anchor behavior around `EditDelline` and `EditRealign`, exact word movement and reformat-helper semantics, the mapping of the exposed abort state into historical long-running operations where useful, and typed historical error resources. MicroStar-specific UI features can remain samples rather than dependencies of the reusable core.
 
 ## Run the interactive FIRST-ED sample
 
@@ -91,8 +94,9 @@ Target framework: **.NET 10**.
 - A document and its views/windows are separate concepts; multiple windows may share one document.
 - Physical row allocation is kept in a host-neutral layout service rather than embedded in a console renderer.
 - Mutation APIs own dirty-state and undo integration; deliberately destructive compatibility commands explicitly discard obsolete undo state.
-- Historical input/value conventions live in compatibility services instead of leaking DOS details into the general text engine.
+- Historical input/value conventions and unusual FIRST-ED cursor semantics live in compatibility services instead of leaking DOS-era choices into the general text engine.
 - The typeahead compatibility layer stores normalized key strokes, not DOS bytes or raw scan codes.
+- Historical pointer/free-list mechanics are not public API requirements; observable document, marker, block and window invariants are the compatibility target.
 - Historical names are documented as compatibility references, not copied as a 1:1 public API.
 - Platform-specific rendering stays outside the core; keyboard events are normalized before entering typeahead/key mapping.
 - Key maps declare required prompt arguments but never display prompts themselves.
@@ -121,6 +125,8 @@ Target framework: **.NET 10**.
 - Fenstergeometrie: [`docs/de/FENSTER-GEOMETRIE.md`](docs/de/FENSTER-GEOMETRIE.md)
 - Typeahead and window-text deletion: [`docs/en/TYPEAHEAD-AND-WINDOW-TEXT.md`](docs/en/TYPEAHEAD-AND-WINDOW-TEXT.md)
 - Typeahead und Fenstertext-Löschung: [`docs/de/TYPEAHEAD-UND-FENSTERTEXT.md`](docs/de/TYPEAHEAD-UND-FENSTERTEXT.md)
+- Kernel compatibility audit: [`docs/en/KERNEL-COMPATIBILITY-AUDIT.md`](docs/en/KERNEL-COMPATIBILITY-AUDIT.md)
+- Kernel-Kompatibilitätsaudit: [`docs/de/KERNEL-KOMPATIBILITAETSAUDIT.md`](docs/de/KERNEL-KOMPATIBILITAETSAUDIT.md)
 - Language-neutral V1 contract: [`spec/editor-v1.md`](spec/editor-v1.md)
 
 ## License

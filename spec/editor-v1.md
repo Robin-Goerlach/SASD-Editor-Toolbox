@@ -34,15 +34,23 @@ This document defines behavior that every language implementation should preserv
 
 V1 includes character/word/line movement, page movement, beginning/end/top/bottom navigation, text insertion, newline, tab, control-character insertion, left/right deletion, word deletion, line deletion, delete-to-end-of-line, case change, centering and paragraph reformatting.
 
-Display-dependent commands receive the number of visible text rows from the host. Line-up/down and scroll-up/down keep the cursor visible according to the historical edge rules. Page-up/down move the viewport by `visibleRows - 1`. Because the handbook does not separately specify the cursor's post-page screen row, implementations must document their cursor policy; the .NET implementation preserves the relative visible row when possible.
+- Character-left from the first column of a non-first logical line moves to the previous line immediately after its last non-blank character. At the beginning of the text stream it does nothing.
+- Character-right increments the logical column without crossing to the next logical line. A compatibility implementation must therefore support a virtual cursor column beyond the current line length.
+- Tab advances to the next configured tab stop. In Insert mode the padding is inserted into the document; in Overtype mode only the cursor moves.
+- Display-dependent commands receive the number of visible text rows from the host. Line-up/down and scroll-up/down keep the cursor visible according to the historical edge rules.
+- Page-up/down move the viewport by `visibleRows - 1`. Because the handbook does not separately specify the cursor's post-page screen row, implementations must document their cursor policy; the .NET implementation preserves the relative visible row when possible.
+- Top-of-file selects the first line and first column. Bottom-of-file selects the last line and first column and places that last line at the top of the viewport.
 
-Top-of-file selects the first line and first column. Bottom-of-file selects the last line and first column and places that last line at the top of the viewport.
+The historical implementation's 16-bit integer ceiling is not a portable document-size requirement. Target-language overflow must be guarded without artificially limiting modern documents to Turbo Pascal's `Maxint`.
 
 ## 5. Blocks and markers
 
 - The historical V1 compatibility block is whole-line and contiguous.
 - One active block may be begun/ended, copied, moved, deleted and hidden.
-- Numbered markers 1..20 identify a document and text position and can be jumped to while the document remains open.
+- Logical block limits and visible `InBlock` flags are distinct state. A compatibility operation equivalent to `EditOffblock` clears `InBlock` from every open text stream without deleting the logical block limits; the active block can subsequently be projected into flags again.
+- Numbered markers 1..20 identify a document and logical line, not a saved column.
+- Jumping to a marker may select a window that displays its document and changes the cursor line while preserving that target view's current column.
+- Implementations must eventually preserve marker/block/window anchor semantics across line insert/delete topology, but they do not need to reproduce raw descriptor pointers to do so.
 
 ## 6. Search and replace
 
@@ -106,6 +114,13 @@ The core does not write directly to console/video memory. It exposes viewport/st
 - The FIRST-ED-compatible read operation inserts decoded lines after the current line and preserves the current cursor position.
 - Hosts collect filenames; core file services receive resolved paths and perform no UI prompting.
 
-## 13. Compatibility policy
+## 13. Low-level compatibility policy
 
-The Borland handbook is a requirements/reference source only. Implementations must be independently written and must not copy historical source code. When the handbook leaves behavior unspecified, modern policy must be documented as such instead of being presented as historical behavior.
+- Observable text, cursor, window, block, marker, undo and persistence behavior is part of the portable contract.
+- Pascal pointer addresses, line-descriptor free lists, manual heap release and video-memory representation are not portable requirements.
+- Low-level operations such as historical line deletion must preserve the externally visible anchor relationships without requiring target languages to expose pointer-shaped APIs.
+- Where the handbook leaves behavior unspecified, a modern implementation policy must be documented as such rather than presented as historical behavior.
+
+## 14. Compatibility source policy
+
+The Borland handbook is a requirements/reference source only. Implementations must be independently written and must not copy historical source code.

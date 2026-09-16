@@ -18,19 +18,29 @@ Ziel ist funktionale Abdeckung, nicht eine identische Quellcode- oder API-Strukt
 | Insert / Overtype | `EditorWindowOptions.InsertMode` | Implementiert |
 | Word-Wrap | `EditorWindowOptions.WordWrap` | Implementiert |
 | Auto-Indent | `EditorWindowOptions.AutoIndent` | Implementiert |
-| Ränder / Tabulatorbreite | `EditorWindowOptions` | Implementiert |
+| Linker/rechter Rand | `EditorWindowOptions` | Implementiert |
+| Tabulatorbreite | pro Fenster `EditorWindowOptions.TabSize`; historischer globaler Scope separat dokumentiert | Grundlage / dokumentierte Abweichung |
+| `EditTab` Insert-/Overtype-Verhalten | `FirstEdPrimitiveCompatibilityProcessor.Tab` | Implementiert |
 | Cursorbewegung | `EditorEngine` plus Kompatibilitäts-Navigation | Implementiert |
+| `EditLeftChar`: vorherige Zeile hinter letztem Nicht-Leerzeichen | Primitive Compatibility Processor | Implementiert |
+| `EditRightChar`: nur Spalte / virtuelle Spalte | Primitive Compatibility Processor | Implementiert |
 | Historische Begin/End/Goto-Details | `FirstEdCompatibilityProcessor` | Implementiert |
 | Up/Down-Line mit Viewport-Nachführung | Compatibility Processor + sichtbare Zeilenzahl | Implementiert |
 | Scroll Up/Down mit Cursor-Randverhalten | `FirstEdCompatibilityProcessor` | Implementiert |
 | Page Up/Down, dokumentierte Viewport-Verschiebung | Compatibility Processor, `visibleLines - 1` | Implementiert |
 | Top/Bottom File inklusive Viewport-Platzierung | Compatibility Processor | Implementiert |
-| Zeichen-/Wort-/Zeilenlöschen | `EditorEngine` | Implementiert |
-| Groß-/Kleinschreibung, Zentrieren, Absatzformatierung | `EditorEngine` | Implementiert |
+| Zeichen-/Wort-/Zeilenlöschen | `EditorEngine` | Implementierte Grundlage; Low-Level-Anker-Audit offen |
+| `EditDelline` / `EditRealign`: Fenster-/Marker-/Block-Anker reparieren | Zeilenstruktur-Kompatibilitätsaudit | Geplant |
+| Groß-/Kleinschreibung, Zentrieren, Absatzformatierung | `EditorEngine` | Implementierte Grundlage; Helfer-Parität offen |
+| `EditLongLine` / `EditShortLine` / `EditShiftLine` | Reformat-Kompatibilitätsaudit | Geplant |
 | Ganze-Zeilen-Blöcke | `EditorBlock`, `EditorSession` | Implementiert |
 | Block kopieren/verschieben/löschen/verbergen | Engine/Session | Implementiert |
+| `EditOffblock`: InBlock global löschen, Grenzen behalten | `EditorSession.ClearBlockHighlights` | Implementiert |
+| `EditMarkblock`: aktiven Bereich in Flags projizieren | `EditorSession.MarkBlockHighlights` | Implementiert |
 | Blockanfang/-ende anspringen | Compatibility Processor | Implementiert |
-| Marker | Marker 1..20 | Implementiert |
+| Marker 1..20 | `EditorMarker` | Implementiert |
+| Marker bezeichnet Zeile; Sprung erhält Zielspalte | zeilenorientierter Marker / Session-Jump | Implementiert |
+| Stabile Markeridentität bei allen Zeilen-Inserts/-Deletes | künftiges Low-Level-Ankermodell | Geplanter Audit |
 | Undo inkl. Limit | `EditorUndoManager` + Command Binding | Implementiert (Snapshot-Backend) |
 | Undo-Bereinigung zerstörter Dokumente | `EditorUndoManager.DiscardDocument` | Implementiert |
 | Vorwärtssuche / gemerktes Find Again | `EditorSearchService` | Implementiert |
@@ -74,6 +84,10 @@ Ziel ist funktionale Abdeckung, nicht eine identische Quellcode- oder API-Strukt
 | DOS-/Videospeicher-Routinen | bewusst durch Host-Rendering ersetzt | Ersetzt |
 | Overlays | auf modernen Plattformen nicht erforderlich | Entfällt |
 
+## Low-Level-Kompatibilitätspolitik
+
+Rohe Pascal-Pointer, Deskriptor-Freelists und 16-Bit-Integergrenzen sind Implementierungsmechanismen und keine portablen Anforderungen. Der V1-Audit erhält das beobachtbare Verhalten: welche Zeile, welches Fenster, welcher Block oder Marker ausgewählt bleibt, welcher Text verändert wird, was Undo kann und was der Host sieht. Wenn moderne Datenstrukturen eine historische Speicherverwaltungsroutine vollständig überflüssig machen, dokumentieren wir die Ersetzung statt künstlich eine Pointer-API zu erzeugen.
+
 ## Modernisierung des Typeahead-Puffers
 
 Die Reihenfolge und die historische Standardgröße 500 bleiben erhalten. Rohe DOS-Bytes, Ringpuffer-Indizes und Scan-Codes gehören jedoch bewusst nicht zum portablen V1-Vertrag. Makro- und physische Eingaben werden zuerst in `EditorKeyStroke` normalisiert. Ein vom Host stammendes Ctrl-U nimmt den unmittelbaren Abort-Pfad; eine vorne eingeschobene Makro-Eingabe wird nicht stillschweigend zu physischer Tastatureingabe umgedeutet.
@@ -88,4 +102,4 @@ Der historische Bildschirm hatte eine feste Größe. Die Größenänderung eines
 
 ## V1-Abschlusskriterium
 
-Die C#/.NET-Implementierung deckt die großen strukturellen FIRST-ED-Bereiche jetzt inklusive Fenstergeometrie, gepufferter/Makro-Eingabe und destruktiver Fenstertext-Löschung ausführbar ab. Vor V1 folgt der verbleibende Prozedur-für-Prozedur-Audit, das Schließen von Verhaltens-/Testlücken - darunter die Frage, welche historischen Langläufer über Ctrl-U unterbrechbar sein sollen - sowie die Entscheidung über typisierte historische Fehlerressourcen. MicroStar-spezifische Demonstrationen können als Samples statt als Core-Abhängigkeiten geliefert werden.
+Die C#/.NET-Implementierung deckt die großen strukturellen FIRST-ED-Bereiche jetzt ausführbar ab und besitzt einen aktiven Prozedur-für-Prozedur-Kernelaudit. Vor V1 schließen wir die verbleibenden Lücken bei Zeilenstruktur/Ankern, exakter Wortbewegung/Reformat-Helfern, Unterbrechbarkeit und historischen Fehlerressourcen und führen anschließend einen finalen Audit des Handbuch-Indexes durch. MicroStar-spezifische Demonstrationen können als Samples statt als Core-Abhängigkeiten geliefert werden.

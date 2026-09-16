@@ -18,19 +18,29 @@ The goal is behavioral coverage, not source-level or public-name identity.
 | Insert / overtype | `EditorWindowOptions.InsertMode` | Implemented |
 | Word-wrap | `EditorWindowOptions.WordWrap`, engine wrap logic | Implemented |
 | Auto-indent | `EditorWindowOptions.AutoIndent` | Implemented |
-| Left/right margins and tab width | `EditorWindowOptions` | Implemented |
+| Left/right margins | `EditorWindowOptions` | Implemented |
+| Tab width | per-window `EditorWindowOptions.TabSize`; historical global scope documented separately | Foundation / documented divergence |
+| `EditTab` Insert-vs-Overtype behavior | `FirstEdPrimitiveCompatibilityProcessor.Tab` | Implemented |
 | Cursor movement | `EditorEngine` plus compatibility navigation processors | Implemented |
+| `EditLeftChar` previous-line last-nonblank rule | primitive compatibility processor | Implemented |
+| `EditRightChar` column-only / virtual-column rule | primitive compatibility processor | Implemented |
 | Historical begin/end/goto navigation details | `FirstEdCompatibilityProcessor` | Implemented |
 | Up/down line viewport-follow behavior | `FirstEdCompatibilityProcessor` + host visible-row count | Implemented |
 | Scroll up/down edge-cursor behavior | `FirstEdCompatibilityProcessor` | Implemented |
 | Page up/down documented viewport displacement | compatibility processor, `visibleLines - 1` | Implemented |
 | Top/bottom file viewport placement | compatibility processor | Implemented |
-| Character/word/line deletion | `EditorEngine` delete methods | Implemented |
-| Change case / center line / paragraph reformat | `EditorEngine` | Implemented |
+| Character/word/line deletion | `EditorEngine` delete methods | Implemented foundation; low-level anchor audit pending |
+| `EditDelline` / `EditRealign` window-marker-block anchor repair | line-topology compatibility audit | Planned |
+| Change case / center line / paragraph reformat | `EditorEngine` | Implemented foundation; helper parity audit pending |
+| `EditLongLine` / `EditShortLine` / `EditShiftLine` details | paragraph-reformat compatibility audit | Planned |
 | Whole-line block begin/end | `EditorBlock`, `EditorSession` | Implemented |
 | Block copy/move/delete/hide | `EditorEngine` / `EditorSession` | Implemented |
+| `EditOffblock` global InBlock clear, limits retained | `EditorSession.ClearBlockHighlights` | Implemented |
+| `EditMarkblock` active-range flag projection | `EditorSession.MarkBlockHighlights` | Implemented |
 | Top/bottom of active block commands | compatibility processor | Implemented |
-| Markers | `EditorMarker`, markers 1..20 | Implemented |
+| Markers 1..20 | `EditorMarker` | Implemented |
+| Marker identifies line; jump preserves target view column | line-only marker/session jump | Implemented |
+| Stable marker identity through all line insertion/deletion topology | future low-level anchor model | Planned audit |
 | Undo limit and undo operation | `EditorUndoManager` + command binding | Implemented (snapshot backend) |
 | Destructive-document undo cleanup | `EditorUndoManager.DiscardDocument` | Implemented |
 | Forward find / remembered Find Again | `EditorSearchService` | Implemented |
@@ -75,6 +85,10 @@ The goal is behavioral coverage, not source-level or public-name identity.
 | DOS/video-memory assembly routines | intentionally not reproduced | Replaced by host rendering |
 | Overlay support | obsolete on modern platforms | Not applicable |
 
+## Low-level compatibility policy
+
+Raw Pascal pointers, descriptor free lists and 16-bit integer ceilings are implementation mechanisms, not portable requirements. The V1 audit preserves observable behavior: which line/window/block/marker remains selected, which text changes, what is undoable and what the host sees. Where modern data structures remove a historical memory-management operation entirely, the compatibility matrix records the replacement instead of manufacturing a pointer-shaped API.
+
 ## Typeahead modernization policy
 
 Behavioral ordering and the historical 500-entry default are retained, but raw DOS bytes, circular-buffer indices and scan codes are deliberately not part of the portable V1 contract. Macro input and physical input are normalized to `EditorKeyStroke` first. A host-originated Ctrl-U takes the immediate abort path; front-injected macro input does not silently become physical input.
@@ -89,4 +103,4 @@ The historical screen was fixed-size. Resizing a modern terminal is therefore no
 
 ## V1 release gate
 
-The C#/.NET implementation now has executable coverage for the major FIRST-ED structural areas, including stacked window geometry, buffered/macro input and destructive window-text deletion. Before calling V1 complete, perform the remaining procedure-by-procedure audit, close behavior/test gaps (including where Ctrl-U should interrupt long-running compatibility operations), and decide how much of the historical error-message catalog belongs in typed core resources. MicroStar-specific demonstrations may ship as samples rather than core dependencies.
+The C#/.NET implementation now has executable coverage for the major FIRST-ED structural areas and an active procedure-by-procedure kernel audit. Before calling V1 complete, close the remaining line-topology/anchor, exact word-movement/reformat-helper, interruptibility and historical error-resource gaps, then run a final handbook-index audit. MicroStar-specific demonstrations may ship as samples rather than core dependencies.
