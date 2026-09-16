@@ -166,6 +166,81 @@ internal static class FirstEdPrimitiveCompatibilityProcessor
     }
 
     /// <summary>
+    /// Clean-room transfer of EditDeleteRightChar. A character at the cursor is
+    /// removed normally. Once the cursor is at or beyond the first column after
+    /// the last non-blank character, the command joins the following logical line
+    /// instead. The join participates in line-topology realignment so linked
+    /// windows, markers and block boundaries cannot retain stale line numbers.
+    /// </summary>
+    public static bool DeleteRightCharacter(EditorSession session)
+    {
+        var window = RequireWindow(session);
+        var document = window.Document;
+        var lineIndex = window.Cursor.Line;
+        var line = document.Buffer.GetLine(lineIndex);
+        var column = Math.Max(0, window.Cursor.Column);
+
+        if (column >= LastNonBlankEnd(line.Text))
+        {
+            return JoinFollowingLine(session, window, "Delete right character");
+        }
+
+        if (column >= line.Text.Length)
+        {
+            return false;
+        }
+
+        session.Undo.Capture(window, "Delete right character");
+        document.Buffer.ReplaceLine(lineIndex, line.Text.Remove(column, 1));
+        document.MarkChanged();
+        session.RefreshBlockFlags();
+        return true;
+    }
+
+    /// <summary>
+    /// Clean-room transfer of EditDeleteRightWord. A word is the run of characters
+    /// in the cursor's current historical class (alphanumeric, punctuation or
+    /// blank) plus immediately following blanks. When the cursor is already at or
+    /// beyond the last non-blank character, the following line is joined instead.
+    /// </summary>
+    public static bool DeleteRightWord(EditorSession session)
+    {
+        var window = RequireWindow(session);
+        var document = window.Document;
+        var lineIndex = window.Cursor.Line;
+        var line = document.Buffer.GetLine(lineIndex);
+        var column = Math.Max(0, window.Cursor.Column);
+
+        if (column >= LastNonBlankEnd(line.Text))
+        {
+            return JoinFollowingLine(session, window, "Delete right word");
+        }
+
+        if (column >= line.Text.Length)
+        {
+            return false;
+        }
+
+        var wordClass = Classify(line.Text[column]);
+        var end = column;
+        while (end < line.Text.Length && Classify(line.Text[end]) == wordClass)
+        {
+            end++;
+        }
+
+        while (end < line.Text.Length && IsBlank(line.Text[end]))
+        {
+            end++;
+        }
+
+        session.Undo.Capture(window, "Delete right word");
+        document.Buffer.ReplaceLine(lineIndex, line.Text.Remove(column, end - column));
+        document.MarkChanged();
+        session.RefreshBlockFlags();
+        return true;
+    }
+
+    /// <summary>
     /// Clean-room transfer of EditDeleteLine together with the observable
     /// EditDelline/EditRealign responsibilities. The line is captured for modern
     /// snapshot undo, line-number references are repaired centrally, markers on
@@ -229,6 +304,31 @@ internal static class FirstEdPrimitiveCompatibilityProcessor
             window.Cursor = window.Cursor with { Column = column + spaces };
         }
 
+        return true;
+    }
+
+    /// <summary>
+    /// Joins the following logical line into the current one while applying the
+    /// same topology repair that a descriptor deletion historically required.
+    /// </summary>
+    private static bool JoinFollowingLine(EditorSession session, EditorWindow window, string undoDescription)
+    {
+        var document = window.Document;
+        var lineIndex = window.Cursor.Line;
+        if (lineIndex + 1 >= document.Buffer.LineCount)
+        {
+            return false;
+        }
+
+        var current = document.Buffer.GetLine(lineIndex);
+        var following = document.Buffer.GetLine(lineIndex + 1);
+
+        session.Undo.Capture(window, undoDescription);
+        document.Buffer.ReplaceLine(lineIndex, current.Text + following.Text, current.Flags);
+        document.Buffer.RemoveLine(lineIndex + 1);
+        session.Topology.LinesDeleted(document, lineIndex + 1, 1);
+        document.MarkChanged();
+        session.RefreshBlockFlags();
         return true;
     }
 
