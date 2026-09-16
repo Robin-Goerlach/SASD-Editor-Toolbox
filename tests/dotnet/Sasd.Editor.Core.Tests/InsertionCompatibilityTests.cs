@@ -155,10 +155,25 @@ public sealed class InsertionCompatibilityTests
         session.Engine.InsertText("e");
 
         Assert.Equal(new[] { "abcd", "e", "tail" }, source.Document.Buffer.Snapshot().Select(line => line.Text));
-        Assert.True(source.Document.Buffer.GetLine(1).Flags.HasFlag(EditorLineFlags.Wrapped));
+        Assert.True(source.Document.Buffer.GetLine(0).Flags.HasFlag(EditorLineFlags.Wrapped));
+        Assert.False(source.Document.Buffer.GetLine(1).Flags.HasFlag(EditorLineFlags.Wrapped));
         Assert.Equal(new TextPosition(2, 6), linked.Cursor);
         Assert.Equal(2, linked.TopLine);
         Assert.True(session.JumpToMarker(1));
         Assert.Equal(2, source.Cursor.Line);
+    }
+
+    [Fact]
+    public void TextInsertion_OnWrappedLinePreservesSoftBoundary()
+    {
+        var session = new EditorSession();
+        var window = session.CreateDocument("alpha\nbeta");
+        window.Document.Buffer.SetFlags(0, EditorLineFlags.Wrapped);
+        window.Cursor = new TextPosition(0, 2);
+
+        session.Engine.InsertText("X");
+
+        Assert.Equal("alXpha", window.Document.Buffer.GetLine(0).Text);
+        Assert.True(window.Document.Buffer.GetLine(0).Flags.HasFlag(EditorLineFlags.Wrapped));
     }
 }

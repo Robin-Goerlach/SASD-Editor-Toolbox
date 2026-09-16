@@ -151,6 +151,10 @@ public sealed class EditorEngine
         window.Cursor = window.Cursor with { Column = Math.Min(window.Cursor.Column, leftPadding + content.Length) };
     });
 
+    /// <summary>
+    /// General-purpose paragraph formatter for direct engine consumers. FIRST-ED
+    /// commands use the stricter compatibility processor in the command layer.
+    /// </summary>
     public void ReformatParagraph() => Mutate("Reformat paragraph", () =>
     {
         var window = Window;
@@ -163,9 +167,14 @@ public sealed class EditorEngine
             .SelectMany(index => buffer.GetLine(index).Text.Split((char[]?)null, StringSplitOptions.RemoveEmptyEntries))
             .ToArray();
         if (words.Length == 0) return;
-        var formatted = WrapWords(words, window.Options.LeftMargin, window.Options.RightMargin)
-            .Select((text, index) => new EditorLineSnapshot(text, index == 0 ? EditorLineFlags.None : EditorLineFlags.Wrapped))
+
+        var formattedText = WrapWords(words, window.Options.LeftMargin, window.Options.RightMargin).ToArray();
+        var formatted = formattedText
+            .Select((text, index) => new EditorLineSnapshot(
+                text,
+                index < formattedText.Length - 1 ? EditorLineFlags.Wrapped : EditorLineFlags.None))
             .ToArray();
+
         var rebuilt = buffer.Snapshot().ToList();
         rebuilt.RemoveRange(start, end - start + 1);
         rebuilt.InsertRange(start, formatted);
@@ -309,7 +318,11 @@ public sealed class EditorEngine
         var column = Math.Max(0, window.Cursor.Column);
         if (column > text.Length) text = text.PadRight(column);
         text = window.Options.InsertMode || column >= text.Length ? text.Insert(column, ch.ToString()) : text.Remove(column, 1).Insert(column, ch.ToString());
-        window.Document.Buffer.ReplaceLine(window.Cursor.Line, text, line.Flags & ~EditorLineFlags.Wrapped);
+
+        // Ordinary text entry changes the line contents, not the nature of the
+        // line boundary. In particular it must not silently turn a soft wrapped
+        // boundary into a hard paragraph break.
+        window.Document.Buffer.ReplaceLine(window.Cursor.Line, text, line.Flags);
         window.Cursor = window.Cursor with { Column = column + 1 };
         if (window.Options.WordWrap && window.Cursor.Column > window.Options.RightMargin + 1) WrapCurrentLine();
     }
@@ -323,8 +336,13 @@ public sealed class EditorEngine
         var left = line.Text[..column];
         var right = line.Text[column..];
         var indentation = window.Options.AutoIndent ? new string(' ', left.TakeWhile(char.IsWhiteSpace).Count()) : new string(' ', window.Options.LeftMargin);
+
+        // A directly inserted newline is a hard boundary at the split point. If
+        // the old line itself flowed softly into a following line, that outgoing
+        // boundary belongs to the moved lower fragment after the split.
+        var downstreamWrapped = line.Flags & EditorLineFlags.Wrapped;
         window.Document.Buffer.ReplaceLine(lineIndex, left, line.Flags & ~EditorLineFlags.Wrapped);
-        window.Document.Buffer.InsertLine(lineIndex + 1, indentation + right);
+        window.Document.Buffer.InsertLine(lineIndex + 1, indentation + right, downstreamWrapped);
         _session.Topology.LinesInserted(window.Document, lineIndex + 1, 1);
         window.Cursor = new TextPosition(lineIndex + 1, indentation.Length);
     }
@@ -344,8 +362,14 @@ public sealed class EditorEngine
         var left = text[..split].TrimEnd();
         var right = text[split..].TrimStart();
         var prefix = new string(' ', window.Options.LeftMargin);
-        window.Document.Buffer.ReplaceLine(lineIndex, left, snapshot.Flags);
-        window.Document.Buffer.InsertLine(lineIndex + 1, prefix + right, EditorLineFlags.Wrapped);
+
+        // Wrapped describes the soft boundary *after* a line. Creating a new
+        // continuation therefore marks the upper line. If the original line was
+        // already a soft continuation into a later line, that downstream soft
+        // boundary is transferred to the newly inserted lower fragment.
+        var downstreamWrapped = snapshot.Flags & EditorLineFlags.Wrapped;
+        window.Document.Buffer.ReplaceLine(lineIndex, left, snapshot.Flags | EditorLineFlags.Wrapped);
+        window.Document.Buffer.InsertLine(lineIndex + 1, prefix + right, downstreamWrapped);
         _session.Topology.LinesInserted(window.Document, lineIndex + 1, 1);
         window.Cursor = new TextPosition(lineIndex + 1, prefix.Length + right.Length);
     }
