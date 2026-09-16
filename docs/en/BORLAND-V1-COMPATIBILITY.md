@@ -31,18 +31,21 @@ The goal is behavioral coverage, not source-level or public-name identity.
 | Scroll up/down edge-cursor behavior | `FirstEdCompatibilityProcessor` | Implemented |
 | Page up/down documented viewport displacement | compatibility processor, `visibleLines - 1` | Implemented |
 | Top/bottom file viewport placement | compatibility processor | Implemented |
-| Character/word/line deletion | `EditorEngine` delete methods | Implemented foundation; low-level anchor audit pending |
-| `EditDelline` / `EditRealign` window-marker-block anchor repair | line-topology compatibility audit | Planned |
+| Character/word deletion | `EditorEngine` delete methods | Implemented foundation; detailed delete-word audit still open |
+| `EditDeleteLine` single-line preservation, marker invalidation and block-boundary cleanup | `FirstEdPrimitiveCompatibilityProcessor.DeleteLine` | Implemented |
+| `EditDelline` / `EditRealign` window-marker-block reference repair | `EditorLineTopology` | Foundation / expanding |
+| Compatibility file insertion reference realignment | `EditorFileService` + `EditorLineTopology.LinesInserted` | Implemented |
+| Remaining newline/wrap/join/block/reformat topology integration | topology audit | Planned |
 | Change case / center line / paragraph reformat | `EditorEngine` | Implemented foundation; helper parity audit pending |
 | `EditLongLine` / `EditShortLine` / `EditShiftLine` details | paragraph-reformat compatibility audit | Planned |
 | Whole-line block begin/end | `EditorBlock`, `EditorSession` | Implemented |
-| Block copy/move/delete/hide | `EditorEngine` / `EditorSession` | Implemented |
+| Block copy/move/delete/hide | `EditorEngine` / `EditorSession` | Implemented foundation; topology audit pending |
 | `EditOffblock` global InBlock clear, limits retained | `EditorSession.ClearBlockHighlights` | Implemented |
 | `EditMarkblock` active-range flag projection | `EditorSession.MarkBlockHighlights` | Implemented |
 | Top/bottom of active block commands | compatibility processor | Implemented |
 | Markers 1..20 | `EditorMarker` | Implemented |
 | Marker identifies line; jump preserves target view column | line-only marker/session jump | Implemented |
-| Stable marker identity through all line insertion/deletion topology | future low-level anchor model | Planned audit |
+| Marker realignment for audited line insertion/deletion paths | `EditorLineTopology` | Implemented foundation |
 | Undo limit and undo operation | `EditorUndoManager` + command binding | Implemented (snapshot backend) |
 | Destructive-document undo cleanup | `EditorUndoManager.DiscardDocument` | Implemented |
 | Forward find / remembered Find Again | `EditorSearchService` | Implemented |
@@ -91,6 +94,12 @@ The goal is behavioral coverage, not source-level or public-name identity.
 
 The handbook's three word classes are retained. For modern Unicode text the .NET implementation treats Unicode letters/digits as alphanumeric, Unicode whitespace as blank, and other characters as punctuation. This is behaviorally compatible for ASCII input while avoiding an ASCII-only reusable core.
 
+## Line-topology modernization policy
+
+The historical implementation obtains stable line identity through descriptor pointers. SASD represents the same observable relationships through `DocumentId` plus logical line numbers and an explicit `EditorLineTopology` realignment service. Pointer addresses, splicing mechanics and manual descriptor release are not part of the portable API.
+
+The first .NET block model stores a complete start/end pair. When a deleted line is a block boundary it therefore clears the complete active block and highlighting. This is a conservative representation of the historical result (a boundary becomes undefined), not a claim that both historical pointers were set to `nil`.
+
 ## Low-level compatibility policy
 
 Raw Pascal pointers, descriptor free lists and 16-bit integer ceilings are implementation mechanisms, not portable requirements. The V1 audit preserves observable behavior: which line/window/block/marker remains selected, which text changes, what is undoable and what the host sees. Where modern data structures remove a historical memory-management operation entirely, the compatibility matrix records the replacement instead of manufacturing a pointer-shaped API.
@@ -109,4 +118,4 @@ The historical screen was fixed-size. Resizing a modern terminal is therefore no
 
 ## V1 release gate
 
-The C#/.NET implementation now has executable coverage for the major FIRST-ED structural areas and an active procedure-by-procedure kernel audit. Before calling V1 complete, close the remaining line-topology/anchor, reformat-helper, parameter-validation, interruptibility and historical error-resource gaps, then run a final handbook-index audit. MicroStar-specific demonstrations may ship as samples rather than core dependencies.
+The C#/.NET implementation now has executable coverage for the major FIRST-ED structural areas and a central line-topology foundation for the audited delete/read-insert paths. Before calling V1 complete, route the remaining structural mutation sites through the topology contract as required, close reformat-helper, parameter-validation, interruptibility and historical error-resource gaps, then run a final handbook-index audit. MicroStar-specific demonstrations may ship as samples rather than core dependencies.

@@ -47,6 +47,9 @@ The current foundation contains:
 - historical FIRST-ED begin/end/goto, top/bottom-file and viewport-aware movement semantics isolated behind compatibility processors;
 - display-row-aware line scrolling and page movement supplied with a host-visible row count;
 - deletion commands, change-case, centering and paragraph reformatting;
+- a central `EditorLineTopology` service that realigns window cursors/top-line anchors, markers and block limits for the audited structural operations;
+- FIRST-ED-compatible `DeleteLine` semantics including the single-line blanking rule, marker invalidation and block-boundary cleanup;
+- compatibility file insertion that preserves the initiating cursor while realigning linked windows, markers and block limits;
 - whole-line block begin/end/copy/move/delete/hide operations plus block-boundary navigation;
 - `EditOffblock`/`EditMarkblock`-style separation of logical block limits from global `InBlock` highlight flags;
 - numbered line markers whose jumps preserve the selected target view's current column;
@@ -69,7 +72,7 @@ The current foundation contains:
 - English and German architecture/compatibility documentation;
 - automated unit tests.
 
-The remaining V1 work is mainly a procedure-by-procedure compatibility audit. The next important low-level gaps are line-topology/anchor behavior around `EditDelline` and `EditRealign`, exact reformat-helper semantics, command-boundary validation, the mapping of the exposed abort state into historical long-running operations where useful, and typed historical error resources. MicroStar-specific UI features can remain samples rather than dependencies of the reusable core.
+The remaining V1 work is mainly a procedure-by-procedure compatibility audit. The next low-level task is to route the remaining structural mutation sites (newline/wrap/join, block operations and paragraph reformatting) through the topology contract where historical anchor behavior requires it. Exact reformat-helper semantics, command-boundary validation, historical long-operation abort coverage and typed historical error resources also remain. MicroStar-specific UI features can remain samples rather than dependencies of the reusable core.
 
 ## Run the interactive FIRST-ED sample
 
@@ -96,6 +99,7 @@ Target framework: **.NET 10**.
 - Physical row allocation is kept in a host-neutral layout service rather than embedded in a console renderer.
 - Mutation APIs own dirty-state and undo integration; deliberately destructive compatibility commands explicitly discard obsolete undo state.
 - Historical input/value conventions and unusual FIRST-ED cursor/word semantics live in compatibility services instead of leaking DOS-era choices into the general text engine.
+- Structural line changes use an explicit topology/anchor boundary rather than scattering marker/window/block index repair across commands.
 - The typeahead compatibility layer stores normalized key strokes, not DOS bytes or raw scan codes.
 - Historical pointer/free-list mechanics are not public API requirements; observable document, marker, block and window invariants are the compatibility target.
 - Historical names are documented as compatibility references, not copied as a 1:1 public API.
@@ -103,7 +107,7 @@ Target framework: **.NET 10**.
 - Key maps declare required prompt arguments but never display prompts themselves.
 - Historical byte-level file compatibility is isolated behind a codec and does not replace modern UTF-8 storage.
 - Scheduler/background work remains cooperative and bounded; platform input stays behind `IEditorInputPump`.
-- Expensive optimizations (rope/piece-table buffers, lock-free queues, SIMD search, native backends) are introduced only behind stable interfaces and after profiling.
+- Expensive optimizations (rope/piece-table buffers, indexed anchors, lock-free queues, SIMD search, native backends) are introduced only behind stable interfaces and after profiling.
 - The first implementation favors correctness, reviewability and tests over premature micro-optimization.
 
 ## Documentation
@@ -128,6 +132,8 @@ Target framework: **.NET 10**.
 - Typeahead und Fenstertext-Löschung: [`docs/de/TYPEAHEAD-UND-FENSTERTEXT.md`](docs/de/TYPEAHEAD-UND-FENSTERTEXT.md)
 - Kernel compatibility audit: [`docs/en/KERNEL-COMPATIBILITY-AUDIT.md`](docs/en/KERNEL-COMPATIBILITY-AUDIT.md)
 - Kernel-Kompatibilitätsaudit: [`docs/de/KERNEL-KOMPATIBILITAETSAUDIT.md`](docs/de/KERNEL-KOMPATIBILITAETSAUDIT.md)
+- Line topology and realignment: [`docs/en/LINE-TOPOLOGY-AND-REALIGNMENT.md`](docs/en/LINE-TOPOLOGY-AND-REALIGNMENT.md)
+- Zeilentopologie und Realignment: [`docs/de/ZEILENTOPOLOGIE-UND-REALIGNMENT.md`](docs/de/ZEILENTOPOLOGIE-UND-REALIGNMENT.md)
 - Language-neutral V1 contract: [`spec/editor-v1.md`](spec/editor-v1.md)
 
 ## License

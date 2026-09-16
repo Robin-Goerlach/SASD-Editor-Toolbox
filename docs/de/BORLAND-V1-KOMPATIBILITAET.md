@@ -31,18 +31,21 @@ Ziel ist funktionale Abdeckung, nicht eine identische Quellcode- oder API-Strukt
 | Scroll Up/Down mit Cursor-Randverhalten | `FirstEdCompatibilityProcessor` | Implementiert |
 | Page Up/Down, dokumentierte Viewport-Verschiebung | Compatibility Processor, `visibleLines - 1` | Implementiert |
 | Top/Bottom File inklusive Viewport-Platzierung | Compatibility Processor | Implementiert |
-| Zeichen-/Wort-/Zeilenlöschen | `EditorEngine` | Implementierte Grundlage; Low-Level-Anker-Audit offen |
-| `EditDelline` / `EditRealign`: Fenster-/Marker-/Block-Anker reparieren | Zeilenstruktur-Kompatibilitätsaudit | Geplant |
+| Zeichen-/Wortlöschen | `EditorEngine` | Implementierte Grundlage; Detailaudit für Delete Word offen |
+| `EditDeleteLine`: Ein-Zeilen-Regel, Marker-Ungültigkeit, Blockgrenzen | `FirstEdPrimitiveCompatibilityProcessor.DeleteLine` | Implementiert |
+| `EditDelline` / `EditRealign`: Fenster-/Marker-/Block-Referenzen reparieren | `EditorLineTopology` | Grundlage / wird erweitert |
+| Referenz-Realignment beim kompatiblen Datei-Insert | `EditorFileService` + `EditorLineTopology.LinesInserted` | Implementiert |
+| Verbleibende Topologie für Newline/Wrap/Join/Block/Reformat | Topologie-Audit | Geplant |
 | Groß-/Kleinschreibung, Zentrieren, Absatzformatierung | `EditorEngine` | Implementierte Grundlage; Helfer-Parität offen |
 | `EditLongLine` / `EditShortLine` / `EditShiftLine` | Reformat-Kompatibilitätsaudit | Geplant |
 | Ganze-Zeilen-Blöcke | `EditorBlock`, `EditorSession` | Implementiert |
-| Block kopieren/verschieben/löschen/verbergen | Engine/Session | Implementiert |
+| Block kopieren/verschieben/löschen/verbergen | Engine/Session | Implementierte Grundlage; Topologie-Audit offen |
 | `EditOffblock`: InBlock global löschen, Grenzen behalten | `EditorSession.ClearBlockHighlights` | Implementiert |
 | `EditMarkblock`: aktiven Bereich in Flags projizieren | `EditorSession.MarkBlockHighlights` | Implementiert |
 | Blockanfang/-ende anspringen | Compatibility Processor | Implementiert |
 | Marker 1..20 | `EditorMarker` | Implementiert |
 | Marker bezeichnet Zeile; Sprung erhält Zielspalte | zeilenorientierter Marker / Session-Jump | Implementiert |
-| Stabile Markeridentität bei allen Zeilen-Inserts/-Deletes | künftiges Low-Level-Ankermodell | Geplanter Audit |
+| Marker-Realignment in auditierten Insert-/Delete-Pfaden | `EditorLineTopology` | Implementierte Grundlage |
 | Undo inkl. Limit | `EditorUndoManager` + Command Binding | Implementiert (Snapshot-Backend) |
 | Undo-Bereinigung zerstörter Dokumente | `EditorUndoManager.DiscardDocument` | Implementiert |
 | Vorwärtssuche / gemerktes Find Again | `EditorSearchService` | Implementiert |
@@ -90,6 +93,12 @@ Ziel ist funktionale Abdeckung, nicht eine identische Quellcode- oder API-Strukt
 
 Die drei Wortklassen des Handbuchs bleiben erhalten. Für modernen Unicode-Text behandelt die .NET-Implementierung Unicode-Buchstaben/-Ziffern als alphanumerisch, Unicode-Whitespace als Leerraum und alle übrigen Zeichen als Interpunktion. Für ASCII-Eingaben bleibt das historische Verhalten erhalten, ohne den wiederverwendbaren Kern auf ASCII zu begrenzen.
 
+## Modernisierung der Zeilentopologie
+
+Die historische Implementierung erhält stabile Zeilenidentität über Deskriptor-Pointer. SASD bildet dieselben beobachtbaren Beziehungen über `DocumentId`, logische Zeilennummern und den expliziten Realignment-Dienst `EditorLineTopology` ab. Pointeradressen, manuelles Splicing und das Freigeben von Deskriptoren gehören nicht zur portablen API.
+
+Das erste .NET-Blockmodell speichert ein vollständiges Start-/End-Paar. Wird eine Blockgrenze gelöscht, wird deshalb der vollständige aktive Block samt Hervorhebung entfernt. Das ist eine konservative Abbildung des historischen Ergebnisses (eine Grenze wird undefiniert) und keine Behauptung, dass historisch beide Pointer auf `nil` gesetzt wurden.
+
 ## Low-Level-Kompatibilitätspolitik
 
 Rohe Pascal-Pointer, Deskriptor-Freelists und 16-Bit-Integergrenzen sind Implementierungsmechanismen und keine portablen Anforderungen. Der V1-Audit erhält das beobachtbare Verhalten: welche Zeile, welches Fenster, welcher Block oder Marker ausgewählt bleibt, welcher Text verändert wird, was Undo kann und was der Host sieht. Wenn moderne Datenstrukturen eine historische Speicherverwaltungsroutine vollständig überflüssig machen, dokumentieren wir die Ersetzung statt künstlich eine Pointer-API zu erzeugen.
@@ -108,4 +117,4 @@ Der historische Bildschirm hatte eine feste Größe. Die Größenänderung eines
 
 ## V1-Abschlusskriterium
 
-Die C#/.NET-Implementierung deckt die großen strukturellen FIRST-ED-Bereiche jetzt ausführbar ab und besitzt einen aktiven Prozedur-für-Prozedur-Kernelaudit. Vor V1 schließen wir die verbleibenden Lücken bei Zeilenstruktur/Ankern, Reformat-Helfern, Parameterprüfung, Unterbrechbarkeit und historischen Fehlerressourcen und führen anschließend einen finalen Audit des Handbuch-Indexes durch. MicroStar-spezifische Demonstrationen können als Samples statt als Core-Abhängigkeiten geliefert werden.
+Die C#/.NET-Implementierung deckt die großen strukturellen FIRST-ED-Bereiche ausführbar ab und besitzt jetzt eine zentrale Zeilentopologie-Grundlage für die auditierten Delete-/Read-Insert-Pfade. Vor V1 werden die verbleibenden strukturellen Mutationsstellen bei Bedarf durch den Topologievertrag geführt, danach schließen wir Lücken bei Reformat-Helfern, Parameterprüfung, Unterbrechbarkeit und historischen Fehlerressourcen und führen einen finalen Audit des Handbuch-Indexes durch. MicroStar-spezifische Demonstrationen können als Samples statt als Core-Abhängigkeiten geliefert werden.

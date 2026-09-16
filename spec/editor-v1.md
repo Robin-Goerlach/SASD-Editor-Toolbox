@@ -40,20 +40,26 @@ V1 includes character/word/line movement, page movement, beginning/end/top/botto
 - Word-left treats leading blanks as a boundary: from within or immediately after leading indentation it moves to column zero. From column zero it enters the preceding line immediately after that line's last non-blank. Otherwise it moves to the beginning of the preceding same-line word/class run.
 - Target languages may use Unicode-aware letter/digit and whitespace classification as a documented extension; ASCII input must preserve the three historical classes.
 - Tab advances to the next configured tab stop. In Insert mode the padding is inserted into the document; in Overtype mode only the cursor moves.
+- Deleting the current line invalidates a marker on that line. If the line is a block boundary, that boundary becomes undefined and visible block highlighting is removed.
+- A text stream must retain at least one logical line. Deleting its sole line blanks that line rather than removing the final logical-line container.
 - Display-dependent commands receive the number of visible text rows from the host. Line-up/down and scroll-up/down keep the cursor visible according to the historical edge rules.
 - Page-up/down move the viewport by `visibleRows - 1`. Because the handbook does not separately specify the cursor's post-page screen row, implementations must document their cursor policy; the .NET implementation preserves the relative visible row when possible.
 - Top-of-file selects the first line and first column. Bottom-of-file selects the last line and first column and places that last line at the top of the viewport.
 
 The historical implementation's 16-bit integer ceiling is not a portable document-size requirement. Target-language overflow must be guarded without artificially limiting modern documents to Turbo Pascal's `Maxint`.
 
-## 5. Blocks and markers
+## 5. Blocks, markers and line topology
 
 - The historical V1 compatibility block is whole-line and contiguous.
 - One active block may be begun/ended, copied, moved, deleted and hidden.
 - Logical block limits and visible `InBlock` flags are distinct state. A compatibility operation equivalent to `EditOffblock` clears `InBlock` from every open text stream without deleting the logical block limits; the active block can subsequently be projected into flags again.
 - Numbered markers 1..20 identify a document and logical line, not a saved column.
 - Jumping to a marker may select a window that displays its document and changes the cursor line while preserving that target view's current column.
-- Implementations must eventually preserve marker/block/window anchor semantics across line insert/delete topology, but they do not need to reproduce raw descriptor pointers to do so.
+- Structural insertion or deletion must keep every affected window's current-line and top-line references valid.
+- References to surviving logical lines after an insertion/deletion must be realigned so they continue to identify those surviving lines rather than merely retaining stale numeric indices.
+- A marker that points directly at a deleted logical line becomes undefined; markers on later surviving lines are realigned.
+- If a deletion removes a block boundary, a complete active block is no longer available for highlighting until valid boundaries are defined again. An implementation may represent this as one undefined boundary or conservatively clear its complete active block object.
+- Raw line-descriptor pointers are not required. A centralized anchor/topology service, buffer-native anchors or another target-language mechanism may provide the observable behavior.
 
 ## 6. Search and replace
 
@@ -115,6 +121,7 @@ The core does not write directly to console/video memory. It exposes viewport/st
 - Compatibility file commands use a separate file-codec boundary so historical formats do not become mandatory modern storage formats.
 - The Turbo Editor Toolbox wrapped-line marker is a high-bit carriage return (`0x8D`, decimal 141). Decoding it marks the preceding logical line as wrapped; encoding a wrapped separator emits it again.
 - The FIRST-ED-compatible read operation inserts decoded lines after the current line and preserves the current cursor position.
+- Existing window, marker and block references to logical lines following a read insertion must be realigned to those same surviving logical lines.
 - Hosts collect filenames; core file services receive resolved paths and perform no UI prompting.
 
 ## 13. Low-level compatibility policy
