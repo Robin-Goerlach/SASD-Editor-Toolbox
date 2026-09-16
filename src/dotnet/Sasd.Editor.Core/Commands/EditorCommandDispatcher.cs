@@ -49,7 +49,7 @@ public sealed class EditorCommandDispatcher(EditorSession session)
                 case EditorCommandId.DeleteLeftCharacter: session.Engine.DeleteLeftCharacter(); break;
                 case EditorCommandId.DeleteRightCharacter: session.Engine.DeleteRightCharacter(); break;
                 case EditorCommandId.DeleteRightWord: session.Engine.DeleteRightWord(); break;
-                case EditorCommandId.DeleteLine: session.Engine.DeleteLine(); break;
+                case EditorCommandId.DeleteLine: return FirstEdPrimitiveCompatibilityProcessor.DeleteLine(session);
                 case EditorCommandId.DeleteToEndOfLine: session.Engine.DeleteToEndOfLine(); break;
                 case EditorCommandId.ChangeCase: session.Engine.ChangeCase(); break;
                 case EditorCommandId.CenterLine: session.Engine.CenterLine(); break;
