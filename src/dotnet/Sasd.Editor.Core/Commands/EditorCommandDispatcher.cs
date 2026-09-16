@@ -43,10 +43,11 @@ public sealed class EditorCommandDispatcher(EditorSession session)
                 case EditorCommandId.GoToLine: return FirstEdCompatibilityProcessor.GoToLine(session, RequireNumber(command));
                 case EditorCommandId.GoToColumn: return FirstEdCompatibilityProcessor.GoToColumn(session, RequireNumber(command));
                 case EditorCommandId.InsertText: session.Engine.InsertText(command.Text ?? string.Empty); break;
-                case EditorCommandId.InsertLine: session.Engine.InsertNewLine(); break;
+                case EditorCommandId.InsertLine: return FirstEdPrimitiveCompatibilityProcessor.InsertLine(session);
+                case EditorCommandId.NewLine: return FirstEdPrimitiveCompatibilityProcessor.NewLine(session);
                 case EditorCommandId.InsertControlCharacter: session.Engine.InsertControlCharacter(RequireText(command)[0]); break;
                 case EditorCommandId.Tab: return FirstEdPrimitiveCompatibilityProcessor.Tab(session);
-                case EditorCommandId.DeleteLeftCharacter: session.Engine.DeleteLeftCharacter(); break;
+                case EditorCommandId.DeleteLeftCharacter: return FirstEdPrimitiveCompatibilityProcessor.DeleteLeftCharacter(session);
                 case EditorCommandId.DeleteRightCharacter: return FirstEdPrimitiveCompatibilityProcessor.DeleteRightCharacter(session);
                 case EditorCommandId.DeleteRightWord: return FirstEdPrimitiveCompatibilityProcessor.DeleteRightWord(session);
                 case EditorCommandId.DeleteLine: return FirstEdPrimitiveCompatibilityProcessor.DeleteLine(session);
