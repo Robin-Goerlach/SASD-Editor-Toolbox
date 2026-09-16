@@ -30,6 +30,7 @@ public enum EditorCommandId
     GoToColumn,
     InsertText,
     InsertLine,
+    NewLine,
     InsertControlCharacter,
     Tab,
     DeleteLeftCharacter,
