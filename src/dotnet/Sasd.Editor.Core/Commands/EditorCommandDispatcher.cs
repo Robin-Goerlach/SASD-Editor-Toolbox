@@ -54,7 +54,8 @@ public sealed class EditorCommandDispatcher(EditorSession session)
                 case EditorCommandId.DeleteToEndOfLine: session.Engine.DeleteToEndOfLine(); break;
                 case EditorCommandId.ChangeCase: session.Engine.ChangeCase(); break;
                 case EditorCommandId.CenterLine: session.Engine.CenterLine(); break;
-                case EditorCommandId.ReformatParagraph: session.Engine.ReformatParagraph(); break;
+                case EditorCommandId.ReformatParagraph:
+                    return FirstEdReformatCompatibilityProcessor.Reformat(session, cancellationToken);
                 case EditorCommandId.ToggleInsert: session.Engine.ToggleInsertMode(); break;
                 case EditorCommandId.ToggleWordWrap: session.Engine.ToggleWordWrap(); break;
                 case EditorCommandId.ToggleAutoIndent: session.Engine.ToggleAutoIndent(); break;
