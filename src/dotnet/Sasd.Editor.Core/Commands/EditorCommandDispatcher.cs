@@ -31,8 +31,8 @@ public sealed class EditorCommandDispatcher(EditorSession session)
                 case EditorCommandId.PageDown: FirstEdCompatibilityProcessor.PageDown(session, visibleLines); break;
                 case EditorCommandId.ScrollUp: FirstEdCompatibilityProcessor.ScrollUp(session, visibleLines); break;
                 case EditorCommandId.ScrollDown: FirstEdCompatibilityProcessor.ScrollDown(session, visibleLines); break;
-                case EditorCommandId.WordLeft: session.Engine.MoveLeftWord(); break;
-                case EditorCommandId.WordRight: session.Engine.MoveRightWord(); break;
+                case EditorCommandId.WordLeft: return FirstEdPrimitiveCompatibilityProcessor.MoveLeftWord(session);
+                case EditorCommandId.WordRight: return FirstEdPrimitiveCompatibilityProcessor.MoveRightWord(session);
                 case EditorCommandId.BeginningOfLine: session.Engine.MoveBeginningOfLine(); break;
                 case EditorCommandId.EndOfLine: FirstEdCompatibilityProcessor.MoveEndOfLine(session); break;
                 case EditorCommandId.BeginningOrEndOfLine: FirstEdCompatibilityProcessor.MoveBeginningOrEndOfLine(session); break;

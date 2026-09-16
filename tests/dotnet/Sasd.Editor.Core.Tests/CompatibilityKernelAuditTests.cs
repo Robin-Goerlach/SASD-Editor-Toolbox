@@ -39,6 +39,67 @@ public sealed class CompatibilityKernelAuditTests
     }
 
     [Fact]
+    public async Task LeftWord_FromLeadingIndentation_StopsAtColumnZeroBeforeCrossingLine()
+    {
+        var session = new EditorSession();
+        session.CreateDocument("previous   \n    alpha beta");
+        session.CurrentWindow.Cursor = new TextPosition(1, 3);
+        var dispatcher = new EditorCommandDispatcher(session);
+
+        Assert.True(await dispatcher.ExecuteAsync(new(EditorCommandId.WordLeft)));
+        Assert.Equal(new TextPosition(1, 0), session.CurrentWindow.Cursor);
+
+        Assert.True(await dispatcher.ExecuteAsync(new(EditorCommandId.WordLeft)));
+        Assert.Equal(new TextPosition(0, 8), session.CurrentWindow.Cursor);
+    }
+
+    [Fact]
+    public async Task LeftWord_SkipsBlanksAndFindsBeginningOfPreviousClass()
+    {
+        var session = new EditorSession();
+        session.CreateDocument("alpha,  beta");
+        session.CurrentWindow.Cursor = new TextPosition(0, 12);
+        var dispatcher = new EditorCommandDispatcher(session);
+
+        Assert.True(await dispatcher.ExecuteAsync(new(EditorCommandId.WordLeft)));
+        Assert.Equal(new TextPosition(0, 8), session.CurrentWindow.Cursor);
+
+        Assert.True(await dispatcher.ExecuteAsync(new(EditorCommandId.WordLeft)));
+        Assert.Equal(new TextPosition(0, 5), session.CurrentWindow.Cursor);
+    }
+
+    [Fact]
+    public async Task RightWord_UsesAlphanumericPunctuationAndBlankClasses()
+    {
+        var session = new EditorSession();
+        session.CreateDocument("alpha,  beta");
+        var dispatcher = new EditorCommandDispatcher(session);
+
+        session.CurrentWindow.Cursor = new TextPosition(0, 0);
+        Assert.True(await dispatcher.ExecuteAsync(new(EditorCommandId.WordRight)));
+        Assert.Equal(new TextPosition(0, 5), session.CurrentWindow.Cursor);
+
+        Assert.True(await dispatcher.ExecuteAsync(new(EditorCommandId.WordRight)));
+        Assert.Equal(new TextPosition(0, 8), session.CurrentWindow.Cursor);
+
+        Assert.True(await dispatcher.ExecuteAsync(new(EditorCommandId.WordRight)));
+        Assert.Equal(new TextPosition(0, 12), session.CurrentWindow.Cursor);
+    }
+
+    [Fact]
+    public async Task RightWord_BeyondLastNonBlank_MovesToNextLineBeginning()
+    {
+        var session = new EditorSession();
+        session.CreateDocument("alpha   \n  beta");
+        session.CurrentWindow.Cursor = new TextPosition(0, 5);
+        var dispatcher = new EditorCommandDispatcher(session);
+
+        Assert.True(await dispatcher.ExecuteAsync(new(EditorCommandId.WordRight)));
+
+        Assert.Equal(new TextPosition(1, 0), session.CurrentWindow.Cursor);
+    }
+
+    [Fact]
     public async Task Tab_InOvertypeMode_MovesCursorWithoutChangingDocument()
     {
         var session = new EditorSession();
