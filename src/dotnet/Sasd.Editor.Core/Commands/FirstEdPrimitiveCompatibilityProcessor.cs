@@ -166,6 +166,44 @@ internal static class FirstEdPrimitiveCompatibilityProcessor
     }
 
     /// <summary>
+    /// Clean-room transfer of EditDeleteLine together with the observable
+    /// EditDelline/EditRealign responsibilities. The line is captured for modern
+    /// snapshot undo, line-number references are repaired centrally, markers on
+    /// the removed line are invalidated, and a block touching the removed boundary
+    /// is hidden/cleared by the topology coordinator.
+    /// </summary>
+    public static bool DeleteLine(EditorSession session)
+    {
+        var window = RequireWindow(session);
+        var document = window.Document;
+        var lineIndex = window.Cursor.Line;
+        var line = document.Buffer.GetLine(lineIndex);
+
+        session.Undo.Capture(window, "Delete line");
+
+        if (document.Buffer.LineCount == 1)
+        {
+            // The historical command keeps the sole descriptor and blanks its
+            // contents instead of deleting the final line from the stream.
+            session.Topology.InvalidateLineReferences(document, lineIndex);
+            var preservedFlags = line.Flags & EditorLineFlags.UserColored;
+            document.Buffer.ReplaceLine(
+                lineIndex,
+                new string(' ', line.Text.Length),
+                preservedFlags);
+        }
+        else
+        {
+            document.Buffer.RemoveLine(lineIndex);
+            session.Topology.LinesDeleted(document, lineIndex, 1);
+        }
+
+        document.MarkChanged();
+        session.RefreshBlockFlags();
+        return true;
+    }
+
+    /// <summary>
     /// Clean-room transfer of EditTab. In insert mode the padding to the next tab
     /// stop is inserted into the document. In overtype mode Tab is cursor movement
     /// only and therefore must not dirty the document or create an undo entry.
