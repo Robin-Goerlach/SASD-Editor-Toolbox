@@ -41,15 +41,17 @@ The current foundation contains:
 - historical Create Window compression/splitting and Delete Window row-reclamation rules with a three-row minimum per displayed window;
 - destructive `EditWindowDeleteText` semantics: blank `NONAME`, linked-stream detachment, block cleanup and no undo resurrection;
 - cursor movement, insertion/overtype, newline, auto-indent, word-wrap and tab handling;
-- historical FIRST-ED character-left/right behavior, including last-nonblank cross-line movement and virtual right-hand columns, isolated in a primitive compatibility adapter;
+- historical FIRST-ED character-left/right behavior, including last-nonblank cross-line movement and persistent virtual right-hand columns, isolated in a primitive compatibility adapter;
 - historical FIRST-ED left/right word movement using alphanumeric, punctuation and blank classes plus the documented line-boundary rules;
 - insert/overtype-aware historical Tab behavior: Insert mutates text, Overtype moves only the cursor;
+- distinct historical `EditInsertLine` and `EditNewLine` semantics, including Ctrl-N versus Return, three-way line splitting, Overtype Return, Autoindent and `Wrapped` reset;
 - historical FIRST-ED begin/end/goto, top/bottom-file and viewport-aware movement semantics isolated behind compatibility processors;
 - display-row-aware line scrolling and page movement supplied with a host-visible row count;
-- deletion commands, change-case, centering and paragraph reformatting;
-- a central `EditorLineTopology` service that realigns window cursors/top-line anchors, markers and block limits for the audited structural operations;
-- FIRST-ED-compatible `DeleteLine` semantics including the single-line blanking rule, marker invalidation and block-boundary cleanup;
-- compatibility file insertion that preserves the initiating cursor while realigning linked windows, markers and block limits;
+- audited left/right character deletion, right-word deletion and line deletion, including cursor-positioned line joins and the sole-line blanking rule;
+- change-case, centering and a foundation paragraph formatter pending exact reformat-helper parity;
+- a central `EditorLineTopology` service that realigns window cursors/top-line anchors, markers and block limits for audited structural insert/delete operations;
+- structural realignment for Insert Line, New Line, automatic word-wrap, compatibility file reads and character/word line joins;
+- marker invalidation and block-boundary cleanup on audited line deletion paths;
 - whole-line block begin/end/copy/move/delete/hide operations plus block-boundary navigation;
 - `EditOffblock`/`EditMarkblock`-style separation of logical block limits from global `InBlock` highlight flags;
 - numbered line markers whose jumps preserve the selected target view's current column;
@@ -72,7 +74,7 @@ The current foundation contains:
 - English and German architecture/compatibility documentation;
 - automated unit tests.
 
-The remaining V1 work is mainly a procedure-by-procedure compatibility audit. The next low-level task is to route the remaining structural mutation sites (newline/wrap/join, block operations and paragraph reformatting) through the topology contract where historical anchor behavior requires it. Exact reformat-helper semantics, command-boundary validation, historical long-operation abort coverage and typed historical error resources also remain. MicroStar-specific UI features can remain samples rather than dependencies of the reusable core.
+The remaining V1 work is increasingly concentrated rather than broad. The next major behavioral milestone is the exact paragraph-reformat family (`EditCompressLine`, `EditShiftLine`, `EditLongLine`, `EditShortLine`, `EditReformat`). Multi-line block copy/move/delete and bulk reformatting also need a final topology audit. Command-boundary validation, historical long-operation abort coverage and typed historical error resources remain before the final handbook procedure-index audit. MicroStar-specific UI features can remain samples rather than dependencies of the reusable core.
 
 ## Run the interactive FIRST-ED sample
 
@@ -100,6 +102,7 @@ Target framework: **.NET 10**.
 - Mutation APIs own dirty-state and undo integration; deliberately destructive compatibility commands explicitly discard obsolete undo state.
 - Historical input/value conventions and unusual FIRST-ED cursor/word semantics live in compatibility services instead of leaking DOS-era choices into the general text engine.
 - Structural line changes use an explicit topology/anchor boundary rather than scattering marker/window/block index repair across commands.
+- Virtual non-negative columns are valid editor state and are not silently collapsed by structural line normalization.
 - The typeahead compatibility layer stores normalized key strokes, not DOS bytes or raw scan codes.
 - Historical pointer/free-list mechanics are not public API requirements; observable document, marker, block and window invariants are the compatibility target.
 - Historical names are documented as compatibility references, not copied as a 1:1 public API.
@@ -134,6 +137,10 @@ Target framework: **.NET 10**.
 - Kernel-Kompatibilitätsaudit: [`docs/de/KERNEL-KOMPATIBILITAETSAUDIT.md`](docs/de/KERNEL-KOMPATIBILITAETSAUDIT.md)
 - Line topology and realignment: [`docs/en/LINE-TOPOLOGY-AND-REALIGNMENT.md`](docs/en/LINE-TOPOLOGY-AND-REALIGNMENT.md)
 - Zeilentopologie und Realignment: [`docs/de/ZEILENTOPOLOGIE-UND-REALIGNMENT.md`](docs/de/ZEILENTOPOLOGIE-UND-REALIGNMENT.md)
+- Deletion compatibility: [`docs/en/DELETION-COMPATIBILITY.md`](docs/en/DELETION-COMPATIBILITY.md)
+- Löschbefehle-Kompatibilität: [`docs/de/LOESCHBEFEHLE-KOMPATIBILITAET.md`](docs/de/LOESCHBEFEHLE-KOMPATIBILITAET.md)
+- Line insertion and New Line: [`docs/en/LINE-INSERTION-AND-NEWLINE.md`](docs/en/LINE-INSERTION-AND-NEWLINE.md)
+- Zeileneinfügung und Neue Zeile: [`docs/de/ZEILENEINFUEGUNG-UND-NEUE-ZEILE.md`](docs/de/ZEILENEINFUEGUNG-UND-NEUE-ZEILE.md)
 - Language-neutral V1 contract: [`spec/editor-v1.md`](spec/editor-v1.md)
 
 ## License
