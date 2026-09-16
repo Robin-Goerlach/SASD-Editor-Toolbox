@@ -59,9 +59,11 @@ public sealed class EditorEngine
 
         if (window.Cursor.Line + 1 < window.Document.Buffer.LineCount)
         {
-            var next = window.Document.Buffer.GetLine(window.Cursor.Line + 1).Text;
+            var nextLineIndex = window.Cursor.Line + 1;
+            var next = window.Document.Buffer.GetLine(nextLineIndex).Text;
             window.Document.Buffer.ReplaceLine(window.Cursor.Line, line + next);
-            window.Document.Buffer.RemoveLine(window.Cursor.Line + 1);
+            window.Document.Buffer.RemoveLine(nextLineIndex);
+            _session.Topology.LinesDeleted(window.Document, nextLineIndex, 1);
         }
     });
 
@@ -79,12 +81,14 @@ public sealed class EditorEngine
                 return;
             }
 
-            var previousLineIndex = window.Cursor.Line - 1;
+            var removedLineIndex = window.Cursor.Line;
+            var previousLineIndex = removedLineIndex - 1;
             var previous = window.Document.Buffer.GetLine(previousLineIndex).Text;
-            var current = window.Document.Buffer.GetLine(window.Cursor.Line).Text;
+            var current = window.Document.Buffer.GetLine(removedLineIndex).Text;
             var joinColumn = previous.Length;
             window.Document.Buffer.ReplaceLine(previousLineIndex, previous + current);
-            window.Document.Buffer.RemoveLine(window.Cursor.Line);
+            window.Document.Buffer.RemoveLine(removedLineIndex);
+            _session.Topology.LinesDeleted(window.Document, removedLineIndex, 1);
             window.Cursor = new TextPosition(previousLineIndex, joinColumn);
         });
     }
@@ -92,8 +96,14 @@ public sealed class EditorEngine
     public void DeleteLine() => Mutate("Delete line", () =>
     {
         var window = Window;
-        window.Document.Buffer.RemoveLine(window.Cursor.Line);
-        window.Cursor = new TextPosition(Math.Min(window.Cursor.Line, window.Document.Buffer.LineCount - 1), 0);
+        var lineIndex = window.Cursor.Line;
+        var oldLineCount = window.Document.Buffer.LineCount;
+        window.Document.Buffer.RemoveLine(lineIndex);
+        if (oldLineCount > 1)
+        {
+            _session.Topology.LinesDeleted(window.Document, lineIndex, 1);
+        }
+        window.Cursor = new TextPosition(Math.Min(lineIndex, window.Document.Buffer.LineCount - 1), 0);
     });
 
     public void DeleteRightWord() => Mutate("Delete right word", () =>
@@ -307,14 +317,16 @@ public sealed class EditorEngine
     private void InsertNewLineCore()
     {
         var window = Window;
-        var line = window.Document.Buffer.GetLine(window.Cursor.Line);
+        var lineIndex = window.Cursor.Line;
+        var line = window.Document.Buffer.GetLine(lineIndex);
         var column = Math.Min(window.Cursor.Column, line.Text.Length);
         var left = line.Text[..column];
         var right = line.Text[column..];
         var indentation = window.Options.AutoIndent ? new string(' ', left.TakeWhile(char.IsWhiteSpace).Count()) : new string(' ', window.Options.LeftMargin);
-        window.Document.Buffer.ReplaceLine(window.Cursor.Line, left, line.Flags & ~EditorLineFlags.Wrapped);
-        window.Document.Buffer.InsertLine(window.Cursor.Line + 1, indentation + right);
-        window.Cursor = new TextPosition(window.Cursor.Line + 1, indentation.Length);
+        window.Document.Buffer.ReplaceLine(lineIndex, left, line.Flags & ~EditorLineFlags.Wrapped);
+        window.Document.Buffer.InsertLine(lineIndex + 1, indentation + right);
+        _session.Topology.LinesInserted(window.Document, lineIndex + 1, 1);
+        window.Cursor = new TextPosition(lineIndex + 1, indentation.Length);
     }
 
     private void WrapCurrentLine()
@@ -334,17 +346,21 @@ public sealed class EditorEngine
         var prefix = new string(' ', window.Options.LeftMargin);
         window.Document.Buffer.ReplaceLine(lineIndex, left, snapshot.Flags);
         window.Document.Buffer.InsertLine(lineIndex + 1, prefix + right, EditorLineFlags.Wrapped);
+        _session.Topology.LinesInserted(window.Document, lineIndex + 1, 1);
         window.Cursor = new TextPosition(lineIndex + 1, prefix.Length + right.Length);
     }
 
     private void DeleteRightCharacterCore()
     {
         var window = Window;
-        var line = window.Document.Buffer.GetLine(window.Cursor.Line).Text;
-        if (window.Cursor.Line + 1 >= window.Document.Buffer.LineCount) return;
-        var next = window.Document.Buffer.GetLine(window.Cursor.Line + 1).Text;
-        window.Document.Buffer.ReplaceLine(window.Cursor.Line, line + next);
-        window.Document.Buffer.RemoveLine(window.Cursor.Line + 1);
+        var lineIndex = window.Cursor.Line;
+        var line = window.Document.Buffer.GetLine(lineIndex).Text;
+        if (lineIndex + 1 >= window.Document.Buffer.LineCount) return;
+        var nextLineIndex = lineIndex + 1;
+        var next = window.Document.Buffer.GetLine(nextLineIndex).Text;
+        window.Document.Buffer.ReplaceLine(lineIndex, line + next);
+        window.Document.Buffer.RemoveLine(nextLineIndex);
+        _session.Topology.LinesDeleted(window.Document, nextLineIndex, 1);
     }
 
     private void MoveVertical(int delta)
