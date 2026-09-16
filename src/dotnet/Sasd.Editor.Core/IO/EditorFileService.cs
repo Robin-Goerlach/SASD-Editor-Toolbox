@@ -48,6 +48,11 @@ public sealed class EditorFileService
             document.Buffer.InsertLine(insertionLine + index, line.Text, flags);
         }
 
+        // The historical editor's line descriptors made existing references stay
+        // attached to their logical lines automatically. Our integer line model
+        // needs an explicit EditRealign-like pass after structural insertion.
+        _session.Topology.LinesInserted(document, insertionLine, lines.Count);
+
         document.MarkChanged();
         window.Cursor = originalCursor;
         _session.RefreshBlockFlags();
