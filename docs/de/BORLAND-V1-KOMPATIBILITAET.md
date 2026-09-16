@@ -31,11 +31,13 @@ Ziel ist funktionale Abdeckung, nicht eine identische Quellcode- oder API-Strukt
 | Scroll Up/Down mit Cursor-Randverhalten | `FirstEdCompatibilityProcessor` | Implementiert |
 | Page Up/Down, dokumentierte Viewport-Verschiebung | Compatibility Processor, `visibleLines - 1` | Implementiert |
 | Top/Bottom File inklusive Viewport-Platzierung | Compatibility Processor | Implementiert |
-| Zeichen-/Wortlöschen | `EditorEngine` | Implementierte Grundlage; Detailaudit für Delete Word offen |
+| `EditDeleteRightChar`: Join-Regel hinter letztem Nicht-Leerzeichen | Primitive Compatibility Processor + Topologie | Implementiert |
+| `EditDeleteRightWord`: drei Klassen, folgende Leerzeichen und Join-Regel | Primitive Compatibility Processor + Topologie | Implementiert |
+| `EditDeleteLeftChar`: exakte Kompatibilitätsdetails | allgemeiner Engine-Pfad | Grundlage; Detailaudit offen |
 | `EditDeleteLine`: Ein-Zeilen-Regel, Marker-Ungültigkeit, Blockgrenzen | `FirstEdPrimitiveCompatibilityProcessor.DeleteLine` | Implementiert |
 | `EditDelline` / `EditRealign`: Fenster-/Marker-/Block-Referenzen reparieren | `EditorLineTopology` | Grundlage / wird erweitert |
 | Referenz-Realignment beim kompatiblen Datei-Insert | `EditorFileService` + `EditorLineTopology.LinesInserted` | Implementiert |
-| Verbleibende Topologie für Newline/Wrap/Join/Block/Reformat | Topologie-Audit | Geplant |
+| Verbleibende Topologie für Newline/Wrap/Left-Join/Block/Reformat | Topologie-Audit | Geplant |
 | Groß-/Kleinschreibung, Zentrieren, Absatzformatierung | `EditorEngine` | Implementierte Grundlage; Helfer-Parität offen |
 | `EditLongLine` / `EditShortLine` / `EditShiftLine` | Reformat-Kompatibilitätsaudit | Geplant |
 | Ganze-Zeilen-Blöcke | `EditorBlock`, `EditorSession` | Implementiert |
@@ -91,7 +93,7 @@ Ziel ist funktionale Abdeckung, nicht eine identische Quellcode- oder API-Strukt
 
 ## Modernisierung der Wortklassen
 
-Die drei Wortklassen des Handbuchs bleiben erhalten. Für modernen Unicode-Text behandelt die .NET-Implementierung Unicode-Buchstaben/-Ziffern als alphanumerisch, Unicode-Whitespace als Leerraum und alle übrigen Zeichen als Interpunktion. Für ASCII-Eingaben bleibt das historische Verhalten erhalten, ohne den wiederverwendbaren Kern auf ASCII zu begrenzen.
+Die drei Wortklassen des Handbuchs bleiben erhalten. Für modernen Unicode-Text behandelt die .NET-Implementierung Unicode-Buchstaben/-Ziffern als alphanumerisch, Unicode-Whitespace als Leerraum und alle übrigen Zeichen als Interpunktion. Für ASCII-Eingaben bleibt das historische Verhalten erhalten, ohne den wiederverwendbaren Kern auf ASCII zu begrenzen. Derselbe Klassifikator wird in den auditierten Pfaden für Rechts-Wortbewegung und Rechts-Wortlöschen verwendet.
 
 ## Modernisierung der Zeilentopologie
 
@@ -117,4 +119,4 @@ Der historische Bildschirm hatte eine feste Größe. Die Größenänderung eines
 
 ## V1-Abschlusskriterium
 
-Die C#/.NET-Implementierung deckt die großen strukturellen FIRST-ED-Bereiche ausführbar ab und besitzt jetzt eine zentrale Zeilentopologie-Grundlage für die auditierten Delete-/Read-Insert-Pfade. Vor V1 werden die verbleibenden strukturellen Mutationsstellen bei Bedarf durch den Topologievertrag geführt, danach schließen wir Lücken bei Reformat-Helfern, Parameterprüfung, Unterbrechbarkeit und historischen Fehlerressourcen und führen einen finalen Audit des Handbuch-Indexes durch. MicroStar-spezifische Demonstrationen können als Samples statt als Core-Abhängigkeiten geliefert werden.
+Die C#/.NET-Implementierung deckt die großen strukturellen FIRST-ED-Bereiche ausführbar ab und besitzt jetzt eine zentrale Zeilentopologie-Grundlage, die für auditiertes Zeilenlöschen, Rechts-Join und Datei-Insert verwendet wird. Vor V1 werden die verbleibenden strukturellen Mutationsstellen bei Bedarf durch den Topologievertrag geführt; anschließend schließen wir Lücken bei Links-Löschen, Reformat-Helfern, Parameterprüfung, Unterbrechbarkeit und historischen Fehlerressourcen und führen einen finalen Audit des Handbuch-Indexes durch. MicroStar-spezifische Demonstrationen können als Samples statt als Core-Abhängigkeiten geliefert werden.
