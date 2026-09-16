@@ -221,62 +221,36 @@ public sealed class EditorSession
         RefreshBlockFlags();
     }
 
-    public void ClearBlock()
+    /// <summary>
+    /// Modern clean-room counterpart of EditOffblock. It clears the visual
+    /// <see cref="EditorLineFlags.InBlock"/> bit from every line in every open
+    /// text stream but deliberately leaves the logical block limits unchanged.
+    /// </summary>
+    public void ClearBlockHighlights()
     {
-        if (Block is not null)
+        foreach (var document in _windows
+                     .Select(static window => window.Document)
+                     .GroupBy(static document => document.DocumentId)
+                     .Select(static group => group.First()))
         {
-            var document = FindDocument(Block.DocumentId);
-            if (document is not null)
-            {
-                ClearBlockFlags(document);
-            }
+            ClearBlockFlags(document);
         }
-
-        Block = null;
     }
 
-    public void SetMarker(int markerNumber)
+    /// <summary>
+    /// Modern clean-room counterpart of EditMarkblock. The currently defined
+    /// whole-line block is projected back into line flags without changing its
+    /// limits. Hidden or undefined blocks deliberately produce no markings.
+    /// </summary>
+    public void MarkBlockHighlights()
     {
-        EnsureWindow();
-        ValidateMarker(markerNumber);
-        _markers[markerNumber] = new EditorMarker(CurrentWindow.Document.DocumentId, CurrentWindow.Cursor);
-    }
-
-    public bool JumpToMarker(int markerNumber)
-    {
-        ValidateMarker(markerNumber);
-        if (!_markers.TryGetValue(markerNumber, out var marker))
-        {
-            return false;
-        }
-
-        var window = _windows.FirstOrDefault(window => window.Document.DocumentId == marker.DocumentId);
-        if (window is null)
-        {
-            return false;
-        }
-
-        CurrentWindow = window;
-        window.Cursor = marker.Position;
-        window.ClampCursor();
-        return true;
-    }
-
-    internal void RefreshBlockFlags()
-    {
-        if (Block is null)
+        if (Block is null || Block.Hidden)
         {
             return;
         }
 
         var document = FindDocument(Block.DocumentId);
         if (document is null)
-        {
-            return;
-        }
-
-        ClearBlockFlags(document);
-        if (Block.Hidden)
         {
             return;
         }
@@ -288,6 +262,58 @@ public sealed class EditorSession
             var snapshot = document.Buffer.GetLine(line);
             document.Buffer.SetFlags(line, snapshot.Flags | EditorLineFlags.InBlock);
         }
+    }
+
+    public void ClearBlock()
+    {
+        // Clearing stale block bits globally is intentionally stronger than only
+        // touching the active document and mirrors EditOffblock's recovery role.
+        ClearBlockHighlights();
+        Block = null;
+    }
+
+    public void SetMarker(int markerNumber)
+    {
+        EnsureWindow();
+        ValidateMarker(markerNumber);
+
+        // Turbo Editor Toolbox markers identify a line, not a saved cursor
+        // column. Keeping that distinction is important when jumping later.
+        _markers[markerNumber] = new EditorMarker(
+            CurrentWindow.Document.DocumentId,
+            CurrentWindow.Cursor.Line);
+    }
+
+    public bool JumpToMarker(int markerNumber)
+    {
+        ValidateMarker(markerNumber);
+        if (!_markers.TryGetValue(markerNumber, out var marker))
+        {
+            return false;
+        }
+
+        // Prefer the current view when it already displays the marker's stream;
+        // otherwise choose an open view of that document. In either case the
+        // view's column remains untouched, matching the historical command.
+        var window = CurrentWindow is not null && CurrentWindow.Document.DocumentId == marker.DocumentId
+            ? CurrentWindow
+            : _windows.FirstOrDefault(candidate => candidate.Document.DocumentId == marker.DocumentId);
+
+        if (window is null)
+        {
+            return false;
+        }
+
+        CurrentWindow = window;
+        var targetLine = Math.Clamp(marker.Line, 0, window.Document.Buffer.LineCount - 1);
+        window.Cursor = window.Cursor with { Line = targetLine };
+        return true;
+    }
+
+    internal void RefreshBlockFlags()
+    {
+        ClearBlockHighlights();
+        MarkBlockHighlights();
     }
 
     private static EditorDocument CreateDocumentModel(string? text)

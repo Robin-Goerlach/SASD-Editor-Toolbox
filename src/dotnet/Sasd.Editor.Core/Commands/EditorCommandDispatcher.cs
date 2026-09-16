@@ -23,8 +23,8 @@ public sealed class EditorCommandDispatcher(EditorSession session)
             var visibleLines = command.PageSize ?? DefaultVisibleLines;
             switch (command.Id)
             {
-                case EditorCommandId.CursorLeft: session.Engine.MoveLeft(); break;
-                case EditorCommandId.CursorRight: session.Engine.MoveRight(); break;
+                case EditorCommandId.CursorLeft: return FirstEdPrimitiveCompatibilityProcessor.MoveLeftChar(session);
+                case EditorCommandId.CursorRight: return FirstEdPrimitiveCompatibilityProcessor.MoveRightChar(session);
                 case EditorCommandId.CursorUp: FirstEdCompatibilityProcessor.MoveUpLine(session, visibleLines); break;
                 case EditorCommandId.CursorDown: FirstEdCompatibilityProcessor.MoveDownLine(session, visibleLines); break;
                 case EditorCommandId.PageUp: FirstEdCompatibilityProcessor.PageUp(session, visibleLines); break;
@@ -45,7 +45,7 @@ public sealed class EditorCommandDispatcher(EditorSession session)
                 case EditorCommandId.InsertText: session.Engine.InsertText(command.Text ?? string.Empty); break;
                 case EditorCommandId.InsertLine: session.Engine.InsertNewLine(); break;
                 case EditorCommandId.InsertControlCharacter: session.Engine.InsertControlCharacter(RequireText(command)[0]); break;
-                case EditorCommandId.Tab: session.Engine.Tab(); break;
+                case EditorCommandId.Tab: return FirstEdPrimitiveCompatibilityProcessor.Tab(session);
                 case EditorCommandId.DeleteLeftCharacter: session.Engine.DeleteLeftCharacter(); break;
                 case EditorCommandId.DeleteRightCharacter: session.Engine.DeleteRightCharacter(); break;
                 case EditorCommandId.DeleteRightWord: session.Engine.DeleteRightWord(); break;
