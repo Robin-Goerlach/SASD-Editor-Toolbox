@@ -104,7 +104,10 @@ public sealed class FirstEdKeyMap
 
     private static EditorInputAction? TranslateSpecialKey(EditorKeyStroke keyStroke) => keyStroke.Key switch
     {
-        EditorKey.Enter => Command(EditorCommandId.InsertLine),
+        // FIRST-ED treats Return (EditNewLine) and Ctrl-N (EditInsertLine) as
+        // distinct operations. Keeping separate semantic ids preserves the
+        // Insert/Overtype and autoindent rules of the historical editor.
+        EditorKey.Enter => Command(EditorCommandId.NewLine),
         EditorKey.Escape => Command(EditorCommandId.Undo),
         EditorKey.Backspace => Command(EditorCommandId.DeleteLeftCharacter),
         EditorKey.Delete => Command(EditorCommandId.DeleteRightCharacter),
