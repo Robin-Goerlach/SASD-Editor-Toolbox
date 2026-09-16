@@ -62,9 +62,9 @@ public sealed class EditorCommandDispatcher(EditorSession session)
                 case EditorCommandId.Undo: return session.Engine.Undo();
                 case EditorCommandId.BeginBlock: session.BeginBlock(); break;
                 case EditorCommandId.EndBlock: session.EndBlock(); break;
-                case EditorCommandId.CopyBlock: session.Engine.CopyBlockToCursor(); break;
-                case EditorCommandId.MoveBlock: session.Engine.MoveBlockToCursor(); break;
-                case EditorCommandId.DeleteBlock: session.Engine.DeleteBlock(); break;
+                case EditorCommandId.CopyBlock: return FirstEdBlockCompatibilityProcessor.CopyToCursor(session);
+                case EditorCommandId.MoveBlock: return FirstEdBlockCompatibilityProcessor.MoveToCursor(session);
+                case EditorCommandId.DeleteBlock: return FirstEdBlockCompatibilityProcessor.Delete(session);
                 case EditorCommandId.HideBlock: session.ToggleBlockHidden(); break;
                 case EditorCommandId.CreateWindow:
                     return FirstEdCompatibilityProcessor.CreateWindow(

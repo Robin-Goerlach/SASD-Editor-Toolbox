@@ -238,61 +238,24 @@ public sealed class EditorEngine
         else window.Cursor = window.Cursor with { Column = column };
     }
 
-    public void CopyBlockToCursor()
-    {
-        var block = RequireCurrentBlock();
-        var sourceDocument = _session.FindDocument(block.DocumentId)!;
-        var lines = Enumerable.Range(block.FirstLine, block.LineCount)
-            .Select(index => sourceDocument.Buffer.GetLine(index) with { Flags = EditorLineFlags.None }).ToArray();
-        Mutate("Copy block", () =>
-        {
-            var insertionLine = Window.Cursor.Line;
-            for (var index = 0; index < lines.Length; index++)
-                Window.Document.Buffer.InsertLine(insertionLine + index, lines[index].Text, lines[index].Flags);
-            Window.Cursor = new TextPosition(insertionLine, 0);
-        });
-    }
+    /// <summary>
+    /// Whole-line block copy exposed to direct engine consumers. The detailed
+    /// FIRST-ED compatibility rules live in a dedicated processor so command and
+    /// programmatic entry points cannot drift apart.
+    /// </summary>
+    public void CopyBlockToCursor() => FirstEdBlockCompatibilityProcessor.CopyToCursor(_session);
 
-    public void DeleteBlock()
-    {
-        var block = RequireCurrentBlock();
-        var document = _session.FindDocument(block.DocumentId)!;
-        var targetWindow = _session.Windows.First(window => window.Document.DocumentId == document.DocumentId);
-        _session.SetCurrentWindow(targetWindow.WindowId);
-        Mutate("Delete block", () =>
-        {
-            for (var index = block.LastLine; index >= block.FirstLine; index--) document.Buffer.RemoveLine(index);
-            targetWindow.Cursor = new TextPosition(Math.Min(block.FirstLine, document.Buffer.LineCount - 1), 0);
-            _session.ClearBlock();
-        });
-    }
+    /// <summary>
+    /// Whole-line block deletion routed through the compatibility processor so
+    /// linked windows, markers and the sole-line invariant are handled centrally.
+    /// </summary>
+    public void DeleteBlock() => FirstEdBlockCompatibilityProcessor.Delete(_session);
 
-    public void MoveBlockToCursor()
-    {
-        var block = RequireCurrentBlock();
-        var sourceDocument = _session.FindDocument(block.DocumentId)!;
-        var targetWindow = Window;
-        var targetDocument = targetWindow.Document;
-        var targetLine = targetWindow.Cursor.Line;
-        var lines = Enumerable.Range(block.FirstLine, block.LineCount)
-            .Select(index => sourceDocument.Buffer.GetLine(index) with { Flags = EditorLineFlags.None }).ToArray();
-        _session.Undo.Capture(targetWindow, "Move block");
-        if (sourceDocument.DocumentId != targetDocument.DocumentId)
-        {
-            var sourceWindow = _session.Windows.First(window => window.Document.DocumentId == sourceDocument.DocumentId);
-            _session.Undo.Capture(sourceWindow, "Move block source");
-        }
-        for (var index = block.LastLine; index >= block.FirstLine; index--) sourceDocument.Buffer.RemoveLine(index);
-        if (sourceDocument.DocumentId == targetDocument.DocumentId && targetLine > block.LastLine) targetLine -= block.LineCount;
-        targetLine = Math.Clamp(targetLine, 0, targetDocument.Buffer.LineCount);
-        for (var index = 0; index < lines.Length; index++) targetDocument.Buffer.InsertLine(targetLine + index, lines[index].Text, lines[index].Flags);
-        sourceDocument.MarkChanged();
-        if (sourceDocument.DocumentId != targetDocument.DocumentId) targetDocument.MarkChanged();
-        targetWindow.Cursor = new TextPosition(targetLine, 0);
-        _session.ClearBlock();
-        ClampLinkedWindows(sourceDocument);
-        ClampLinkedWindows(targetDocument);
-    }
+    /// <summary>
+    /// Whole-line block move routed through the compatibility processor. A move
+    /// whose current cursor lies inside the source block is rejected.
+    /// </summary>
+    public void MoveBlockToCursor() => FirstEdBlockCompatibilityProcessor.MoveToCursor(_session);
 
     public bool Undo() => _session.Undo.Undo(_session);
 
@@ -393,13 +356,6 @@ public sealed class EditorEngine
         var targetLine = Math.Clamp(window.Cursor.Line + delta, 0, window.Document.Buffer.LineCount - 1);
         var targetColumn = Math.Min(window.Cursor.Column, window.Document.Buffer.GetLine(targetLine).Text.Length);
         window.Cursor = new TextPosition(targetLine, targetColumn);
-    }
-
-    private EditorBlock RequireCurrentBlock()
-    {
-        var block = _session.Block ?? throw new InvalidOperationException("No block is defined.");
-        if (_session.FindDocument(block.DocumentId) is null) throw new InvalidOperationException("The block document is no longer open.");
-        return block;
     }
 
     private void Mutate(string description, Action mutation)
