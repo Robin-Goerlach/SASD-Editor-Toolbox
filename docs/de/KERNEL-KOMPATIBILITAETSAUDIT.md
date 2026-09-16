@@ -12,6 +12,8 @@ Ziel ist keine Quellcode-Übersetzung. Das Handbuch dient als Verhaltensspezifik
 |---|---|---|
 | `EditLeftChar` | `FirstEdPrimitiveCompatibilityProcessor.MoveLeftChar` | Von Spalte 1 geht der Cursor in die vorherige Zeile direkt hinter deren letztes Nicht-Leerzeichen. Am ersten Zeichen des Textstroms erfolgt keine Bewegung. |
 | `EditRightChar` | `FirstEdPrimitiveCompatibilityProcessor.MoveRightChar` | Der Befehl erhöht nur die Spalte und überschreitet keine logische Zeilengrenze. Damit sind virtuelle Spalten hinter dem Zeilenende möglich. |
+| `EditLeftWord` | `FirstEdPrimitiveCompatibilityProcessor.MoveLeftWord` | Führende Einrückung wird zunächst auf Spalte 1 reduziert; von Spalte 1 geht es hinter das letzte Nicht-Leerzeichen der vorherigen Zeile. Sonst wird der Beginn der vorherigen Wort-/Zeichenklasse derselben Zeile gewählt. |
+| `EditRightWord` | `FirstEdPrimitiveCompatibilityProcessor.MoveRightWord` | Alphanumerische Zeichen, Interpunktion und Leerraum bilden getrennte Klassen. Der Cursor überquert die aktuelle Klasse und folgende Leerzeichen; hinter dem letzten Nicht-Leerzeichen geht es an den Anfang der nächsten Zeile. |
 | `EditTab` | `FirstEdPrimitiveCompatibilityProcessor.Tab` | Der Cursor geht zum nächsten Tabulatorstopp. Im Insert-Modus werden die nötigen Leerzeichen eingefügt; im Overtype-Modus ist Tab nur Cursorbewegung. |
 | `EditSetMarker` / `EditJumpMarker` | `EditorMarker`, `EditorSession.SetMarker`, `JumpToMarker` | Ein Marker bezeichnet eine logische Zeile. Beim Anspringen kann das Fenster wechseln; die Spalte des gewählten Zielfensters bleibt jedoch erhalten. |
 | `EditOffblock` | `EditorSession.ClearBlockHighlights` | Löscht das `InBlock`-Flag in allen offenen Textströmen, ohne die logischen Blockgrenzen zu verändern. |
@@ -21,7 +23,13 @@ Ziel ist keine Quellcode-Übersetzung. Das Handbuch dient als Verhaltensspezifik
 
 `EditorEngine` ist die wiederverwendbare Editing-Schicht für SASD-Anwendungen. Einige historische FIRST-ED-Regeln sind nach heutigen Maßstäben bewusst ungewöhnlich. So kann ein Rechts-Befehl den Cursor in einer virtuellen Spalte belassen, statt in die nächste logische Zeile zu wechseln; beim Links-Befehl von Spalte eins wird dagegen die Position hinter dem letzten *Nicht-Leerzeichen* der vorherigen Zeile verwendet.
 
-Diese Regeln liegen deshalb in `FirstEdPrimitiveCompatibilityProcessor`. Der moderne Kern bleibt dadurch eigenständig nutzbar, während das Kompatibilitätsprofil explizit, testbar und später auf C++, Java und JavaScript übertragbar bleibt.
+Auch die historischen Wortbefehle verwenden ein Drei-Klassen-Modell statt eines modernen Identifier-Token-Begriffs: alphanumerische Zeichen, Interpunktion und Leerraum sind getrennte Läufe. Diese Regeln liegen deshalb in `FirstEdPrimitiveCompatibilityProcessor`. Der moderne Kern bleibt dadurch eigenständig nutzbar, während das Kompatibilitätsprofil explizit, testbar und später auf C++, Java und JavaScript übertragbar bleibt.
+
+## Zeichenklassen bei Wortbewegungen
+
+Für ASCII-Text entspricht die Implementierung direkt den drei Klassen des Handbuchs. Die .NET-Implementierung verwendet bewusst die Unicode-fähigen Prüfungen `char.IsLetterOrDigit` und `char.IsWhiteSpace`; alle übrigen Zeichen gelten als Interpunktion. Für ASCII bleibt das historische Ergebnis erhalten, ohne die wiederverwendbare Bibliothek künstlich auf ASCII zu begrenzen.
+
+`EditRightWord` überquert die aktuelle Nicht-Leerraum-Klasse und danach vorhandenen Leerraum. Steht der Cursor bereits hinter dem letzten Nicht-Leerzeichen, wechselt der nächste Aufruf auf Spalte null der folgenden logischen Zeile. `EditLeftWord` behandelt führende Einrückung gesondert: Ein Cursor innerhalb oder direkt hinter dem führenden Leerraum geht zuerst auf Spalte null; erst ein weiterer Aufruf wechselt in die vorherige logische Zeile.
 
 ## Marker-Modell
 
@@ -44,10 +52,13 @@ Diese Trennung ist für die Reparatur veralteter oder inkonsistenter Blockmarkie
 
 ## Neue Tests
 
-`CompatibilityKernelAuditTests` prüft:
+`CompatibilityKernelAuditTests` prüft inzwischen:
 
 - Links-Bewegung über eine Zeilengrenze bei nachgestellten Leerzeichen;
 - Rechts-Bewegung in eine virtuelle Spalte ohne Zeilenwechsel;
+- Links-Wort-Bewegung bei führender Einrückung und Übergang in die vorherige Zeile;
+- Rechts-/Links-Wort-Bewegung über alphanumerische, Interpunktions- und Leerraum-Klassen;
+- Rechts-Wort-Übergang vom Ende einer logischen Zeile in die nächste;
 - Tab im Insert-Modus inklusive Mutation, Dirty-State und Undo;
 - Tab im Overtype-Modus ohne Mutation, Dirty-State oder Undo;
 - zeilenorientierte Marker-Sprünge mit erhaltener Zielspalte;
@@ -58,9 +69,9 @@ Diese Trennung ist für die Reparatur veralteter oder inkonsistenter Blockmarkie
 Als nächste Gruppe sollten wir uns auf die Zeilenstruktur statt auf Pascal-Speicherverwaltung konzentrieren:
 
 1. `EditDelline` und die sichtbaren Regeln für Fenster-Cursor/TopLine, Blockgrenzen und Marker;
-2. `EditRealign` und die Viewport-Reparatur nach dem Entfernen einer Zeile;
-3. `EditLeftWord` / `EditRightWord` mit den exakten FIRST-ED-Whitespace- und Randregeln;
-4. die Reformat-Helfer `EditLongLine`, `EditShortLine` und `EditShiftLine`;
+2. `EditRealign` und die Viewport-Reparatur nach dem Einfügen oder Entfernen von Zeilen;
+3. die Reformat-Helfer `EditLongLine`, `EditShortLine` und `EditShiftLine`;
+4. direkte Command-Grenzfälle wie `EditSetUndoLimit` und weitere Parameterprüfungen;
 5. historische Fehlercodes/-ressourcen, soweit sie das Befehlsverhalten beeinflussen.
 
 `EditDestxtdes` selbst ist eine Speicherfreigabe-Routine und sollte nicht als öffentliche C#-Pointer-/Freelist-API nachgebaut werden.

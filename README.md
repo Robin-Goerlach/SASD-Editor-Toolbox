@@ -42,6 +42,7 @@ The current foundation contains:
 - destructive `EditWindowDeleteText` semantics: blank `NONAME`, linked-stream detachment, block cleanup and no undo resurrection;
 - cursor movement, insertion/overtype, newline, auto-indent, word-wrap and tab handling;
 - historical FIRST-ED character-left/right behavior, including last-nonblank cross-line movement and virtual right-hand columns, isolated in a primitive compatibility adapter;
+- historical FIRST-ED left/right word movement using alphanumeric, punctuation and blank classes plus the documented line-boundary rules;
 - insert/overtype-aware historical Tab behavior: Insert mutates text, Overtype moves only the cursor;
 - historical FIRST-ED begin/end/goto, top/bottom-file and viewport-aware movement semantics isolated behind compatibility processors;
 - display-row-aware line scrolling and page movement supplied with a host-visible row count;
@@ -68,7 +69,7 @@ The current foundation contains:
 - English and German architecture/compatibility documentation;
 - automated unit tests.
 
-The remaining V1 work is mainly a procedure-by-procedure compatibility audit. The next important low-level gaps are line-topology/anchor behavior around `EditDelline` and `EditRealign`, exact word movement and reformat-helper semantics, the mapping of the exposed abort state into historical long-running operations where useful, and typed historical error resources. MicroStar-specific UI features can remain samples rather than dependencies of the reusable core.
+The remaining V1 work is mainly a procedure-by-procedure compatibility audit. The next important low-level gaps are line-topology/anchor behavior around `EditDelline` and `EditRealign`, exact reformat-helper semantics, command-boundary validation, the mapping of the exposed abort state into historical long-running operations where useful, and typed historical error resources. MicroStar-specific UI features can remain samples rather than dependencies of the reusable core.
 
 ## Run the interactive FIRST-ED sample
 
@@ -94,7 +95,7 @@ Target framework: **.NET 10**.
 - A document and its views/windows are separate concepts; multiple windows may share one document.
 - Physical row allocation is kept in a host-neutral layout service rather than embedded in a console renderer.
 - Mutation APIs own dirty-state and undo integration; deliberately destructive compatibility commands explicitly discard obsolete undo state.
-- Historical input/value conventions and unusual FIRST-ED cursor semantics live in compatibility services instead of leaking DOS-era choices into the general text engine.
+- Historical input/value conventions and unusual FIRST-ED cursor/word semantics live in compatibility services instead of leaking DOS-era choices into the general text engine.
 - The typeahead compatibility layer stores normalized key strokes, not DOS bytes or raw scan codes.
 - Historical pointer/free-list mechanics are not public API requirements; observable document, marker, block and window invariants are the compatibility target.
 - Historical names are documented as compatibility references, not copied as a 1:1 public API.

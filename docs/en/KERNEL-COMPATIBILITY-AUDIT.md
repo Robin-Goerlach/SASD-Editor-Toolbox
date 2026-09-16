@@ -12,6 +12,8 @@ The goal is not a source translation. The handbook is used as a behavioral speci
 |---|---|---|
 | `EditLeftChar` | `FirstEdPrimitiveCompatibilityProcessor.MoveLeftChar` | Moving left from column 1 enters the previous line immediately after its last non-blank character. At the first character of the text stream, no movement occurs. |
 | `EditRightChar` | `FirstEdPrimitiveCompatibilityProcessor.MoveRightChar` | The command increments the column without crossing a logical line boundary. A virtual column beyond end-of-line is therefore possible. |
+| `EditLeftWord` | `FirstEdPrimitiveCompatibilityProcessor.MoveLeftWord` | Leading indentation first collapses to column 1; from column 1 the previous line is entered after its last non-blank. Otherwise the previous same-line word/class start is selected. |
+| `EditRightWord` | `FirstEdPrimitiveCompatibilityProcessor.MoveRightWord` | Alphanumeric, punctuation and blank runs are distinct classes. Movement crosses the current class and following blanks; from beyond the last non-blank it enters the next line at column 1. |
 | `EditTab` | `FirstEdPrimitiveCompatibilityProcessor.Tab` | The cursor advances to the next tab stop. In Insert mode the required padding is inserted; in Overtype mode the operation is cursor movement only. |
 | `EditSetMarker` / `EditJumpMarker` | `EditorMarker`, `EditorSession.SetMarker`, `JumpToMarker` | A marker identifies a logical line. Jumping to it may switch windows, but the selected target view keeps its own column. |
 | `EditOffblock` | `EditorSession.ClearBlockHighlights` | Clears the `InBlock` flag across every open text stream while retaining the logical block limits. |
@@ -21,7 +23,13 @@ The goal is not a source translation. The handbook is used as a behavioral speci
 
 `EditorEngine` is the reusable editing layer for SASD applications. Several historical FIRST-ED rules are deliberately unusual by modern standards. For example, a right-character command may leave the cursor in a virtual column rather than move to the next logical line, while left-character movement from column one uses the previous line's last *non-blank* position.
 
-Those rules therefore live in `FirstEdPrimitiveCompatibilityProcessor`. This keeps the modern engine useful on its own while making the compatibility profile explicit, testable and portable to later C++, Java and JavaScript implementations.
+The historical word commands also use a three-class model rather than the more common modern notion of an identifier token: alphanumeric characters, punctuation and blanks are separate runs. These rules therefore live in `FirstEdPrimitiveCompatibilityProcessor`. This keeps the modern engine useful on its own while making the compatibility profile explicit, testable and portable to later C++, Java and JavaScript implementations.
+
+## Word-class policy
+
+For ASCII text, the implementation reproduces the handbook's three visible classes directly. The .NET implementation deliberately uses Unicode-aware `char.IsLetterOrDigit` and `char.IsWhiteSpace`; every other character is treated as punctuation. This preserves the historical result for ASCII input while avoiding an artificial ASCII-only restriction in the reusable library.
+
+`EditRightWord` moves across the current non-blank class and then any blanks. If the cursor is already beyond the last non-blank character, the next invocation moves to column zero of the following logical line. `EditLeftWord` treats leading indentation specially: a cursor inside or immediately after the leading blank region first moves to column zero, and only a subsequent invocation crosses to the preceding logical line.
 
 ## Marker model
 
@@ -44,10 +52,13 @@ This distinction matters for recovery from stale or corrupted block highlighting
 
 ## Tests added
 
-`CompatibilityKernelAuditTests` covers:
+`CompatibilityKernelAuditTests` now covers:
 
 - left-character movement across a line boundary with trailing blanks;
 - right-character movement into a virtual column without changing the line;
+- left-word behavior around leading indentation and previous-line transitions;
+- right/left word-class behavior across alphanumeric, punctuation and blank runs;
+- right-word transition from the end of one logical line to the next;
 - Insert-mode tab mutation, dirty state and undo capture;
 - Overtype-mode tab movement without mutation, dirty state or undo;
 - line-only marker jumps preserving the destination view column;
@@ -58,9 +69,9 @@ This distinction matters for recovery from stale or corrupted block highlighting
 The next group should concentrate on line topology rather than raw Pascal memory management:
 
 1. `EditDelline` and the observable anchor rules for window cursor/top line, block limits and markers;
-2. `EditRealign` and viewport repair after a line is removed;
-3. `EditLeftWord` / `EditRightWord`, including FIRST-ED's exact whitespace and boundary rules;
-4. the `EditLongLine`, `EditShortLine` and `EditShiftLine` helpers used by paragraph reformatting;
+2. `EditRealign` and viewport repair after lines are inserted or removed;
+3. the `EditLongLine`, `EditShortLine` and `EditShiftLine` helpers used by paragraph reformatting;
+4. direct command-boundary details such as `EditSetUndoLimit` and remaining parameter validation;
 5. historical error codes/resources where they materially affect command behavior.
 
 `EditDestxtdes` itself is a memory-release primitive and should not be recreated as a public C# pointer/free-list API.

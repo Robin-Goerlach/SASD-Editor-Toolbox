@@ -24,6 +24,8 @@ Ziel ist funktionale Abdeckung, nicht eine identische Quellcode- oder API-Strukt
 | Cursorbewegung | `EditorEngine` plus Kompatibilitäts-Navigation | Implementiert |
 | `EditLeftChar`: vorherige Zeile hinter letztem Nicht-Leerzeichen | Primitive Compatibility Processor | Implementiert |
 | `EditRightChar`: nur Spalte / virtuelle Spalte | Primitive Compatibility Processor | Implementiert |
+| `EditLeftWord`: Einrückung und vorheriges Wort | Primitive Compatibility Processor | Implementiert |
+| `EditRightWord`: Alphanumerik/Interpunktion/Leerraum + Zeilenwechsel | Primitive Compatibility Processor | Implementiert |
 | Historische Begin/End/Goto-Details | `FirstEdCompatibilityProcessor` | Implementiert |
 | Up/Down-Line mit Viewport-Nachführung | Compatibility Processor + sichtbare Zeilenzahl | Implementiert |
 | Scroll Up/Down mit Cursor-Randverhalten | `FirstEdCompatibilityProcessor` | Implementiert |
@@ -84,6 +86,10 @@ Ziel ist funktionale Abdeckung, nicht eine identische Quellcode- oder API-Strukt
 | DOS-/Videospeicher-Routinen | bewusst durch Host-Rendering ersetzt | Ersetzt |
 | Overlays | auf modernen Plattformen nicht erforderlich | Entfällt |
 
+## Modernisierung der Wortklassen
+
+Die drei Wortklassen des Handbuchs bleiben erhalten. Für modernen Unicode-Text behandelt die .NET-Implementierung Unicode-Buchstaben/-Ziffern als alphanumerisch, Unicode-Whitespace als Leerraum und alle übrigen Zeichen als Interpunktion. Für ASCII-Eingaben bleibt das historische Verhalten erhalten, ohne den wiederverwendbaren Kern auf ASCII zu begrenzen.
+
 ## Low-Level-Kompatibilitätspolitik
 
 Rohe Pascal-Pointer, Deskriptor-Freelists und 16-Bit-Integergrenzen sind Implementierungsmechanismen und keine portablen Anforderungen. Der V1-Audit erhält das beobachtbare Verhalten: welche Zeile, welches Fenster, welcher Block oder Marker ausgewählt bleibt, welcher Text verändert wird, was Undo kann und was der Host sieht. Wenn moderne Datenstrukturen eine historische Speicherverwaltungsroutine vollständig überflüssig machen, dokumentieren wir die Ersetzung statt künstlich eine Pointer-API zu erzeugen.
@@ -102,4 +108,4 @@ Der historische Bildschirm hatte eine feste Größe. Die Größenänderung eines
 
 ## V1-Abschlusskriterium
 
-Die C#/.NET-Implementierung deckt die großen strukturellen FIRST-ED-Bereiche jetzt ausführbar ab und besitzt einen aktiven Prozedur-für-Prozedur-Kernelaudit. Vor V1 schließen wir die verbleibenden Lücken bei Zeilenstruktur/Ankern, exakter Wortbewegung/Reformat-Helfern, Unterbrechbarkeit und historischen Fehlerressourcen und führen anschließend einen finalen Audit des Handbuch-Indexes durch. MicroStar-spezifische Demonstrationen können als Samples statt als Core-Abhängigkeiten geliefert werden.
+Die C#/.NET-Implementierung deckt die großen strukturellen FIRST-ED-Bereiche jetzt ausführbar ab und besitzt einen aktiven Prozedur-für-Prozedur-Kernelaudit. Vor V1 schließen wir die verbleibenden Lücken bei Zeilenstruktur/Ankern, Reformat-Helfern, Parameterprüfung, Unterbrechbarkeit und historischen Fehlerressourcen und führen anschließend einen finalen Audit des Handbuch-Indexes durch. MicroStar-spezifische Demonstrationen können als Samples statt als Core-Abhängigkeiten geliefert werden.

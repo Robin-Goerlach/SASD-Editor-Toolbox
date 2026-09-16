@@ -24,6 +24,8 @@ The goal is behavioral coverage, not source-level or public-name identity.
 | Cursor movement | `EditorEngine` plus compatibility navigation processors | Implemented |
 | `EditLeftChar` previous-line last-nonblank rule | primitive compatibility processor | Implemented |
 | `EditRightChar` column-only / virtual-column rule | primitive compatibility processor | Implemented |
+| `EditLeftWord` leading-indent and previous-word rules | primitive compatibility processor | Implemented |
+| `EditRightWord` alphanumeric/punctuation/blank classes and next-line transition | primitive compatibility processor | Implemented |
 | Historical begin/end/goto navigation details | `FirstEdCompatibilityProcessor` | Implemented |
 | Up/down line viewport-follow behavior | `FirstEdCompatibilityProcessor` + host visible-row count | Implemented |
 | Scroll up/down edge-cursor behavior | `FirstEdCompatibilityProcessor` | Implemented |
@@ -85,6 +87,10 @@ The goal is behavioral coverage, not source-level or public-name identity.
 | DOS/video-memory assembly routines | intentionally not reproduced | Replaced by host rendering |
 | Overlay support | obsolete on modern platforms | Not applicable |
 
+## Word-class modernization policy
+
+The handbook's three word classes are retained. For modern Unicode text the .NET implementation treats Unicode letters/digits as alphanumeric, Unicode whitespace as blank, and other characters as punctuation. This is behaviorally compatible for ASCII input while avoiding an ASCII-only reusable core.
+
 ## Low-level compatibility policy
 
 Raw Pascal pointers, descriptor free lists and 16-bit integer ceilings are implementation mechanisms, not portable requirements. The V1 audit preserves observable behavior: which line/window/block/marker remains selected, which text changes, what is undoable and what the host sees. Where modern data structures remove a historical memory-management operation entirely, the compatibility matrix records the replacement instead of manufacturing a pointer-shaped API.
@@ -103,4 +109,4 @@ The historical screen was fixed-size. Resizing a modern terminal is therefore no
 
 ## V1 release gate
 
-The C#/.NET implementation now has executable coverage for the major FIRST-ED structural areas and an active procedure-by-procedure kernel audit. Before calling V1 complete, close the remaining line-topology/anchor, exact word-movement/reformat-helper, interruptibility and historical error-resource gaps, then run a final handbook-index audit. MicroStar-specific demonstrations may ship as samples rather than core dependencies.
+The C#/.NET implementation now has executable coverage for the major FIRST-ED structural areas and an active procedure-by-procedure kernel audit. Before calling V1 complete, close the remaining line-topology/anchor, reformat-helper, parameter-validation, interruptibility and historical error-resource gaps, then run a final handbook-index audit. MicroStar-specific demonstrations may ship as samples rather than core dependencies.

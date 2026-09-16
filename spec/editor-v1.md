@@ -36,6 +36,9 @@ V1 includes character/word/line movement, page movement, beginning/end/top/botto
 
 - Character-left from the first column of a non-first logical line moves to the previous line immediately after its last non-blank character. At the beginning of the text stream it does nothing.
 - Character-right increments the logical column without crossing to the next logical line. A compatibility implementation must therefore support a virtual cursor column beyond the current line length.
+- Word-right uses three character classes: alphanumeric, punctuation and blank. Starting on a non-blank class moves across that run and any following blanks; starting on blanks moves to the next non-blank. If the cursor is beyond the current line's last non-blank, it moves to column zero of the following line when one exists.
+- Word-left treats leading blanks as a boundary: from within or immediately after leading indentation it moves to column zero. From column zero it enters the preceding line immediately after that line's last non-blank. Otherwise it moves to the beginning of the preceding same-line word/class run.
+- Target languages may use Unicode-aware letter/digit and whitespace classification as a documented extension; ASCII input must preserve the three historical classes.
 - Tab advances to the next configured tab stop. In Insert mode the padding is inserted into the document; in Overtype mode only the cursor moves.
 - Display-dependent commands receive the number of visible text rows from the host. Line-up/down and scroll-up/down keep the cursor visible according to the historical edge rules.
 - Page-up/down move the viewport by `visibleRows - 1`. Because the handbook does not separately specify the cursor's post-page screen row, implementations must document their cursor policy; the .NET implementation preserves the relative visible row when possible.
