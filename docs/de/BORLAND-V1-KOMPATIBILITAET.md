@@ -9,6 +9,7 @@ Ziel ist funktionale Abdeckung, nicht eine identische Quellcode- oder API-Strukt
 | Textzeilen / Text Streams | `ITextBuffer`, `EditorDocument` | Implementiert |
 | Verkettete Zeilen | `LinkedLineTextBuffer` | Implementiert |
 | Zeilenflags Block / Wrapped / Sonderfarbe | `EditorLineFlags` | Implementiert |
+| `Wrapped` als weiche ausgehende Zeilengrenze | Zeilenflags + Engine/Reformat/Dateicodec | Implementiert |
 | Mehrere Fenster | `EditorSession`, `EditorWindow` | Implementiert |
 | Verknüpfte Fenster auf denselben Text | mehrere Fenster auf einem `EditorDocument` | Implementiert |
 | Physische gestapelte Fensterzeilen | `EditorWindowLayout`, `EditorWindowFrame` | Implementiert |
@@ -16,7 +17,7 @@ Ziel ist funktionale Abdeckung, nicht eine identische Quellcode- oder API-Strukt
 | `EditWindowDelete(Wno)` Übernahme freier Zeilen | Compatibility Processor + Layout | Implementiert |
 | `EditWindowDeleteText` destruktives Zurücksetzen | `DeleteCurrentWindowText`, getrennte neue Leerdokumente | Implementiert |
 | Insert / Overtype | `EditorWindowOptions.InsertMode` | Implementiert |
-| Word-Wrap | `EditorWindowOptions.WordWrap`, Engine-Wrap | Implementierte Grundlage; exakte Reformat-Interaktion separat im Audit |
+| Word-Wrap | `EditorWindowOptions.WordWrap`, Engine-Wrap | Implementierte Grundlage |
 | Auto-Indent | `EditorWindowOptions.AutoIndent` | Implementiert |
 | Linker/rechter Rand | `EditorWindowOptions` | Implementiert |
 | Tabulatorbreite | pro Fenster `EditorWindowOptions.TabSize`; historischer globaler Scope separat dokumentiert | Grundlage / dokumentierte Abweichung |
@@ -40,13 +41,15 @@ Ziel ist funktionale Abdeckung, nicht eine identische Quellcode- oder API-Strukt
 | `EditDeleteRightChar`: cursorpositionierter Join hinter letztem Nicht-Leerzeichen | Primitive Compatibility Processor + Topologie | Implementiert |
 | `EditDeleteRightWord`: drei Klassen, folgende Leerzeichen, cursorpositionierter Join | Primitive Compatibility Processor + Topologie | Implementiert |
 | `EditDeleteLine`: Ein-Zeilen-Regel, Marker-Ungültigkeit, Blockgrenzen | `FirstEdPrimitiveCompatibilityProcessor.DeleteLine` | Implementiert |
-| `EditDelline` / `EditRealign`: beobachtbare Fenster-/Marker-/Block-Referenzen reparieren | `EditorLineTopology` | Implementierte Grundlage; Bulk-Mutationsaudit offen |
+| `EditDelline` / `EditRealign`: beobachtbare Fenster-/Marker-/Block-Referenzen reparieren | `EditorLineTopology` | Implementierte Grundlage; Block-Bulk-Audit offen |
 | Referenz-Realignment beim kompatiblen Datei-Insert | `EditorFileService` + `EditorLineTopology.LinesInserted` | Implementiert |
 | Realignment bei generischem Newline / automatischem Wrap | `EditorEngine` + `EditorLineTopology.LinesInserted` | Implementiert |
-| Verbleibende Bulk-Topologie für Block/Reformat | Topologie-Audit | Geplant |
-| Groß-/Kleinschreibung, Zentrieren, Absatzformatierung | `EditorEngine` | Implementierte Grundlage; Helfer-Parität offen |
-| `EditCompressLine` / `EditLongLine` / `EditShortLine` / `EditShiftLine` | Reformat-Kompatibilitätsaudit | Geplant |
-| Exaktes `EditReformat`: Absatzdurchlauf / Wrapped-Semantik | Reformat-Kompatibilitätsmeilenstein | Geplant |
+| Referenz-Realignment bei Reformat-Vergrößerung/-Verkleinerung | Reformat Processor + `EditorLineTopology` | Implementiert |
+| Groß-/Kleinschreibung / Zentrieren | `EditorEngine` | Implementierte Grundlage; ggf. Helfer-Parität separat |
+| `EditCompressLine` / `EditShiftLine` | Normalisierung / Linksrandverschiebung im Reformat-Plan | Implementiert |
+| `EditLongLine` / `EditShortLine` | Push-down / Pull-up im Reformat-Plan | Implementiert |
+| `EditReformat`: Wrapped-Durchlauf / Randformatierung | `FirstEdReformatCompatibilityProcessor` | Implementiert |
+| Reformat: zu langes Wort vor Mutation erkennen | Plan-Validierung | Implementiert |
 | Ganze-Zeilen-Blöcke | `EditorBlock`, `EditorSession` | Implementiert |
 | Block kopieren/verschieben/löschen/verbergen | Engine/Session | Implementierte Grundlage; Bulk-Topologie-Audit offen |
 | `EditOffblock`: InBlock global löschen, Grenzen behalten | `EditorSession.ClearBlockHighlights` | Implementiert |
@@ -55,7 +58,7 @@ Ziel ist funktionale Abdeckung, nicht eine identische Quellcode- oder API-Strukt
 | Marker 1..20 | `EditorMarker` | Implementiert |
 | Marker bezeichnet Zeile; Sprung erhält Zielspalte | zeilenorientierter Marker / Session-Jump | Implementiert |
 | Marker-Realignment in auditierten Insert-/Delete-Pfaden | `EditorLineTopology` | Implementiert |
-| Stabile Anker bei Block-/Reformat-Bulk-Topologie | Topologie-Audit | Geplant |
+| Stabile Anker bei Reformat-Bulk-Topologie | Reformat Processor + Topologie | Implementiert |
 | Undo inkl. Limit | `EditorUndoManager` + Command Binding | Implementiert (Snapshot-Backend) |
 | Undo-Bereinigung zerstörter Dokumente | `EditorUndoManager.DiscardDocument` | Implementiert |
 | Vorwärtssuche / gemerktes Find Again | `EditorSearchService` | Implementiert |
@@ -103,11 +106,17 @@ Ziel ist funktionale Abdeckung, nicht eine identische Quellcode- oder API-Strukt
 
 Die drei Wortklassen des Handbuchs bleiben erhalten. Für modernen Unicode-Text behandelt die .NET-Implementierung Unicode-Buchstaben/-Ziffern als alphanumerisch, Unicode-Whitespace als Leerraum und alle übrigen Zeichen als Interpunktion. Für ASCII-Eingaben bleibt das historische Verhalten erhalten, ohne den wiederverwendbaren Kern auf ASCII zu begrenzen. Derselbe Klassifikator wird in den auditierten Pfaden für Rechts-Wortbewegung und Rechts-Wortlöschen verwendet.
 
+## Policy für Wrapped-Grenzen
+
+`EditorLineFlags.Wrapped` bezeichnet die weiche Grenze nach der markierten logischen Zeile. Diese Policy wird gemeinsam von expliziter Neuformatierung, automatischem Wrap und dem Legacy-Codec mit High-Bit-Carriage-Return verwendet. Ein explizites New Line löscht das `Wrapped`-Bit der zuvor aktuellen Zeile und erzeugt damit eine harte Absatzgrenze.
+
+Die historische Beschreibung von `EditCompressLine` spricht ausdrücklich von Spaces. Der .NET-Reformat-Planer akzeptiert zusätzlich Unicode-Whitespace und erhält für ASCII dasselbe Verhalten; dies ist eine moderne Erweiterung und keine Aussage über den historischen Zeichensatz.
+
 ## Modernisierung der Zeilentopologie
 
 Die historische Implementierung erhält stabile Zeilenidentität über Deskriptor-Pointer. SASD bildet dieselben beobachtbaren Beziehungen über `DocumentId`, logische Zeilennummern und den expliziten Realignment-Dienst `EditorLineTopology` ab. Pointeradressen, manuelles Splicing und das Freigeben von Deskriptoren gehören nicht zur portablen API.
 
-Die auditierten Pfade für einzelne Zeileneinfügungen, New Line, automatischen Wrap, Datei-Insert und Löschen/Join melden Topologieänderungen jetzt zentral. Der verbleibende Topologie-Audit konzentriert sich auf mehrzeilige Blockoperationen und den aktuellen Bulk-Pfad der Absatz-Reformatierung.
+Die auditierten Pfade für einzelne Zeileneinfügungen, New Line, automatischen Wrap, Datei-Insert, Löschen/Join und Absatz-Neuformatierung melden Topologieänderungen jetzt zentral. Der verbleibende Bulk-Topologie-Audit konzentriert sich auf mehrzeilige Blockoperationen Copy/Move/Delete.
 
 Das erste .NET-Blockmodell speichert ein vollständiges Start-/End-Paar. Wird eine Blockgrenze gelöscht, wird deshalb der vollständige aktive Block samt Hervorhebung entfernt. Das ist eine konservative Abbildung des historischen Ergebnisses (eine Grenze wird undefiniert) und keine Behauptung, dass historisch beide Pointer auf `nil` gesetzt wurden.
 
@@ -133,4 +142,4 @@ Der historische Bildschirm hatte eine feste Größe. Die Größenänderung eines
 
 ## V1-Abschlusskriterium
 
-Die C#/.NET-Implementierung deckt die großen strukturellen FIRST-ED-Bereiche inzwischen ausführbar ab, einschließlich auditiertem Einfügen einzelner Zeilen, New Line, Löschen und Realignment. Vor V1 schließen wir die verbleibenden Lücken bei Reformat-Helfern und Bulk-Topologie sowie die Audits für Parameter/Fehlerressourcen und Unterbrechbarkeit; anschließend folgt ein finaler Audit des Handbuch-Prozedurindexes. MicroStar-spezifische Demonstrationen können als Samples statt als Core-Abhängigkeiten geliefert werden.
+Die C#/.NET-Implementierung deckt die großen strukturellen FIRST-ED-Bereiche inzwischen ausführbar ab, einschließlich Absatz-Neuformatierung und ihrer Topologieeffekte. Vor V1 schließen wir den verbleibenden mehrzeiligen Block-Topologie-Audit sowie systematische Audits für Command-Grenzen/Fehlerressourcen und Unterbrechbarkeit; anschließend folgt ein finaler Audit des Handbuch-Prozedurindexes. MicroStar-spezifische Demonstrationen können als Samples statt als Core-Abhängigkeiten geliefert werden.
