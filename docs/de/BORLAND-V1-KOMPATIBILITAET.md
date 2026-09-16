@@ -16,14 +16,19 @@ Ziel ist funktionale Abdeckung, nicht eine identische Quellcode- oder API-Strukt
 | `EditWindowDelete(Wno)` Übernahme freier Zeilen | Compatibility Processor + Layout | Implementiert |
 | `EditWindowDeleteText` destruktives Zurücksetzen | `DeleteCurrentWindowText`, getrennte neue Leerdokumente | Implementiert |
 | Insert / Overtype | `EditorWindowOptions.InsertMode` | Implementiert |
-| Word-Wrap | `EditorWindowOptions.WordWrap` | Implementiert |
+| Word-Wrap | `EditorWindowOptions.WordWrap`, Engine-Wrap | Implementierte Grundlage; exakte Reformat-Interaktion separat im Audit |
 | Auto-Indent | `EditorWindowOptions.AutoIndent` | Implementiert |
 | Linker/rechter Rand | `EditorWindowOptions` | Implementiert |
 | Tabulatorbreite | pro Fenster `EditorWindowOptions.TabSize`; historischer globaler Scope separat dokumentiert | Grundlage / dokumentierte Abweichung |
 | `EditTab` Insert-/Overtype-Verhalten | `FirstEdPrimitiveCompatibilityProcessor.Tab` | Implementiert |
+| `EditInsertLine`: leer oben / leer unten / Split | Primitive Compatibility Processor + Topologie | Implementiert |
+| `EditNewLine`: Insert-/Overtype-Verhalten | getrennter `NewLine`-Befehl + Compatibility Processor | Implementiert |
+| Unterscheidung Return vs Ctrl-N | `FirstEdKeyMap`: `NewLine` vs `InsertLine` | Implementiert |
+| New Line Autoindent und Reset des vorherigen `Wrapped`-Flags | Primitive Compatibility Processor | Implementiert |
 | Cursorbewegung | `EditorEngine` plus Kompatibilitäts-Navigation | Implementiert |
 | `EditLeftChar`: vorherige Zeile hinter letztem Nicht-Leerzeichen | Primitive Compatibility Processor | Implementiert |
 | `EditRightChar`: nur Spalte / virtuelle Spalte | Primitive Compatibility Processor | Implementiert |
+| Virtuelle Spalten überleben strukturelle Normalisierung | `EditorWindow.ClampCursor` erhält nichtnegative Spalte | Implementiert |
 | `EditLeftWord`: Einrückung und vorheriges Wort | Primitive Compatibility Processor | Implementiert |
 | `EditRightWord`: Alphanumerik/Interpunktion/Leerraum + Zeilenwechsel | Primitive Compatibility Processor | Implementiert |
 | Historische Begin/End/Goto-Details | `FirstEdCompatibilityProcessor` | Implementiert |
@@ -31,23 +36,26 @@ Ziel ist funktionale Abdeckung, nicht eine identische Quellcode- oder API-Strukt
 | Scroll Up/Down mit Cursor-Randverhalten | `FirstEdCompatibilityProcessor` | Implementiert |
 | Page Up/Down, dokumentierte Viewport-Verschiebung | Compatibility Processor, `visibleLines - 1` | Implementiert |
 | Top/Bottom File inklusive Viewport-Platzierung | Compatibility Processor | Implementiert |
-| `EditDeleteRightChar`: Join-Regel hinter letztem Nicht-Leerzeichen | Primitive Compatibility Processor + Topologie | Implementiert |
-| `EditDeleteRightWord`: drei Klassen, folgende Leerzeichen und Join-Regel | Primitive Compatibility Processor + Topologie | Implementiert |
-| `EditDeleteLeftChar`: exakte Kompatibilitätsdetails | allgemeiner Engine-Pfad | Grundlage; Detailaudit offen |
+| `EditDeleteLeftChar`: Zeichen + Join zur vorherigen Zeile | Primitive Compatibility Processor + Topologie | Implementiert; Virtual-Space-Regel separat dokumentiert |
+| `EditDeleteRightChar`: cursorpositionierter Join hinter letztem Nicht-Leerzeichen | Primitive Compatibility Processor + Topologie | Implementiert |
+| `EditDeleteRightWord`: drei Klassen, folgende Leerzeichen, cursorpositionierter Join | Primitive Compatibility Processor + Topologie | Implementiert |
 | `EditDeleteLine`: Ein-Zeilen-Regel, Marker-Ungültigkeit, Blockgrenzen | `FirstEdPrimitiveCompatibilityProcessor.DeleteLine` | Implementiert |
-| `EditDelline` / `EditRealign`: Fenster-/Marker-/Block-Referenzen reparieren | `EditorLineTopology` | Grundlage / wird erweitert |
+| `EditDelline` / `EditRealign`: beobachtbare Fenster-/Marker-/Block-Referenzen reparieren | `EditorLineTopology` | Implementierte Grundlage; Bulk-Mutationsaudit offen |
 | Referenz-Realignment beim kompatiblen Datei-Insert | `EditorFileService` + `EditorLineTopology.LinesInserted` | Implementiert |
-| Verbleibende Topologie für Newline/Wrap/Left-Join/Block/Reformat | Topologie-Audit | Geplant |
+| Realignment bei generischem Newline / automatischem Wrap | `EditorEngine` + `EditorLineTopology.LinesInserted` | Implementiert |
+| Verbleibende Bulk-Topologie für Block/Reformat | Topologie-Audit | Geplant |
 | Groß-/Kleinschreibung, Zentrieren, Absatzformatierung | `EditorEngine` | Implementierte Grundlage; Helfer-Parität offen |
-| `EditLongLine` / `EditShortLine` / `EditShiftLine` | Reformat-Kompatibilitätsaudit | Geplant |
+| `EditCompressLine` / `EditLongLine` / `EditShortLine` / `EditShiftLine` | Reformat-Kompatibilitätsaudit | Geplant |
+| Exaktes `EditReformat`: Absatzdurchlauf / Wrapped-Semantik | Reformat-Kompatibilitätsmeilenstein | Geplant |
 | Ganze-Zeilen-Blöcke | `EditorBlock`, `EditorSession` | Implementiert |
-| Block kopieren/verschieben/löschen/verbergen | Engine/Session | Implementierte Grundlage; Topologie-Audit offen |
+| Block kopieren/verschieben/löschen/verbergen | Engine/Session | Implementierte Grundlage; Bulk-Topologie-Audit offen |
 | `EditOffblock`: InBlock global löschen, Grenzen behalten | `EditorSession.ClearBlockHighlights` | Implementiert |
 | `EditMarkblock`: aktiven Bereich in Flags projizieren | `EditorSession.MarkBlockHighlights` | Implementiert |
 | Blockanfang/-ende anspringen | Compatibility Processor | Implementiert |
 | Marker 1..20 | `EditorMarker` | Implementiert |
 | Marker bezeichnet Zeile; Sprung erhält Zielspalte | zeilenorientierter Marker / Session-Jump | Implementiert |
-| Marker-Realignment in auditierten Insert-/Delete-Pfaden | `EditorLineTopology` | Implementierte Grundlage |
+| Marker-Realignment in auditierten Insert-/Delete-Pfaden | `EditorLineTopology` | Implementiert |
+| Stabile Anker bei Block-/Reformat-Bulk-Topologie | Topologie-Audit | Geplant |
 | Undo inkl. Limit | `EditorUndoManager` + Command Binding | Implementiert (Snapshot-Backend) |
 | Undo-Bereinigung zerstörter Dokumente | `EditorUndoManager.DiscardDocument` | Implementiert |
 | Vorwärtssuche / gemerktes Find Again | `EditorSearchService` | Implementiert |
@@ -99,7 +107,13 @@ Die drei Wortklassen des Handbuchs bleiben erhalten. Für modernen Unicode-Text 
 
 Die historische Implementierung erhält stabile Zeilenidentität über Deskriptor-Pointer. SASD bildet dieselben beobachtbaren Beziehungen über `DocumentId`, logische Zeilennummern und den expliziten Realignment-Dienst `EditorLineTopology` ab. Pointeradressen, manuelles Splicing und das Freigeben von Deskriptoren gehören nicht zur portablen API.
 
+Die auditierten Pfade für einzelne Zeileneinfügungen, New Line, automatischen Wrap, Datei-Insert und Löschen/Join melden Topologieänderungen jetzt zentral. Der verbleibende Topologie-Audit konzentriert sich auf mehrzeilige Blockoperationen und den aktuellen Bulk-Pfad der Absatz-Reformatierung.
+
 Das erste .NET-Blockmodell speichert ein vollständiges Start-/End-Paar. Wird eine Blockgrenze gelöscht, wird deshalb der vollständige aktive Block samt Hervorhebung entfernt. Das ist eine konservative Abbildung des historischen Ergebnisses (eine Grenze wird undefiniert) und keine Behauptung, dass historisch beide Pointer auf `nil` gesetzt wurden.
+
+## Policy für virtuelle Spalten
+
+FIRST-ED erlaubt ausdrücklich, den Cursor hinter die physische Pufferlänge einer Zeile zu bewegen. Nichtnegative virtuelle Spalten sind daher gültiger Editorzustand. `EditorWindow.ClampCursor` normalisiert nach strukturellen Änderungen Zeile und Viewport, erhält aber bewusst die Spalte. Für Backspace im nicht gespeicherten virtuellen Bereich ist das Handbuch nicht eindeutig; die .NET-V1-Implementierung verwendet dort reine Cursorbewegung und dokumentiert dies als moderne Policy.
 
 ## Low-Level-Kompatibilitätspolitik
 
@@ -119,4 +133,4 @@ Der historische Bildschirm hatte eine feste Größe. Die Größenänderung eines
 
 ## V1-Abschlusskriterium
 
-Die C#/.NET-Implementierung deckt die großen strukturellen FIRST-ED-Bereiche ausführbar ab und besitzt jetzt eine zentrale Zeilentopologie-Grundlage, die für auditiertes Zeilenlöschen, Rechts-Join und Datei-Insert verwendet wird. Vor V1 werden die verbleibenden strukturellen Mutationsstellen bei Bedarf durch den Topologievertrag geführt; anschließend schließen wir Lücken bei Links-Löschen, Reformat-Helfern, Parameterprüfung, Unterbrechbarkeit und historischen Fehlerressourcen und führen einen finalen Audit des Handbuch-Indexes durch. MicroStar-spezifische Demonstrationen können als Samples statt als Core-Abhängigkeiten geliefert werden.
+Die C#/.NET-Implementierung deckt die großen strukturellen FIRST-ED-Bereiche inzwischen ausführbar ab, einschließlich auditiertem Einfügen einzelner Zeilen, New Line, Löschen und Realignment. Vor V1 schließen wir die verbleibenden Lücken bei Reformat-Helfern und Bulk-Topologie sowie die Audits für Parameter/Fehlerressourcen und Unterbrechbarkeit; anschließend folgt ein finaler Audit des Handbuch-Prozedurindexes. MicroStar-spezifische Demonstrationen können als Samples statt als Core-Abhängigkeiten geliefert werden.
