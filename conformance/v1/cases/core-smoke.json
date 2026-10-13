@@ -10,7 +10,10 @@
           {
             "id": "doc-1",
             "lines": [
-              { "text": "abc", "flags": [] }
+              {
+                "text": "abc",
+                "flags": []
+              }
             ]
           }
         ],
@@ -18,7 +21,10 @@
           {
             "id": "win-1",
             "documentId": "doc-1",
-            "cursor": { "line": 0, "column": 3 }
+            "cursor": {
+              "line": 0,
+              "column": 3
+            }
           }
         ],
         "currentWindowId": "win-1"
@@ -29,7 +35,10 @@
       "expect": {
         "windows": {
           "win-1": {
-            "cursor": { "line": 0, "column": 4 }
+            "cursor": {
+              "line": 0,
+              "column": 4
+            }
           }
         }
       }
@@ -42,7 +51,10 @@
           {
             "id": "doc-1",
             "lines": [
-              { "text": "only line", "flags": [] }
+              {
+                "text": "only line",
+                "flags": []
+              }
             ]
           }
         ],
@@ -50,7 +62,10 @@
           {
             "id": "win-1",
             "documentId": "doc-1",
-            "cursor": { "line": 0, "column": 0 }
+            "cursor": {
+              "line": 0,
+              "column": 0
+            }
           }
         ],
         "currentWindowId": "win-1"
@@ -62,13 +77,19 @@
         "documents": {
           "doc-1": {
             "lines": [
-              { "text": "         ", "flags": [] }
+              {
+                "text": "         ",
+                "flags": []
+              }
             ]
           }
         },
         "windows": {
           "win-1": {
-            "cursor": { "line": 0, "column": 0 }
+            "cursor": {
+              "line": 0,
+              "column": 0
+            }
           }
         }
       }
@@ -81,9 +102,18 @@
           {
             "id": "doc-1",
             "lines": [
-              { "text": "a", "flags": [] },
-              { "text": "b", "flags": [] },
-              { "text": "c", "flags": [] }
+              {
+                "text": "a",
+                "flags": []
+              },
+              {
+                "text": "b",
+                "flags": []
+              },
+              {
+                "text": "c",
+                "flags": []
+              }
             ]
           }
         ],
@@ -91,7 +121,10 @@
           {
             "id": "win-1",
             "documentId": "doc-1",
-            "cursor": { "line": 1, "column": 0 }
+            "cursor": {
+              "line": 1,
+              "column": 0
+            }
           }
         ],
         "currentWindowId": "win-1"
@@ -101,7 +134,10 @@
       },
       "expect": {
         "blockState": {
-          "start": { "documentId": "doc-1", "line": 1 },
+          "start": {
+            "documentId": "doc-1",
+            "line": 1
+          },
           "end": null,
           "hidden": true,
           "complete": false
@@ -116,7 +152,10 @@
           {
             "id": "doc-1",
             "lines": [
-              { "text": "abcd", "flags": [] }
+              {
+                "text": "abcd",
+                "flags": []
+              }
             ]
           }
         ],
@@ -124,8 +163,14 @@
           {
             "id": "win-1",
             "documentId": "doc-1",
-            "cursor": { "line": 0, "column": 2 },
-            "options": { "insertMode": true, "autoIndent": false }
+            "cursor": {
+              "line": 0,
+              "column": 2
+            },
+            "options": {
+              "insertMode": true,
+              "autoIndent": false
+            }
           }
         ],
         "currentWindowId": "win-1"
@@ -137,15 +182,109 @@
         "documents": {
           "doc-1": {
             "lines": [
-              { "text": "ab", "flags": [] },
-              { "text": "cd", "flags": [] }
+              {
+                "text": "ab",
+                "flags": []
+              },
+              {
+                "text": "cd",
+                "flags": []
+              }
             ]
           }
         },
         "windows": {
           "win-1": {
-            "cursor": { "line": 1, "column": 0 }
+            "cursor": {
+              "line": 1,
+              "column": 0
+            }
           }
+        }
+      }
+    },
+    {
+      "id": "navigation.goto-line-zero-is-rejected",
+      "area": "command-boundary",
+      "initial": {
+        "documents": [
+          {
+            "id": "doc-1",
+            "lines": [
+              {
+                "text": "one",
+                "flags": []
+              },
+              {
+                "text": "two",
+                "flags": []
+              }
+            ]
+          }
+        ],
+        "windows": [
+          {
+            "id": "win-1",
+            "documentId": "doc-1",
+            "cursor": {
+              "line": 1,
+              "column": 3
+            }
+          }
+        ],
+        "currentWindowId": "win-1"
+      },
+      "operation": {
+        "id": "goto_line",
+        "number": 0
+      },
+      "expect": {
+        "commandSucceeded": false,
+        "windows": {
+          "win-1": {
+            "cursor": {
+              "line": 1,
+              "column": 3
+            }
+          }
+        }
+      }
+    },
+    {
+      "id": "settings.undo-limit-zero-is-rejected",
+      "area": "command-boundary",
+      "initial": {
+        "documents": [
+          {
+            "id": "doc-1",
+            "lines": [
+              {
+                "text": "text",
+                "flags": []
+              }
+            ]
+          }
+        ],
+        "windows": [
+          {
+            "id": "win-1",
+            "documentId": "doc-1",
+            "cursor": {
+              "line": 0,
+              "column": 0
+            }
+          }
+        ],
+        "currentWindowId": "win-1"
+      },
+      "operation": {
+        "id": "set_undo_limit",
+        "number": 0
+      },
+      "expect": {
+        "commandSucceeded": false,
+        "undo": {
+          "limit": 100
         }
       }
     }

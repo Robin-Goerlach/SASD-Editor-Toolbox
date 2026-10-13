@@ -83,9 +83,11 @@ public enum EditorCommandId
 /// <param name="Number">Optional first numeric argument.</param>
 /// <param name="PageSize">Optional host-specific visible page size.</param>
 /// <param name="Number2">Optional second numeric argument used by two-value compatibility commands.</param>
+/// <param name="Text2">Optional second textual argument, used for operations such as find/replace.</param>
 public sealed record EditorCommandRequest(
     EditorCommandId Id,
     string? Text = null,
     int? Number = null,
     int? PageSize = null,
-    int? Number2 = null);
+    int? Number2 = null,
+    string? Text2 = null);

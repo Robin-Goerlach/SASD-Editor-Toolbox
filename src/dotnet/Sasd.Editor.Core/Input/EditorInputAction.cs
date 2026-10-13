@@ -33,10 +33,11 @@ public sealed record EditorCommandBinding(
     /// </summary>
     public EditorCommandRequest CreateRequest(
         string? text = null,
+        string? text2 = null,
         int? number = null,
         int? number2 = null,
         int? pageSize = null) =>
-        new(CommandId, text, FixedNumber ?? number, pageSize, number2);
+        new(CommandId, text, FixedNumber ?? number, pageSize, number2, text2);
 }
 
 public enum EditorInputActionKind

@@ -17,6 +17,15 @@ public sealed class EditorCommandDispatcher(EditorSession session)
     {
         ArgumentNullException.ThrowIfNull(request);
         var command = session.Hooks.FilterCommand(session, request);
+        var validationFailure = EditorCommandValidator.Validate(command);
+        if (validationFailure is not null)
+        {
+            await session.Hooks.OnErrorAsync(
+                session,
+                new EditorError("EDITOR_COMMAND_INVALID_ARGUMENT", validationFailure.Message),
+                cancellationToken).ConfigureAwait(false);
+            return false;
+        }
 
         try
         {
@@ -97,13 +106,11 @@ public sealed class EditorCommandDispatcher(EditorSession session)
                     return session.Search.FindAgain() is not null;
                 case EditorCommandId.ReplaceNext:
                 {
-                    var parts = RequireText(command).Split('\0', 2);
-                    if (parts.Length != 2)
-                    {
-                        throw new ArgumentException("ReplaceNext expects Text to contain pattern + NUL + replacement.", nameof(request));
-                    }
-
-                    return await session.Search.ReplaceNextAsync(parts[0], parts[1], cancellationToken: cancellationToken).ConfigureAwait(false);
+                    var (pattern, replacement) = EditorCommandValidator.GetReplaceArguments(command);
+                    return await session.Search.ReplaceNextAsync(
+                        pattern,
+                        replacement,
+                        cancellationToken: cancellationToken).ConfigureAwait(false);
                 }
                 case EditorCommandId.ReadFile:
                     await session.Files.ReadIntoCurrentWindowAsync(RequireText(command), cancellationToken).ConfigureAwait(false);

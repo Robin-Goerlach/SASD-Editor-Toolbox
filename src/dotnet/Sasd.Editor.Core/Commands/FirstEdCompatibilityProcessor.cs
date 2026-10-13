@@ -355,7 +355,10 @@ internal static class FirstEdCompatibilityProcessor
 
     public static bool SetUndoLimit(EditorSession session, int limit)
     {
-        if (limit < 0)
+        // EditSetUndoLimit treats values below one as no-ops. The underlying
+        // modern undo service may still use zero when an application explicitly
+        // wants to disable capture outside the FIRST-ED compatibility command.
+        if (limit < 1)
         {
             return false;
         }

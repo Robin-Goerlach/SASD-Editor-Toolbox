@@ -78,8 +78,10 @@ internal sealed class ConsoleFirstEdPromptService(ConsoleFirstEdRenderer rendere
         }
 
         // Empty replacement is valid and means deletion of the matched text.
+        // Keep pattern and replacement separate at the semantic boundary so the
+        // command contract remains portable to C++, Java and later languages.
         var replacement = renderer.ReadPrompt("Replace with: ") ?? string.Empty;
-        return binding.CreateRequest(text: find + '\0' + replacement, pageSize: visibleRows);
+        return binding.CreateRequest(text: find, text2: replacement, pageSize: visibleRows);
     }
 
     private EditorCommandRequest? ResolveCharacter(EditorCommandBinding binding, int visibleRows)

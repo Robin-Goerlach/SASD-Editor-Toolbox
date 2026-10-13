@@ -49,14 +49,11 @@ public sealed class PortableConformanceTests
         var testCase = parsed.RootElement;
 
         var context = BuildInitialState(testCase.GetProperty("initial"));
-        var operation = testCase.GetProperty("operation").GetProperty("id").GetString()
-            ?? throw new InvalidDataException($"Conformance case '{caseId}' has no operation id.");
-
-        var request = new EditorCommandRequest(MapOperation(operation));
+        var operation = testCase.GetProperty("operation");
+        var request = BuildRequest(operation);
         var executed = await new EditorCommandDispatcher(context.Session).ExecuteAsync(request);
 
-        Assert.True(executed);
-        AssertExpectedState(context, testCase.GetProperty("expect"));
+        AssertExpectedState(context, testCase.GetProperty("expect"), executed);
     }
 
     private static TestContext BuildInitialState(JsonElement initial)
@@ -173,6 +170,18 @@ public sealed class PortableConformanceTests
         return result;
     }
 
+    private static EditorCommandRequest BuildRequest(JsonElement operation)
+    {
+        var operationId = RequireString(operation, "id");
+        return new EditorCommandRequest(
+            MapOperation(operationId),
+            Text: operation.TryGetProperty("text", out var text) ? text.GetString() : null,
+            Number: operation.TryGetProperty("number", out var number) ? number.GetInt32() : null,
+            PageSize: operation.TryGetProperty("pageSize", out var pageSize) ? pageSize.GetInt32() : null,
+            Number2: operation.TryGetProperty("number2", out var number2) ? number2.GetInt32() : null,
+            Text2: operation.TryGetProperty("text2", out var text2) ? text2.GetString() : null);
+    }
+
     private static EditorCommandId MapOperation(string operation) =>
         operation switch
         {
@@ -180,12 +189,26 @@ public sealed class PortableConformanceTests
             "delete_line" => EditorCommandId.DeleteLine,
             "begin_block" => EditorCommandId.BeginBlock,
             "new_line" => EditorCommandId.NewLine,
+            "goto_line" => EditorCommandId.GoToLine,
+            "set_undo_limit" => EditorCommandId.SetUndoLimit,
             _ => throw new InvalidDataException(
                 $"The .NET conformance adapter does not support operation '{operation}'.")
         };
 
-    private static void AssertExpectedState(TestContext context, JsonElement expected)
+    private static void AssertExpectedState(
+        TestContext context,
+        JsonElement expected,
+        bool commandSucceeded)
     {
+        if (expected.TryGetProperty("commandSucceeded", out var expectedCommandSucceeded))
+        {
+            Assert.Equal(expectedCommandSucceeded.GetBoolean(), commandSucceeded);
+        }
+        else
+        {
+            Assert.True(commandSucceeded);
+        }
+
         if (expected.TryGetProperty("documents", out var documents))
         {
             foreach (var portableDocument in documents.EnumerateObject())
@@ -209,6 +232,12 @@ public sealed class PortableConformanceTests
         if (expected.TryGetProperty("blockState", out var blockState))
         {
             AssertExpectedBlockState(context, blockState);
+        }
+
+        if (expected.TryGetProperty("undo", out var undo)
+            && undo.TryGetProperty("limit", out var undoLimit))
+        {
+            Assert.Equal(undoLimit.GetInt32(), context.Session.Undo.Limit);
         }
     }
 
