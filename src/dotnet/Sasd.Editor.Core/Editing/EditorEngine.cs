@@ -361,12 +361,13 @@ public sealed class EditorEngine
     private void Mutate(string description, Action mutation)
     {
         var window = Window;
-        _session.Undo.Capture(window, description);
+        var undo = _session.Undo.BeginTransaction(_session, window, description);
         mutation();
         window.Document.MarkChanged();
         window.ClampCursor();
         ClampLinkedWindows(window.Document);
         _session.RefreshBlockFlags();
+        undo.Commit();
     }
 
     private void ClampLinkedWindows(Sasd.Editor.Document.EditorDocument document)

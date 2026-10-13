@@ -32,11 +32,12 @@ internal static class FirstEdBlockCompatibilityProcessor
         var insertionLine = targetWindow.Cursor.Line;
         var lines = SnapshotBlock(sourceDocument, block);
 
-        session.Undo.Capture(targetWindow, "Copy block");
+        var undo = session.Undo.BeginTransaction(session, targetWindow, "Copy block");
         InsertLines(targetDocument, insertionLine, lines);
         session.Topology.LinesInserted(targetDocument, insertionLine, lines.Length);
         targetDocument.MarkChanged();
         session.RefreshBlockFlags();
+        undo.Commit();
         return true;
     }
 
@@ -51,7 +52,7 @@ internal static class FirstEdBlockCompatibilityProcessor
         ArgumentNullException.ThrowIfNull(session);
         var (block, sourceDocument, sourceWindow) = RequireBlock(session);
 
-        session.Undo.Capture(sourceWindow, "Delete block");
+        var undo = session.Undo.BeginTransaction(session, sourceWindow, "Delete block");
         RemoveLines(sourceDocument, block.FirstLine, block.LineCount);
 
         // Report the logical range, not merely the number of physical linked-list
@@ -61,6 +62,7 @@ internal static class FirstEdBlockCompatibilityProcessor
         session.Topology.LinesDeleted(sourceDocument, block.FirstLine, block.LineCount);
         sourceDocument.MarkChanged();
         session.RefreshBlockFlags();
+        undo.Commit();
         return true;
     }
 
@@ -87,15 +89,15 @@ internal static class FirstEdBlockCompatibilityProcessor
         var movedLines = SnapshotBlock(sourceDocument, block);
         var hidden = block.Hidden;
 
-        // The current snapshot backend records both affected streams separately
-        // for a cross-document move. This keeps both sides recoverable without
-        // introducing a premature transaction journal; compound undo remains a
-        // replaceable-backend concern documented for the final undo audit.
-        session.Undo.Capture(targetWindow, sameDocument ? "Move block" : "Move block target");
-        if (!sameDocument)
-        {
-            session.Undo.Capture(sourceWindow, "Move block source");
-        }
+        // A move is one logical command even when it spans two documents. Capture
+        // both streams in one transaction so one Undo cannot restore the source
+        // while accidentally leaving a duplicate copy in the destination.
+        var undo = sameDocument
+            ? session.Undo.BeginTransaction(session, targetWindow, "Move block")
+            : session.Undo.BeginTransaction(
+                session,
+                new[] { sourceWindow, targetWindow },
+                "Move block");
 
         RemoveLines(sourceDocument, block.FirstLine, block.LineCount);
         session.Topology.LinesDeleted(sourceDocument, block.FirstLine, block.LineCount);
@@ -120,6 +122,7 @@ internal static class FirstEdBlockCompatibilityProcessor
         }
 
         session.RefreshBlockFlags();
+        undo.Commit();
         return true;
     }
 

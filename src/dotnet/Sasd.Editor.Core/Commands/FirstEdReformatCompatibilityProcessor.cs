@@ -85,7 +85,7 @@ internal static class FirstEdReformatCompatibilityProcessor
         await session.Interruption.CheckpointAsync(cancellationToken).ConfigureAwait(false);
 
         var originalCursor = window.Cursor;
-        session.Undo.Capture(window, "Reformat paragraph");
+        var undo = session.Undo.BeginTransaction(session, window, "Reformat paragraph");
         ApplyPlan(session, document, startLine, sourceLines.Count, plannedLines);
         document.MarkChanged();
 
@@ -95,6 +95,7 @@ internal static class FirstEdReformatCompatibilityProcessor
         // host-neutral policy. Virtual columns remain valid by design.
         window.Cursor = originalCursor;
         session.RefreshBlockFlags();
+        undo.Commit();
         return true;
     }
 

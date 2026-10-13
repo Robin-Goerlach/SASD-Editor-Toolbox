@@ -46,7 +46,7 @@ public sealed class EditorFileService
         var originalCursor = window.Cursor;
         var insertionLine = window.Cursor.Line + 1;
 
-        _session.Undo.Capture(window, "Read file");
+        var undo = _session.Undo.BeginTransaction(_session, window, "Read file");
 
         for (var index = 0; index < lines.Count; index++)
         {
@@ -63,6 +63,7 @@ public sealed class EditorFileService
         document.MarkChanged();
         window.Cursor = originalCursor;
         _session.RefreshBlockFlags();
+        undo.Commit();
         return lines.Count;
     }
 

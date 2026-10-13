@@ -175,7 +175,10 @@ internal static class FirstEdPrimitiveCompatibilityProcessor
     public static bool InsertLine(EditorSession session)
     {
         var window = RequireWindow(session);
-        InsertLineCore(session, window, "Insert line");
+        var undo = session.Undo.BeginTransaction(session, window, "Insert line");
+        InsertLineCore(session, window);
+        session.RefreshBlockFlags();
+        undo.Commit();
         return true;
     }
 
@@ -197,20 +200,22 @@ internal static class FirstEdPrimitiveCompatibilityProcessor
 
         if (window.Options.InsertMode)
         {
-            var lowerLine = InsertLineCore(session, window, "New line");
+            var undo = session.Undo.BeginTransaction(session, window, "New line");
+            var lowerLine = InsertLineCore(session, window);
             var upper = document.Buffer.GetLine(previousLineIndex);
             document.Buffer.SetFlags(previousLineIndex, upper.Flags & ~EditorLineFlags.Wrapped);
             window.Cursor = new TextPosition(lowerLine, targetColumn);
+            session.RefreshBlockFlags();
+            undo.Commit();
             return true;
         }
 
         var appendLine = previousLineIndex == document.Buffer.LineCount - 1;
         var clearsWrapped = previous.Flags.HasFlag(EditorLineFlags.Wrapped);
 
-        if (appendLine || clearsWrapped)
-        {
-            session.Undo.Capture(window, "New line");
-        }
+        var undo = appendLine || clearsWrapped
+            ? session.Undo.BeginTransaction(session, window, "New line")
+            : null;
 
         if (appendLine)
         {
@@ -232,6 +237,7 @@ internal static class FirstEdPrimitiveCompatibilityProcessor
 
         var targetLine = Math.Min(previousLineIndex + 1, document.Buffer.LineCount - 1);
         window.Cursor = new TextPosition(targetLine, targetColumn);
+        undo?.Commit();
         return true;
     }
 
@@ -263,11 +269,12 @@ internal static class FirstEdPrimitiveCompatibilityProcessor
                 return true;
             }
 
-            session.Undo.Capture(window, "Delete left character");
+            var undo = session.Undo.BeginTransaction(session, window, "Delete left character");
             document.Buffer.ReplaceLine(lineIndex, line.Text.Remove(deletionColumn, 1));
             window.Cursor = window.Cursor with { Column = deletionColumn };
             document.MarkChanged();
             session.RefreshBlockFlags();
+            undo.Commit();
             return true;
         }
 
@@ -281,7 +288,7 @@ internal static class FirstEdPrimitiveCompatibilityProcessor
         var current = document.Buffer.GetLine(lineIndex);
         var joinColumn = LastNonBlankEnd(previous.Text);
 
-        session.Undo.Capture(window, "Delete left character");
+        var joinUndo = session.Undo.BeginTransaction(session, window, "Delete left character");
         document.Buffer.ReplaceLine(
             previousLineIndex,
             PrefixToColumn(previous.Text, joinColumn) + current.Text,
@@ -291,6 +298,7 @@ internal static class FirstEdPrimitiveCompatibilityProcessor
         window.Cursor = new TextPosition(previousLineIndex, joinColumn);
         document.MarkChanged();
         session.RefreshBlockFlags();
+        joinUndo.Commit();
         return true;
     }
 
@@ -319,10 +327,11 @@ internal static class FirstEdPrimitiveCompatibilityProcessor
             return false;
         }
 
-        session.Undo.Capture(window, "Delete right character");
+        var undo = session.Undo.BeginTransaction(session, window, "Delete right character");
         document.Buffer.ReplaceLine(lineIndex, line.Text.Remove(column, 1));
         document.MarkChanged();
         session.RefreshBlockFlags();
+        undo.Commit();
         return true;
     }
 
@@ -362,10 +371,11 @@ internal static class FirstEdPrimitiveCompatibilityProcessor
             end++;
         }
 
-        session.Undo.Capture(window, "Delete right word");
+        var undo = session.Undo.BeginTransaction(session, window, "Delete right word");
         document.Buffer.ReplaceLine(lineIndex, line.Text.Remove(column, end - column));
         document.MarkChanged();
         session.RefreshBlockFlags();
+        undo.Commit();
         return true;
     }
 
@@ -383,7 +393,7 @@ internal static class FirstEdPrimitiveCompatibilityProcessor
         var lineIndex = window.Cursor.Line;
         var line = document.Buffer.GetLine(lineIndex);
 
-        session.Undo.Capture(window, "Delete line");
+        var undo = session.Undo.BeginTransaction(session, window, "Delete line");
 
         if (document.Buffer.LineCount == 1)
         {
@@ -441,7 +451,7 @@ internal static class FirstEdPrimitiveCompatibilityProcessor
     /// mode branch of EditNewLine. The caller decides whether the cursor follows
     /// the text onto the newly created lower line.
     /// </summary>
-    private static int InsertLineCore(EditorSession session, EditorWindow window, string undoDescription)
+    private static int InsertLineCore(EditorSession session, EditorWindow window)
     {
         var document = window.Document;
         var lineIndex = window.Cursor.Line;
@@ -468,13 +478,11 @@ internal static class FirstEdPrimitiveCompatibilityProcessor
             lowerText = line.Text[splitColumn..];
         }
 
-        session.Undo.Capture(window, undoDescription);
         document.Buffer.ReplaceLine(lineIndex, upperText, line.Flags);
         var insertedLine = lineIndex + 1;
         document.Buffer.InsertLine(insertedLine, lowerText);
         session.Topology.LinesInserted(document, insertedLine, 1);
         document.MarkChanged();
-        session.RefreshBlockFlags();
         return insertedLine;
     }
 
@@ -497,7 +505,7 @@ internal static class FirstEdPrimitiveCompatibilityProcessor
         var following = document.Buffer.GetLine(lineIndex + 1);
         var joinColumn = Math.Max(0, window.Cursor.Column);
 
-        session.Undo.Capture(window, undoDescription);
+        var undo = session.Undo.BeginTransaction(session, window, undoDescription);
         document.Buffer.ReplaceLine(
             lineIndex,
             PrefixToColumn(current.Text, joinColumn) + following.Text,
@@ -506,6 +514,7 @@ internal static class FirstEdPrimitiveCompatibilityProcessor
         session.Topology.LinesDeleted(document, lineIndex + 1, 1);
         document.MarkChanged();
         session.RefreshBlockFlags();
+        undo.Commit();
         return true;
     }
 

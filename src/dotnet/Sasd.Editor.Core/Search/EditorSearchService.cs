@@ -177,7 +177,7 @@ public sealed class EditorSearchService
         var buffer = window.Document.Buffer;
         var comparison = options.CaseSensitive ? StringComparison.Ordinal : StringComparison.OrdinalIgnoreCase;
         var replacements = 0;
-        _session.Undo.Capture(window, "Replace all");
+        var undo = _session.Undo.BeginTransaction(_session, window, "Replace all");
 
         for (var lineIndex = 0; lineIndex < buffer.LineCount; lineIndex++)
         {
@@ -218,6 +218,7 @@ public sealed class EditorSearchService
         if (replacements > 0)
         {
             window.Document.MarkChanged();
+            undo.Commit();
         }
 
         return replacements;
