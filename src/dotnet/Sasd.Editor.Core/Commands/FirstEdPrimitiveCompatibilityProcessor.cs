@@ -414,6 +414,7 @@ internal static class FirstEdPrimitiveCompatibilityProcessor
 
         document.MarkChanged();
         session.RefreshBlockFlags();
+        undo.Commit();
         return true;
     }
 
