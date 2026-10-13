@@ -200,20 +200,20 @@ internal static class FirstEdPrimitiveCompatibilityProcessor
 
         if (window.Options.InsertMode)
         {
-            var undo = session.Undo.BeginTransaction(session, window, "New line");
+            var insertUndo = session.Undo.BeginTransaction(session, window, "New line");
             var lowerLine = InsertLineCore(session, window);
             var upper = document.Buffer.GetLine(previousLineIndex);
             document.Buffer.SetFlags(previousLineIndex, upper.Flags & ~EditorLineFlags.Wrapped);
             window.Cursor = new TextPosition(lowerLine, targetColumn);
             session.RefreshBlockFlags();
-            undo.Commit();
+            insertUndo.Commit();
             return true;
         }
 
         var appendLine = previousLineIndex == document.Buffer.LineCount - 1;
         var clearsWrapped = previous.Flags.HasFlag(EditorLineFlags.Wrapped);
 
-        var undo = appendLine || clearsWrapped
+        var overtypeUndo = appendLine || clearsWrapped
             ? session.Undo.BeginTransaction(session, window, "New line")
             : null;
 
@@ -237,7 +237,7 @@ internal static class FirstEdPrimitiveCompatibilityProcessor
 
         var targetLine = Math.Min(previousLineIndex + 1, document.Buffer.LineCount - 1);
         window.Cursor = new TextPosition(targetLine, targetColumn);
-        undo?.Commit();
+        overtypeUndo?.Commit();
         return true;
     }
 

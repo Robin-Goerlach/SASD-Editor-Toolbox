@@ -308,7 +308,7 @@ public sealed class EditorUndoManager
             static pair => pair.Key,
             static pair => pair.Value);
 
-        var currentWindowId = session.Windows.Count == 0
+        Guid? currentWindowId = session.Windows.Count == 0
             ? null
             : session.CurrentWindow.WindowId;
 
