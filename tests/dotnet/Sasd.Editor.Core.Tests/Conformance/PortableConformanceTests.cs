@@ -2,6 +2,7 @@ using System.Text.Json;
 using Sasd.Editor.Commands;
 using Sasd.Editor.Document;
 using Sasd.Editor.Editing;
+using Sasd.Editor.Hooks;
 using Sasd.Editor.Model;
 using Sasd.Editor.Windows;
 using Xunit;
@@ -60,7 +61,8 @@ public sealed class PortableConformanceTests
 
     private static TestContext BuildInitialState(JsonElement initial)
     {
-        var session = new EditorSession();
+        var hooks = new RecordingHooks();
+        var session = new EditorSession(hooks);
         var documents = new Dictionary<string, EditorDocument>(StringComparer.Ordinal);
         var windows = new Dictionary<string, EditorWindow>(StringComparer.Ordinal);
 
@@ -104,7 +106,7 @@ public sealed class PortableConformanceTests
         var currentWindowId = RequireString(initial, "currentWindowId");
         session.SetCurrentWindow(windows[currentWindowId].WindowId);
 
-        return new TestContext(session, documents, windows);
+        return new TestContext(session, documents, windows, hooks);
     }
 
     private static EditorWindowOptions ParseOptions(JsonElement portableWindow)
@@ -241,7 +243,46 @@ public sealed class PortableConformanceTests
         {
             Assert.Equal(undoLimit.GetInt32(), context.Session.Undo.Limit);
         }
+
+        if (expected.TryGetProperty("error", out var error))
+        {
+            AssertExpectedError(context, error);
+        }
     }
+
+    private static void AssertExpectedError(TestContext context, JsonElement expected)
+    {
+        var actual = Assert.Single(context.Hooks.Errors);
+
+        if (expected.TryGetProperty("id", out var id))
+        {
+            Assert.Equal(RequireString(expected, "id"), PortableErrorId(actual.Id));
+        }
+
+        if (expected.TryGetProperty("code", out var code))
+        {
+            Assert.Equal(RequireString(expected, "code"), actual.Code);
+        }
+
+        if (expected.TryGetProperty("resourceKey", out var resourceKey))
+        {
+            Assert.Equal(RequireString(expected, "resourceKey"), actual.ResourceKey);
+        }
+    }
+
+    private static string PortableErrorId(EditorErrorId id) =>
+        id switch
+        {
+            EditorErrorId.InvalidCommandArgument => "invalid_command_argument",
+            EditorErrorId.CommandRejected => "command_rejected",
+            EditorErrorId.OperationFailed => "operation_failed",
+            EditorErrorId.FileIoFailed => "file_io_failed",
+            EditorErrorId.AccessDenied => "access_denied",
+            EditorErrorId.UnsupportedOperation => "unsupported_operation",
+            EditorErrorId.TypeaheadOverflow => "typeahead_overflow",
+            EditorErrorId.OperationAborted => "operation_aborted",
+            _ => throw new InvalidDataException($"Unsupported portable editor error id '{id}'.")
+        };
 
     private static void AssertExpectedDocument(EditorDocument document, JsonElement expected)
     {
@@ -330,5 +371,20 @@ public sealed class PortableConformanceTests
     private sealed record TestContext(
         EditorSession Session,
         IReadOnlyDictionary<string, EditorDocument> Documents,
-        IReadOnlyDictionary<string, EditorWindow> Windows);
+        IReadOnlyDictionary<string, EditorWindow> Windows,
+        RecordingHooks Hooks);
+
+    private sealed class RecordingHooks : IEditorHooks
+    {
+        public List<EditorError> Errors { get; } = [];
+
+        public ValueTask OnErrorAsync(
+            EditorSession session,
+            EditorError error,
+            CancellationToken cancellationToken)
+        {
+            Errors.Add(error);
+            return ValueTask.CompletedTask;
+        }
+    }
 }

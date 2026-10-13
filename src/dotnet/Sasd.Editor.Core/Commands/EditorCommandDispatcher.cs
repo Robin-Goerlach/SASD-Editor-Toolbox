@@ -20,11 +20,9 @@ public sealed class EditorCommandDispatcher(EditorSession session)
         var validationFailure = EditorCommandValidator.Validate(command);
         if (validationFailure is not null)
         {
-            await session.Hooks.OnErrorAsync(
-                session,
-                new EditorError("EDITOR_COMMAND_INVALID_ARGUMENT", validationFailure.Message),
+            return await ReportErrorAsync(
+                EditorErrorCatalog.InvalidCommandArgument(validationFailure),
                 cancellationToken).ConfigureAwait(false);
-            return false;
         }
 
         try
@@ -76,26 +74,43 @@ public sealed class EditorCommandDispatcher(EditorSession session)
                 case EditorCommandId.DeleteBlock: return FirstEdBlockCompatibilityProcessor.Delete(session);
                 case EditorCommandId.HideBlock: session.ToggleBlockHidden(); break;
                 case EditorCommandId.CreateWindow:
-                    return FirstEdCompatibilityProcessor.CreateWindow(
+                {
+                    var created = FirstEdCompatibilityProcessor.CreateWindow(
                         session,
                         RequireNumber(command),
                         RequireSecondNumber(command));
+                    return created || await ReportRejectedAsync(command.Id, cancellationToken).ConfigureAwait(false);
+                }
                 case EditorCommandId.LinkWindow:
-                    return FirstEdCompatibilityProcessor.LinkWindows(
+                {
+                    var linked = FirstEdCompatibilityProcessor.LinkWindows(
                         session,
                         RequireNumber(command),
                         RequireSecondNumber(command));
+                    return linked || await ReportRejectedAsync(command.Id, cancellationToken).ConfigureAwait(false);
+                }
                 case EditorCommandId.PreviousWindow: return FirstEdCompatibilityProcessor.PreviousWindow(session);
                 case EditorCommandId.NextWindow: return session.NextWindow() is not null;
                 case EditorCommandId.GoToWindow: return FirstEdCompatibilityProcessor.GoToWindow(session, RequireNumber(command));
                 case EditorCommandId.DeleteWindow:
-                    return command.Number.HasValue
+                {
+                    var deleted = command.Number.HasValue
                         ? FirstEdCompatibilityProcessor.DeleteWindow(session, command.Number.Value)
                         : FirstEdCompatibilityProcessor.DeleteWindow(session, CurrentWindowNumber(session));
+                    return deleted || await ReportRejectedAsync(command.Id, cancellationToken).ConfigureAwait(false);
+                }
                 case EditorCommandId.DeleteWindowText:
                     return session.DeleteCurrentWindowText();
-                case EditorCommandId.SetLeftMargin: return FirstEdCompatibilityProcessor.SetLeftMargin(session, RequireNumber(command));
-                case EditorCommandId.SetRightMargin: return FirstEdCompatibilityProcessor.SetRightMargin(session, RequireNumber(command));
+                case EditorCommandId.SetLeftMargin:
+                {
+                    var updated = FirstEdCompatibilityProcessor.SetLeftMargin(session, RequireNumber(command));
+                    return updated || await ReportRejectedAsync(command.Id, cancellationToken).ConfigureAwait(false);
+                }
+                case EditorCommandId.SetRightMargin:
+                {
+                    var updated = FirstEdCompatibilityProcessor.SetRightMargin(session, RequireNumber(command));
+                    return updated || await ReportRejectedAsync(command.Id, cancellationToken).ConfigureAwait(false);
+                }
                 case EditorCommandId.SetTabWidth: return FirstEdCompatibilityProcessor.SetTabWidth(session, RequireNumber(command));
                 case EditorCommandId.SetUndoLimit: return FirstEdCompatibilityProcessor.SetUndoLimit(session, RequireNumber(command));
                 case EditorCommandId.SetMarker: session.SetMarker(RequireNumber(command)); break;
@@ -134,12 +149,23 @@ public sealed class EditorCommandDispatcher(EditorSession session)
                                           or UnauthorizedAccessException
                                           or NotSupportedException)
         {
-            await session.Hooks.OnErrorAsync(
-                session,
-                new EditorError("EDITOR_COMMAND_FAILED", exception.Message, exception),
+            return await ReportErrorAsync(
+                EditorErrorCatalog.FromException(exception),
                 cancellationToken).ConfigureAwait(false);
-            return false;
         }
+    }
+
+    private ValueTask<bool> ReportRejectedAsync(
+        EditorCommandId commandId,
+        CancellationToken cancellationToken) =>
+        ReportErrorAsync(EditorErrorCatalog.CommandRejected(commandId), cancellationToken);
+
+    private async ValueTask<bool> ReportErrorAsync(
+        EditorError error,
+        CancellationToken cancellationToken)
+    {
+        await session.Hooks.OnErrorAsync(session, error, cancellationToken).ConfigureAwait(false);
+        return false;
     }
 
     private static string RequireText(EditorCommandRequest command) =>

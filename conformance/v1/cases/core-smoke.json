@@ -247,6 +247,11 @@
               "column": 3
             }
           }
+        },
+        "error": {
+          "id": "invalid_command_argument",
+          "code": "EDITOR_COMMAND_INVALID_ARGUMENT",
+          "resourceKey": "Editor.Errors.Command.InvalidArgument"
         }
       }
     },
@@ -285,6 +290,11 @@
         "commandSucceeded": false,
         "undo": {
           "limit": 100
+        },
+        "error": {
+          "id": "invalid_command_argument",
+          "code": "EDITOR_COMMAND_INVALID_ARGUMENT",
+          "resourceKey": "Editor.Errors.Command.InvalidArgument"
         }
       }
     }

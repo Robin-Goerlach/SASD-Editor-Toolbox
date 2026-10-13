@@ -1,5 +1,6 @@
 using Sasd.Editor.Commands;
 using Sasd.Editor.Editing;
+using Sasd.Editor.Hooks;
 using Sasd.Editor.Input;
 using Sasd.Editor.Scheduling;
 
@@ -59,14 +60,22 @@ internal sealed class ConsoleFirstEdHost : IEditorInputPump
             if (writeResult == EditorTypeaheadWriteResult.Aborted)
             {
                 _keyMap.Reset();
-                Render("Ctrl-U: pending typeahead input aborted.");
+                await session.Hooks.OnErrorAsync(
+                    session,
+                    EditorErrorCatalog.OperationAborted(),
+                    cancellationToken).ConfigureAwait(false);
+                Render(_hooks.TakeMessage());
                 return true;
             }
 
             if (writeResult == EditorTypeaheadWriteResult.Overflow)
             {
                 _keyMap.Reset();
-                Render("Typeahead buffer overflow: pending input was cleared.");
+                await session.Hooks.OnErrorAsync(
+                    session,
+                    EditorErrorCatalog.TypeaheadOverflow(),
+                    cancellationToken).ConfigureAwait(false);
+                Render(_hooks.TakeMessage());
                 return true;
             }
 
