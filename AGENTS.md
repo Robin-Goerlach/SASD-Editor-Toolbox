@@ -203,18 +203,12 @@ When the user says only “continue”, “keep going” or asks Codex to work a
 
 ### P0 - V1 release-gate work
 
-The independent historical block-endpoint lifecycle, semantic command-boundary validation, typed host-neutral error/resource model and abort/interruptibility audit are implemented. `EditorInterruptionService` now separates Ctrl-U abort semantics from platform cancellation and provides EditBreathe-style host checkpoints. The next unfinished release-gate item is the compound undo/navigation-state audit.
+The independent historical block-endpoint lifecycle, semantic command-boundary validation, typed host-neutral error/resource model, abort/interruptibility audit and compound undo/navigation-state audit are implemented. `EditorUndoManager` now records a logical command as one transaction even when it spans multiple documents, and restores command-induced view/anchor state without blindly overwriting later explicit navigation. The next unfinished release-gate item is the final handbook procedure/function-index audit.
 
-1. **Compound undo/navigation-state audit**
-   - Review cross-document block move and other multi-document mutations.
-   - The current snapshot backend is correctness-first; do not replace it merely for performance.
-   - Determine whether one logical command requires one atomic compound undo transaction and which navigation/view state must be restored.
-
-2. **Final handbook procedure/function-index audit**
+1. **Final handbook procedure/function-index audit**
    - Compare the historical procedure/function inventory against the compatibility matrix and implementation.
    - Classify each item as Implemented, Replaced by modern invariant, Not Applicable, Sample/Host concern, or intentionally deferred.
    - Add regression coverage for any small omissions found.
-
 ### P1 - Sample breadth after the reusable V1 gate
 
 Only after the reusable V1 release gate is in good shape, or when explicitly requested:

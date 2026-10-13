@@ -127,11 +127,14 @@ The handbook does not separately define whether markers or other non-block ancho
 - Successful persistence clears dirty state when the operation is semantically a save.
 - A direct compatibility Write File operation does not implicitly change document identity.
 - Undo is a replaceable service. Correctness is more important than storage efficiency in the first implementation.
+- The handbook's historical `EditUndo` is a line-stack operation rather than a general command journal. SASD's command-oriented snapshot undo is therefore a documented modernization boundary, not a claim of storage-level historical equivalence.
 - Historical destructive operations explicitly documented as not entering undo must not be made reversible merely because a modern undo backend exists. Obsolete snapshots for a destroyed document must not remain usable.
 - Cursor-only movement, including a documented implementation policy for movement through virtual columns, must not create a text-undo entry merely because it passed through a compatibility command.
 - A successful paragraph reformat is one logical undoable mutation. Validation failure or a no-op must not create a snapshot merely because the command was attempted.
-- Multi-document mutations must preserve recoverable pre-mutation state for each affected document. Whether a target language/backend exposes that as one compound undo item or multiple coordinated snapshots is an undo-backend concern unless a historical user-visible rule is separately established.
-
+- One successful logical SASD mutation command contributes at most one undo transaction. A mutation spanning multiple documents, such as a cross-document block move, must not expose a state in which one Undo restores only one side of the command.
+- The correctness-first .NET backend captures every affected document before the mutation and records final session navigation/anchor state only when the command commits. One Undo restores all affected document snapshots atomically from the editor user's perspective.
+- Command-induced cursor/top-line/left-column changes in linked views, marker realignment, block endpoint state and current-window selection are restored when they still match the recorded post-command state. Explicit navigation or marker/block changes made after the edit are not blindly overwritten; any surviving anchors are normalized against the restored documents.
+- If a deliberately destructive operation destroys a document, every compound undo transaction that references that document is discarded as a whole rather than retaining a partially restorable transaction.
 ## 8. Command dispatch, normalized input and typeahead
 
 - Host-specific keyboard events are normalized before compatibility mapping.

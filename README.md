@@ -84,7 +84,7 @@ The current foundation contains:
 - whole-line block begin/end/hide state plus block-boundary navigation;
 - `EditOffblock`/`EditMarkblock`-style separation of logical block limits from global `InBlock` highlight flags;
 - numbered line markers whose jumps preserve the selected target view's current column;
-- snapshot-based undo with a configurable limit and replaceable backend boundary;
+- correctness-first transactional snapshot undo with a configurable limit, one logical history item for cross-document mutations, and post-state-aware restoration of linked-window/marker/block navigation state;
 - literal forward find/replace services plus remembered FIRST-ED Find Again state;
 - modern asynchronous UTF-8 document persistence through `ITextStorage` / `FileTextStorage`;
 - historical read/write command semantics through `EditorFileService`;
@@ -106,7 +106,7 @@ The current foundation contains:
 - English and German architecture/compatibility documentation;
 - automated unit tests.
 
-The remaining V1 work is increasingly concentrated rather than broad. Multi-line block topology, independent historical `Blockfrom`/`Blockto` endpoint state, command-boundary validation, typed errors/resources and the abort/interruptibility bridge are now covered. The next release-gate item is the compound-undo/navigation-state audit for cross-document mutations; after that, the handbook procedure/function index can be audited end-to-end for small omissions. MicroStar-specific UI features can remain samples rather than dependencies of the reusable core.
+The remaining V1 work is now concentrated in the final compatibility inventory. Multi-line block topology, independent historical `Blockfrom`/`Blockto` endpoint state, command-boundary validation, typed errors/resources, abort/interruptibility and compound undo/navigation-state restoration are covered. The next release-gate item is an end-to-end audit of the handbook procedure/function index for small omissions or classifications. MicroStar-specific UI features can remain samples rather than dependencies of the reusable core.
 
 ## Run the interactive FIRST-ED sample
 
@@ -176,6 +176,8 @@ Future C++ and Java builds will live entirely inside their own implementation la
 - Fehler-/Ressourcenmodell: [`docs/de/FEHLERMODELL.md`](docs/de/FEHLERMODELL.md)
 - Interruptibility and Ctrl-U: [`docs/en/INTERRUPTIBILITY.md`](docs/en/INTERRUPTIBILITY.md)
 - Unterbrechbarkeit und Ctrl-U: [`docs/de/UNTERBRECHBARKEIT.md`](docs/de/UNTERBRECHBARKEIT.md)
+- Compound undo transactions: [`docs/en/UNDO-TRANSACTIONS.md`](docs/en/UNDO-TRANSACTIONS.md)
+- Zusammengesetzte Undo-Transaktionen: [`docs/de/UNDO-TRANSAKTIONEN.md`](docs/de/UNDO-TRANSAKTIONEN.md)
 - Search and file commands: [`docs/en/SEARCH-AND-FILE-COMMANDS.md`](docs/en/SEARCH-AND-FILE-COMMANDS.md)
 - Suchen und Datei-Befehle: [`docs/de/SUCHEN-UND-DATEI-BEFEHLE.md`](docs/de/SUCHEN-UND-DATEI-BEFEHLE.md)
 - Lifecycle and scrolling: [`docs/en/LIFECYCLE-AND-SCROLLING.md`](docs/en/LIFECYCLE-AND-SCROLLING.md)
