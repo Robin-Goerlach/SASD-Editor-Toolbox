@@ -94,6 +94,7 @@ The current foundation contains:
 - typed host-neutral error IDs, stable machine codes and resource keys so terminal, desktop, web and future language ports can render failures independently;
 - a UI-neutral key-stroke model plus the FIRST-ED Ctrl-K/Ctrl-O/Ctrl-Q and primary-key mapping contract;
 - a bounded 500-entry `EditorTypeaheadBuffer` with host FIFO input, front injection for macros, overflow clearing and the historical immediate host Ctrl-U abort boundary;
+- `EditorInterruptionService` as the host-neutral EditBreathe modernization: long operations can poll bounded host input, translate Ctrl-U into a one-shot editor abort, and keep platform `CancellationToken` cancellation semantically separate;
 - typed prompt metadata so keyboard mapping remains independent of UI prompting;
 - window up/down/goto semantics and historical stream linking by reattaching an existing view to a shared document;
 - an explicit rundown state corresponding to the historical `Rundown` flag;
@@ -105,7 +106,7 @@ The current foundation contains:
 - English and German architecture/compatibility documentation;
 - automated unit tests.
 
-The remaining V1 work is increasingly concentrated rather than broad. Multi-line block topology and the independent historical `Blockfrom`/`Blockto` endpoint lifecycle are now covered. Remaining compatibility work includes systematic command-boundary validation, complete long-operation abort coverage, typed modern error resources and a compound-undo/navigation-state audit for cross-document mutations. After those items, the handbook procedure/function index can be audited end-to-end for small omissions. MicroStar-specific UI features can remain samples rather than dependencies of the reusable core.
+The remaining V1 work is increasingly concentrated rather than broad. Multi-line block topology, independent historical `Blockfrom`/`Blockto` endpoint state, command-boundary validation, typed errors/resources and the abort/interruptibility bridge are now covered. The next release-gate item is the compound-undo/navigation-state audit for cross-document mutations; after that, the handbook procedure/function index can be audited end-to-end for small omissions. MicroStar-specific UI features can remain samples rather than dependencies of the reusable core.
 
 ## Run the interactive FIRST-ED sample
 
@@ -173,6 +174,8 @@ Future C++ and Java builds will live entirely inside their own implementation la
 - Befehlsgrenzen-Validierung: [`docs/de/BEFEHLSGRENZEN-VALIDIERUNG.md`](docs/de/BEFEHLSGRENZEN-VALIDIERUNG.md)
 - Error/resource model: [`docs/en/ERROR-MODEL.md`](docs/en/ERROR-MODEL.md)
 - Fehler-/Ressourcenmodell: [`docs/de/FEHLERMODELL.md`](docs/de/FEHLERMODELL.md)
+- Interruptibility and Ctrl-U: [`docs/en/INTERRUPTIBILITY.md`](docs/en/INTERRUPTIBILITY.md)
+- Unterbrechbarkeit und Ctrl-U: [`docs/de/UNTERBRECHBARKEIT.md`](docs/de/UNTERBRECHBARKEIT.md)
 - Search and file commands: [`docs/en/SEARCH-AND-FILE-COMMANDS.md`](docs/en/SEARCH-AND-FILE-COMMANDS.md)
 - Suchen und Datei-Befehle: [`docs/de/SUCHEN-UND-DATEI-BEFEHLE.md`](docs/de/SUCHEN-UND-DATEI-BEFEHLE.md)
 - Lifecycle and scrolling: [`docs/en/LIFECYCLE-AND-SCROLLING.md`](docs/en/LIFECYCLE-AND-SCROLLING.md)

@@ -48,7 +48,7 @@ Der Dispatcher ordnet erwartete Exception-Familien stabil zu, ohne deren Wortlau
 - verbleibende `ArgumentException` -> `InvalidCommandArgument`;
 - `InvalidOperationException` -> `OperationFailed`.
 
-Cancellation wird hier bewusst nicht umgewandelt. `OperationCanceledException` bleibt Kontrollfluss für `CancellationToken`; der separate Audit zur Unterbrechbarkeit klärt das Zusammenspiel zwischen historischem Ctrl-U-Abortzustand und moderner Cancellation.
+Cancellation wird hier bewusst nicht umgewandelt. `OperationCanceledException` bleibt Kontrollfluss für `CancellationToken`. Die abgeschlossene Unterbrechbarkeitsbrücke behandelt historisches Host-Ctrl-U getrennt: `EditorOperationAbortedException` wird vom semantischen Dispatcher abgefangen und als `EditorErrorId.OperationAborted` gemeldet, während externe Cancellation zum Aufrufer weiterpropagiert.
 
 ## Eingabefehler
 

@@ -66,3 +66,10 @@ Das ist bewusst korrektheitsorientiert. V1 optimiert weder Absatzplanung noch Sn
 ## Verbleibende verwandte Arbeit
 
 Die Reformat-Familie ist nun verhaltensorientiert abgebildet. Für V1 bleiben insbesondere der abschließende Bulk-Topologie-Audit für Block Copy/Move/Delete, Command-Grenzvalidierung, vollständige Abort-Unterstützung bei Langläufern und typisierte historische Fehlerressourcen. Diese Themen bleiben bewusst vom Reformat-Algorithmus getrennt, damit dessen interne Strategie später optimiert werden kann, ohne den Kompatibilitätsvertrag zu verändern.
+
+
+## Unterbrechungsgrenze
+
+Die Neuformatierung verwendet jetzt `EditorInterruptionService.CheckpointAsync` beim Lesen des Wrapped-Absatzes, beim Komprimieren der Wörter und beim Aufbau des neuen Zeilenplans. Diese Phasen sind frei von Seiteneffekten.
+
+Unmittelbar vor Undo-Capture und Dokumentmutation erfolgt ein letzter Checkpoint. Danach wird der bereits vorbereitete In-Memory-Plan ohne weitere Ctrl-U-Prüfung übernommen. Das ist bewusst so: Ein Abbruch zwischen einzelnen Replace-/Insert-/Delete-Schritten würde einen halb neu formatierten Absatz und inkonsistente Topologie hinterlassen. Externe Cancellation und Ctrl-U bleiben damit während der potenziell längeren Planungsarbeit reaktionsfähig, während der kurze Commit aus Sicht des Editorbenutzers atomar bleibt.

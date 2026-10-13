@@ -56,3 +56,14 @@ The existing `FileTextStorage` is intentionally **not** changed. It remains the 
 ## Still pending
 
 The remaining major V1 gaps are now primarily lifecycle and display concerns: editor rundown/exit confirmation, exact display-dependent scroll/page semantics, physical Create Window layout, the interactive FIRST-ED host, and later MicroStar demonstration features.
+
+
+## Interruption and cancellation
+
+Compatibility Read/Write and modern Save now execute codec I/O through `EditorInterruptionService`. The service periodically gives the host an EditBreathe-style opportunity to collect physical input while awaited I/O is outstanding.
+
+For Read File, decoded lines are not inserted until the codec operation has completed and a final interruption checkpoint succeeds. A Ctrl-U during the read therefore cancels the codec token and leaves the current document, cursor, dirty flag and undo stack untouched.
+
+Write/Save pass the same linked token to the codec. A cancelled external file write can still be partially visible at the filesystem/provider level; editor document state is updated only after successful completion. Save does not clear dirty state if the write is interrupted.
+
+Semantic Find/Find Again use the interruptible search path. Scanning checkpoints once per logical line and only commits the cursor and remembered-search state after a successful scan. Direct synchronous service methods remain available for applications that deliberately want an in-process non-interruptible call.

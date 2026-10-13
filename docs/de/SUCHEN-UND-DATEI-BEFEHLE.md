@@ -56,3 +56,14 @@ Die historischen Datei-Routinen verwenden ein Carriage-Return-Byte mit gesetztem
 ## Noch offen
 
 Die wesentlichen V1-Lücken liegen jetzt vor allem bei Lifecycle und Darstellung: Rundown/Exit-Bestätigung, exakte bildschirmabhängige Scroll-/Page-Semantik, physische Create-Window-Anordnung, der interaktive FIRST-ED-Host und später die MicroStar-Demofunktionen.
+
+
+## Unterbrechung und Cancellation
+
+Kompatibles Read/Write sowie modernes Save führen Codec-I/O jetzt über `EditorInterruptionService` aus. Während asynchrone I/O aussteht, gibt der Dienst dem Host regelmäßig eine EditBreathe-artige Gelegenheit, physische Eingabe einzusammeln.
+
+Bei Read File werden dekodierte Zeilen erst eingefügt, nachdem der Codec erfolgreich beendet und ein abschließender Unterbrechungs-Checkpoint bestanden wurde. Ctrl-U während des Lesens bricht deshalb den Codec-Token ab und lässt aktuelles Dokument, Cursor, Dirty-Flag und Undo-Stack unverändert.
+
+Write/Save reichen denselben verknüpften Token an den Codec weiter. Ein abgebrochener externer Dateischreibvorgang kann auf Dateisystem-/Provider-Ebene trotzdem teilweise sichtbar sein; Editor-Dokumentzustand wird erst nach erfolgreichem Abschluss aktualisiert. Save löscht bei Unterbrechung den Dirty-Zustand nicht.
+
+Semantisches Find/Find Again verwendet den unterbrechbaren Suchpfad. Der Scan prüft einmal pro logischer Zeile und übernimmt Cursor sowie gemerkten Suchzustand erst nach erfolgreichem Abschluss. Direkte synchrone Service-Methoden bleiben für Anwendungen verfügbar, die bewusst einen nicht unterbrechbaren In-Process-Aufruf wünschen.

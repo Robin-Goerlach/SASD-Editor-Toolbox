@@ -164,7 +164,12 @@ The handbook does not separately define whether markers or other non-block ancho
 - If no input is available, one cooperative background slice runs.
 - The system loop repeats scheduler cycles until rundown is requested or external cancellation occurs.
 - Background tasks must keep their own resumable state and return after a bounded unit of work.
-- Long-running compatibility operations may observe the editor abort state in addition to the target platform's normal cancellation primitive. Exact procedure coverage is audited separately.
+- Long-running compatibility operations use a host-neutral interruption checkpoint equivalent in purpose to historical EditBreathe: the host may collect a bounded amount of physical input while the operation runs, ordinary input remains queued, and a physical Ctrl-U raises the one-shot editor abort state.
+- User-originated Ctrl-U abort and platform/external cancellation are distinct. Ctrl-U is translated into the typed editor error `OperationAborted`; `CancellationToken` cancellation remains platform control flow and propagates to the caller.
+- Async compatibility file I/O is wrapped so Ctrl-U can cancel the in-flight codec token. For Read File, decoded data is not committed into the document until the read completes and the final interruption checkpoint succeeds.
+- Interruptible Find/Find Again scan logical lines at safe checkpoints and commit cursor/remembered-search state only after the scan completes.
+- Paragraph reformatting polls during its side-effect-free planning phase and performs one final checkpoint before mutation. Once the small in-memory commit phase starts, it completes without Ctrl-U checkpoints so the paragraph cannot be left half reformatted.
+- Short structural edit commits (for example whole-line block splice operations) are intentionally not interrupted mid-mutation; they preserve structural atomicity and are covered by their normal topology/undo invariants.
 
 ## 10. Host hooks
 

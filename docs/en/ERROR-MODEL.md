@@ -48,7 +48,7 @@ The dispatcher maps expected exception families without leaking their text into 
 - residual `ArgumentException` -> `InvalidCommandArgument`;
 - `InvalidOperationException` -> `OperationFailed`.
 
-Cancellation is intentionally not converted here. `OperationCanceledException` remains control flow for `CancellationToken`; the separate interruptibility audit owns how historical Ctrl-U abort state and modern cancellation cooperate.
+Cancellation is intentionally not converted here. `OperationCanceledException` remains control flow for `CancellationToken`. The completed interruptibility bridge treats historical host Ctrl-U separately: `EditorOperationAbortedException` is caught by the semantic dispatcher and reported as `EditorErrorId.OperationAborted`, while external cancellation continues to propagate to the caller.
 
 ## Input errors
 

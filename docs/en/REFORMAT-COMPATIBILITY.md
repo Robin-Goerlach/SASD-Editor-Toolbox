@@ -66,3 +66,10 @@ This is intentionally correctness-first. V1 does not optimize paragraph planning
 ## Remaining related work
 
 The paragraph-reformat family is now behaviorally represented, but V1 still needs the final bulk-topology audit for block copy/move/delete, command-boundary validation, complete long-operation abort coverage and typed historical error resources. Those concerns remain separate from the reformat algorithm so later optimization can replace the internal planning strategy without changing the compatibility contract.
+
+
+## Interruption boundary
+
+Reformatting now uses `EditorInterruptionService.CheckpointAsync` while reading the Wrapped paragraph, compressing words and building the new line plan. Those phases are side-effect free.
+
+One final checkpoint occurs immediately before undo capture and document mutation. After that point the already prepared in-memory plan is committed without further Ctrl-U checks. This is intentional: cancelling between individual line replacements/insertions/deletions would leave a partially reformatted paragraph and inconsistent topology. External cancellation and Ctrl-U therefore remain responsive during the potentially long planning work while the short commit remains atomic from the editor user's perspective.

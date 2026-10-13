@@ -86,8 +86,10 @@ Ziel ist funktionale Abdeckung, nicht eine identische Quellcode- oder API-Strukt
 | `EditPushtbf` Front-Einfügen | `EditorTypeaheadBuffer.PushNext` | Implementiert |
 | `EditUserpush` Sequenz-/Makro-Eingabe | `PushSequence`, `PushText` | Implementiert |
 | Typeahead-Overflow leert wartende Eingabe | begrenzter Puffer + Write-Result | Implementiert |
-| Sofortiges Host-Ctrl-U / `EditAbort` für den Puffer | Queue leeren + `AbortRequested` | Implementierte Grundlage |
-| Ctrl-U-Polling in allen unterbrechbaren Langläufern | Abort-State + moderne Cancellation-Grenze | Geplanter Audit |
+| Sofortiges Host-Ctrl-U / `EditAbort` für den Puffer | Queue leeren + `AbortRequested` | Implementiert |
+| `EditBreathe`-artiges begrenztes Host-Polling | `IEditorHooks.PollInputDuringOperationAsync` + `EditorInterruptionService.CheckpointAsync` | Implementiert |
+| Ctrl-U in unterbrechbaren Langläufern | Datei-I/O-Wrapper + Such-/Reformat-Checkpoints + typisiertes `OperationAborted` | Implementiert / auditiert |
+| Externe Cancellation bleibt von Ctrl-U getrennt | `CancellationToken` propagiert; kein Editor-Abortfehler | Implementiert |
 | Console-Tastennormalisierung | `ConsoleKeyTranslator` | Implementiertes Beispiel |
 | Terminaleingabe durch editor-eigenen Typeahead | `ConsoleFirstEdHost` | Implementiertes Beispiel |
 | Ctrl-K/Ctrl-O/Ctrl-Q Prefix-Dispatcher | Prefix-Zustandsautomat in `FirstEdKeyMap` | Implementiert (Zuordnung) |
@@ -145,6 +147,14 @@ Rohe Pascal-Pointer, Deskriptor-Freelists und 16-Bit-Integergrenzen sind Impleme
 
 Die Reihenfolge und die historische Standardgröße 500 bleiben erhalten. Rohe DOS-Bytes, Ringpuffer-Indizes und Scan-Codes gehören jedoch bewusst nicht zum portablen V1-Vertrag. Makro- und physische Eingaben werden zuerst in `EditorKeyStroke` normalisiert. Ein vom Host stammendes Ctrl-U nimmt den unmittelbaren Abort-Pfad; eine vorne eingeschobene Makro-Eingabe wird nicht stillschweigend zu physischer Tastatureingabe umgedeutet.
 
+## Modernisierung der Unterbrechbarkeit
+
+Das Handbuch beschreibt `EditAbort` ausdrücklich als sofortige Ctrl-U-Behandlung und `EditBreathe` als Tastatur-Polling aus längeren Operationen; das kompatible Einlesen einer Datei ist ausdrücklich während des Lesens abbrechbar. Die .NET-Implementierung erhält dieses Verhalten, ohne Console-APIs in den Core zu ziehen: Ein Host-Hook pollt begrenzt physische Eingabe, `EditorInterruptionService` konsumiert den einmaligen Abortzustand und unterbrechbare asynchrone Datei-I/O erhält einen verknüpften Cancellation-Token.
+
+Suche und Reformatierung verwenden zusätzlich sichere Checkpoints als moderne Erweiterung für gute Reaktionsfähigkeit. Zustand wird erst nach erfolgreichem Scan beziehungsweise nach erfolgreicher Planungsphase übernommen. Kurze strukturelle Commit-Phasen akzeptieren bewusst kein Ctrl-U mitten in der Mutation, weil ein halb gesplictes Dokument unsicherer wäre als der Abschluss der begrenzten In-Memory-Änderung.
+
+Externe `CancellationToken`-Cancellation wird nicht als Ctrl-U gemeldet und bleibt Kontrollfluss des Aufrufers.
+
 ## Cursor-Regel bei Page-Befehlen
 
 Das Handbuch legt fest, dass Page-Bewegungen das Fenster um eine Zeile weniger als die Zahl sichtbarer Textzeilen verschieben. Es legt aber nicht separat fest, auf welcher Bildschirmzeile der Cursor danach stehen soll. SASD erhält deshalb nach Möglichkeit die relative sichtbare Cursorzeile und dokumentiert dies ausdrücklich als moderne Host-Regel statt als historische Aussage.
@@ -155,4 +165,4 @@ Der historische Bildschirm hatte eine feste Größe. Die Größenänderung eines
 
 ## V1-Abschlusskriterium
 
-Die C#/.NET-Implementierung deckt die großen strukturellen FIRST-ED-Bereiche inzwischen ausführbar ab, einschließlich Absatz-Neuformatierung, mehrzeiliger Block-Bulk-Topologie und unabhängiger Block-Endpunkte. Vor V1 schließen wir noch den Audit zur Unterbrechbarkeit ab, prüfen zusammengesetztes Undo/Navigationszustand bei dokumentübergreifenden Mutationen und führen anschließend einen finalen Audit des Handbuch-Prozedurindexes durch. MicroStar-spezifische Demonstrationen können als Samples statt als Core-Abhängigkeiten geliefert werden.
+Die C#/.NET-Implementierung deckt die großen strukturellen FIRST-ED-Bereiche inzwischen ausführbar ab, einschließlich Absatz-Neuformatierung, mehrzeiliger Block-Bulk-Topologie und unabhängiger Block-Endpunkte. Vor V1 prüfen wir noch zusammengesetztes Undo/Navigationszustand bei dokumentübergreifenden Mutationen und führen anschließend einen finalen Audit des Handbuch-Prozedurindexes durch. MicroStar-spezifische Demonstrationen können als Samples statt als Core-Abhängigkeiten geliefert werden.

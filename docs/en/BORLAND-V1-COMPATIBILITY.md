@@ -86,8 +86,10 @@ The goal is behavioral coverage, not source-level or public-name identity.
 | `EditPushtbf` front insertion | `EditorTypeaheadBuffer.PushNext` | Implemented |
 | `EditUserpush` ordered sequence/macro insertion | `PushSequence`, `PushText` | Implemented |
 | Typeahead overflow clears pending input | bounded buffer write results | Implemented |
-| Immediate host Ctrl-U / `EditAbort` buffer semantics | clear queue + `AbortRequested` | Implemented foundation |
-| Ctrl-U polling inside every interruptible long operation | abort state + modern cancellation boundary | Planned audit |
+| Immediate host Ctrl-U / `EditAbort` buffer semantics | clear queue + `AbortRequested` | Implemented |
+| `EditBreathe`-style bounded host polling | `IEditorHooks.PollInputDuringOperationAsync` + `EditorInterruptionService.CheckpointAsync` | Implemented |
+| Ctrl-U during interruptible long operations | file I/O wrapper + search/reformat checkpoints + typed `OperationAborted` | Implemented / audited |
+| External cancellation remains distinct from Ctrl-U | `CancellationToken` propagates; no editor abort error | Implemented |
 | Console key normalization | `ConsoleKeyTranslator` | Implemented sample |
 | Terminal input through editor-owned typeahead | `ConsoleFirstEdHost` | Implemented sample |
 | Prefixed Ctrl-K / Ctrl-O / Ctrl-Q dispatchers | `FirstEdKeyMap` prefix state machine | Implemented (mapping) |
@@ -146,6 +148,14 @@ Raw Pascal pointers, descriptor free lists and 16-bit integer ceilings are imple
 
 Behavioral ordering and the historical 500-entry default are retained, but raw DOS bytes, circular-buffer indices and scan codes are deliberately not part of the portable V1 contract. Macro input and physical input are normalized to `EditorKeyStroke` first. A host-originated Ctrl-U takes the immediate abort path; front-injected macro input does not silently become physical input.
 
+## Interruptibility modernization policy
+
+The handbook explicitly describes `EditAbort` as immediate Ctrl-U handling and `EditBreathe` as keyboard polling from long operations, with compatibility file reading specifically abortable during the read. The .NET implementation preserves that behavior without polling Console APIs from the core: a host hook performs bounded physical-input polling, `EditorInterruptionService` consumes the one-shot abort state, and interruptible async I/O receives a linked cancellation token.
+
+Search and reformat also use safe checkpoints as a modern extension for responsiveness. Their state is committed only after the interruptible scan/planning phase succeeds. Short structural commit phases deliberately do not accept Ctrl-U halfway through mutation, because a partially spliced document would be less safe than completing the bounded in-memory change.
+
+External `CancellationToken` cancellation is not reported as Ctrl-U and remains caller control flow.
+
 ## Page cursor policy
 
 The handbook states that page movement slides the window by one less than the number of displayed text lines, but it does not separately specify the cursor's resulting screen row. SASD preserves the cursor's relative visible row when possible and documents this as a modern host-neutral policy rather than claiming it as historical behavior.
@@ -156,4 +166,4 @@ The historical screen was fixed-size. Resizing a modern terminal is therefore no
 
 ## V1 release gate
 
-The C#/.NET implementation now has executable coverage for the major FIRST-ED structural areas, including paragraph reformatting, whole-line block bulk topology and independent block endpoints. Before calling V1 complete, finish the interruptibility audit, review compound undo/navigation state for cross-document mutations, then run a final handbook procedure-index audit. MicroStar-specific demonstrations may ship as samples rather than core dependencies.
+The C#/.NET implementation now has executable coverage for the major FIRST-ED structural areas, including paragraph reformatting, whole-line block bulk topology and independent block endpoints. Before calling V1 complete, review compound undo/navigation state for cross-document mutations, then run a final handbook procedure-index audit. MicroStar-specific demonstrations may ship as samples rather than core dependencies.
