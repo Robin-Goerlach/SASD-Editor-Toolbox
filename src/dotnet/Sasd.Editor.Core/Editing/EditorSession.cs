@@ -30,6 +30,7 @@ public sealed class EditorSession
         Topology = new EditorLineTopology(this);
         Engine = new EditorEngine(this);
         Search = new EditorSearchService(this);
+        Interruption = new EditorInterruptionService(this);
         Files = new EditorFileService(this, fileCodec);
         Scheduler = new EditorScheduler(this);
         SystemLoop = new EditorSystemLoop(this, Scheduler);
@@ -41,6 +42,7 @@ public sealed class EditorSession
     public EditorWindowLayout WindowLayout { get; }
     public EditorEngine Engine { get; }
     public EditorSearchService Search { get; }
+    public EditorInterruptionService Interruption { get; }
     public EditorFileService Files { get; }
     public EditorScheduler Scheduler { get; }
     public EditorSystemLoop SystemLoop { get; }

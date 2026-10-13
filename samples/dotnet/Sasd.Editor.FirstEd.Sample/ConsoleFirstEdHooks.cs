@@ -1,5 +1,6 @@
 using Sasd.Editor.Editing;
 using Sasd.Editor.Hooks;
+using Sasd.Editor.Input;
 
 namespace Sasd.Editor.FirstEd.Sample;
 
@@ -19,6 +20,41 @@ internal sealed class ConsoleFirstEdHooks : IEditorHooks
     {
         _pendingMessage = $"{error.Code}: {error.Message}";
         return ValueTask.CompletedTask;
+    }
+
+    /// <summary>
+    /// EditBreathe-style polling used only while the reusable core is executing
+    /// an interruptible operation. One physical key is collected per checkpoint
+    /// so the hook remains bounded and cannot turn a CPU loop into an input loop.
+    /// </summary>
+    public async ValueTask PollInputDuringOperationAsync(
+        EditorSession session,
+        CancellationToken cancellationToken)
+    {
+        cancellationToken.ThrowIfCancellationRequested();
+        if (!Console.KeyAvailable)
+        {
+            return;
+        }
+
+        var translated = ConsoleKeyTranslator.Translate(Console.ReadKey(intercept: true));
+        if (!translated.HasValue)
+        {
+            return;
+        }
+
+        var result = session.Typeahead.EnqueueFromHost(translated.Value);
+        if (result == EditorTypeaheadWriteResult.Overflow)
+        {
+            await OnErrorAsync(
+                session,
+                EditorErrorCatalog.TypeaheadOverflow(),
+                cancellationToken).ConfigureAwait(false);
+        }
+
+        // Aborted is deliberately not rendered here. The interruption service
+        // consumes the abort flag and the dispatcher reports one typed abort
+        // error, avoiding duplicate Ctrl-U messages.
     }
 
     public string? TakeMessage()

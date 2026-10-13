@@ -28,12 +28,19 @@ public sealed class EditorFileService
         CancellationToken cancellationToken = default)
     {
         ArgumentException.ThrowIfNullOrWhiteSpace(path);
-        var lines = await _codec.ReadAsync(path, cancellationToken).ConfigureAwait(false);
+        var lines = await _session.Interruption
+            .RunInterruptibleAsync(
+                token => _codec.ReadAsync(path, token),
+                cancellationToken)
+            .ConfigureAwait(false);
         if (lines.Count == 0)
         {
             return 0;
         }
 
+        // The entire compatibility file is decoded before editor mutation starts.
+        // A Ctrl-U detected during the awaited read therefore cancels I/O and
+        // leaves document text, cursor, dirty state and undo history untouched.
         var window = _session.CurrentWindow;
         var document = window.Document;
         var originalCursor = window.Cursor;
@@ -69,7 +76,10 @@ public sealed class EditorFileService
         CancellationToken cancellationToken = default)
     {
         ArgumentException.ThrowIfNullOrWhiteSpace(path);
-        return _codec.WriteAsync(path, _session.CurrentWindow.Document.Buffer.Snapshot(), cancellationToken);
+        var snapshot = _session.CurrentWindow.Document.Buffer.Snapshot();
+        return _session.Interruption.RunInterruptibleAsync(
+            token => _codec.WriteAsync(path, snapshot, token),
+            cancellationToken);
     }
 
     /// <summary>
@@ -88,7 +98,12 @@ public sealed class EditorFileService
             return false;
         }
 
-        await _codec.WriteAsync(target, document.Buffer.Snapshot(), cancellationToken).ConfigureAwait(false);
+        var snapshot = document.Buffer.Snapshot();
+        await _session.Interruption
+            .RunInterruptibleAsync(
+                token => _codec.WriteAsync(target, snapshot, token),
+                cancellationToken)
+            .ConfigureAwait(false);
         document.MarkSaved(target);
         return true;
     }

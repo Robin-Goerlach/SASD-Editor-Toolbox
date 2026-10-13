@@ -60,6 +60,13 @@ internal sealed class ConsoleFirstEdHost : IEditorInputPump
             if (writeResult == EditorTypeaheadWriteResult.Aborted)
             {
                 _keyMap.Reset();
+
+                // Outside a long-running operation the input pump itself is the
+                // consumer of Ctrl-U. Clear the one-shot abort flag here so a
+                // later unrelated interruptible command is not aborted by stale
+                // state.
+                session.Typeahead.ConsumeAbortRequest();
+
                 await session.Hooks.OnErrorAsync(
                     session,
                     EditorErrorCatalog.OperationAborted(),

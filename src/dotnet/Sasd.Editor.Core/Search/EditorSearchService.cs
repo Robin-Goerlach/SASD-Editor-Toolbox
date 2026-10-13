@@ -42,6 +42,35 @@ public sealed class EditorSearchService
     }
 
     /// <summary>
+    /// Interruptible semantic-command form of <see cref="FindNext"/>.
+    /// </summary>
+    /// <remarks>
+    /// Search state and cursor position are committed only after the scan
+    /// completes. A Ctrl-U or external cancellation therefore leaves both the
+    /// remembered Find Again state and the current cursor unchanged.
+    /// </remarks>
+    public async ValueTask<TextPosition?> FindNextAsync(
+        string pattern,
+        SearchOptions? options = null,
+        CancellationToken cancellationToken = default)
+    {
+        ValidatePattern(pattern);
+        options ??= new SearchOptions();
+
+        var window = _session.CurrentWindow;
+        var start = window.Cursor;
+        var match = await FindFromAsync(start, pattern, options, cancellationToken).ConfigureAwait(false);
+
+        Remember(pattern, options, match, window.Document.DocumentId);
+        if (match is not null)
+        {
+            window.Cursor = match.Value;
+        }
+
+        return match;
+    }
+
+    /// <summary>
     /// Repeats the most recent search. When the cursor is still on the previous
     /// match, scanning resumes after that match instead of returning it again.
     /// </summary>
@@ -73,6 +102,41 @@ public sealed class EditorSearchService
         return match;
     }
 
+    /// <summary>
+    /// Interruptible semantic-command form of <see cref="FindAgain"/>.
+    /// </summary>
+    public async ValueTask<TextPosition?> FindAgainAsync(
+        CancellationToken cancellationToken = default)
+    {
+        if (string.IsNullOrEmpty(_lastPattern))
+        {
+            return null;
+        }
+
+        var window = _session.CurrentWindow;
+        var start = window.Cursor;
+        if (_lastDocumentId == window.Document.DocumentId
+            && _lastMatch.HasValue
+            && _lastMatch.Value == window.Cursor)
+        {
+            start = AdvancePastMatch(window.Cursor, _lastPattern.Length);
+        }
+
+        var match = await FindFromAsync(
+            start,
+            _lastPattern,
+            _lastOptions,
+            cancellationToken).ConfigureAwait(false);
+
+        Remember(_lastPattern, _lastOptions, match, window.Document.DocumentId);
+        if (match is not null)
+        {
+            window.Cursor = match.Value;
+        }
+
+        return match;
+    }
+
     public async ValueTask<bool> ReplaceNextAsync(
         string pattern,
         string replacement,
@@ -80,7 +144,7 @@ public sealed class EditorSearchService
         CancellationToken cancellationToken = default)
     {
         ArgumentNullException.ThrowIfNull(replacement);
-        var match = FindNext(pattern, options);
+        var match = await FindNextAsync(pattern, options, cancellationToken).ConfigureAwait(false);
         if (match is null)
         {
             return false;
@@ -190,6 +254,43 @@ public sealed class EditorSearchService
         return match;
     }
 
+    private async ValueTask<TextPosition?> FindFromAsync(
+        TextPosition start,
+        string pattern,
+        SearchOptions options,
+        CancellationToken cancellationToken)
+    {
+        var window = _session.CurrentWindow;
+        var buffer = window.Document.Buffer;
+        var comparison = options.CaseSensitive ? StringComparison.Ordinal : StringComparison.OrdinalIgnoreCase;
+        var startLine = Math.Clamp(start.Line, 0, buffer.LineCount - 1);
+        var startColumn = Math.Max(0, start.Column);
+
+        var match = await FindInRangeAsync(
+            startLine,
+            buffer.LineCount - 1,
+            startColumn,
+            pattern,
+            options,
+            comparison,
+            cancellationToken).ConfigureAwait(false);
+
+        if (match is null && options.WrapAround)
+        {
+            match = await FindInRangeAsync(
+                0,
+                startLine,
+                0,
+                pattern,
+                options,
+                comparison,
+                cancellationToken,
+                stopColumnExclusive: startColumn).ConfigureAwait(false);
+        }
+
+        return match;
+    }
+
     private TextPosition AdvancePastMatch(TextPosition position, int length)
     {
         var buffer = _session.CurrentWindow.Document.Buffer;
@@ -211,6 +312,52 @@ public sealed class EditorSearchService
         var buffer = _session.CurrentWindow.Document.Buffer;
         for (var lineIndex = startLine; lineIndex <= endLine; lineIndex++)
         {
+            var text = buffer.GetLine(lineIndex).Text;
+            var column = lineIndex == startLine ? Math.Clamp(startColumn, 0, text.Length) : 0;
+            var limit = lineIndex == endLine && stopColumnExclusive.HasValue
+                ? Math.Clamp(stopColumnExclusive.Value, 0, text.Length)
+                : text.Length;
+
+            while (column <= limit - pattern.Length)
+            {
+                var index = text.IndexOf(pattern, column, comparison);
+                if (index < 0 || index >= limit)
+                {
+                    break;
+                }
+
+                if (!options.WholeWord || IsWholeWord(text, index, pattern.Length))
+                {
+                    return new TextPosition(lineIndex, index);
+                }
+
+                column = index + 1;
+            }
+        }
+
+        return null;
+    }
+
+    /// <summary>
+    /// Scans one logical line at a time and yields to the host at each line
+    /// boundary. This is the modern host-neutral counterpart of calling
+    /// EditBreathe inside a potentially long loop.
+    /// </summary>
+    private async ValueTask<TextPosition?> FindInRangeAsync(
+        int startLine,
+        int endLine,
+        int startColumn,
+        string pattern,
+        SearchOptions options,
+        StringComparison comparison,
+        CancellationToken cancellationToken,
+        int? stopColumnExclusive = null)
+    {
+        var buffer = _session.CurrentWindow.Document.Buffer;
+        for (var lineIndex = startLine; lineIndex <= endLine; lineIndex++)
+        {
+            await _session.Interruption.CheckpointAsync(cancellationToken).ConfigureAwait(false);
+
             var text = buffer.GetLine(lineIndex).Text;
             var column = lineIndex == startLine ? Math.Clamp(startColumn, 0, text.Length) : 0;
             var limit = lineIndex == endLine && stopColumnExclusive.HasValue

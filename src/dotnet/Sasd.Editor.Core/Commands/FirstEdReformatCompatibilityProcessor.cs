@@ -28,14 +28,23 @@ internal static class FirstEdReformatCompatibilityProcessor
     /// at the first line whose outgoing boundary is hard, or at end of stream.
     /// Reformatting is intentionally independent of the window's WordWrap mode.
     /// </remarks>
-    public static bool Reformat(EditorSession session, CancellationToken cancellationToken = default)
+    public static async ValueTask<bool> ReformatAsync(
+        EditorSession session,
+        CancellationToken cancellationToken = default)
     {
         ArgumentNullException.ThrowIfNull(session);
         var window = RequireWindow(session);
         var document = window.Document;
         var startLine = window.Cursor.Line;
-        var sourceLines = ReadParagraph(document, startLine, cancellationToken);
-        var words = CompressLines(sourceLines, cancellationToken);
+        var sourceLines = await ReadParagraphAsync(
+            session,
+            document,
+            startLine,
+            cancellationToken).ConfigureAwait(false);
+        var words = await CompressLinesAsync(
+            session,
+            sourceLines,
+            cancellationToken).ConfigureAwait(false);
 
         if (words.Count == 0)
         {
@@ -56,13 +65,24 @@ internal static class FirstEdReformatCompatibilityProcessor
                 $"Cannot reformat paragraph because the word '{tooLong}' is wider than the current margins.");
         }
 
-        var formattedText = WrapWords(words, leftMargin, contentWidth, cancellationToken);
+        var formattedText = await WrapWordsAsync(
+            session,
+            words,
+            leftMargin,
+            contentWidth,
+            cancellationToken).ConfigureAwait(false);
         var plannedLines = BuildPlannedLines(sourceLines, formattedText);
 
         if (Equivalent(sourceLines, plannedLines))
         {
             return false;
         }
+
+        // All interruption checkpoints are deliberately completed before this
+        // commit phase. Once mutation starts, the small in-memory plan is applied
+        // atomically from the editor user's perspective instead of allowing Ctrl-U
+        // to leave a half-reformatted paragraph behind.
+        await session.Interruption.CheckpointAsync(cancellationToken).ConfigureAwait(false);
 
         var originalCursor = window.Cursor;
         session.Undo.Capture(window, "Reformat paragraph");
@@ -82,7 +102,8 @@ internal static class FirstEdReformatCompatibilityProcessor
     /// Reads the current paragraph according to the Wrapped-bit chain. The final
     /// hard-boundary line belongs to the paragraph and terminates the scan.
     /// </summary>
-    private static IReadOnlyList<EditorLineSnapshot> ReadParagraph(
+    private static async ValueTask<IReadOnlyList<EditorLineSnapshot>> ReadParagraphAsync(
+        EditorSession session,
         EditorDocument document,
         int startLine,
         CancellationToken cancellationToken)
@@ -92,7 +113,7 @@ internal static class FirstEdReformatCompatibilityProcessor
 
         while (lineIndex < document.Buffer.LineCount)
         {
-            cancellationToken.ThrowIfCancellationRequested();
+            await session.Interruption.CheckpointAsync(cancellationToken).ConfigureAwait(false);
             var line = document.Buffer.GetLine(lineIndex);
             lines.Add(line);
 
@@ -112,14 +133,15 @@ internal static class FirstEdReformatCompatibilityProcessor
     /// word separators before splicing. The historical routine names spaces;
     /// Unicode whitespace is accepted as a deliberate modern extension.
     /// </summary>
-    private static IReadOnlyList<string> CompressLines(
+    private static async ValueTask<IReadOnlyList<string>> CompressLinesAsync(
+        EditorSession session,
         IReadOnlyList<EditorLineSnapshot> lines,
         CancellationToken cancellationToken)
     {
         var words = new List<string>();
         foreach (var line in lines)
         {
-            cancellationToken.ThrowIfCancellationRequested();
+            await session.Interruption.CheckpointAsync(cancellationToken).ConfigureAwait(false);
             words.AddRange(line.Text.Split((char[]?)null, StringSplitOptions.RemoveEmptyEntries));
         }
 
@@ -131,7 +153,8 @@ internal static class FirstEdReformatCompatibilityProcessor
     /// Words are shifted to the left margin, pushed down when a line would exceed
     /// the right margin, and pulled up whenever the next word still fits.
     /// </summary>
-    private static IReadOnlyList<string> WrapWords(
+    private static async ValueTask<IReadOnlyList<string>> WrapWordsAsync(
+        EditorSession session,
         IReadOnlyList<string> words,
         int leftMargin,
         int contentWidth,
@@ -143,7 +166,7 @@ internal static class FirstEdReformatCompatibilityProcessor
 
         foreach (var word in words)
         {
-            cancellationToken.ThrowIfCancellationRequested();
+            await session.Interruption.CheckpointAsync(cancellationToken).ConfigureAwait(false);
             var required = currentWords.Count == 0 ? word.Length : checked(word.Length + 1);
 
             if (currentWords.Count > 0 && currentLength + required > contentWidth)

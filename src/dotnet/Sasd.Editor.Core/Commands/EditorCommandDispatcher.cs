@@ -62,7 +62,9 @@ public sealed class EditorCommandDispatcher(EditorSession session)
                 case EditorCommandId.ChangeCase: session.Engine.ChangeCase(); break;
                 case EditorCommandId.CenterLine: session.Engine.CenterLine(); break;
                 case EditorCommandId.ReformatParagraph:
-                    return FirstEdReformatCompatibilityProcessor.Reformat(session, cancellationToken);
+                    return await FirstEdReformatCompatibilityProcessor
+                        .ReformatAsync(session, cancellationToken)
+                        .ConfigureAwait(false);
                 case EditorCommandId.ToggleInsert: session.Engine.ToggleInsertMode(); break;
                 case EditorCommandId.ToggleWordWrap: session.Engine.ToggleWordWrap(); break;
                 case EditorCommandId.ToggleAutoIndent: session.Engine.ToggleAutoIndent(); break;
@@ -116,9 +118,13 @@ public sealed class EditorCommandDispatcher(EditorSession session)
                 case EditorCommandId.SetMarker: session.SetMarker(RequireNumber(command)); break;
                 case EditorCommandId.JumpMarker: return session.JumpToMarker(RequireNumber(command));
                 case EditorCommandId.FindNext:
-                    return session.Search.FindNext(RequireText(command), new SearchOptions()) is not null;
+                    return await session.Search
+                        .FindNextAsync(RequireText(command), new SearchOptions(), cancellationToken)
+                        .ConfigureAwait(false) is not null;
                 case EditorCommandId.FindAgain:
-                    return session.Search.FindAgain() is not null;
+                    return await session.Search
+                        .FindAgainAsync(cancellationToken)
+                        .ConfigureAwait(false) is not null;
                 case EditorCommandId.ReplaceNext:
                 {
                     var (pattern, replacement) = EditorCommandValidator.GetReplaceArguments(command);
@@ -142,6 +148,12 @@ public sealed class EditorCommandDispatcher(EditorSession session)
             }
 
             return true;
+        }
+        catch (EditorOperationAbortedException)
+        {
+            return await ReportErrorAsync(
+                EditorErrorCatalog.OperationAborted(),
+                cancellationToken).ConfigureAwait(false);
         }
         catch (Exception exception) when (exception is ArgumentException
                                           or InvalidOperationException
