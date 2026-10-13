@@ -57,15 +57,12 @@ internal sealed class EditorLineTopology
             }
         }
 
-        var block = _session.Block;
-        if (block is not null && block.DocumentId == document.DocumentId)
+        var state = _session.BlockState;
+        _session.ReplaceBlockStateForTopology(state with
         {
-            _session.ReplaceBlockForTopology(block with
-            {
-                StartLine = ShiftForInsertion(block.StartLine, firstInsertedLine, count),
-                EndLine = ShiftForInsertion(block.EndLine, firstInsertedLine, count)
-            });
-        }
+            Start = ShiftEndpointForInsertion(state.Start, document, firstInsertedLine, count),
+            End = ShiftEndpointForInsertion(state.End, document, firstInsertedLine, count)
+        });
     }
 
     /// <summary>
@@ -76,9 +73,8 @@ internal sealed class EditorLineTopology
     /// Windows that pointed at a removed line are attached to the line that now
     /// occupies the first removed index, or to the new final line when the removed
     /// range reached the end of the document. Markers on removed lines become
-    /// undefined. The current V1 block model stores a complete pair of limits, so
-    /// deleting either boundary clears the block rather than keeping a half-defined
-    /// block; that conservative policy is documented as a modernization boundary.
+    /// undefined. Block endpoints are invalidated independently, preserving the
+    /// remaining historical endpoint when only one boundary line is deleted.
     /// </remarks>
     public void LinesDeleted(EditorDocument document, int firstDeletedLine, int count)
     {
@@ -147,13 +143,12 @@ internal sealed class EditorLineTopology
             }
         }
 
-        var block = _session.Block;
-        if (block is not null
-            && block.DocumentId == document.DocumentId
-            && (block.StartLine == lineIndex || block.EndLine == lineIndex))
+        var state = _session.BlockState;
+        _session.ReplaceBlockStateForTopology(state with
         {
-            _session.ClearBlock();
-        }
+            Start = InvalidateEndpoint(state.Start, document, lineIndex),
+            End = InvalidateEndpoint(state.End, document, lineIndex)
+        });
     }
 
     private void RealignBlockAfterDeletion(
@@ -162,37 +157,62 @@ internal sealed class EditorLineTopology
         int lastDeletedLine,
         int count)
     {
-        var block = _session.Block;
-        if (block is null || block.DocumentId != document.DocumentId)
+        var state = _session.BlockState;
+        _session.ReplaceBlockStateForTopology(state with
         {
-            return;
-        }
-
-        if (IsDeleted(block.StartLine, firstDeletedLine, lastDeletedLine)
-            || IsDeleted(block.EndLine, firstDeletedLine, lastDeletedLine))
-        {
-            _session.ClearBlock();
-            return;
-        }
-
-        _session.ReplaceBlockForTopology(block with
-        {
-            StartLine = ShiftAfterDeletedRange(block.StartLine, lastDeletedLine, count),
-            EndLine = ShiftAfterDeletedRange(block.EndLine, lastDeletedLine, count)
+            Start = ShiftEndpointForDeletion(state.Start, document, firstDeletedLine, lastDeletedLine, count),
+            End = ShiftEndpointForDeletion(state.End, document, firstDeletedLine, lastDeletedLine, count)
         });
     }
 
     private IEnumerable<EditorWindow> WindowsFor(EditorDocument document) =>
         _session.Windows.Where(window => window.Document.DocumentId == document.DocumentId);
 
-    private static int ShiftForInsertion(int line, int firstInsertedLine, int count) =>
-        line >= firstInsertedLine ? checked(line + count) : line;
+    private static EditorBlockEndpoint? ShiftEndpointForInsertion(
+        EditorBlockEndpoint? endpoint,
+        EditorDocument document,
+        int firstInsertedLine,
+        int count)
+    {
+        if (endpoint is null || endpoint.DocumentId != document.DocumentId || endpoint.Line < firstInsertedLine)
+        {
+            return endpoint;
+        }
 
-    private static int ShiftAfterDeletedRange(int line, int lastDeletedLine, int count) =>
-        line > lastDeletedLine ? line - count : line;
+        return endpoint with { Line = checked(endpoint.Line + count) };
+    }
 
-    private static bool IsDeleted(int line, int firstDeletedLine, int lastDeletedLine) =>
-        line >= firstDeletedLine && line <= lastDeletedLine;
+    private static EditorBlockEndpoint? ShiftEndpointForDeletion(
+        EditorBlockEndpoint? endpoint,
+        EditorDocument document,
+        int firstDeletedLine,
+        int lastDeletedLine,
+        int count)
+    {
+        if (endpoint is null || endpoint.DocumentId != document.DocumentId)
+        {
+            return endpoint;
+        }
+
+        if (endpoint.Line >= firstDeletedLine && endpoint.Line <= lastDeletedLine)
+        {
+            return null;
+        }
+
+        return endpoint.Line > lastDeletedLine
+            ? endpoint with { Line = endpoint.Line - count }
+            : endpoint;
+    }
+
+    private static EditorBlockEndpoint? InvalidateEndpoint(
+        EditorBlockEndpoint? endpoint,
+        EditorDocument document,
+        int lineIndex) =>
+        endpoint is not null
+        && endpoint.DocumentId == document.DocumentId
+        && endpoint.Line == lineIndex
+            ? null
+            : endpoint;
 
     private static int ShiftForDeletion(
         int line,

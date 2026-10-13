@@ -18,6 +18,7 @@ public sealed class EditorSession
 {
     private readonly List<EditorWindow> _windows = [];
     private readonly Dictionary<int, EditorMarker> _markers = [];
+    private EditorBlockState _blockState = EditorBlockState.Empty;
 
     public EditorSession(IEditorHooks? hooks = null, IEditorFileCodec? fileCodec = null)
     {
@@ -44,7 +45,20 @@ public sealed class EditorSession
     public EditorSystemLoop SystemLoop { get; }
     public IReadOnlyList<EditorWindow> Windows => _windows;
     public EditorWindow CurrentWindow { get; private set; } = null!;
-    public EditorBlock? Block { get; private set; }
+
+    /// <summary>
+    /// Raw whole-line block endpoint state. Unlike <see cref="Block"/>, this
+    /// property can represent a begin marker without an end marker, or an end
+    /// marker without a begin marker, matching the historical Blockfrom/Blockto
+    /// lifecycle without exposing pointer mechanics.
+    /// </summary>
+    public EditorBlockState BlockState => _blockState;
+
+    /// <summary>
+    /// Returns the currently usable contiguous block, or <see langword="null"/>
+    /// while one of the two historical block endpoints is still undefined.
+    /// </summary>
+    public EditorBlock? Block => _blockState.CompleteBlock;
 
     /// <summary>
     /// Internal line-topology coordinator. Structural editing code uses this
@@ -181,7 +195,7 @@ public sealed class EditorSession
         EnsureWindow();
         var documentId = CurrentWindow.Document.DocumentId;
 
-        if (Block?.DocumentId == documentId)
+        if (_blockState.ReferencesDocument(documentId))
         {
             ClearBlock();
         }
@@ -204,34 +218,77 @@ public sealed class EditorSession
         return true;
     }
 
+    /// <summary>
+    /// Defines or repoints the historical block-begin endpoint at the current
+    /// line. The end endpoint remains defined only when it still follows the new
+    /// begin endpoint in the same document.
+    /// </summary>
     public void BeginBlock()
     {
         EnsureWindow();
-        Block = new EditorBlock(CurrentWindow.Document.DocumentId, CurrentWindow.Cursor.Line, CurrentWindow.Cursor.Line);
-        RefreshBlockFlags();
+        ClearBlockHighlights();
+
+        var start = new EditorBlockEndpoint(CurrentWindow.Document.DocumentId, CurrentWindow.Cursor.Line);
+        var end = _blockState.End;
+
+        // EditBlockBegin scans forward from the new begin marker to the old end
+        // marker. If the old end cannot be reached, it becomes undefined rather
+        // than manufacturing a reversed/cross-stream block.
+        if (end is not null
+            && (end.DocumentId != start.DocumentId || start.Line > end.Line))
+        {
+            end = null;
+        }
+
+        _blockState = new EditorBlockState(start, end, Hidden: end is null);
+        MarkBlockHighlights();
     }
 
+    /// <summary>
+    /// Defines or repoints the historical block-end endpoint at the current
+    /// line. A usable block exists only when the begin endpoint precedes it in
+    /// the same document.
+    /// </summary>
     public void EndBlock()
     {
         EnsureWindow();
-        if (Block is null || Block.DocumentId != CurrentWindow.Document.DocumentId)
+        ClearBlockHighlights();
+
+        var end = new EditorBlockEndpoint(CurrentWindow.Document.DocumentId, CurrentWindow.Cursor.Line);
+        var start = _blockState.Start;
+
+        // The handbook defines Blockfrom as the top limit and Blockto as the
+        // bottom limit. This is the symmetric clean-room endpoint rule: an end
+        // marker before the existing begin marker, or in another stream, leaves
+        // only the newly defined end marker.
+        if (start is not null
+            && (start.DocumentId != end.DocumentId || start.Line > end.Line))
         {
-            BeginBlock();
-            return;
+            start = null;
         }
 
-        Block = Block with { EndLine = CurrentWindow.Cursor.Line };
-        RefreshBlockFlags();
+        _blockState = new EditorBlockState(start, end, Hidden: start is null);
+        MarkBlockHighlights();
     }
 
     public void ToggleBlockHidden()
     {
-        if (Block is null)
+        if (_blockState.IsEmpty)
         {
             return;
         }
 
-        Block = Block with { Hidden = !Block.Hidden };
+        if (!_blockState.Hidden)
+        {
+            _blockState = _blockState with { Hidden = true };
+        }
+        else if (_blockState.IsComplete)
+        {
+            _blockState = _blockState with { Hidden = false };
+        }
+
+        // An incomplete endpoint pair can never be displayed. Refreshing also
+        // removes stale InBlock flags left by a preceding complete definition.
         RefreshBlockFlags();
     }
 
@@ -258,19 +315,20 @@ public sealed class EditorSession
     /// </summary>
     public void MarkBlockHighlights()
     {
-        if (Block is null || Block.Hidden)
+        var block = Block;
+        if (block is null || block.Hidden)
         {
             return;
         }
 
-        var document = FindDocument(Block.DocumentId);
+        var document = FindDocument(block.DocumentId);
         if (document is null)
         {
             return;
         }
 
-        var first = Math.Clamp(Block.FirstLine, 0, document.Buffer.LineCount - 1);
-        var last = Math.Clamp(Block.LastLine, 0, document.Buffer.LineCount - 1);
+        var first = Math.Clamp(block.FirstLine, 0, document.Buffer.LineCount - 1);
+        var last = Math.Clamp(block.LastLine, 0, document.Buffer.LineCount - 1);
         for (var line = first; line <= last; line++)
         {
             var snapshot = document.Buffer.GetLine(line);
@@ -283,7 +341,7 @@ public sealed class EditorSession
         // Clearing stale block bits globally is intentionally stronger than only
         // touching the active document and mirrors EditOffblock's recovery role.
         ClearBlockHighlights();
-        Block = null;
+        _blockState = EditorBlockState.Empty;
     }
 
     public void SetMarker(int markerNumber)
@@ -331,10 +389,23 @@ public sealed class EditorSession
     }
 
     /// <summary>
-    /// Allows the topology service to replace a complete block after line-number
-    /// realignment without making the public block setter mutable.
+    /// Allows structural compatibility code to replace a complete block while
+    /// preserving the richer endpoint-state model used by Begin/End commands.
     /// </summary>
-    internal void ReplaceBlockForTopology(EditorBlock? block) => Block = block;
+    internal void ReplaceBlockForTopology(EditorBlock? block) =>
+        _blockState = block is null ? EditorBlockState.Empty : EditorBlockState.FromCompleteBlock(block);
+
+    /// <summary>
+    /// Allows the topology coordinator to realign independently defined block
+    /// endpoints after logical line insertions or deletions.
+    /// </summary>
+    internal void ReplaceBlockStateForTopology(EditorBlockState state)
+    {
+        ArgumentNullException.ThrowIfNull(state);
+        _blockState = state.EnsureVisibilityInvariant();
+    }
+
+    internal bool BlockReferencesDocument(Guid documentId) => _blockState.ReferencesDocument(documentId);
 
     private static EditorDocument CreateDocumentModel(string? text)
     {

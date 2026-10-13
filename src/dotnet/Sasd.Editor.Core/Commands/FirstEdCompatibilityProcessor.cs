@@ -298,7 +298,7 @@ internal static class FirstEdCompatibilityProcessor
 
         // The historical command drops the active block when the deleted window
         // contains it, even when another linked window keeps the text stream.
-        if (session.Block?.DocumentId == window.Document.DocumentId)
+        if (session.BlockReferencesDocument(window.Document.DocumentId))
         {
             session.ClearBlock();
         }
