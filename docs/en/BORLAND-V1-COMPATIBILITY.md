@@ -67,9 +67,11 @@ The goal is behavioral coverage, not source-level or public-name identity.
 | Marker realignment for audited line insertion/deletion paths | `EditorLineTopology` | Implemented |
 | Stable anchors through reformat/block bulk topology | compatibility processors + topology | Implemented |
 | Marker policy for lines moved out of source block | source deletion semantics; block recreated at target | Documented modern policy |
-| Undo limit and undo operation | `EditorUndoManager` + validated compatibility command | Implemented (snapshot backend; compatibility limit >= 1) |
-| Destructive-document undo cleanup | `EditorUndoManager.DiscardDocument` | Implemented |
-| Cross-document block-move compound undo | separate source/target snapshots | Foundation / backend audit |
+| Undo limit and undo operation | `EditorUndoManager` + validated compatibility command | Implemented (transactional snapshot backend; compatibility limit >= 1) |
+| One logical mutation = one undo history item | `EditorUndoTransaction` commit boundary | Implemented modern policy |
+| Cross-document block-move compound undo | one multi-document transaction restoring source + target together | Implemented |
+| Undo navigation/anchor restoration | post-state-aware window/marker/block/current-window restoration | Implemented modern policy |
+| Destructive-document undo cleanup | `EditorUndoManager.DiscardDocument` removes a whole compound item | Implemented |
 | Forward find / remembered Find Again | `EditorSearchService` | Implemented |
 | Replace-next + replace hook | `EditorSearchService`, `IEditorHooks` | Implemented |
 | Modern UTF-8 document storage | `ITextStorage`, `FileTextStorage` | Implemented foundation |
@@ -166,4 +168,4 @@ The historical screen was fixed-size. Resizing a modern terminal is therefore no
 
 ## V1 release gate
 
-The C#/.NET implementation now has executable coverage for the major FIRST-ED structural areas, including paragraph reformatting, whole-line block bulk topology and independent block endpoints. Before calling V1 complete, review compound undo/navigation state for cross-document mutations, then run a final handbook procedure-index audit. MicroStar-specific demonstrations may ship as samples rather than core dependencies.
+The C#/.NET implementation now has executable coverage for the major FIRST-ED structural areas, including paragraph reformatting, whole-line block bulk topology, independent block endpoints and atomic multi-document undo/navigation restoration. Before calling V1 complete, run the final handbook procedure/function-index audit and classify any remaining small omissions or historical platform mechanisms. MicroStar-specific demonstrations may ship as samples rather than core dependencies.

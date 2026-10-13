@@ -67,9 +67,11 @@ Ziel ist funktionale Abdeckung, nicht eine identische Quellcode- oder API-Strukt
 | Marker-Realignment in auditierten Insert-/Delete-Pfaden | `EditorLineTopology` | Implementiert |
 | Stabile Anker bei Reformat-/Block-Bulk-Topologie | Compatibility Processor + Topologie | Implementiert |
 | Marker-Policy für aus dem Quellblock verschobene Zeilen | Quell-Löschsemantik; Block am Ziel neu erzeugt | Dokumentierte moderne Policy |
-| Undo inkl. Limit | `EditorUndoManager` + validierter Kompatibilitätsbefehl | Implementiert (Snapshot-Backend; Kompatibilitätslimit >= 1) |
-| Undo-Bereinigung zerstörter Dokumente | `EditorUndoManager.DiscardDocument` | Implementiert |
-| Zusammengesetztes Undo bei dokumentübergreifendem Block-Move | getrennte Quell-/Ziel-Snapshots | Grundlage / Backend-Audit |
+| Undo inkl. Limit | `EditorUndoManager` + validierter Kompatibilitätsbefehl | Implementiert (transaktionales Snapshot-Backend; Kompatibilitätslimit >= 1) |
+| Eine logische Mutation = ein Undo-History-Eintrag | Commit-Grenze von `EditorUndoTransaction` | Implementierte moderne Policy |
+| Zusammengesetztes Undo bei dokumentübergreifendem Block-Move | eine Multi-Dokument-Transaktion stellt Quelle + Ziel gemeinsam wieder her | Implementiert |
+| Wiederherstellung von Navigation/Ankern bei Undo | Post-State-aware Fenster-/Marker-/Block-/Current-Window-Restoration | Implementierte moderne Policy |
+| Undo-Bereinigung zerstörter Dokumente | `EditorUndoManager.DiscardDocument` entfernt den vollständigen Compound-Eintrag | Implementiert |
 | Vorwärtssuche / gemerktes Find Again | `EditorSearchService` | Implementiert |
 | Replace Next + Replace-Hook | `EditorSearchService`, `IEditorHooks` | Implementiert |
 | Moderne UTF-8-Dokumentpersistenz | `ITextStorage`, `FileTextStorage` | Implementierte Grundlage |
@@ -165,4 +167,4 @@ Der historische Bildschirm hatte eine feste Größe. Die Größenänderung eines
 
 ## V1-Abschlusskriterium
 
-Die C#/.NET-Implementierung deckt die großen strukturellen FIRST-ED-Bereiche inzwischen ausführbar ab, einschließlich Absatz-Neuformatierung, mehrzeiliger Block-Bulk-Topologie und unabhängiger Block-Endpunkte. Vor V1 prüfen wir noch zusammengesetztes Undo/Navigationszustand bei dokumentübergreifenden Mutationen und führen anschließend einen finalen Audit des Handbuch-Prozedurindexes durch. MicroStar-spezifische Demonstrationen können als Samples statt als Core-Abhängigkeiten geliefert werden.
+Die C#/.NET-Implementierung deckt die großen strukturellen FIRST-ED-Bereiche inzwischen ausführbar ab, einschließlich Absatz-Neuformatierung, mehrzeiliger Block-Bulk-Topologie, unabhängiger Block-Endpunkte und atomarer Multi-Dokument-Undo-/Navigationswiederherstellung. Vor V1 führen wir noch den finalen Audit des Handbuch-Prozedur-/Funktionsindexes durch und klassifizieren verbleibende kleine Lücken beziehungsweise historische Plattformmechanismen. MicroStar-spezifische Demonstrationen können als Samples statt als Core-Abhängigkeiten geliefert werden.
