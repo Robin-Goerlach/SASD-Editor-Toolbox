@@ -92,7 +92,7 @@ The historical implementation's 16-bit integer ceiling is not a portable documen
 
 - The historical V1 compatibility block is whole-line and contiguous.
 - Begin and end limits are independently definable. Until both limits identify an ordered range in the same document/text stream, no operational block range is available and block highlighting remains hidden.
-- Repointing one limit may invalidate the opposite limit when the two endpoints no longer form an ordered range in one stream; implementations must not manufacture a reversed or cross-stream block.
+- Repointing the begin limit invalidates an existing end limit when that end is no longer reachable later in the same stream, matching the documented Begin behavior. For the inverse End-before-Begin/cross-stream case, V1 uses a documented clean-room validity policy: no reversed or cross-stream operational block is materialized.
 - One active block may be begun/ended, copied, moved, deleted and hidden, and block manipulation may be initiated from another open window/document.
 - Copy inserts copies of the block lines immediately before the current cursor line and leaves the source text and logical source block unchanged.
 - Move removes the source block and inserts those lines immediately before the current cursor line. For a same-document move, the current cursor line must not lie inside the source block. The logical block follows the moved lines to their destination.
