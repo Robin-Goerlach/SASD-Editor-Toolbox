@@ -109,7 +109,8 @@ The goal is behavioral coverage, not source-level or public-name identity.
 | MicroStar pull-down menus | host sample | Planned |
 | MicroStar pop-up helpers | host sample | Planned |
 | Background printing | scheduler sample | Planned |
-| Historical error-message catalog | typed error codes/resources | Planned |
+| Historical error-message catalog | deliberately not copied; modern `EditorErrorId` + stable codes/resource keys replace presentation-specific text | Replaced / Implemented |
+| Typed host-neutral error/resource model | `EditorErrorCatalog`, `IEditorHooks.OnErrorAsync` | Implemented |
 | DOS/video-memory assembly routines | intentionally not reproduced | Replaced by host rendering |
 | Overlay support | obsolete on modern platforms | Not applicable |
 
@@ -155,4 +156,4 @@ The historical screen was fixed-size. Resizing a modern terminal is therefore no
 
 ## V1 release gate
 
-The C#/.NET implementation now has executable coverage for the major FIRST-ED structural areas, including paragraph reformatting, whole-line block bulk topology and independent block endpoints. Before calling V1 complete, finish the typed error/resource and interruptibility audits, review compound undo/navigation state for cross-document mutations, then run a final handbook procedure-index audit. MicroStar-specific demonstrations may ship as samples rather than core dependencies.
+The C#/.NET implementation now has executable coverage for the major FIRST-ED structural areas, including paragraph reformatting, whole-line block bulk topology and independent block endpoints. Before calling V1 complete, finish the interruptibility audit, review compound undo/navigation state for cross-document mutations, then run a final handbook procedure-index audit. MicroStar-specific demonstrations may ship as samples rather than core dependencies.

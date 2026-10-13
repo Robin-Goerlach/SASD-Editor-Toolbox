@@ -108,7 +108,8 @@ Ziel ist funktionale Abdeckung, nicht eine identische Quellcode- oder API-Strukt
 | Interaktiver FIRST-ED-Demohost | Terminalhost in `Sasd.Editor.FirstEd.Sample` | Implementiertes Beispiel |
 | MicroStar-Menüs/Pop-ups | Host-Beispiele | Geplant |
 | Hintergrunddruck | Scheduler-Beispiel | Geplant |
-| Historischer Fehlertext-Katalog | typisierte Fehlercodes/Ressourcen | Geplant |
+| Historischer Fehlertext-Katalog | bewusst nicht kopiert; modernes `EditorErrorId` + stabile Codes/Ressourcenschlüssel ersetzen präsentationsgebundene Texte | Ersetzt / Implementiert |
+| Typisiertes hostneutrales Fehler-/Ressourcenmodell | `EditorErrorCatalog`, `IEditorHooks.OnErrorAsync` | Implementiert |
 | DOS-/Videospeicher-Routinen | bewusst durch Host-Rendering ersetzt | Ersetzt |
 | Overlays | auf modernen Plattformen nicht erforderlich | Entfällt |
 
@@ -154,4 +155,4 @@ Der historische Bildschirm hatte eine feste Größe. Die Größenänderung eines
 
 ## V1-Abschlusskriterium
 
-Die C#/.NET-Implementierung deckt die großen strukturellen FIRST-ED-Bereiche inzwischen ausführbar ab, einschließlich Absatz-Neuformatierung, mehrzeiliger Block-Bulk-Topologie und unabhängiger Block-Endpunkte. Vor V1 schließen wir noch die Audits für typisierte Fehler/Ressourcen und Unterbrechbarkeit ab, prüfen zusammengesetztes Undo/Navigationszustand bei dokumentübergreifenden Mutationen und führen anschließend einen finalen Audit des Handbuch-Prozedurindexes durch. MicroStar-spezifische Demonstrationen können als Samples statt als Core-Abhängigkeiten geliefert werden.
+Die C#/.NET-Implementierung deckt die großen strukturellen FIRST-ED-Bereiche inzwischen ausführbar ab, einschließlich Absatz-Neuformatierung, mehrzeiliger Block-Bulk-Topologie und unabhängiger Block-Endpunkte. Vor V1 schließen wir noch den Audit zur Unterbrechbarkeit ab, prüfen zusammengesetztes Undo/Navigationszustand bei dokumentübergreifenden Mutationen und führen anschließend einen finalen Audit des Handbuch-Prozedurindexes durch. MicroStar-spezifische Demonstrationen können als Samples statt als Core-Abhängigkeiten geliefert werden.

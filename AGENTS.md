@@ -203,24 +203,19 @@ When the user says only “continue”, “keep going” or asks Codex to work a
 
 ### P0 - V1 release-gate work
 
-The independent historical block-endpoint lifecycle and the semantic command-boundary/parameter-validation audit are implemented. `EditorCommandValidator` rejects malformed requests before mutation or I/O and exposes typed validation categories. The next unfinished release-gate item is the broader typed error/resource model.
+The independent historical block-endpoint lifecycle, semantic command-boundary validation and the typed host-neutral error/resource model are implemented. `EditorErrorId`, stable machine codes and resource keys now separate editor failures from UI wording. The next unfinished release-gate item is the abort/interruptibility audit.
 
-1. **Typed error/resource model**
-   - Introduce stable modern error identifiers/resources where command behavior requires them.
-   - Do not copy a historical error-message catalog verbatim.
-   - Hosts decide how errors are rendered.
-
-2. **Abort/interruptibility audit**
+1. **Abort/interruptibility audit**
    - Host-originated Ctrl-U already establishes an abort boundary in typeahead.
    - Audit long or iterative operations so abort/cancellation is observed at sensible safe points.
    - Reconcile historical abort behavior with modern `CancellationToken` without duplicating cancellation systems unnecessarily.
 
-3. **Compound undo/navigation-state audit**
+2. **Compound undo/navigation-state audit**
    - Review cross-document block move and other multi-document mutations.
    - The current snapshot backend is correctness-first; do not replace it merely for performance.
    - Determine whether one logical command requires one atomic compound undo transaction and which navigation/view state must be restored.
 
-4. **Final handbook procedure/function-index audit**
+3. **Final handbook procedure/function-index audit**
    - Compare the historical procedure/function inventory against the compatibility matrix and implementation.
    - Classify each item as Implemented, Replaced by modern invariant, Not Applicable, Sample/Host concern, or intentionally deferred.
    - Add regression coverage for any small omissions found.

@@ -42,7 +42,7 @@ Der zentrale Validator prüft nur Tatsachen, die aus dem Request selbst feststeh
 
 Bei einem Validierungsfehler liefert der Dispatcher `false`, führt keine Befehlsmutation beziehungsweise Datei-I/O aus und meldet über `IEditorHooks.OnErrorAsync` den hostneutralen Code `EDITOR_COMMAND_INVALID_ARGUMENT`.
 
-`EditorCommandValidationFailure` enthält zusätzlich einen typisierten `EditorCommandValidationCode`, Parameternamen und einen englischen Fallback-Diagnosetext. Der nächste V1-Schritt für Fehlerressourcen kann darauf aufbauen, ohne den Core an UI-Texte zu koppeln.
+`EditorCommandValidationFailure` enthält zusätzlich einen typisierten `EditorCommandValidationCode`, Parameternamen und einen englischen Fallback-Diagnosetext. Die inzwischen implementierte Fehler-/Ressourcenschicht bildet dies auf `EditorErrorId.InvalidCommandArgument`, den stabilen Code `EDITOR_COMMAND_INVALID_ARGUMENT` und den Ressourcenschlüssel `Editor.Errors.Command.InvalidArgument` ab; siehe [FEHLERMODELL.md](FEHLERMODELL.md).
 
 ## Tests und sprachübergreifende Conformance
 

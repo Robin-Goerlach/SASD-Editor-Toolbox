@@ -170,6 +170,8 @@ The handbook does not separately define whether markers or other non-block ancho
 
 Equivalent extension points must exist for command filtering, error handling, status transformation, replace confirmation and cooperative idle/background work.
 
+Error notifications use stable semantic categories independent of UI wording. A portable V1 implementation provides a typed error identifier plus stable machine code and resource key; hosts own localization and rendering. The English fallback message is diagnostic convenience rather than normative text. Validation failures, state-dependent command rejections, expected file/access/unsupported-operation failures, typeahead overflow and host-originated aborts all use this common error contract. Historical numeric/message catalogs are not part of the portable contract.
+
 ## 11. Rendering
 
 The core does not write directly to console/video memory. It exposes viewport/status projections for individual windows plus host-neutral window frames. WPF, WinForms, terminal, web and other hosts decide how those projections are drawn.

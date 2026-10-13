@@ -42,7 +42,7 @@ The centralized validator checks only facts established by the request itself. I
 
 A validation failure returns `false` from the dispatcher, performs no command mutation or file I/O, and is reported through `IEditorHooks.OnErrorAsync` with the host-neutral code `EDITOR_COMMAND_INVALID_ARGUMENT`.
 
-`EditorCommandValidationFailure` carries a typed `EditorCommandValidationCode`, parameter name and English fallback diagnostic. The next V1 error-resource milestone can build on these categories without coupling the core to UI text.
+`EditorCommandValidationFailure` carries a typed `EditorCommandValidationCode`, parameter name and English fallback diagnostic. The completed error-resource layer maps this into `EditorErrorId.InvalidCommandArgument`, the stable code `EDITOR_COMMAND_INVALID_ARGUMENT` and resource key `Editor.Errors.Command.InvalidArgument`; see [ERROR-MODEL.md](ERROR-MODEL.md).
 
 ## Tests and cross-language conformance
 

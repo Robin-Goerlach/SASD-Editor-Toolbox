@@ -91,6 +91,7 @@ The current foundation contains:
 - a dedicated `FirstEdLegacyFileCodec` preserving the historical `0x8D` wrapped-line marker without imposing that format on modern storage;
 - semantic command requests and a dispatcher separated from editing primitives;
 - centralized host-neutral command-boundary validation for required arguments, stable numeric ranges, page sizes, marker numbers, search/replace values and file paths before mutation/I/O;
+- typed host-neutral error IDs, stable machine codes and resource keys so terminal, desktop, web and future language ports can render failures independently;
 - a UI-neutral key-stroke model plus the FIRST-ED Ctrl-K/Ctrl-O/Ctrl-Q and primary-key mapping contract;
 - a bounded 500-entry `EditorTypeaheadBuffer` with host FIFO input, front injection for macros, overflow clearing and the historical immediate host Ctrl-U abort boundary;
 - typed prompt metadata so keyboard mapping remains independent of UI prompting;
@@ -170,6 +171,8 @@ Future C++ and Java builds will live entirely inside their own implementation la
 - Command-Prozessor-Übertragung: [`docs/de/COMMAND-PROCESSOR-UEBERTRAGUNG.md`](docs/de/COMMAND-PROCESSOR-UEBERTRAGUNG.md)
 - Command-boundary validation: [`docs/en/COMMAND-BOUNDARY-VALIDATION.md`](docs/en/COMMAND-BOUNDARY-VALIDATION.md)
 - Befehlsgrenzen-Validierung: [`docs/de/BEFEHLSGRENZEN-VALIDIERUNG.md`](docs/de/BEFEHLSGRENZEN-VALIDIERUNG.md)
+- Error/resource model: [`docs/en/ERROR-MODEL.md`](docs/en/ERROR-MODEL.md)
+- Fehler-/Ressourcenmodell: [`docs/de/FEHLERMODELL.md`](docs/de/FEHLERMODELL.md)
 - Search and file commands: [`docs/en/SEARCH-AND-FILE-COMMANDS.md`](docs/en/SEARCH-AND-FILE-COMMANDS.md)
 - Suchen und Datei-Befehle: [`docs/de/SUCHEN-UND-DATEI-BEFEHLE.md`](docs/de/SUCHEN-UND-DATEI-BEFEHLE.md)
 - Lifecycle and scrolling: [`docs/en/LIFECYCLE-AND-SCROLLING.md`](docs/en/LIFECYCLE-AND-SCROLLING.md)
