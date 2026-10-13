@@ -4,6 +4,12 @@
 
 The long-term goal is broader than a stand-alone text editor: the toolbox should provide reusable document, buffer, command, search, block, window, undo, rendering-model and extension infrastructure that can be embedded in SASD Workbench applications.
 
+## Editor UI preview (concept)
+
+![SASD Editor Toolbox — FIRST-ED-inspired UI concept](docs/assets/editor-toolbox-concept.svg)
+
+> **Design concept, not an application screenshot.** This illustration shows a possible graphical host for the UI-agnostic Editor Toolbox: linked document windows, command dispatch, text search, block editing, line markers and cross-language development. The current runnable FIRST-ED reference host is terminal-based; the illustrated GUI and its sample values are not claims of implemented features.
+
 ## V1 target: Turbo Editor Toolbox compatibility set
 
 Version 1 uses the functional scope of Borland's historical **Turbo Editor Toolbox 1.0 (1985)** as a compatibility/reference milestone. This is a **clean-room reimplementation**: the historical handbook is treated as a behavioral requirements source; historical source code is not copied.
