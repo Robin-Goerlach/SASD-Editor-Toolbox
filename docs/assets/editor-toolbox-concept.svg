@@ -1,0 +1,316 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1600" height="900" viewBox="0 0 1600 900" role="img" aria-label="SASD Editor Toolbox illustrative FIRST-ED UI design concept with linked editor views, command and search panels">
+<defs><linearGradient id="top" x1="0" x2="1"><stop stop-color="#172c41"/><stop offset="1" stop-color="#0e1d2c"/></linearGradient></defs>
+<rect x="0" y="0" width="1600" height="900" rx="0" fill="#08121d" />
+<rect x="6" y="5" width="1588" height="887" rx="12" fill="#101c2a" stroke="#2b4157"/>
+<rect x="7" y="6" width="1586" height="44" rx="9" fill="url(#top)" />
+<path d="M7,51L1593,51" stroke="#2b4157"/>
+<rect x="22" y="16" width="24" height="24" rx="5" fill="#66adff" />
+<text x="30" y="33" fill="#112136" font-size="16" font-weight="800" font-family="Inter,Segoe UI,Arial,sans-serif" >S</text>
+<text x="60" y="34" fill="#e5effa" font-size="20" font-weight="700" font-family="Inter,Segoe UI,Arial,sans-serif" >SASD Editor Toolbox</text>
+<text x="301" y="34" fill="#93a9be" font-size="16" font-weight="400" font-family="Inter,Segoe UI,Arial,sans-serif" >— FIRST-ED Concept Host</text>
+<rect x="1250" y="15" width="213" height="24" rx="5" fill="#174156" />
+<text x="1262" y="32" fill="#5bdeed" font-size="13" font-weight="600" font-family="Inter,Segoe UI,Arial,sans-serif" >Turbo Toolbox · V1 concept</text>
+<text x="1500" y="33" fill="#93a9be" font-size="19" font-weight="400" font-family="Inter,Segoe UI,Arial,sans-serif" >—</text>
+<text x="1542" y="33" fill="#93a9be" font-size="20" font-weight="400" font-family="Inter,Segoe UI,Arial,sans-serif" >□</text>
+<text x="1571" y="33" fill="#93a9be" font-size="22" font-weight="400" font-family="Inter,Segoe UI,Arial,sans-serif" >×</text>
+<rect x="14" y="62" width="249" height="783" rx="9" fill="#122337" stroke="#2b4157"/>
+<text x="31" y="89" fill="#e5effa" font-size="17" font-weight="650" font-family="Inter,Segoe UI,Arial,sans-serif" >Workspace</text>
+<path d="M26,105L251,105" stroke="#2b4157"/>
+<text x="29" y="124" fill="#e5effa" font-size="15" font-weight="600" font-family="Inter,Segoe UI,Arial,sans-serif" >⌄  SampleProject</text>
+<text x="46" y="154" fill="#93a9be" font-size="14" font-weight="400" font-family="Inter,Segoe UI,Arial,sans-serif" >▸  .editorconfig</text>
+<text x="46" y="185" fill="#93a9be" font-size="14" font-weight="400" font-family="Inter,Segoe UI,Arial,sans-serif" >⌄  docs</text>
+<text x="46" y="215" fill="#93a9be" font-size="14" font-weight="400" font-family="Inter,Segoe UI,Arial,sans-serif" >   overview.md</text>
+<text x="46" y="244" fill="#93a9be" font-size="14" font-weight="400" font-family="Inter,Segoe UI,Arial,sans-serif" >   commands.md</text>
+<text x="46" y="275" fill="#93a9be" font-size="14" font-weight="400" font-family="Inter,Segoe UI,Arial,sans-serif" >⌄  src</text>
+<rect x="22" y="288" width="230" height="33" rx="5" fill="#1b466d" />
+<text x="64" y="310" fill="#e5effa" font-size="15" font-weight="620" font-family="Inter,Segoe UI,Arial,sans-serif" >●  EditorSession.cs</text>
+<text x="60" y="340" fill="#93a9be" font-size="14" font-weight="400" font-family="Inter,Segoe UI,Arial,sans-serif" >●  EditorWindow.cs</text>
+<text x="60" y="372" fill="#93a9be" font-size="14" font-weight="400" font-family="Inter,Segoe UI,Arial,sans-serif" >●  CommandDispatcher.cs</text>
+<text x="60" y="403" fill="#93a9be" font-size="14" font-weight="400" font-family="Inter,Segoe UI,Arial,sans-serif" >●  SearchService.cs</text>
+<text x="60" y="441" fill="#93a9be" font-size="14" font-weight="400" font-family="Inter,Segoe UI,Arial,sans-serif" >⌄  samples</text>
+<text x="60" y="472" fill="#5bdeed" font-size="14" font-weight="400" font-family="Inter,Segoe UI,Arial,sans-serif" >   FirstEd.Sample</text>
+<path d="M29,496L248,496" stroke="#2b4157"/>
+<rect x="22" y="511" width="232" height="34" rx="5" fill="#1d446a" />
+<text x="35" y="536" fill="#66adff" font-size="21" font-weight="600" font-family="Inter,Segoe UI,Arial,sans-serif" >▤</text>
+<text x="73" y="536" fill="#e5effa" font-size="16" font-weight="650" font-family="Inter,Segoe UI,Arial,sans-serif" >Documents</text>
+<rect x="219" y="516" width="28" height="25" rx="12" fill="#285374" />
+<text x="227" y="534" fill="#e5effa" font-size="13" font-weight="550" font-family="Inter,Segoe UI,Arial,sans-serif" >2</text>
+<text x="35" y="579" fill="#66adff" font-size="21" font-weight="600" font-family="Inter,Segoe UI,Arial,sans-serif" >▣</text>
+<text x="73" y="579" fill="#93a9be" font-size="16" font-weight="400" font-family="Inter,Segoe UI,Arial,sans-serif" >Windows</text>
+<rect x="219" y="559" width="28" height="25" rx="12" fill="#285374" />
+<text x="227" y="577" fill="#e5effa" font-size="13" font-weight="550" font-family="Inter,Segoe UI,Arial,sans-serif" >2</text>
+<text x="35" y="622" fill="#66adff" font-size="21" font-weight="600" font-family="Inter,Segoe UI,Arial,sans-serif" >⌘</text>
+<text x="73" y="622" fill="#93a9be" font-size="16" font-weight="400" font-family="Inter,Segoe UI,Arial,sans-serif" >Commands</text>
+<text x="35" y="665" fill="#66adff" font-size="21" font-weight="600" font-family="Inter,Segoe UI,Arial,sans-serif" >⌕</text>
+<text x="73" y="665" fill="#93a9be" font-size="16" font-weight="400" font-family="Inter,Segoe UI,Arial,sans-serif" >Search</text>
+<text x="35" y="708" fill="#f5ba6d" font-size="21" font-weight="600" font-family="Inter,Segoe UI,Arial,sans-serif" >⚑</text>
+<text x="73" y="708" fill="#93a9be" font-size="16" font-weight="400" font-family="Inter,Segoe UI,Arial,sans-serif" >Markers</text>
+<rect x="219" y="688" width="28" height="25" rx="12" fill="#285374" />
+<text x="227" y="706" fill="#e5effa" font-size="13" font-weight="550" font-family="Inter,Segoe UI,Arial,sans-serif" >3</text>
+<text x="35" y="751" fill="#66adff" font-size="21" font-weight="600" font-family="Inter,Segoe UI,Arial,sans-serif" >◇</text>
+<text x="73" y="751" fill="#93a9be" font-size="16" font-weight="400" font-family="Inter,Segoe UI,Arial,sans-serif" >Conformance</text>
+<text x="35" y="794" fill="#66adff" font-size="21" font-weight="600" font-family="Inter,Segoe UI,Arial,sans-serif" >⬡</text>
+<text x="73" y="794" fill="#93a9be" font-size="16" font-weight="400" font-family="Inter,Segoe UI,Arial,sans-serif" >Extensions</text>
+<rect x="273" y="62" width="952" height="389" rx="9" fill="#122337" stroke="#2b4157"/>
+<rect x="273" y="62" width="952" height="42" rx="8" fill="#162d43" />
+<rect x="273" y="95" width="952" height="10" rx="0" fill="#162d43" />
+<rect x="287" y="69" width="209" height="27" rx="5" fill="#1d4568" />
+<text x="299" y="87" fill="#5bdeed" font-size="13" font-weight="700" font-family="Inter,Segoe UI,Arial,sans-serif" >C#</text>
+<text x="330" y="88" fill="#e5effa" font-size="15" font-weight="600" font-family="Inter,Segoe UI,Arial,sans-serif" >EditorSession.cs</text>
+<text x="469" y="88" fill="#93a9be" font-size="18" font-weight="400" font-family="Inter,Segoe UI,Arial,sans-serif" >×</text>
+<text x="511" y="89" fill="#93a9be" font-size="20" font-weight="400" font-family="Inter,Segoe UI,Arial,sans-serif" >+</text>
+<text x="293" y="123" fill="#93a9be" font-size="13" font-weight="400" font-family="Inter,Segoe UI,Arial,sans-serif" >SampleProject  ›  src  ›  EditorSession.cs</text>
+<rect x="281" y="131" width="938" height="311" rx="5" fill="#0b1623" />
+<rect x="290" y="131" width="64" height="311" rx="0" fill="#102031" />
+<path d="M354,131L354,442" stroke="#2b4157"/>
+<text x="338" y="155" fill="#6f869c" font-size="13" font-weight="400" font-family="Consolas,Menlo,monospace" text-anchor="end">16</text>
+<text x="370" y="155" fill="#61d9a5" font-size="14" font-weight="400" font-family="Consolas,Menlo,monospace" >// Reusable text model independent of the UI host.</text>
+<text x="338" y="174.4" fill="#6f869c" font-size="13" font-weight="400" font-family="Consolas,Menlo,monospace" text-anchor="end">17</text>
+<text x="370" y="174.4" fill="#61d9a5" font-size="14" font-weight="400" font-family="Consolas,Menlo,monospace" >// Multiple windows can share a document.</text>
+<text x="338" y="193.8" fill="#6f869c" font-size="13" font-weight="400" font-family="Consolas,Menlo,monospace" text-anchor="end">18</text>
+<text x="370" y="193.8" fill="#5bdeed" font-size="14" font-weight="400" font-family="Consolas,Menlo,monospace" >public sealed class EditorSession</text>
+<text x="338" y="213.2" fill="#6f869c" font-size="13" font-weight="400" font-family="Consolas,Menlo,monospace" text-anchor="end">19</text>
+<text x="370" y="213.2" fill="#e5effa" font-size="14" font-weight="400" font-family="Consolas,Menlo,monospace" >{</text>
+<text x="338" y="232.6" fill="#6f869c" font-size="13" font-weight="400" font-family="Consolas,Menlo,monospace" text-anchor="end">20</text>
+<text x="370" y="232.6" fill="#66adff" font-size="14" font-weight="400" font-family="Consolas,Menlo,monospace" >    private readonly List&lt;EditorWindow&gt; _windows = new();</text>
+<text x="338" y="252" fill="#6f869c" font-size="13" font-weight="400" font-family="Consolas,Menlo,monospace" text-anchor="end">21</text>
+<text x="370" y="252" fill="#66adff" font-size="14" font-weight="400" font-family="Consolas,Menlo,monospace" >    private readonly EditorCommandDispatcher _commands;</text>
+<text x="338" y="271.4" fill="#6f869c" font-size="13" font-weight="400" font-family="Consolas,Menlo,monospace" text-anchor="end">22</text>
+<text x="370" y="271.4" fill="#e5effa" font-size="14" font-weight="400" font-family="Consolas,Menlo,monospace" ></text>
+<text x="338" y="290.79999999999995" fill="#6f869c" font-size="13" font-weight="400" font-family="Consolas,Menlo,monospace" text-anchor="end">23</text>
+<text x="370" y="290.79999999999995" fill="#5bdeed" font-size="14" font-weight="400" font-family="Consolas,Menlo,monospace" >    public EditorDocument Document { get; }</text>
+<text x="338" y="310.2" fill="#6f869c" font-size="13" font-weight="400" font-family="Consolas,Menlo,monospace" text-anchor="end">24</text>
+<text x="370" y="310.2" fill="#5bdeed" font-size="14" font-weight="400" font-family="Consolas,Menlo,monospace" >    public IReadOnlyList&lt;EditorWindow&gt; Windows =&gt; _windows;</text>
+<text x="338" y="329.6" fill="#6f869c" font-size="13" font-weight="400" font-family="Consolas,Menlo,monospace" text-anchor="end">25</text>
+<text x="370" y="329.6" fill="#e5effa" font-size="14" font-weight="400" font-family="Consolas,Menlo,monospace" ></text>
+<text x="338" y="349" fill="#6f869c" font-size="13" font-weight="400" font-family="Consolas,Menlo,monospace" text-anchor="end">26</text>
+<text x="370" y="349" fill="#5bdeed" font-size="14" font-weight="400" font-family="Consolas,Menlo,monospace" >    public EditorWindow CreateWindow(int height)</text>
+<text x="338" y="368.4" fill="#6f869c" font-size="13" font-weight="400" font-family="Consolas,Menlo,monospace" text-anchor="end">27</text>
+<text x="370" y="368.4" fill="#e5effa" font-size="14" font-weight="400" font-family="Consolas,Menlo,monospace" >    {</text>
+<text x="338" y="387.79999999999995" fill="#6f869c" font-size="13" font-weight="400" font-family="Consolas,Menlo,monospace" text-anchor="end">28</text>
+<text x="370" y="387.79999999999995" fill="#e5effa" font-size="14" font-weight="400" font-family="Consolas,Menlo,monospace" >        var view = new EditorWindow(Document);</text>
+<text x="338" y="407.2" fill="#6f869c" font-size="13" font-weight="400" font-family="Consolas,Menlo,monospace" text-anchor="end">29</text>
+<text x="370" y="407.2" fill="#e5effa" font-size="14" font-weight="400" font-family="Consolas,Menlo,monospace" >        _windows.Add(view);</text>
+<text x="338" y="426.59999999999997" fill="#6f869c" font-size="13" font-weight="400" font-family="Consolas,Menlo,monospace" text-anchor="end">30</text>
+<text x="370" y="426.59999999999997" fill="#e5effa" font-size="14" font-weight="400" font-family="Consolas,Menlo,monospace" >        return view;</text>
+<text x="338" y="446" fill="#6f869c" font-size="13" font-weight="400" font-family="Consolas,Menlo,monospace" text-anchor="end">31</text>
+<text x="370" y="446" fill="#e5effa" font-size="14" font-weight="400" font-family="Consolas,Menlo,monospace" >    }</text>
+<rect x="1131" y="134" width="81" height="305" rx="0" fill="#0e2232" />
+<rect x="1136" y="141" width="12" height="1.5" rx="1" fill="#61d9a5" />
+<rect x="1139" y="147" width="29" height="1.5" rx="1" fill="#567b94" />
+<rect x="1142" y="153" width="46" height="1.5" rx="1" fill="#567b94" />
+<rect x="1145" y="159" width="19" height="1.5" rx="1" fill="#5bdeed" />
+<rect x="1136" y="165" width="36" height="1.5" rx="1" fill="#567b94" />
+<rect x="1139" y="171" width="53" height="1.5" rx="1" fill="#61d9a5" />
+<rect x="1142" y="177" width="26" height="1.5" rx="1" fill="#5bdeed" />
+<rect x="1145" y="183" width="43" height="1.5" rx="1" fill="#567b94" />
+<rect x="1136" y="189" width="16" height="1.5" rx="1" fill="#567b94" />
+<rect x="1139" y="195" width="33" height="1.5" rx="1" fill="#5bdeed" />
+<rect x="1142" y="201" width="50" height="1.5" rx="1" fill="#61d9a5" />
+<rect x="1145" y="207" width="23" height="1.5" rx="1" fill="#567b94" />
+<rect x="1136" y="213" width="40" height="1.5" rx="1" fill="#5bdeed" />
+<rect x="1139" y="219" width="13" height="1.5" rx="1" fill="#567b94" />
+<rect x="1142" y="225" width="30" height="1.5" rx="1" fill="#567b94" />
+<rect x="1145" y="231" width="47" height="1.5" rx="1" fill="#61d9a5" />
+<rect x="1136" y="237" width="20" height="1.5" rx="1" fill="#567b94" />
+<rect x="1139" y="243" width="37" height="1.5" rx="1" fill="#567b94" />
+<rect x="1142" y="249" width="54" height="1.5" rx="1" fill="#5bdeed" />
+<rect x="1145" y="255" width="27" height="1.5" rx="1" fill="#567b94" />
+<rect x="1136" y="261" width="44" height="1.5" rx="1" fill="#61d9a5" />
+<rect x="1139" y="267" width="17" height="1.5" rx="1" fill="#5bdeed" />
+<rect x="1142" y="273" width="34" height="1.5" rx="1" fill="#567b94" />
+<rect x="1145" y="279" width="51" height="1.5" rx="1" fill="#567b94" />
+<rect x="1136" y="285" width="24" height="1.5" rx="1" fill="#5bdeed" />
+<rect x="1139" y="291" width="41" height="1.5" rx="1" fill="#61d9a5" />
+<rect x="1142" y="297" width="14" height="1.5" rx="1" fill="#567b94" />
+<rect x="1145" y="303" width="31" height="1.5" rx="1" fill="#5bdeed" />
+<rect x="1136" y="309" width="48" height="1.5" rx="1" fill="#567b94" />
+<rect x="1139" y="315" width="21" height="1.5" rx="1" fill="#567b94" />
+<rect x="1142" y="321" width="38" height="1.5" rx="1" fill="#61d9a5" />
+<rect x="1145" y="327" width="55" height="1.5" rx="1" fill="#567b94" />
+<rect x="1136" y="333" width="28" height="1.5" rx="1" fill="#567b94" />
+<rect x="1139" y="339" width="45" height="1.5" rx="1" fill="#5bdeed" />
+<rect x="1142" y="345" width="18" height="1.5" rx="1" fill="#567b94" />
+<rect x="1145" y="351" width="35" height="1.5" rx="1" fill="#61d9a5" />
+<rect x="1136" y="357" width="52" height="1.5" rx="1" fill="#5bdeed" />
+<rect x="1139" y="363" width="25" height="1.5" rx="1" fill="#567b94" />
+<rect x="1142" y="369" width="42" height="1.5" rx="1" fill="#567b94" />
+<rect x="1145" y="375" width="15" height="1.5" rx="1" fill="#5bdeed" />
+<rect x="1136" y="381" width="32" height="1.5" rx="1" fill="#61d9a5" />
+<rect x="1139" y="387" width="49" height="1.5" rx="1" fill="#567b94" />
+<rect x="1142" y="393" width="22" height="1.5" rx="1" fill="#5bdeed" />
+<rect x="1145" y="399" width="39" height="1.5" rx="1" fill="#567b94" />
+<rect x="1136" y="405" width="12" height="1.5" rx="1" fill="#567b94" />
+<rect x="1139" y="411" width="29" height="1.5" rx="1" fill="#61d9a5" />
+<rect x="1142" y="417" width="46" height="1.5" rx="1" fill="#567b94" />
+<rect x="1145" y="423" width="19" height="1.5" rx="1" fill="#567b94" />
+<rect x="1136" y="429" width="36" height="1.5" rx="1" fill="#5bdeed" />
+<rect x="1139" y="435" width="53" height="1.5" rx="1" fill="#567b94" />
+<rect x="1204" y="231.60000000000002" width="4" height="45" rx="2" fill="#526e89" />
+<rect x="273" y="462" width="952" height="383" rx="9" fill="#122337" stroke="#2b4157"/>
+<rect x="273" y="462" width="952" height="42" rx="8" fill="#162d43" />
+<rect x="273" y="495" width="952" height="10" rx="0" fill="#162d43" />
+<rect x="287" y="469" width="209" height="27" rx="5" fill="#1d4568" />
+<text x="299" y="487" fill="#5bdeed" font-size="13" font-weight="700" font-family="Inter,Segoe UI,Arial,sans-serif" >C#</text>
+<text x="330" y="488" fill="#e5effa" font-size="15" font-weight="600" font-family="Inter,Segoe UI,Arial,sans-serif" >EditorSession.cs</text>
+<text x="469" y="488" fill="#93a9be" font-size="18" font-weight="400" font-family="Inter,Segoe UI,Arial,sans-serif" >×</text>
+<text x="511" y="489" fill="#93a9be" font-size="20" font-weight="400" font-family="Inter,Segoe UI,Arial,sans-serif" >+</text>
+<text x="293" y="523" fill="#93a9be" font-size="13" font-weight="400" font-family="Inter,Segoe UI,Arial,sans-serif" >SampleProject  ›  src  ›  EditorSession.cs</text>
+<rect x="281" y="531" width="938" height="305" rx="5" fill="#0b1623" />
+<rect x="290" y="531" width="64" height="305" rx="0" fill="#102031" />
+<path d="M354,531L354,836" stroke="#2b4157"/>
+<text x="338" y="555" fill="#6f869c" font-size="13" font-weight="400" font-family="Consolas,Menlo,monospace" text-anchor="end">116</text>
+<text x="370" y="555" fill="#61d9a5" font-size="14" font-weight="400" font-family="Consolas,Menlo,monospace" >    // Semantic commands are independent of the renderer.</text>
+<text x="338" y="574.4" fill="#6f869c" font-size="13" font-weight="400" font-family="Consolas,Menlo,monospace" text-anchor="end">117</text>
+<text x="370" y="574.4" fill="#5bdeed" font-size="14" font-weight="400" font-family="Consolas,Menlo,monospace" >    public void Execute(EditorCommand command)</text>
+<text x="338" y="593.8" fill="#6f869c" font-size="13" font-weight="400" font-family="Consolas,Menlo,monospace" text-anchor="end">118</text>
+<text x="370" y="593.8" fill="#e5effa" font-size="14" font-weight="400" font-family="Consolas,Menlo,monospace" >    {</text>
+<text x="338" y="613.2" fill="#6f869c" font-size="13" font-weight="400" font-family="Consolas,Menlo,monospace" text-anchor="end">119</text>
+<text x="370" y="613.2" fill="#e5effa" font-size="14" font-weight="400" font-family="Consolas,Menlo,monospace" >        _commands.Dispatch(command);</text>
+<text x="338" y="632.6" fill="#6f869c" font-size="13" font-weight="400" font-family="Consolas,Menlo,monospace" text-anchor="end">120</text>
+<text x="370" y="632.6" fill="#e5effa" font-size="14" font-weight="400" font-family="Consolas,Menlo,monospace" >    }</text>
+<text x="338" y="652" fill="#6f869c" font-size="13" font-weight="400" font-family="Consolas,Menlo,monospace" text-anchor="end">121</text>
+<text x="370" y="652" fill="#e5effa" font-size="14" font-weight="400" font-family="Consolas,Menlo,monospace" >}</text>
+<text x="338" y="671.4" fill="#6f869c" font-size="13" font-weight="400" font-family="Consolas,Menlo,monospace" text-anchor="end">122</text>
+<text x="370" y="671.4" fill="#e5effa" font-size="14" font-weight="400" font-family="Consolas,Menlo,monospace" ></text>
+<rect x="350" y="674.8" width="762" height="22" rx="2" fill="#1b4569" />
+<text x="338" y="690.8" fill="#6f869c" font-size="13" font-weight="400" font-family="Consolas,Menlo,monospace" text-anchor="end">123</text>
+<text x="370" y="690.8" fill="#5bdeed" font-size="14" font-weight="400" font-family="Consolas,Menlo,monospace" >public readonly record struct TextRange(int Start, int Length)</text>
+<text x="338" y="710.2" fill="#6f869c" font-size="13" font-weight="400" font-family="Consolas,Menlo,monospace" text-anchor="end">124</text>
+<text x="370" y="710.2" fill="#e5effa" font-size="14" font-weight="400" font-family="Consolas,Menlo,monospace" >{</text>
+<text x="338" y="729.6" fill="#6f869c" font-size="13" font-weight="400" font-family="Consolas,Menlo,monospace" text-anchor="end">125</text>
+<text x="370" y="729.6" fill="#5bdeed" font-size="14" font-weight="400" font-family="Consolas,Menlo,monospace" >    public int End =&gt; Start + Length;</text>
+<text x="338" y="749" fill="#6f869c" font-size="13" font-weight="400" font-family="Consolas,Menlo,monospace" text-anchor="end">126</text>
+<text x="370" y="749" fill="#e5effa" font-size="14" font-weight="400" font-family="Consolas,Menlo,monospace" >}</text>
+<text x="338" y="768.4" fill="#6f869c" font-size="13" font-weight="400" font-family="Consolas,Menlo,monospace" text-anchor="end">127</text>
+<text x="370" y="768.4" fill="#e5effa" font-size="14" font-weight="400" font-family="Consolas,Menlo,monospace" ></text>
+<text x="338" y="787.8" fill="#6f869c" font-size="13" font-weight="400" font-family="Consolas,Menlo,monospace" text-anchor="end">128</text>
+<text x="370" y="787.8" fill="#61d9a5" font-size="14" font-weight="400" font-family="Consolas,Menlo,monospace" >// Search runs against a shared editor document.</text>
+<text x="338" y="807.2" fill="#6f869c" font-size="13" font-weight="400" font-family="Consolas,Menlo,monospace" text-anchor="end">129</text>
+<text x="370" y="807.2" fill="#5bdeed" font-size="14" font-weight="400" font-family="Consolas,Menlo,monospace" >public static class SearchService</text>
+<text x="338" y="826.5999999999999" fill="#6f869c" font-size="13" font-weight="400" font-family="Consolas,Menlo,monospace" text-anchor="end">130</text>
+<text x="370" y="826.5999999999999" fill="#e5effa" font-size="14" font-weight="400" font-family="Consolas,Menlo,monospace" >{</text>
+<text x="338" y="846" fill="#6f869c" font-size="13" font-weight="400" font-family="Consolas,Menlo,monospace" text-anchor="end">131</text>
+<text x="370" y="846" fill="#5bdeed" font-size="14" font-weight="400" font-family="Consolas,Menlo,monospace" >    public static IEnumerable&lt;TextRange&gt; FindAll(</text>
+<rect x="1131" y="534" width="81" height="299" rx="0" fill="#0e2232" />
+<rect x="1136" y="541" width="12" height="1.5" rx="1" fill="#61d9a5" />
+<rect x="1139" y="547" width="29" height="1.5" rx="1" fill="#567b94" />
+<rect x="1142" y="553" width="46" height="1.5" rx="1" fill="#567b94" />
+<rect x="1145" y="559" width="19" height="1.5" rx="1" fill="#5bdeed" />
+<rect x="1136" y="565" width="36" height="1.5" rx="1" fill="#567b94" />
+<rect x="1139" y="571" width="53" height="1.5" rx="1" fill="#61d9a5" />
+<rect x="1142" y="577" width="26" height="1.5" rx="1" fill="#5bdeed" />
+<rect x="1145" y="583" width="43" height="1.5" rx="1" fill="#567b94" />
+<rect x="1136" y="589" width="16" height="1.5" rx="1" fill="#567b94" />
+<rect x="1139" y="595" width="33" height="1.5" rx="1" fill="#5bdeed" />
+<rect x="1142" y="601" width="50" height="1.5" rx="1" fill="#61d9a5" />
+<rect x="1145" y="607" width="23" height="1.5" rx="1" fill="#567b94" />
+<rect x="1136" y="613" width="40" height="1.5" rx="1" fill="#5bdeed" />
+<rect x="1139" y="619" width="13" height="1.5" rx="1" fill="#567b94" />
+<rect x="1142" y="625" width="30" height="1.5" rx="1" fill="#567b94" />
+<rect x="1145" y="631" width="47" height="1.5" rx="1" fill="#61d9a5" />
+<rect x="1136" y="637" width="20" height="1.5" rx="1" fill="#567b94" />
+<rect x="1139" y="643" width="37" height="1.5" rx="1" fill="#567b94" />
+<rect x="1142" y="649" width="54" height="1.5" rx="1" fill="#5bdeed" />
+<rect x="1145" y="655" width="27" height="1.5" rx="1" fill="#567b94" />
+<rect x="1136" y="661" width="44" height="1.5" rx="1" fill="#61d9a5" />
+<rect x="1139" y="667" width="17" height="1.5" rx="1" fill="#5bdeed" />
+<rect x="1142" y="673" width="34" height="1.5" rx="1" fill="#567b94" />
+<rect x="1145" y="679" width="51" height="1.5" rx="1" fill="#567b94" />
+<rect x="1136" y="685" width="24" height="1.5" rx="1" fill="#5bdeed" />
+<rect x="1139" y="691" width="41" height="1.5" rx="1" fill="#61d9a5" />
+<rect x="1142" y="697" width="14" height="1.5" rx="1" fill="#567b94" />
+<rect x="1145" y="703" width="31" height="1.5" rx="1" fill="#5bdeed" />
+<rect x="1136" y="709" width="48" height="1.5" rx="1" fill="#567b94" />
+<rect x="1139" y="715" width="21" height="1.5" rx="1" fill="#567b94" />
+<rect x="1142" y="721" width="38" height="1.5" rx="1" fill="#61d9a5" />
+<rect x="1145" y="727" width="55" height="1.5" rx="1" fill="#567b94" />
+<rect x="1136" y="733" width="28" height="1.5" rx="1" fill="#567b94" />
+<rect x="1139" y="739" width="45" height="1.5" rx="1" fill="#5bdeed" />
+<rect x="1142" y="745" width="18" height="1.5" rx="1" fill="#567b94" />
+<rect x="1145" y="751" width="35" height="1.5" rx="1" fill="#61d9a5" />
+<rect x="1136" y="757" width="52" height="1.5" rx="1" fill="#5bdeed" />
+<rect x="1139" y="763" width="25" height="1.5" rx="1" fill="#567b94" />
+<rect x="1142" y="769" width="42" height="1.5" rx="1" fill="#567b94" />
+<rect x="1145" y="775" width="15" height="1.5" rx="1" fill="#5bdeed" />
+<rect x="1136" y="781" width="32" height="1.5" rx="1" fill="#61d9a5" />
+<rect x="1139" y="787" width="49" height="1.5" rx="1" fill="#567b94" />
+<rect x="1142" y="793" width="22" height="1.5" rx="1" fill="#5bdeed" />
+<rect x="1145" y="799" width="39" height="1.5" rx="1" fill="#567b94" />
+<rect x="1136" y="805" width="12" height="1.5" rx="1" fill="#567b94" />
+<rect x="1139" y="811" width="29" height="1.5" rx="1" fill="#61d9a5" />
+<rect x="1142" y="817" width="46" height="1.5" rx="1" fill="#567b94" />
+<rect x="1145" y="823" width="19" height="1.5" rx="1" fill="#567b94" />
+<rect x="1136" y="829" width="36" height="1.5" rx="1" fill="#5bdeed" />
+<rect x="1204" y="629.6800000000001" width="4" height="45" rx="2" fill="#526e89" />
+<rect x="1238" y="62" width="348" height="202" rx="9" fill="#122337" stroke="#2b4157"/>
+<text x="1255" y="89" fill="#e5effa" font-size="17" font-weight="650" font-family="Inter,Segoe UI,Arial,sans-serif" >Find / Replace</text>
+<path d="M1250,105L1574,105" stroke="#2b4157"/>
+<rect x="1254" y="114" width="317" height="37" rx="5" fill="#0b1623" stroke="#2b4157"/>
+<text x="1268" y="140" fill="#e5effa" font-size="15" font-weight="400" font-family="Inter,Segoe UI,Arial,sans-serif" >TextRange</text>
+<text x="1542" y="139" fill="#93a9be" font-size="17" font-weight="400" font-family="Inter,Segoe UI,Arial,sans-serif" >⌄</text>
+<rect x="1254" y="161" width="317" height="34" rx="5" fill="#0b1623" stroke="#2b4157"/>
+<text x="1267" y="184" fill="#93a9be" font-size="14" font-weight="400" font-family="Inter,Segoe UI,Arial,sans-serif" >Replace with…</text>
+<text x="1255" y="221" fill="#93a9be" font-size="12" font-weight="400" font-family="Inter,Segoe UI,Arial,sans-serif" >□ Match case</text>
+<text x="1368" y="221" fill="#93a9be" font-size="12" font-weight="400" font-family="Inter,Segoe UI,Arial,sans-serif" >□ Whole word</text>
+<text x="1493" y="221" fill="#93a9be" font-size="12" font-weight="400" font-family="Inter,Segoe UI,Arial,sans-serif" >□ Regex</text>
+<text x="1255" y="247" fill="#93a9be" font-size="13" font-weight="400" font-family="Inter,Segoe UI,Arial,sans-serif" >12 matches</text>
+<rect x="1470" y="226" width="100" height="29" rx="5" fill="#256fbd" />
+<text x="1483" y="246" fill="#e5effa" font-size="13" font-weight="550" font-family="Inter,Segoe UI,Arial,sans-serif" >Replace</text>
+<rect x="1238" y="273" width="348" height="134" rx="9" fill="#122337" stroke="#2b4157"/>
+<text x="1255" y="300" fill="#e5effa" font-size="17" font-weight="650" font-family="Inter,Segoe UI,Arial,sans-serif" >Block editing</text>
+<path d="M1250,316L1574,316" stroke="#2b4157"/>
+<text x="1256" y="340" fill="#e5effa" font-size="15" font-weight="400" font-family="Inter,Segoe UI,Arial,sans-serif" >☑  Whole-line block selection</text>
+<rect x="1255" y="361" width="84" height="29" rx="5" fill="#233e57" />
+<text x="1268" y="381" fill="#e5effa" font-size="13" font-weight="550" font-family="Inter,Segoe UI,Arial,sans-serif" >Copy</text>
+<rect x="1347" y="361" width="84" height="29" rx="5" fill="#233e57" />
+<text x="1360" y="381" fill="#e5effa" font-size="13" font-weight="550" font-family="Inter,Segoe UI,Arial,sans-serif" >Move</text>
+<rect x="1439" y="361" width="85" height="29" rx="5" fill="#233e57" />
+<text x="1452" y="381" fill="#e5effa" font-size="13" font-weight="550" font-family="Inter,Segoe UI,Arial,sans-serif" >Delete</text>
+<rect x="1238" y="418" width="348" height="135" rx="9" fill="#122337" stroke="#2b4157"/>
+<text x="1255" y="445" fill="#e5effa" font-size="17" font-weight="650" font-family="Inter,Segoe UI,Arial,sans-serif" >Line markers</text>
+<path d="M1250,461L1574,461" stroke="#2b4157"/>
+<text x="1255" y="485" fill="#f5ba6d" font-size="15" font-weight="400" font-family="Inter,Segoe UI,Arial,sans-serif" >●</text>
+<text x="1276" y="485" fill="#93a9be" font-size="13" font-weight="400" font-family="Inter,Segoe UI,Arial,sans-serif" >03</text>
+<text x="1324" y="485" fill="#e5effa" font-size="13" font-weight="400" font-family="Inter,Segoe UI,Arial,sans-serif" >TODO   Undo improvements</text>
+<text x="1255" y="510" fill="#ed818f" font-size="15" font-weight="400" font-family="Inter,Segoe UI,Arial,sans-serif" >●</text>
+<text x="1276" y="510" fill="#93a9be" font-size="13" font-weight="400" font-family="Inter,Segoe UI,Arial,sans-serif" >27</text>
+<text x="1324" y="510" fill="#e5effa" font-size="13" font-weight="400" font-family="Inter,Segoe UI,Arial,sans-serif" >FIXME  Large documents</text>
+<text x="1255" y="535" fill="#b5a2fe" font-size="15" font-weight="400" font-family="Inter,Segoe UI,Arial,sans-serif" >●</text>
+<text x="1276" y="535" fill="#93a9be" font-size="13" font-weight="400" font-family="Inter,Segoe UI,Arial,sans-serif" >128</text>
+<text x="1324" y="535" fill="#e5effa" font-size="13" font-weight="400" font-family="Inter,Segoe UI,Arial,sans-serif" >NOTE   UI-neutral search</text>
+<rect x="1238" y="563" width="348" height="134" rx="9" fill="#122337" stroke="#2b4157"/>
+<text x="1255" y="590" fill="#e5effa" font-size="17" font-weight="650" font-family="Inter,Segoe UI,Arial,sans-serif" >Command history</text>
+<path d="M1250,606L1574,606" stroke="#2b4157"/>
+<rect x="1250" y="611" width="324" height="26" rx="4" fill="#22517e" />
+<text x="1266" y="629" fill="#e5effa" font-size="14" font-weight="600" font-family="Inter,Segoe UI,Arial,sans-serif" >Typing</text>
+<text x="1548" y="629" fill="#93a9be" font-size="12" font-weight="400" font-family="Inter,Segoe UI,Arial,sans-serif" text-anchor="end">Ctrl+Z</text>
+<text x="1266" y="659" fill="#e5effa" font-size="14" font-weight="400" font-family="Inter,Segoe UI,Arial,sans-serif" >Insert block</text>
+<text x="1547" y="659" fill="#93a9be" font-size="12" font-weight="400" font-family="Inter,Segoe UI,Arial,sans-serif" text-anchor="end">1 s ago</text>
+<text x="1266" y="683" fill="#e5effa" font-size="14" font-weight="400" font-family="Inter,Segoe UI,Arial,sans-serif" >Find TextRange</text>
+<text x="1547" y="683" fill="#93a9be" font-size="12" font-weight="400" font-family="Inter,Segoe UI,Arial,sans-serif" text-anchor="end">8 s ago</text>
+<rect x="1238" y="708" width="348" height="137" rx="9" fill="#122337" stroke="#2b4157"/>
+<text x="1255" y="735" fill="#e5effa" font-size="17" font-weight="650" font-family="Inter,Segoe UI,Arial,sans-serif" >Language lanes</text>
+<path d="M1250,751L1574,751" stroke="#2b4157"/>
+<rect x="1255" y="745" width="62" height="23" rx="5" fill="#24425a" />
+<text x="1265" y="762" fill="#61d9a5" font-size="13" font-weight="700" font-family="Inter,Segoe UI,Arial,sans-serif" >.NET</text>
+<text x="1330" y="762" fill="#93a9be" font-size="14" font-weight="400" font-family="Inter,Segoe UI,Arial,sans-serif" >Active reference</text>
+<rect x="1255" y="771" width="62" height="23" rx="5" fill="#24425a" />
+<text x="1265" y="788" fill="#66adff" font-size="13" font-weight="700" font-family="Inter,Segoe UI,Arial,sans-serif" >C++</text>
+<text x="1330" y="788" fill="#93a9be" font-size="14" font-weight="400" font-family="Inter,Segoe UI,Arial,sans-serif" >Scaffold</text>
+<rect x="1255" y="797" width="62" height="23" rx="5" fill="#24425a" />
+<text x="1265" y="814" fill="#b5a2fe" font-size="13" font-weight="700" font-family="Inter,Segoe UI,Arial,sans-serif" >Java</text>
+<text x="1330" y="814" fill="#93a9be" font-size="14" font-weight="400" font-family="Inter,Segoe UI,Arial,sans-serif" >Scaffold</text>
+<rect x="15" y="851" width="1570" height="37" rx="6" fill="#132639" stroke="#2b4157"/>
+<text x="28" y="874" fill="#93a9be" font-size="13" font-weight="600" font-family="Inter,Segoe UI,Arial,sans-serif" >FIRST-ED commands:</text>
+<rect x="164" y="856" width="142" height="29" rx="5" fill="#233e57" />
+<text x="177" y="876" fill="#e5effa" font-size="13" font-weight="550" font-family="Inter,Segoe UI,Arial,sans-serif" >Ctrl-K · Block</text>
+<rect x="314" y="856" width="156" height="29" rx="5" fill="#233e57" />
+<text x="327" y="876" fill="#e5effa" font-size="13" font-weight="550" font-family="Inter,Segoe UI,Arial,sans-serif" >Ctrl-O · Window</text>
+<rect x="478" y="856" width="145" height="29" rx="5" fill="#233e57" />
+<text x="491" y="876" fill="#e5effa" font-size="13" font-weight="550" font-family="Inter,Segoe UI,Arial,sans-serif" >Ctrl-Q · Search</text>
+<text x="644" y="874" fill="#93a9be" font-size="13" font-weight="400" font-family="Inter,Segoe UI,Arial,sans-serif" >Linked views  •  UI-agnostic editor foundation  •  Shared conformance</text>
+<rect x="1336" y="857" width="76" height="26" rx="5" fill="#1f71bf" />
+<text x="1347" y="875" fill="#e5effa" font-size="13" font-weight="700" font-family="Inter,Segoe UI,Arial,sans-serif" >INSERT</text>
+<text x="1423" y="875" fill="#93a9be" font-size="13" font-weight="400" font-family="Inter,Segoe UI,Arial,sans-serif" >Ln 128  Col 22</text>
+</svg>
