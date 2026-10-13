@@ -60,8 +60,4 @@ Pascal-Pointer-Splicing, Deskriptor-Freelists und manuelle Speicherfreigabe werd
 
 ## Regressionstests
 
-Die Blocktests decken jetzt zusätzlich unabhängige Begin-/End-Zustände, Reihenfolge- und Dokumentgrenzen, Realignment beziehungsweise Invalidierung einzelner Endpunkte bei strukturellen Änderungen sowie Hide/Display bei unvollständigen Definitionen ab. Die bisherigen Tests für Copy, Move, Delete, verknüpfte Fenster, Marker, Metadaten und dokumentübergreifende Operationen bleiben erhalten.
-
-## Regressionstests
-
-Die Block-Kompatibilitätstests decken Copy in ein anderes Dokument, Erhalt der Nicht-Block-Zeilenmetadaten, Realignment von verknüpften Fenstern und Markern beim Löschen, vollständiges Löschen eines Textstroms, Verschiebungen innerhalb desselben Dokuments ober- und unterhalb des Quellbereichs, Ablehnung eines Ziels im Quellblock, dokumentübergreifende Moves, die Verlagerung der Blockdefinition sowie identisches Verhalten von Command-Dispatcher und direktem Engine-Aufruf ab.
+Die Blocktests decken unabhängige Begin-/End-Zustände, Reihenfolge- und Dokumentgrenzen, Realignment beziehungsweise Invalidierung einzelner Endpunkte bei strukturellen Änderungen und Hide/Display bei unvollständigen Definitionen ab. Zusätzlich bleiben Copy in ein anderes Dokument, Erhalt der Nicht-Block-Zeilenmetadaten, Realignment von verknüpften Fenstern und Markern beim Löschen, vollständiges Löschen eines Textstroms, Verschiebungen innerhalb desselben Dokuments ober- und unterhalb des Quellbereichs, Ablehnung eines Ziels im Quellblock, dokumentübergreifende Moves, die Verlagerung der Blockdefinition sowie identisches Verhalten von Command-Dispatcher und direktem Engine-Aufruf abgesichert.
