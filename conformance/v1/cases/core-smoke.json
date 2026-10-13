@@ -1,0 +1,153 @@
+{
+  "formatVersion": 1,
+  "contractVersion": "v1",
+  "cases": [
+    {
+      "id": "editing.move-right-enters-virtual-column",
+      "area": "editing",
+      "initial": {
+        "documents": [
+          {
+            "id": "doc-1",
+            "lines": [
+              { "text": "abc", "flags": [] }
+            ]
+          }
+        ],
+        "windows": [
+          {
+            "id": "win-1",
+            "documentId": "doc-1",
+            "cursor": { "line": 0, "column": 3 }
+          }
+        ],
+        "currentWindowId": "win-1"
+      },
+      "operation": {
+        "id": "move_right_character"
+      },
+      "expect": {
+        "windows": {
+          "win-1": {
+            "cursor": { "line": 0, "column": 4 }
+          }
+        }
+      }
+    },
+    {
+      "id": "editing.delete-sole-line-retains-blank-line",
+      "area": "editing",
+      "initial": {
+        "documents": [
+          {
+            "id": "doc-1",
+            "lines": [
+              { "text": "only line", "flags": [] }
+            ]
+          }
+        ],
+        "windows": [
+          {
+            "id": "win-1",
+            "documentId": "doc-1",
+            "cursor": { "line": 0, "column": 0 }
+          }
+        ],
+        "currentWindowId": "win-1"
+      },
+      "operation": {
+        "id": "delete_line"
+      },
+      "expect": {
+        "documents": {
+          "doc-1": {
+            "lines": [
+              { "text": "", "flags": [] }
+            ]
+          }
+        },
+        "windows": {
+          "win-1": {
+            "cursor": { "line": 0, "column": 0 }
+          }
+        }
+      }
+    },
+    {
+      "id": "blocks.begin-alone-is-incomplete-and-hidden",
+      "area": "blocks",
+      "initial": {
+        "documents": [
+          {
+            "id": "doc-1",
+            "lines": [
+              { "text": "a", "flags": [] },
+              { "text": "b", "flags": [] },
+              { "text": "c", "flags": [] }
+            ]
+          }
+        ],
+        "windows": [
+          {
+            "id": "win-1",
+            "documentId": "doc-1",
+            "cursor": { "line": 1, "column": 0 }
+          }
+        ],
+        "currentWindowId": "win-1"
+      },
+      "operation": {
+        "id": "begin_block"
+      },
+      "expect": {
+        "blockState": {
+          "start": { "documentId": "doc-1", "line": 1 },
+          "end": null,
+          "hidden": true,
+          "complete": false
+        }
+      }
+    },
+    {
+      "id": "editing.new-line-insert-mode-splits-and-moves-cursor",
+      "area": "editing",
+      "initial": {
+        "documents": [
+          {
+            "id": "doc-1",
+            "lines": [
+              { "text": "abcd", "flags": [] }
+            ]
+          }
+        ],
+        "windows": [
+          {
+            "id": "win-1",
+            "documentId": "doc-1",
+            "cursor": { "line": 0, "column": 2 },
+            "options": { "insertMode": true, "autoIndent": false }
+          }
+        ],
+        "currentWindowId": "win-1"
+      },
+      "operation": {
+        "id": "new_line"
+      },
+      "expect": {
+        "documents": {
+          "doc-1": {
+            "lines": [
+              { "text": "ab", "flags": [] },
+              { "text": "cd", "flags": [] }
+            ]
+          }
+        },
+        "windows": {
+          "win-1": {
+            "cursor": { "line": 1, "column": 0 }
+          }
+        }
+      }
+    }
+  ]
+}

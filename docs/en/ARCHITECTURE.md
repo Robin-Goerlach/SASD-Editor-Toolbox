@@ -52,9 +52,13 @@ The first implementation uses snapshots because they are easy to reason about an
 
 Instead of writing to an 80x25 physical screen image, SASD exposes `EditorViewport`. The renderer decides fonts, colors, selection styling, cursor shape and actual screen coordinates.
 
-## Multi-language future
+## Multi-language architecture
 
-Language-specific source trees are peers. The `spec/` directory is authoritative for cross-language semantics.
+Language-specific source trees are peers under `src/<language>`, with matching `tests/<language>` and `samples/<language>` lanes. Implementations do not call into one another. The shared `spec/` contract defines portable observable behavior, while `conformance/` holds implementation-neutral behavior cases that can be executed by language-specific test adapters.
+
+The .NET implementation is the current executable reference because it is furthest along, not because its class layout or API names are normative. C++, Java and later ports should use idiomatic ownership, collections, error models and build systems while preserving the same editor invariants.
+
+See [MULTI-LANGUAGE-DEVELOPMENT.md](MULTI-LANGUAGE-DEVELOPMENT.md) for source-of-truth, synchronization, CI and porting rules.
 
 ## Deliberately postponed
 

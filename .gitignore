@@ -9,3 +9,10 @@ TestResults/
 *.nupkg
 *.snupkg
 .DS_Store
+**/build/
+**/cmake-build-*/
+**/.gradle/
+**/target/
+*.class
+*.jar
+CMakeUserPresets.json

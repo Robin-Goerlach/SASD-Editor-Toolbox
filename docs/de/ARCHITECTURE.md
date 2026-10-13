@@ -30,9 +30,13 @@ Die erste Implementierung verwendet vollständige Snapshots. Das ist noch nicht 
 
 Statt direkt in einen 80x25-Bildschirm beziehungsweise Videospeicher zu schreiben, liefert SASD ein `EditorViewport`-Modell. Die Oberfläche entscheidet über Schrift, Farben, Blockdarstellung, Cursor und Bildschirmkoordinaten.
 
-## Mehrere Programmiersprachen
+## Mehrsprachige Architektur
 
-Spätere Implementierungen liegen als gleichberechtigte Verzeichnisse neben `src/dotnet`. Die sprachneutrale Semantik wird unter `spec/` gepflegt.
+Sprachspezifische Implementierungen liegen gleichberechtigt unter `src/<sprache>` und besitzen passende Bereiche unter `tests/<sprache>` und `samples/<sprache>`. Keine Implementierung ruft zur Laufzeit eine andere Sprachimplementierung auf. Der gemeinsame Vertrag unter `spec/` definiert das beobachtbare Verhalten; `conformance/` enthält sprachunabhängige Testfälle, die von sprachspezifischen Testadaptern ausgeführt werden können.
+
+Die .NET-Implementierung ist derzeit die ausführbare Referenz, weil sie am weitesten entwickelt ist. Ihre Klassenstruktur und API-Namen sind deshalb aber nicht normativ. C++, Java und spätere Ports dürfen idiomatische Ownership-, Collection-, Fehler- und Build-Modelle verwenden, solange die Editor-Invarianten erhalten bleiben.
+
+Weitere Regeln zu Source of Truth, Synchronisierung, CI und Portierung stehen in [MEHRSPRACHIGE-ENTWICKLUNG.md](MEHRSPRACHIGE-ENTWICKLUNG.md).
 
 ## Bewusst später
 

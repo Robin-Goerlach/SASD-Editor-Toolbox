@@ -1,6 +1,6 @@
 # SASD Editor Toolbox
 
-**SASD Editor Toolbox** is a reusable, UI-agnostic editing foundation for SASD applications and tools. The first implementation is written in C#/.NET and is structured so equivalent implementations can later be added without redesigning the repository.
+**SASD Editor Toolbox** is a reusable, UI-agnostic editing foundation for SASD applications and tools. C#/.NET is the first active reference implementation, while the repository is now explicitly structured for peer implementations in C++, Java and additional languages without redesigning the project.
 
 The long-term goal is broader than a stand-alone text editor: the toolbox should provide reusable document, buffer, command, search, block, window, undo, rendering-model and extension infrastructure that can be embedded in SASD Workbench applications.
 
@@ -15,21 +15,40 @@ The historical design is especially useful because it separates the editor into 
 ```text
 SASD-Editor-Toolbox/
 ├── src/
-│   └── dotnet/
-│       └── Sasd.Editor.Core/          # first implementation
+│   ├── dotnet/                        # active C#/.NET reference implementation
+│   ├── cpp/                           # C++ implementation root (scaffold)
+│   └── java/                          # Java implementation root (scaffold)
 ├── tests/
-│   └── dotnet/
+│   ├── dotnet/
+│   ├── cpp/
+│   └── java/
 ├── samples/
-│   └── dotnet/
-│       └── Sasd.Editor.FirstEd.Sample/ # interactive terminal reference host
-├── spec/                              # language-neutral contracts
+│   ├── dotnet/
+│   ├── cpp/
+│   └── java/
+├── spec/                              # normative language-neutral behavior
+├── conformance/                       # shared machine-readable behavior cases
 ├── docs/
-│   ├── en/                            # primary documentation
+│   ├── en/                            # primary technical documentation
 │   └── de/                            # German documentation
+├── tools/                             # repository-wide verification helpers
 └── .github/workflows/
 ```
 
-Future language implementations should be peers of `dotnet` (for example `cpp`, `java`, `javascript`). Language-neutral behavior belongs in `spec/`.
+Language implementations are peers. No implementation is allowed to become a runtime dependency of another implementation. Portable observable behavior belongs in `spec/`; reusable cross-language examples belong in `conformance/`. The .NET implementation is currently the most complete executable reference, but it is not the normative specification.
+
+## Cross-language development model
+
+The repository separates the **portable editor contract** from **language-specific implementation choices**:
+
+- `spec/editor-v1.md` is the normative V1 behavior contract.
+- `conformance/` contains implementation-neutral cases that every language runner can consume.
+- `src/<language>`, `tests/<language>` and `samples/<language>` form one self-contained implementation lane.
+- `implementations.json` records which language lanes exist and their maturity without implying API-name identity.
+- Each language may use idiomatic APIs, containers, ownership models and build systems as long as externally observable editor behavior remains compatible.
+- A semantic change is made in the shared contract first, then reflected in conformance cases and each affected implementation.
+
+See the English and German multi-language architecture documents for the porting and synchronization rules.
 
 ## Implemented foundation
 
@@ -88,7 +107,7 @@ dotnet run --project samples/dotnet/Sasd.Editor.FirstEd.Sample/Sasd.Editor.First
 
 The sample starts with Window 1 editing `NONAME`. Historical Ctrl-K / Ctrl-O / Ctrl-Q sequences are accepted alongside modern cursor keys. **Ctrl-O O** creates a stacked window by asking for its screen-row count and donor window number; **Ctrl-O Y** deletes a window. Use **Ctrl-K X**, then type **YES**, to exit.
 
-## Build
+## Build the .NET reference implementation
 
 ```bash
 dotnet restore Sasd.Editor.Toolbox.slnx
@@ -98,9 +117,19 @@ dotnet test Sasd.Editor.Toolbox.slnx --configuration Release
 
 Target framework: **.NET 10**.
 
+The language-neutral repository contract can be checked independently of any implementation:
+
+```bash
+python3 tools/verify_repository_contract.py
+```
+
+Future C++ and Java builds will live entirely inside their own implementation lanes and receive separate CI jobs; they will not be coupled to the .NET build graph.
+
 ## Design rules
 
-- Core editing logic has no WinForms, WPF, console, terminal or browser dependency.
+- Core editing logic in every language remains UI-agnostic; platform hosts live under samples or host-specific packages, not in the reusable core.
+- No language implementation may depend on another language implementation at runtime.
+- Portable behavior changes start in `spec/` and, where practical, receive shared conformance cases before implementation-specific code changes.
 - A document and its views/windows are separate concepts; multiple windows may share one document.
 - Physical row allocation is kept in a host-neutral layout service rather than embedded in a console renderer.
 - Mutation APIs own dirty-state and undo integration; deliberately destructive compatibility commands explicitly discard obsolete undo state.
@@ -122,6 +151,10 @@ Target framework: **.NET 10**.
 
 - English architecture: [`docs/en/ARCHITECTURE.md`](docs/en/ARCHITECTURE.md)
 - Deutsche Architektur: [`docs/de/ARCHITECTURE.md`](docs/de/ARCHITECTURE.md)
+- Multi-language development: [`docs/en/MULTI-LANGUAGE-DEVELOPMENT.md`](docs/en/MULTI-LANGUAGE-DEVELOPMENT.md)
+- Mehrsprachige Entwicklung: [`docs/de/MEHRSPRACHIGE-ENTWICKLUNG.md`](docs/de/MEHRSPRACHIGE-ENTWICKLUNG.md)
+- Shared conformance cases: [`conformance/README.md`](conformance/README.md)
+- Specification guide: [`spec/README.md`](spec/README.md)
 - V1 compatibility matrix: [`docs/en/BORLAND-V1-COMPATIBILITY.md`](docs/en/BORLAND-V1-COMPATIBILITY.md)
 - Deutsche V1-Matrix: [`docs/de/BORLAND-V1-KOMPATIBILITAET.md`](docs/de/BORLAND-V1-KOMPATIBILITAET.md)
 - FIRST-ED command map: [`docs/en/FIRST-ED-COMMAND-MAP.md`](docs/en/FIRST-ED-COMMAND-MAP.md)

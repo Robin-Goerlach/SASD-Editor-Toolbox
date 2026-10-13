@@ -10,7 +10,7 @@ This repository is **SASD-Editor-Toolbox**.
 
 Do not confuse it with **SASD-Editor-Toolkit** or import plans, source files, milestones or architectural decisions from that repository unless the user explicitly asks for cross-project work.
 
-The Editor Toolbox is a reusable, UI-agnostic editor foundation. C#/.NET is the first reference implementation. The portable behavior contract lives in `spec/`; later C++, Java, JavaScript or other implementations should be peers of `dotnet`, not reasons to distort the C# implementation prematurely.
+The Editor Toolbox is a reusable, UI-agnostic editor foundation. C#/.NET is the first active reference implementation, but it is not the normative specification. C++, Java and later implementations are peer lanes. Portable behavior lives in `spec/`, reusable cross-language examples live in `conformance/`, and language-specific source/tests/samples live below matching `src/<language>`, `tests/<language>` and `samples/<language>` roots.
 
 ## 2. Mission and current V1 target
 
@@ -18,7 +18,7 @@ The immediate product goal is a clean-room modern implementation of the observab
 
 The historical handbook is a **behavioral requirements/reference source only**.
 
-Preserve observable behavior where it is known, but implement it with modern, reviewable C# architecture. Historical Pascal pointer layouts, free lists, DOS scan codes, video memory, overlay mechanics and other implementation details are not compatibility requirements unless they materially affect observable behavior.
+Preserve observable behavior where it is known, but implement it with modern, reviewable architecture idiomatic to the target language. Historical Pascal pointer layouts, free lists, DOS scan codes, video memory, overlay mechanics and other implementation details are not compatibility requirements unless they materially affect observable behavior.
 
 The project deliberately favors:
 
@@ -38,13 +38,14 @@ At the beginning of a new task, inspect the current repository instead of relyin
 Read in this order:
 
 1. `README.md` - current feature status and design rules.
-2. `spec/editor-v1.md` - language-neutral V1 behavior contract.
-3. `docs/en/BORLAND-V1-COMPATIBILITY.md` - current compatibility matrix and remaining V1 gaps.
-4. `docs/en/ARCHITECTURE.md` - architecture and dependency boundaries.
-5. The English document for the subsystem being changed under `docs/en/`.
-6. Its German counterpart under `docs/de/`.
-7. The closest production code and regression tests.
-8. Recent commits touching the same subsystem when the intent is not obvious.
+2. `spec/README.md` and `spec/editor-v1.md` - portable contract rules and V1 behavior.
+3. `conformance/README.md` plus relevant shared cases - implementation-neutral executable examples.
+4. `docs/en/BORLAND-V1-COMPATIBILITY.md` - current compatibility matrix and remaining V1 gaps.
+5. `docs/en/ARCHITECTURE.md` and `docs/en/MULTI-LANGUAGE-DEVELOPMENT.md` - architecture and cross-language dependency boundaries.
+6. The English document for the subsystem being changed under `docs/en/`.
+7. Its German counterpart under `docs/de/`.
+8. The closest production code and regression tests in the target implementation lane.
+9. Recent commits touching the same subsystem when the intent is not obvious.
 
 For historical semantics, use the handbook/manual material only as a behavioral source. If the manual is available outside this repository, do not copy it into the repository.
 
@@ -55,10 +56,11 @@ When instructions or documents appear to conflict, use this order:
 1. The user's current task/instruction.
 2. This `AGENTS.md`.
 3. `spec/editor-v1.md` for portable observable behavior.
-4. Explicit compatibility decisions in `docs/en/BORLAND-V1-COMPATIBILITY.md` and subsystem documentation.
-5. Current executable regression tests.
-6. `README.md`.
-7. Older prose/comments.
+4. Shared cases under `conformance/` when they cover the behavior in question.
+5. Explicit compatibility decisions in `docs/en/BORLAND-V1-COMPATIBILITY.md` and subsystem documentation.
+6. Current executable regression tests in the affected language implementation.
+7. `README.md`.
+8. Older prose/comments.
 
 If a historical behavior is not actually established by the handbook/reference, do not invent certainty. Choose a conservative modern policy where necessary and document it explicitly as **modern policy**, **modernization boundary**, or **documented divergence**.
 
@@ -70,7 +72,7 @@ Allowed:
 
 - derive behavioral requirements from the historical handbook;
 - describe those requirements in your own words;
-- write independent modern C# implementing the behavior;
+- write independent modern code in the target implementation language;
 - use historical routine names briefly in compatibility documentation for traceability;
 - add regression tests for observed behavior.
 
@@ -90,16 +92,9 @@ Preserve these unless the user explicitly requests an architectural change and t
 
 ### 6.1 Core remains UI-agnostic
 
-`src/dotnet/Sasd.Editor.Core` must not depend on:
+Every reusable implementation under `src/<language>` must remain independent of concrete terminal, desktop, web or mobile UI frameworks. Host-specific APIs belong in `samples/<language>` or explicitly host-facing packages, not in the portable editor core.
 
-- Console APIs;
-- terminal libraries;
-- WinForms;
-- WPF;
-- ASP.NET/browser APIs;
-- host-specific dialogs or prompts.
-
-The terminal application under `samples/` is a host/reference application, not a place for reusable editor business logic.
+For .NET this continues to prohibit Console APIs, terminal libraries, WinForms, WPF, ASP.NET/browser APIs and host-specific prompts inside `Sasd.Editor.Core`. Equivalent boundaries apply in C++, Java and later ports.
 
 ### 6.2 Document and view/window are separate
 
@@ -187,6 +182,21 @@ Do not make the legacy high-bit-CR format the general storage format.
 
 Background work must be bounded/cooperative. Do not introduce hidden long-running work on the editor thread without cancellation/abort analysis.
 
+### 6.11 Cross-language contract and implementation lanes
+
+The repository uses a shared-contract / independent-implementation model:
+
+- `spec/` is normative for portable observable behavior.
+- `conformance/` contains language-neutral examples; language runners translate those cases into native APIs.
+- `implementations.json` lists implementation lanes and maturity.
+- `src/<language>`, `tests/<language>` and `samples/<language>` for one language form a self-contained lane.
+- One language implementation must never become a runtime or build dependency of another.
+- Public API names, ownership models, collection types, exception/result idioms and build systems may be language-native.
+- A semantic change should update the shared contract first and add/update conformance coverage before ports intentionally diverge.
+- If an implementation cannot yet support a shared case, record the gap explicitly; do not silently change the shared case to match one implementation.
+
+The .NET code may be consulted as an executable reference, but ports should implement concepts and behavior rather than mechanically transliterating C# classes line by line.
+
 ## 7. Current V1 work priority
 
 When the user says only “continue”, “keep going” or asks Codex to work autonomously, take the first unfinished item below unless current repository evidence shows it is already complete.
@@ -242,21 +252,21 @@ Do not autonomously start:
 - GUI frameworks;
 - plugin systems;
 - arbitrary script execution;
-- additional language ports;
+- full implementation work for additional language ports unless the user explicitly requests that language; repository scaffolding and shared-contract maintenance are allowed;
 - package publication/release automation.
 
 The repository already has stable seams for later optimization and ports. Finish behavior first.
 
-## 8. Pascal-to-C# transfer workflow
+## 8. Historical-behavior transfer workflow
 
-For every historical routine or behavior being transferred:
+For every historical routine or behavior being transferred into any implementation lane:
 
 1. Identify the observable behavior from the handbook/reference.
 2. Write the behavior down in your own words.
-3. Inspect existing C# abstractions before adding a new one.
+3. Inspect the shared contract and existing abstractions in the target implementation before adding a new one.
 4. Identify architecture invariants affected: document/view, topology, block, marker, undo, wrapped boundaries, virtual columns, input, storage, scheduler.
 5. Add or update regression tests for the behavior and important edge cases.
-6. Implement independently in idiomatic, readable C#.
+6. Implement independently in idiomatic, readable target-language code.
 7. Prefer a small correctness-first implementation over clever optimization.
 8. Add comments where the historical behavior or modern replacement is non-obvious.
 9. Update `spec/editor-v1.md` when portable behavior changes.
@@ -274,15 +284,16 @@ Never implement a routine merely because its Pascal name exists. First decide wh
 
 ## 9. Coding style
 
-- Code, APIs, namespaces and public identifiers are English.
-- Nullable reference types remain enabled.
+- Code, APIs, namespaces/packages and public identifiers are English.
+- Follow idiomatic safety features in each language. In .NET, nullable reference types remain enabled.
 - Public APIs should have useful XML documentation where their contract is not self-evident.
 - Comments explain **why**, invariants, compatibility boundaries and trade-offs.
 - Avoid comments that merely restate syntax.
 - Keep methods and types focused on editor concepts.
 - Prefer explicit, testable services over hidden/global mutable state.
-- Avoid public APIs that expose implementation details of the first .NET backend.
-- Preserve language-neutral concepts even when the C# API itself is idiomatic.
+- Avoid public APIs that expose accidental implementation details of any one backend.
+- Preserve language-neutral concepts while allowing each implementation's API to remain idiomatic.
+- Do not force C# naming, inheritance or memory-management patterns into C++ or Java merely for visual similarity.
 
 Optimization policy:
 
@@ -324,13 +335,15 @@ Do not weaken a test simply to make CI green. Establish the intended behavior fi
 
 ## 11. Build and validation
 
-The canonical solution is:
+Always validate the repository-wide language layout and shared conformance metadata:
 
-`Sasd.Editor.Toolbox.slnx`
+```bash
+python3 tools/verify_repository_contract.py
+```
 
-Target framework: **.NET 10**.
+Then run the native build/test gate for every implementation lane changed by the work.
 
-Before declaring a code change complete, run:
+For the current .NET reference implementation the canonical solution is `Sasd.Editor.Toolbox.slnx` and the target framework is **.NET 10**:
 
 ```bash
 dotnet restore Sasd.Editor.Toolbox.slnx
@@ -347,11 +360,9 @@ git diff --check
 git status --short
 ```
 
-The GitHub Actions workflow performs the same restore/build/test sequence on Ubuntu.
+C++ and Java will own their build systems inside their implementation lanes once development starts; they must not be wired through the .NET project graph. GitHub Actions should keep repository-contract validation separate from language-specific build workflows so one language can evolve without introducing runtime coupling to another.
 
-The interactive FIRST-ED terminal sample is valuable for manual smoke testing, but automated regression tests remain the acceptance gate.
-
-If CI fails because of the current change, diagnose and fix it before declaring success.
+The interactive FIRST-ED terminal sample is valuable for manual smoke testing, but automated regression tests remain the acceptance gate. If CI fails because of the current change, diagnose and fix it before declaring success.
 
 ## 12. Documentation policy
 
@@ -361,7 +372,7 @@ English documentation under `docs/en/` is the primary technical narrative.
 
 Maintain the corresponding German document under `docs/de/` in parallel for meaningful compatibility/architecture changes.
 
-Use `spec/editor-v1.md` for language-neutral observable contracts.
+Use `spec/editor-v1.md` for language-neutral observable contracts and `conformance/` for portable behavior examples that should be reusable by more than one implementation.
 
 Use the compatibility matrix to distinguish:
 
@@ -449,6 +460,7 @@ A work item is complete only when all applicable conditions are met:
 - architecture invariants remain intact;
 - topology/undo/marker/block implications were audited when structural text changed;
 - `spec/editor-v1.md` is updated when portable behavior changed;
+- shared conformance cases are added or updated when the behavior can be expressed portably;
 - English and German docs are updated in parallel where appropriate;
 - the compatibility matrix reflects the new status;
 - Release build succeeds;

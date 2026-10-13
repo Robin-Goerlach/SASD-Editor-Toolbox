@@ -1,0 +1,31 @@
+{
+  "formatVersion": 1,
+  "contract": "spec/editor-v1.md",
+  "implementations": [
+    {
+      "id": "dotnet",
+      "language": "C#/.NET",
+      "status": "active-reference",
+      "source": "src/dotnet",
+      "tests": "tests/dotnet",
+      "samples": "samples/dotnet",
+      "ci": ".github/workflows/dotnet.yml"
+    },
+    {
+      "id": "cpp",
+      "language": "C++",
+      "status": "scaffold",
+      "source": "src/cpp",
+      "tests": "tests/cpp",
+      "samples": "samples/cpp"
+    },
+    {
+      "id": "java",
+      "language": "Java",
+      "status": "scaffold",
+      "source": "src/java",
+      "tests": "tests/java",
+      "samples": "samples/java"
+    }
+  ]
+}
