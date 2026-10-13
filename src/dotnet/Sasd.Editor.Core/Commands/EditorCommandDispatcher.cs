@@ -1,6 +1,7 @@
 using Sasd.Editor.Editing;
 using Sasd.Editor.Hooks;
 using Sasd.Editor.Search;
+using Sasd.Editor.Scheduling;
 
 namespace Sasd.Editor.Commands;
 
