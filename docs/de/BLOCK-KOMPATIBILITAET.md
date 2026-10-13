@@ -18,6 +18,18 @@ Das Handbuch beschreibt diese Vorgänge mit `Blockfrom`, `Blockto`, Zeilendeskri
 
 ## Moderne C#-Architektur
 
+### Unabhängiger Begin-/End-Endpunktzustand
+
+Die historischen Anfangs- und Endgrenzen werden jetzt durch `EditorBlockState` und zwei unabhängig nullable `EditorBlockEndpoint`-Werte dargestellt. `EditorSession.Block` bleibt die bequeme operative Projektion, ist aber nur dann ungleich null, wenn beide Endpunkte einen geordneten Bereich im selben Dokument bilden.
+
+`BeginBlock` setzt den Anfangsendpunkt neu. Ist ein bereits vorhandener Endendpunkt im selben Textstrom weiterhin später erreichbar, wird der Block vollständig und sichtbar; andernfalls wird der unvereinbare Endendpunkt verworfen und der Zustand bleibt verborgen. `EndBlock` verwendet die entsprechende Regel für die untere Grenze: Ein Endpunkt vor dem vorhandenen Anfang oder in einem anderen Dokument lässt nur den neu gesetzten Endendpunkt bestehen.
+
+Diese Trennung ist auch für die Topologie wichtig. Zeileneinfügungen realignen jeden definierten Endpunkt unabhängig. Wird eine Grenzzeile gelöscht, wird nur der auf diese Zeile zeigende Endpunkt undefiniert; der andere bleibt erhalten und kann später durch einen neuen Begin-/End-Befehl ergänzt werden. Das bildet die historische Zeilendeskriptor-Wirkung modern ab, ohne Pointeridentität offenzulegen.
+
+Ein `EditOffblock`-artiges Löschen der Hervorhebung verändert den Endpunktzustand nicht. Hide/Display kann die Hervorhebung nur wieder einschalten, wenn ein vollständiges gültiges Paar existiert.
+
+### Copy, Move und Delete
+
 `FirstEdBlockCompatibilityProcessor` enthält die Kompatibilitätslogik für Copy, Move und Delete. Sowohl `EditorCommandDispatcher` als auch die direkten Blockmethoden von `EditorEngine` führen durch diesen Prozessor, damit sich beide Aufrufwege nicht auseinanderentwickeln.
 
 Strukturelle Änderungen werden an `EditorLineTopology` gemeldet. Dieser Dienst richtet aktuelle Zeilen und `TopLine` verknüpfter Fenster, Marker und den logischen Blockbereich neu aus. Der Zielcursor wird damit als Anker an seiner bisherigen logischen Zeile behandelt: Wird ein kopierter oder verschobener Block direkt davor eingefügt, ändert sich die numerische Zeilennummer, der Cursor springt aber nicht stillschweigend auf eine der eingefügten Zeilen.
@@ -38,13 +50,17 @@ Nach dem Einfügen wird der logische Block um die verschobenen Zeilen neu aufgeb
 
 ## Explizite Modernisierungsgrenzen
 
-Das aktuelle .NET-Modell `EditorBlock` speichert ein vollständiges Start-/End-Paar. Historisch konnten `Blockfrom` und `Blockto` unabhängig voneinander undefiniert sein. Die exakte Parität der Begin-/End-Endpunktzustände bleibt deshalb ein eigener Audit-Punkt.
+`EditorBlockState` speichert den Endpunkt-Lebenszyklus bewusst getrennt von der vollständigen `EditorBlock`-Projektion. Dadurch bleiben unabhängig undefinierte Grenzen erhalten, ohne Pointer- oder Freelist-Mechanik in das öffentliche Modell zu übernehmen.
 
 Das Handbuch legt nicht separat fest, ob ein Marker, der auf eine Zeile **innerhalb eines verschobenen Blocks** zeigt, dieser physischen Zeile an den neuen Ort folgen soll. Die .NET-Implementierung verwendet hier konservative Löschsemantik für Quellanker: Marker auf wegbewegten Quellzeilen werden ungültig; nur der logische Block wird am Ziel explizit neu aufgebaut. Das ist dokumentierte Implementierungspolitik und keine Behauptung über nicht dokumentiertes historisches Verhalten.
 
 Das correctness-first Snapshot-Undo speichert bei einer dokumentübergreifenden Verschiebung Quelle und Ziel derzeit in zwei Snapshots. Beide Textströme sind wiederherstellbar, aber eine einzige zusammengesetzte Cross-Document-Undo-Transaktion ist noch nicht modelliert. Ein späteres Undo-Journal kann das verbessern, ohne Block- oder Topologiesemantik zu ändern.
 
 Pascal-Pointer-Splicing, Deskriptor-Freelists und manuelle Speicherfreigabe werden nicht in die moderne API übernommen.
+
+## Regressionstests
+
+Die Blocktests decken jetzt zusätzlich unabhängige Begin-/End-Zustände, Reihenfolge- und Dokumentgrenzen, Realignment beziehungsweise Invalidierung einzelner Endpunkte bei strukturellen Änderungen sowie Hide/Display bei unvollständigen Definitionen ab. Die bisherigen Tests für Copy, Move, Delete, verknüpfte Fenster, Marker, Metadaten und dokumentübergreifende Operationen bleiben erhalten.
 
 ## Regressionstests
 

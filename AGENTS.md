@@ -193,33 +193,29 @@ When the user says only “continue”, “keep going” or asks Codex to work a
 
 ### P0 - V1 release-gate work
 
-1. **Independent block endpoint state audit**
-   - Historical `Blockfrom` and `Blockto` could be independently undefined.
-   - The current `EditorBlock` stores a complete start/end pair.
-   - Determine the required observable Begin/End behavior and introduce a modern representation only if necessary.
-   - Keep whole-line block copy/move/delete behavior and topology tests green.
+The independent historical block-endpoint lifecycle is implemented through `EditorBlockState`; `EditorBlock` is now only the complete operational projection. The next unfinished release-gate item is therefore command-boundary validation.
 
-2. **Command-boundary and parameter validation audit**
+1. **Command-boundary and parameter validation audit**
    - Review all `EditorCommandId` paths and compatibility processor arguments.
    - Include `SetUndoLimit`, window numbers/sizes, margins, tab width, marker numbers, goto values, file arguments and search/replace arguments.
    - Prefer typed validation/results over UI-specific messages.
 
-3. **Typed error/resource model**
+2. **Typed error/resource model**
    - Introduce stable modern error identifiers/resources where command behavior requires them.
    - Do not copy a historical error-message catalog verbatim.
    - Hosts decide how errors are rendered.
 
-4. **Abort/interruptibility audit**
+3. **Abort/interruptibility audit**
    - Host-originated Ctrl-U already establishes an abort boundary in typeahead.
    - Audit long or iterative operations so abort/cancellation is observed at sensible safe points.
    - Reconcile historical abort behavior with modern `CancellationToken` without duplicating cancellation systems unnecessarily.
 
-5. **Compound undo/navigation-state audit**
+4. **Compound undo/navigation-state audit**
    - Review cross-document block move and other multi-document mutations.
    - The current snapshot backend is correctness-first; do not replace it merely for performance.
    - Determine whether one logical command requires one atomic compound undo transaction and which navigation/view state must be restored.
 
-6. **Final handbook procedure/function-index audit**
+5. **Final handbook procedure/function-index audit**
    - Compare the historical procedure/function inventory against the compatibility matrix and implementation.
    - Classify each item as Implemented, Replaced by modern invariant, Not Applicable, Sample/Host concern, or intentionally deferred.
    - Add regression coverage for any small omissions found.

@@ -18,6 +18,18 @@ The handbook describes these operations in terms of `Blockfrom`, `Blockto`, line
 
 ## Modern C# design
 
+### Independent Begin/End endpoint state
+
+The historical begin and end limits are now represented by `EditorBlockState` and two independently nullable `EditorBlockEndpoint` values. `EditorSession.Block` remains the convenient operational projection, but it is non-null only when both endpoints identify an ordered range in the same document.
+
+`BeginBlock` repoints the begin endpoint. If an existing end endpoint is still reachable later in the same stream, the block becomes complete and visible; otherwise the incompatible end endpoint is discarded and the state remains hidden. `EndBlock` applies the corresponding bottom-limit rule: an end before the existing begin, or in another document, leaves only the newly defined end endpoint.
+
+This distinction matters for topology. Line insertion realigns each defined endpoint independently. Deleting a boundary invalidates only the endpoint on that deleted line; the other endpoint survives and can later be paired by a new Begin/End command. This is the modern counterpart of the historical line-descriptor references without exposing pointer identity.
+
+`EditOffblock`-style highlight clearing does not change endpoint state. Hide/display can only turn highlighting back on when a complete valid pair exists.
+
+### Copy, Move and Delete
+
 `FirstEdBlockCompatibilityProcessor` owns the compatibility behavior for Copy, Move and Delete. `EditorCommandDispatcher` and the direct `EditorEngine` block methods both route through this processor so the two entry paths cannot drift.
 
 Structural changes are reported to `EditorLineTopology`. That service realigns linked-window current lines and top lines, markers and the logical block range. The target cursor is therefore treated as an anchor to its existing logical line: inserting a copied or moved block immediately before that line changes its numeric line index but does not silently attach the cursor to one of the inserted lines.
@@ -38,7 +50,7 @@ After insertion, the logical block is recreated around the moved lines and its h
 
 ## Explicit modernization boundaries
 
-The current .NET `EditorBlock` stores a complete start/end pair. The historical `Blockfrom` and `Blockto` pointers could be independently undefined. Exact Begin/End endpoint-state parity therefore remains a separate audit item.
+`EditorBlockState` deliberately stores endpoint lifecycle separately from the complete `EditorBlock` projection. This preserves independently undefined limits while keeping pointer/free-list mechanics out of the public model.
 
 The handbook does not separately state whether a marker pointing to a line inside a **moved** block should follow that physical line to its new location. The .NET implementation uses conservative deletion semantics for source anchors: markers on moved-away source lines become undefined; the logical block itself is explicitly recreated at the destination. This is documented implementation policy, not a claim about undocumented historical behavior.
 
@@ -48,4 +60,4 @@ No Pascal pointer splicing, descriptor free-list behavior or manual memory relea
 
 ## Regression coverage
 
-The block compatibility tests cover copying into another document, preservation of non-block line metadata, linked-window and marker realignment on deletion, complete-stream deletion, same-document moves above/below the source range, rejection of a destination inside the source block, cross-document moves, block relocation, and parity between command-dispatch and direct-engine entry points.
+The block compatibility tests cover independent begin/end states, endpoint ordering and cross-document invalidation, endpoint realignment/invalidation under structural edits, hide/display rules for incomplete definitions, copying into another document, preservation of non-block line metadata, linked-window and marker realignment on deletion, complete-stream deletion, same-document moves above/below the source range, rejection of a destination inside the source block, cross-document moves, block relocation, and parity between command-dispatch and direct-engine entry points.

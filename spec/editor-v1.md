@@ -91,6 +91,8 @@ The historical implementation's 16-bit integer ceiling is not a portable documen
 ## 5. Blocks, markers and line topology
 
 - The historical V1 compatibility block is whole-line and contiguous.
+- Begin and end limits are independently definable. Until both limits identify an ordered range in the same document/text stream, no operational block range is available and block highlighting remains hidden.
+- Repointing one limit may invalidate the opposite limit when the two endpoints no longer form an ordered range in one stream; implementations must not manufacture a reversed or cross-stream block.
 - One active block may be begun/ended, copied, moved, deleted and hidden, and block manipulation may be initiated from another open window/document.
 - Copy inserts copies of the block lines immediately before the current cursor line and leaves the source text and logical source block unchanged.
 - Move removes the source block and inserts those lines immediately before the current cursor line. For a same-document move, the current cursor line must not lie inside the source block. The logical block follows the moved lines to their destination.
@@ -103,13 +105,11 @@ The historical implementation's 16-bit integer ceiling is not a portable documen
 - Structural insertion or deletion must keep every affected window's current-line and top-line references valid.
 - References to surviving logical lines after an insertion/deletion must be realigned so they continue to identify those surviving lines rather than merely retaining stale numeric indices.
 - A marker that points directly at a deleted logical line becomes undefined; markers on later surviving lines are realigned.
-- If a deletion removes a block boundary, a complete active block is no longer available for highlighting until valid boundaries are defined again. An implementation may represent this as one undefined boundary or conservatively clear its complete active block object.
+- If a deletion removes one block boundary, that endpoint becomes undefined independently. The surviving endpoint remains available for a later Begin/End command, while the complete block projection and visible highlighting remain unavailable until both valid limits exist again.
 - Insert Line, New Line, automatic word-wrap insertion, compatibility file insertion, paragraph-reformat expansion/contraction and block bulk mutations are structural changes and must participate in the same realignment contract.
 - Raw line-descriptor pointers are not required. A centralized anchor/topology service, buffer-native anchors or another target-language mechanism may provide the observable behavior.
 
 The handbook does not separately define whether markers or other non-block anchors inside a moved source range follow the physical moved lines. Implementations must document their policy instead of claiming undocumented historical behavior. The .NET V1 implementation applies ordinary deletion semantics to source anchors and explicitly recreates the logical block at the destination.
-
-The first .NET block representation stores a complete start/end pair, whereas the historical limit pointers could be independently undefined. Exact independent Begin/End endpoint-state parity remains an implementation audit item rather than a portable assumption.
 
 ## 6. Search and replace
 

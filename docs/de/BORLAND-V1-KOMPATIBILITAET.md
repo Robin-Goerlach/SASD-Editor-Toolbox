@@ -50,15 +50,15 @@ Ziel ist funktionale Abdeckung, nicht eine identische Quellcode- oder API-Strukt
 | `EditLongLine` / `EditShortLine` | Push-down / Pull-up im Reformat-Plan | Implementiert |
 | `EditReformat`: Wrapped-Durchlauf / Randformatierung | `FirstEdReformatCompatibilityProcessor` | Implementiert |
 | Reformat: zu langes Wort vor Mutation erkennen | Plan-Validierung | Implementiert |
-| Ganzzeilen-Blockmodell | `EditorBlock`, `EditorSession` | Implementierte Grundlage; Audit unabhängiger historischer Endpunktzustände bleibt |
+| Ganzzeilen-Blockmodell | `EditorBlockState` + vollständige `EditorBlock`-Projektion | Implementiert |
 | `EditBlockCopy` | `FirstEdBlockCompatibilityProcessor.CopyToCursor` + Topologie | Implementiert |
 | `EditBlockMove` | Block Compatibility Processor + Topologie | Implementiert |
 | `EditBlockMove`: Cursor im Quellblock ablehnen | Validierung im Compatibility Processor | Implementiert |
 | `EditBlockDelete` | Block Compatibility Processor + Topologie | Implementiert |
 | Fenster-/dokumentübergreifende Blockoperationen | Quellblock + aktuelles Zielfenster/-dokument | Implementiert |
 | Zeilenmetadaten bei Block Copy/Move | `Wrapped`/`UserColored` erhalten; `InBlock` neu projizieren | Implementiert |
-| Block Hide/Display | `EditorSession.ToggleBlockHidden` | Implementierte Grundlage |
-| Unabhängig undefinierte `Blockfrom`-/`Blockto`-Zustände | aktuelles vollständiges `EditorBlock`-Paar | Geplanter Audit |
+| Block Hide/Display | `EditorSession.ToggleBlockHidden` | Implementiert |
+| Unabhängig undefinierte `Blockfrom`-/`Blockto`-Zustände | nullable `EditorBlockState.Start`-/`End`-Endpunkte | Implementiert |
 | `EditOffblock`: InBlock global löschen, Grenzen behalten | `EditorSession.ClearBlockHighlights` | Implementiert |
 | `EditMarkblock`: aktiven Bereich in Flags projizieren | `EditorSession.MarkBlockHighlights` | Implementiert |
 | Blockanfang/-ende anspringen | Compatibility Processor | Implementiert |
@@ -127,7 +127,7 @@ Die historische Implementierung erhält stabile Zeilenidentität über Deskripto
 
 Die auditierten Pfade für einzelne Zeileneinfügungen, New Line, automatischen Wrap, Datei-Insert, Löschen/Join, Absatz-Neuformatierung und mehrzeilige Blockoperationen Copy/Move/Delete melden Topologieänderungen jetzt zentral. Die frühere Block-Bulk-Topologielücke ist geschlossen.
 
-Das erste .NET-Blockmodell speichert ein vollständiges Start-/End-Paar. Historisch konnten `Blockfrom` und `Blockto` unabhängig undefiniert sein; die exakte Parität der Begin-/End-Endpunktzustände bleibt daher ein eigener Audit-Punkt. Wird bei einer gewöhnlichen Löschung eine dargestellte Blockgrenze entfernt, löscht das aktuelle Paarmodell konservativ den aktiven Block, ohne zu behaupten, historisch wären zwingend beide Pointer zurückgesetzt worden.
+Der .NET-Blockzustand speichert unabhängig nullable Begin-/End-Endpunkte und stellt einen vollständigen `EditorBlock` nur bereit, wenn beide Grenzen einen geordneten Bereich in einem Dokument bilden. Strukturelle Einfügungen realignen beide Endpunkte unabhängig; wird eine Grenzzeile gelöscht, wird nur dieser Endpunkt undefiniert und die Hervorhebung bleibt aus, bis wieder ein vollständiges Paar existiert.
 
 Für Block Move legt das Handbuch nicht separat fest, ob Marker oder andere Anker innerhalb des verschobenen Quellbereichs den physischen Zeilen an den neuen Ort folgen. Die .NET-Implementierung wendet auf solche Quellanker normale Löschsemantik an und erzeugt nur den logischen Block am Ziel neu. Das ist dokumentierte moderne Policy und keine historische Behauptung.
 
@@ -153,4 +153,4 @@ Der historische Bildschirm hatte eine feste Größe. Die Größenänderung eines
 
 ## V1-Abschlusskriterium
 
-Die C#/.NET-Implementierung deckt die großen strukturellen FIRST-ED-Bereiche inzwischen ausführbar ab, einschließlich Absatz-Neuformatierung und mehrzeiliger Block-Bulk-Topologie. Vor V1 auditieren wir noch das unabhängige Block-Endpunktmodell, schließen die systematischen Audits für Command-Grenzen/Fehlerressourcen und Unterbrechbarkeit ab, prüfen zusammengesetztes Undo/Navigationszustand bei dokumentübergreifenden Mutationen und führen anschließend einen finalen Audit des Handbuch-Prozedurindexes durch. MicroStar-spezifische Demonstrationen können als Samples statt als Core-Abhängigkeiten geliefert werden.
+Die C#/.NET-Implementierung deckt die großen strukturellen FIRST-ED-Bereiche inzwischen ausführbar ab, einschließlich Absatz-Neuformatierung, mehrzeiliger Block-Bulk-Topologie und unabhängiger Block-Endpunkte. Vor V1 schließen wir noch die systematischen Audits für Command-Grenzen/Fehlerressourcen und Unterbrechbarkeit ab, prüfen zusammengesetztes Undo/Navigationszustand bei dokumentübergreifenden Mutationen und führen anschließend einen finalen Audit des Handbuch-Prozedurindexes durch. MicroStar-spezifische Demonstrationen können als Samples statt als Core-Abhängigkeiten geliefert werden.

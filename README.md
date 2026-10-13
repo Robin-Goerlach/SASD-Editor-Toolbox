@@ -55,6 +55,7 @@ The current foundation contains:
 - structural realignment for Insert Line, New Line, automatic word-wrap, compatibility file reads, paragraph reformatting and character/word line joins;
 - marker invalidation and block-boundary cleanup on audited line deletion paths;
 - audited whole-line block copy/move/delete with cross-window/document operation, move-inside-block rejection, line-metadata preservation and bulk topology realignment;
+- independent FIRST-ED block-begin/block-end endpoint state through `EditorBlockState`, with a complete `EditorBlock` projection only when both limits form a valid contiguous range;
 - whole-line block begin/end/hide state plus block-boundary navigation;
 - `EditOffblock`/`EditMarkblock`-style separation of logical block limits from global `InBlock` highlight flags;
 - numbered line markers whose jumps preserve the selected target view's current column;
@@ -77,7 +78,7 @@ The current foundation contains:
 - English and German architecture/compatibility documentation;
 - automated unit tests.
 
-The remaining V1 work is increasingly concentrated rather than broad. The multi-line block topology gap is now closed. Remaining compatibility work includes the independent historical `Blockfrom`/`Blockto` endpoint-state audit, systematic command-boundary validation, complete long-operation abort coverage, typed historical error resources and a compound-undo/navigation-state audit for cross-document mutations. After those items, the handbook procedure/function index can be audited end-to-end for small omissions. MicroStar-specific UI features can remain samples rather than dependencies of the reusable core.
+The remaining V1 work is increasingly concentrated rather than broad. Multi-line block topology and the independent historical `Blockfrom`/`Blockto` endpoint lifecycle are now covered. Remaining compatibility work includes systematic command-boundary validation, complete long-operation abort coverage, typed modern error resources and a compound-undo/navigation-state audit for cross-document mutations. After those items, the handbook procedure/function index can be audited end-to-end for small omissions. MicroStar-specific UI features can remain samples rather than dependencies of the reusable core.
 
 ## Run the interactive FIRST-ED sample
 

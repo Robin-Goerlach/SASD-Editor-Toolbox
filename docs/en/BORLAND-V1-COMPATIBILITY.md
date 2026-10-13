@@ -50,15 +50,15 @@ The goal is behavioral coverage, not source-level or public-name identity.
 | `EditLongLine` / `EditShortLine` responsibilities | reformat plan push-down / pull-up | Implemented |
 | `EditReformat` Wrapped traversal / margin reflow | `FirstEdReformatCompatibilityProcessor` | Implemented |
 | Reformat word-too-long failure before mutation | preflight plan validation | Implemented |
-| Whole-line block model | `EditorBlock`, `EditorSession` | Implemented foundation; independent historical endpoint-state audit remains |
+| Whole-line block model | `EditorBlockState` + complete `EditorBlock` projection | Implemented |
 | `EditBlockCopy` | `FirstEdBlockCompatibilityProcessor.CopyToCursor` + topology | Implemented |
 | `EditBlockMove` | block compatibility processor + topology | Implemented |
 | `EditBlockMove` cursor-inside-source rejection | compatibility processor validation | Implemented |
 | `EditBlockDelete` | block compatibility processor + topology | Implemented |
 | Cross-window/document block operations | source block + current target window/document | Implemented |
 | Block copy/move line metadata | preserve `Wrapped`/`UserColored`; regenerate `InBlock` | Implemented |
-| Block hide/display | `EditorSession.ToggleBlockHidden` | Implemented foundation |
-| Independent `Blockfrom` / `Blockto` undefined states | current complete-pair `EditorBlock` model | Planned audit |
+| Block hide/display | `EditorSession.ToggleBlockHidden` | Implemented |
+| Independent `Blockfrom` / `Blockto` undefined states | nullable `EditorBlockState.Start` / `End` endpoints | Implemented |
 | `EditOffblock` global InBlock clear, limits retained | `EditorSession.ClearBlockHighlights` | Implemented |
 | `EditMarkblock` active-range flag projection | `EditorSession.MarkBlockHighlights` | Implemented |
 | Top/bottom of active block commands | compatibility processor | Implemented |
@@ -128,7 +128,7 @@ The historical implementation obtains stable line identity through descriptor po
 
 The audited single-line insertion, New Line, automatic wrap, file insertion, deletion/join, paragraph-reformat and multi-line block copy/move/delete paths now report topology changes centrally. The former block bulk-topology gap is closed.
 
-The first .NET block model stores a complete start/end pair. Historical `Blockfrom` and `Blockto` could be independently undefined, so exact Begin/End endpoint-state parity remains a separate audit item. When an ordinary deletion removes a represented boundary, the current complete-pair model conservatively clears the active block rather than pretending both historical pointers were necessarily reset.
+The .NET block state stores independently nullable begin/end endpoints and exposes a complete `EditorBlock` only when both limits form an ordered range in one document. Structural insertion realigns each endpoint independently; deleting one boundary invalidates only that endpoint and forces highlighting off until the pair becomes complete again.
 
 For a block move, the handbook does not separately specify whether markers or other anchors inside the moved source range follow the physical moved lines. The .NET implementation applies normal source-deletion semantics to those anchors and explicitly recreates the logical block at the destination. This is a documented modern policy, not a historical claim.
 
@@ -154,4 +154,4 @@ The historical screen was fixed-size. Resizing a modern terminal is therefore no
 
 ## V1 release gate
 
-The C#/.NET implementation now has executable coverage for the major FIRST-ED structural areas, including paragraph reformatting and whole-line block bulk topology. Before calling V1 complete, audit the independent block-endpoint model, finish systematic command-boundary/error-resource and interruptibility audits, review compound undo/navigation state for cross-document mutations, then run a final handbook procedure-index audit. MicroStar-specific demonstrations may ship as samples rather than core dependencies.
+The C#/.NET implementation now has executable coverage for the major FIRST-ED structural areas, including paragraph reformatting, whole-line block bulk topology and independent block endpoints. Before calling V1 complete, finish systematic command-boundary/error-resource and interruptibility audits, review compound undo/navigation state for cross-document mutations, then run a final handbook procedure-index audit. MicroStar-specific demonstrations may ship as samples rather than core dependencies.
