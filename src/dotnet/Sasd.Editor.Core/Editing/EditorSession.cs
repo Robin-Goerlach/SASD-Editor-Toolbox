@@ -19,6 +19,7 @@ public sealed class EditorSession
     private readonly List<EditorWindow> _windows = [];
     private readonly Dictionary<int, EditorMarker> _markers = [];
     private EditorBlockState _blockState = EditorBlockState.Empty;
+    private EditorBlock? _block;
 
     public EditorSession(IEditorHooks? hooks = null, IEditorFileCodec? fileCodec = null)
     {
@@ -58,7 +59,7 @@ public sealed class EditorSession
     /// Returns the currently usable contiguous block, or <see langword="null"/>
     /// while one of the two historical block endpoints is still undefined.
     /// </summary>
-    public EditorBlock? Block => _blockState.CompleteBlock;
+    public EditorBlock? Block => _block;
 
     /// <summary>
     /// Internal line-topology coordinator. Structural editing code uses this
@@ -240,7 +241,7 @@ public sealed class EditorSession
             end = null;
         }
 
-        _blockState = new EditorBlockState(start, end, Hidden: end is null);
+        SetBlockState(new EditorBlockState(start, end, Hidden: end is null));
         MarkBlockHighlights();
     }
 
@@ -267,7 +268,7 @@ public sealed class EditorSession
             start = null;
         }
 
-        _blockState = new EditorBlockState(start, end, Hidden: start is null);
+        SetBlockState(new EditorBlockState(start, end, Hidden: start is null));
         MarkBlockHighlights();
     }
 
@@ -280,11 +281,11 @@ public sealed class EditorSession
 
         if (!_blockState.Hidden)
         {
-            _blockState = _blockState with { Hidden = true };
+            SetBlockState(_blockState with { Hidden = true });
         }
         else if (_blockState.IsComplete)
         {
-            _blockState = _blockState with { Hidden = false };
+            SetBlockState(_blockState with { Hidden = false });
         }
 
         // An incomplete endpoint pair can never be displayed. Refreshing also
@@ -341,7 +342,7 @@ public sealed class EditorSession
         // Clearing stale block bits globally is intentionally stronger than only
         // touching the active document and mirrors EditOffblock's recovery role.
         ClearBlockHighlights();
-        _blockState = EditorBlockState.Empty;
+        SetBlockState(EditorBlockState.Empty);
     }
 
     public void SetMarker(int markerNumber)
@@ -393,7 +394,7 @@ public sealed class EditorSession
     /// preserving the richer endpoint-state model used by Begin/End commands.
     /// </summary>
     internal void ReplaceBlockForTopology(EditorBlock? block) =>
-        _blockState = block is null ? EditorBlockState.Empty : EditorBlockState.FromCompleteBlock(block);
+        SetBlockState(block is null ? EditorBlockState.Empty : EditorBlockState.FromCompleteBlock(block));
 
     /// <summary>
     /// Allows the topology coordinator to realign independently defined block
@@ -402,10 +403,23 @@ public sealed class EditorSession
     internal void ReplaceBlockStateForTopology(EditorBlockState state)
     {
         ArgumentNullException.ThrowIfNull(state);
-        _blockState = state.EnsureVisibilityInvariant();
+        SetBlockState(state);
     }
 
     internal bool BlockReferencesDocument(Guid documentId) => _blockState.ReferencesDocument(documentId);
+
+    /// <summary>
+    /// Updates raw endpoint state and the cached complete-block projection in one
+    /// place. Keeping the projection stable until the endpoint state changes
+    /// preserves the public Block object's identity for callers that only toggle
+    /// visual highlighting.
+    /// </summary>
+    private void SetBlockState(EditorBlockState state)
+    {
+        ArgumentNullException.ThrowIfNull(state);
+        _blockState = state.EnsureVisibilityInvariant();
+        _block = _blockState.CompleteBlock;
+    }
 
     private static EditorDocument CreateDocumentModel(string? text)
     {
