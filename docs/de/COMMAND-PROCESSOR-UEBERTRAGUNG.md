@@ -35,6 +35,16 @@ Das ist für spätere Implementierungen in C++, Java und JavaScript wichtig: Das
 | `EditSchedule` | `EditorScheduler.RunCycleAsync` | vorhandene Eingabe hat Vorrang vor Hintergrundarbeit |
 | `EditSystem` | `EditorSystemLoop.RunAsync` | Scheduler-Zyklen bis Rundown |
 
+## Validierung an der Befehlsgrenze
+
+`EditorCommandValidator` validiert vom Host gelieferte semantische Requests, bevor der Dispatcher Editorzustand verändert oder Datei-I/O beginnt. Geprüft werden erforderliche Zahlen-/Textargumente, einsbasierte Goto-/Fenster-/Randwerte, das Drei-Zeilen-Minimum für Create Window, Marker 1..20, positive Tab-/Undo-Werte, positive Page Sizes, nichtleere Suchmuster, explizite Replace-Werte sowie nichtleere Read-/Write-Pfade.
+
+Bewusst werden keine zustandsabhängigen Regeln dupliziert. Beispielsweise prüft `FirstEdCompatibilityProcessor` weiterhin den linken Rand gegen den aktuellen rechten Rand, und `EditorWindowLayout` entscheidet weiterhin, ob ein Spenderfenster nach einem Split sein Mindestmaß behält.
+
+Find/Replace besitzt jetzt zwei explizite Textfelder in `EditorCommandRequest`: `Text` enthält das Suchmuster und `Text2` den Ersatztext. Ein leerer Ersatztext ist gültig. Das frühere .NET-spezifische NUL-Packing wird als Übergangskompatibilität noch akzeptiert, vom Terminalhost aber nicht mehr erzeugt und gehört nicht zum portablen Vertrag.
+
+Der historische Kompatibilitätsbefehl für das Undo-Limit verwirft Werte unter 1. Der moderne `EditorUndoManager` darf von einer Anwendung weiterhin direkt auf 0 gesetzt werden, wenn Undo-Capture bewusst abgeschaltet werden soll; diese moderne Service-Fähigkeit ist getrennt von `EditSetUndoLimit`.
+
 ## Moderne Umsetzung von Fenster- und Stream-Besitz
 
 Die Pascal-Version musste Pointer umhängen, Bildschirmkoordinaten korrigieren und aufgegebene Text Streams explizit freigeben. SASD hält die Bildschirmzeilenverteilung in `EditorWindowLayout` und bildet gemeinsamen Text durch mehrere `EditorWindow`-Objekte ab, die auf dasselbe `EditorDocument` zeigen. Das Löschen einer verknüpften View kann dadurch keinen Text freigeben, der noch anderswo angezeigt wird; die Garbage Collection übernimmt den Lebenszyklus, sobald keine Referenzen mehr existieren.
@@ -52,7 +62,7 @@ Der Host besitzt die Bestätigungs-UI für Ctrl-K X; der Core besitzt die direkt
 ## Bewusst noch offen
 
 - der abschließende Prozedur-für-Prozedur-V1-Kompatibilitätsaudit und verbleibende Edge-Case-Tests;
-- typisierte historische Fehlerressourcen dort, wo sie Kompatibilitätswert liefern, ohne normale Anwendungen an Legacy-Wortlaut zu koppeln;
+- die breitere typisierte Fehler-/Ressourcenschicht (die Befehlsgrenzen-Validierung liefert bereits typisierte Validierungskategorien);
 - MicroStar-Menüs, Pop-ups und Hintergrunddruck als spätere Beispiele.
 
 Diese Trennung ist wichtiger als ein schneller monolithischer Port.

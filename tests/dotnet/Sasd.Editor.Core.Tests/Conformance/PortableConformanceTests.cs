@@ -45,6 +45,8 @@ public sealed class PortableConformanceTests
         string caseId,
         string caseJson)
     {
+        Assert.False(string.IsNullOrWhiteSpace(caseId));
+
         using var parsed = JsonDocument.Parse(caseJson);
         var testCase = parsed.RootElement;
 

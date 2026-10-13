@@ -203,29 +203,24 @@ When the user says only “continue”, “keep going” or asks Codex to work a
 
 ### P0 - V1 release-gate work
 
-The independent historical block-endpoint lifecycle is implemented through `EditorBlockState`; `EditorBlock` is now only the complete operational projection. The next unfinished release-gate item is therefore command-boundary validation.
+The independent historical block-endpoint lifecycle and the semantic command-boundary/parameter-validation audit are implemented. `EditorCommandValidator` rejects malformed requests before mutation or I/O and exposes typed validation categories. The next unfinished release-gate item is the broader typed error/resource model.
 
-1. **Command-boundary and parameter validation audit**
-   - Review all `EditorCommandId` paths and compatibility processor arguments.
-   - Include `SetUndoLimit`, window numbers/sizes, margins, tab width, marker numbers, goto values, file arguments and search/replace arguments.
-   - Prefer typed validation/results over UI-specific messages.
-
-2. **Typed error/resource model**
+1. **Typed error/resource model**
    - Introduce stable modern error identifiers/resources where command behavior requires them.
    - Do not copy a historical error-message catalog verbatim.
    - Hosts decide how errors are rendered.
 
-3. **Abort/interruptibility audit**
+2. **Abort/interruptibility audit**
    - Host-originated Ctrl-U already establishes an abort boundary in typeahead.
    - Audit long or iterative operations so abort/cancellation is observed at sensible safe points.
    - Reconcile historical abort behavior with modern `CancellationToken` without duplicating cancellation systems unnecessarily.
 
-4. **Compound undo/navigation-state audit**
+3. **Compound undo/navigation-state audit**
    - Review cross-document block move and other multi-document mutations.
    - The current snapshot backend is correctness-first; do not replace it merely for performance.
    - Determine whether one logical command requires one atomic compound undo transaction and which navigation/view state must be restored.
 
-5. **Final handbook procedure/function-index audit**
+4. **Final handbook procedure/function-index audit**
    - Compare the historical procedure/function inventory against the compatibility matrix and implementation.
    - Classify each item as Implemented, Replaced by modern invariant, Not Applicable, Sample/Host concern, or intentionally deferred.
    - Add regression coverage for any small omissions found.

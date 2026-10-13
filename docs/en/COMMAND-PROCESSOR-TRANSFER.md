@@ -35,6 +35,16 @@ This arrangement is intentional for later C++, Java and JavaScript implementatio
 | `EditSchedule` | `EditorScheduler.RunCycleAsync` | pending input wins over background work |
 | `EditSystem` | `EditorSystemLoop.RunAsync` | repeats scheduler cycles until rundown |
 
+## Command-boundary validation
+
+`EditorCommandValidator` validates host-supplied semantic requests before the dispatcher mutates editor state or begins file I/O. It covers required numeric/text arguments, one-based goto/window/margin values, the three-row Create Window minimum, marker range 1..20, positive tab/undo limits, positive page sizes, non-empty search patterns, explicit replace values and non-blank Read/Write paths.
+
+The validator intentionally does not duplicate stateful rules owned by compatibility services. For example, the left margin still checks the current right margin in `FirstEdCompatibilityProcessor`, and window creation still asks `EditorWindowLayout` whether the donor can retain its minimum height.
+
+Find/replace now has two explicit text slots in `EditorCommandRequest`: `Text` is the search pattern and `Text2` is the replacement. Empty replacement remains valid. The former .NET-only NUL-packed payload is accepted as a transition compatibility form but is no longer emitted by the terminal host and is not part of the portable contract.
+
+The historical compatibility command for the undo limit rejects values below 1. The underlying modern `EditorUndoManager` may still be configured directly with zero by an application that deliberately wants to disable capture; that modern service capability is separate from `EditSetUndoLimit`.
+
 ## Important modern replacement: window and stream ownership
 
 The Pascal implementation had to splice pointers, adjust screen coordinates and explicitly destroy abandoned text streams. SASD keeps screen-row allocation in `EditorWindowLayout` and represents shared text by several `EditorWindow` objects referencing one `EditorDocument`. Deleting one linked view therefore cannot accidentally free text still shown elsewhere; normal garbage collection owns document lifetime once references disappear.
@@ -52,7 +62,7 @@ The host owns the confirmation UI for Ctrl-K X; the core owns the direct exit/ru
 ## Still deliberately pending
 
 - the final procedure-by-procedure V1 compatibility audit and remaining edge-case tests;
-- typed historical error resources where they add compatibility value without coupling normal applications to legacy wording;
+- the broader typed error/resource layer (command-boundary validation already exposes typed validation categories);
 - MicroStar-specific menu, popup and background-print examples.
 
 Keeping these concerns separate is more important than making a large monolithic port quickly.

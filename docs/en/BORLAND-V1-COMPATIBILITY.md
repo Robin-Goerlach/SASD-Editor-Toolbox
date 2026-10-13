@@ -67,7 +67,7 @@ The goal is behavioral coverage, not source-level or public-name identity.
 | Marker realignment for audited line insertion/deletion paths | `EditorLineTopology` | Implemented |
 | Stable anchors through reformat/block bulk topology | compatibility processors + topology | Implemented |
 | Marker policy for lines moved out of source block | source deletion semantics; block recreated at target | Documented modern policy |
-| Undo limit and undo operation | `EditorUndoManager` + command binding | Implemented (snapshot backend) |
+| Undo limit and undo operation | `EditorUndoManager` + validated compatibility command | Implemented (snapshot backend; compatibility limit >= 1) |
 | Destructive-document undo cleanup | `EditorUndoManager.DiscardDocument` | Implemented |
 | Cross-document block-move compound undo | separate source/target snapshots | Foundation / backend audit |
 | Forward find / remembered Find Again | `EditorSearchService` | Implemented |
@@ -78,7 +78,8 @@ The goal is behavioral coverage, not source-level or public-name identity.
 | Host prompting contract | `EditorCommandArgumentKind` | Implemented |
 | Terminal prompt implementation | `ConsoleFirstEdPromptService` | Implemented sample |
 | Dirty/change flag | `EditorDocument.IsDirty` | Implemented |
-| General command dispatcher | `EditorCommandDispatcher` | Foundation / expanding |
+| General command dispatcher | `EditorCommandDispatcher` | Implemented foundation |
+| Semantic command-boundary validation | `EditorCommandValidator` + typed validation categories | Implemented |
 | Normalized host-independent keystrokes | `EditorKeyStroke` | Implemented |
 | Historical default typeahead capacity | `EditorTypeaheadBuffer.DefaultCapacity = 500` | Implemented |
 | `Pokechr` queue-style host insertion | `EditorTypeaheadBuffer.EnqueueFromHost` | Implemented |
@@ -154,4 +155,4 @@ The historical screen was fixed-size. Resizing a modern terminal is therefore no
 
 ## V1 release gate
 
-The C#/.NET implementation now has executable coverage for the major FIRST-ED structural areas, including paragraph reformatting, whole-line block bulk topology and independent block endpoints. Before calling V1 complete, finish systematic command-boundary/error-resource and interruptibility audits, review compound undo/navigation state for cross-document mutations, then run a final handbook procedure-index audit. MicroStar-specific demonstrations may ship as samples rather than core dependencies.
+The C#/.NET implementation now has executable coverage for the major FIRST-ED structural areas, including paragraph reformatting, whole-line block bulk topology and independent block endpoints. Before calling V1 complete, finish the typed error/resource and interruptibility audits, review compound undo/navigation state for cross-document mutations, then run a final handbook procedure-index audit. MicroStar-specific demonstrations may ship as samples rather than core dependencies.

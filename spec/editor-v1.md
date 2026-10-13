@@ -140,6 +140,12 @@ The handbook does not separately define whether markers or other non-block ancho
 - A key map never prompts the user directly. Instead it declares whether a command requires text, a number, two numbers, a character, a file path, find/replace values or confirmation.
 - Numbered prefix commands may carry their number directly in the binding.
 - A command-filter hook may rewrite a semantic command before dispatch.
+- The semantic command boundary validates request shape and stable ranges before mutation or file I/O. Invalid requests fail without applying the command.
+- One-based line/column/window values, tab width and the FIRST-ED undo-limit command require values of at least 1. Create Window additionally requires a size of at least 3 rows. Numbered markers are restricted to 1..20.
+- A supplied visible-page size must contain at least one text row.
+- Find requires a non-empty pattern. Replace requires a non-empty pattern and a replacement value; an empty replacement is valid. Portable request models represent pattern and replacement as separate textual arguments.
+- Read/Write file commands require a non-blank resolved path. Save may omit a path when the document already has an associated path.
+- Stateful constraints, such as a left margin not exceeding the current right margin or a donor window retaining its three-row minimum, are validated by the service that owns that state after the request envelope has passed boundary validation.
 - The engine itself must remain callable directly by application code.
 - Hosts may add modern aliases (for example arrow keys) without removing the historical command sequences.
 - V1 provides an editor-owned bounded typeahead abstraction with a default capacity of 500 logical input units.

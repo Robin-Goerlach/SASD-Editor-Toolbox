@@ -67,7 +67,7 @@ Ziel ist funktionale Abdeckung, nicht eine identische Quellcode- oder API-Strukt
 | Marker-Realignment in auditierten Insert-/Delete-Pfaden | `EditorLineTopology` | Implementiert |
 | Stabile Anker bei Reformat-/Block-Bulk-Topologie | Compatibility Processor + Topologie | Implementiert |
 | Marker-Policy für aus dem Quellblock verschobene Zeilen | Quell-Löschsemantik; Block am Ziel neu erzeugt | Dokumentierte moderne Policy |
-| Undo inkl. Limit | `EditorUndoManager` + Command Binding | Implementiert (Snapshot-Backend) |
+| Undo inkl. Limit | `EditorUndoManager` + validierter Kompatibilitätsbefehl | Implementiert (Snapshot-Backend; Kompatibilitätslimit >= 1) |
 | Undo-Bereinigung zerstörter Dokumente | `EditorUndoManager.DiscardDocument` | Implementiert |
 | Zusammengesetztes Undo bei dokumentübergreifendem Block-Move | getrennte Quell-/Ziel-Snapshots | Grundlage / Backend-Audit |
 | Vorwärtssuche / gemerktes Find Again | `EditorSearchService` | Implementiert |
@@ -78,7 +78,8 @@ Ziel ist funktionale Abdeckung, nicht eine identische Quellcode- oder API-Strukt
 | Host-Abfragevertrag | `EditorCommandArgumentKind` | Implementiert |
 | Terminal-Abfragen | `ConsoleFirstEdPromptService` | Implementiertes Beispiel |
 | Dirty-/Change-Flag | `EditorDocument.IsDirty` | Implementiert |
-| Allgemeiner Command Dispatcher | `EditorCommandDispatcher` | Grundlage / wird erweitert |
+| Allgemeiner Command Dispatcher | `EditorCommandDispatcher` | Implementierte Grundlage |
+| Semantische Validierung an der Befehlsgrenze | `EditorCommandValidator` + typisierte Validierungskategorien | Implementiert |
 | UI-unabhängige normalisierte Tasten | `EditorKeyStroke` | Implementiert |
 | Historische Typeahead-Standardkapazität | `EditorTypeaheadBuffer.DefaultCapacity = 500` | Implementiert |
 | `Pokechr`-artige Queue-Eingabe | `EditorTypeaheadBuffer.EnqueueFromHost` | Implementiert |
@@ -153,4 +154,4 @@ Der historische Bildschirm hatte eine feste Größe. Die Größenänderung eines
 
 ## V1-Abschlusskriterium
 
-Die C#/.NET-Implementierung deckt die großen strukturellen FIRST-ED-Bereiche inzwischen ausführbar ab, einschließlich Absatz-Neuformatierung, mehrzeiliger Block-Bulk-Topologie und unabhängiger Block-Endpunkte. Vor V1 schließen wir noch die systematischen Audits für Command-Grenzen/Fehlerressourcen und Unterbrechbarkeit ab, prüfen zusammengesetztes Undo/Navigationszustand bei dokumentübergreifenden Mutationen und führen anschließend einen finalen Audit des Handbuch-Prozedurindexes durch. MicroStar-spezifische Demonstrationen können als Samples statt als Core-Abhängigkeiten geliefert werden.
+Die C#/.NET-Implementierung deckt die großen strukturellen FIRST-ED-Bereiche inzwischen ausführbar ab, einschließlich Absatz-Neuformatierung, mehrzeiliger Block-Bulk-Topologie und unabhängiger Block-Endpunkte. Vor V1 schließen wir noch die Audits für typisierte Fehler/Ressourcen und Unterbrechbarkeit ab, prüfen zusammengesetztes Undo/Navigationszustand bei dokumentübergreifenden Mutationen und führen anschließend einen finalen Audit des Handbuch-Prozedurindexes durch. MicroStar-spezifische Demonstrationen können als Samples statt als Core-Abhängigkeiten geliefert werden.

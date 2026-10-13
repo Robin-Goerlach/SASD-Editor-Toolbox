@@ -18,7 +18,7 @@ Operation identifiers are test-harness vocabulary, not required public API names
 
 ## Case shape
 
-Each case has a stable `id`, an `area`, an `initial` portable state, one semantic `operation`, and an `expect` object containing the subset of state that must match.
+Each case has a stable `id`, an `area`, an `initial` portable state, one semantic `operation`, and an `expect` object containing the subset of state that must match. An operation may carry portable `text`, `text2`, `number`, `number2` or `pageSize` fields. Expectations may include `commandSucceeded` so invalid-boundary behavior can be tested without depending on target-language exception types.
 
 The initial smoke cases intentionally cover small, well-established invariants. More cases should be added as command-boundary behavior is finalized. Avoid encoding implementation details such as C# GUID types, pointer addresses, collection classes or exception class names.
 
