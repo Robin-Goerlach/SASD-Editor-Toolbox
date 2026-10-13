@@ -94,18 +94,31 @@ public sealed class EditorInterruptionService(EditorSession session)
         catch (EditorOperationAbortedException)
         {
             linkedCancellation.Cancel();
-
-            try
-            {
-                await operationTask.ConfigureAwait(false);
-            }
-            catch (OperationCanceledException) when (linkedCancellation.IsCancellationRequested)
-            {
-                // Expected: the editor abort requested cancellation of the
-                // in-flight operation. The typed abort is rethrown below.
-            }
-
+            await ObserveCancellationAsync(operationTask, linkedCancellation.Token).ConfigureAwait(false);
             throw;
+        }
+        catch (OperationCanceledException) when (cancellationToken.IsCancellationRequested)
+        {
+            // External cancellation is not an editor error, but the in-flight
+            // operation still needs to be observed before this service returns.
+            linkedCancellation.Cancel();
+            await ObserveCancellationAsync(operationTask, linkedCancellation.Token).ConfigureAwait(false);
+            throw;
+        }
+    }
+
+    private static async ValueTask ObserveCancellationAsync<T>(
+        Task<T> operationTask,
+        CancellationToken linkedCancellationToken)
+    {
+        try
+        {
+            await operationTask.ConfigureAwait(false);
+        }
+        catch (OperationCanceledException) when (linkedCancellationToken.IsCancellationRequested)
+        {
+            // Expected cancellation path. Other failures still propagate because
+            // they may indicate a real I/O/provider error that must not be hidden.
         }
     }
 
