@@ -67,7 +67,9 @@ public sealed class CompoundUndoCompatibilityTests
         Assert.Equal(2, session.Block.LastLine);
         Assert.True(source.Document.Buffer.GetLine(1).Flags.HasFlag(EditorLineFlags.InBlock));
         Assert.True(source.Document.Buffer.GetLine(2).Flags.HasFlag(EditorLineFlags.InBlock));
-        Assert.False(target.Document.Buffer.Snapshot().Any(line => line.Flags.HasFlag(EditorLineFlags.InBlock)));
+        Assert.DoesNotContain(
+            target.Document.Buffer.Snapshot(),
+            line => line.Flags.HasFlag(EditorLineFlags.InBlock));
 
         // Markers shifted by source deletion / target insertion are restored too.
         Assert.True(session.JumpToMarker(1));
