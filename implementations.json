@@ -9,7 +9,8 @@
       "source": "src/dotnet",
       "tests": "tests/dotnet",
       "samples": "samples/dotnet",
-      "ci": ".github/workflows/dotnet.yml"
+      "ci": ".github/workflows/dotnet.yml",
+      "conformanceAdapter": "tests/dotnet/Sasd.Editor.Core.Tests/Conformance/PortableConformanceTests.cs"
     },
     {
       "id": "cpp",

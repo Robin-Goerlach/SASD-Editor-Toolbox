@@ -15,4 +15,9 @@
   <ItemGroup>
     <ProjectReference Include="../../../src/dotnet/Sasd.Editor.Core/Sasd.Editor.Core.csproj" />
   </ItemGroup>
+  <ItemGroup>
+    <None Include="../../../conformance/v1/**/*.json"
+          Link="conformance/%(RecursiveDir)%(Filename)%(Extension)"
+          CopyToOutputDirectory="PreserveNewest" />
+  </ItemGroup>
 </Project>

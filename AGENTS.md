@@ -286,7 +286,7 @@ Never implement a routine merely because its Pascal name exists. First decide wh
 
 - Code, APIs, namespaces/packages and public identifiers are English.
 - Follow idiomatic safety features in each language. In .NET, nullable reference types remain enabled.
-- Public APIs should have useful XML documentation where their contract is not self-evident.
+- Public APIs should have useful documentation comments appropriate to the language where their contract is not self-evident; .NET uses XML documentation comments.
 - Comments explain **why**, invariants, compatibility boundaries and trade-offs.
 - Avoid comments that merely restate syntax.
 - Keep methods and types focused on editor concepts.

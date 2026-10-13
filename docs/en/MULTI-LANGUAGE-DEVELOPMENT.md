@@ -61,6 +61,8 @@ A language-specific conformance adapter belongs under `tests/<language>/`. It ma
 
 Expected-state objects are intentionally partial. A runner checks the fields present in `expect` and may ignore unrelated native state. This keeps cases stable even when implementations expose additional diagnostics or internal metadata.
 
+The .NET test project contains the first adapter and executes the shared V1 smoke cases in normal CI. It is intentionally small and maps conceptual operation IDs to the existing semantic `EditorCommandDispatcher`; this adapter is a pattern for other languages, not a required API design.
+
 ## CI strategy
 
 Repository-wide validation and language builds are separate concerns:

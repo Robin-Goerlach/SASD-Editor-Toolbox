@@ -55,6 +55,8 @@ Ein sprachspezifischer Conformance-Adapter gehört unter `tests/<sprache>/`. Er 
 
 Erwartete Zustände sind bewusst partiell. Ein Runner prüft nur die unter `expect` angegebenen Felder und darf zusätzliche native Diagnose- oder interne Zustände ignorieren.
 
+Das .NET-Testprojekt enthält den ersten Adapter und führt die gemeinsamen V1-Smoke-Fälle in der normalen CI aus. Der Adapter ist bewusst klein und bildet die konzeptionellen Operation-IDs auf den vorhandenen semantischen `EditorCommandDispatcher` ab; er ist ein Muster für weitere Sprachen und keine vorgeschriebene API-Struktur.
+
 ## CI-Strategie
 
 Repository-Verifikation und Sprach-Builds sind getrennte Aufgaben:

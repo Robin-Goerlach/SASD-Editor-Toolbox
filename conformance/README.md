@@ -30,4 +30,6 @@ Run:
 python3 tools/verify_repository_contract.py
 ```
 
-This validates implementation-lane declarations, required directory roots, conformance manifests and the basic case envelope. Language-specific runners will later provide the behavioral execution step.
+This validates implementation-lane declarations, required directory roots, conformance manifests and the basic case envelope.
+
+The .NET test lane already contains a conformance adapter that executes every case in `v1/cases/core-smoke.json` through the public semantic command layer. C++ and Java should follow the same adapter pattern when those implementations begin.
