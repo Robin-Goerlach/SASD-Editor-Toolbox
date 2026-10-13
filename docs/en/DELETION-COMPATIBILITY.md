@@ -37,7 +37,7 @@ The .NET implementation uses Unicode-aware `char.IsLetterOrDigit` and `char.IsWh
 
 ## Delete Line
 
-The semantic `DeleteLine` command is routed through the compatibility processor. Its special rules are documented in `LINE-TOPOLOGY-AND-REALIGNMENT.md`: the sole remaining logical-line container is retained and blanked, markers on a deleted line become undefined, block-boundary deletion disables the active block representation, and all surviving references are realigned.
+The semantic `DeleteLine` command is routed through the compatibility processor. Its special rules are documented in `LINE-TOPOLOGY-AND-REALIGNMENT.md`: the sole remaining logical-line container is retained and its previous stored character span is filled with spaces, markers on a deleted line become undefined, block-boundary deletion disables the active block representation, and all surviving references are realigned.
 
 ## Virtual columns and structural normalization
 

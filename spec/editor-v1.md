@@ -67,7 +67,7 @@ V1 includes character/word/line movement, page movement, beginning/end/top/botto
 - Delete Right Word uses the same three character classes as Word Right, removes the current class run plus immediately following blanks, and uses the same following-line join rule when the cursor is beyond the last non-blank.
 - A line join places the first character of the joined line at the cursor location used by the join operation; it must not manufacture a gap merely because the surviving line has trailing blank storage beyond that logical join point.
 - Deleting the current line invalidates a marker on that line. If the line is a block boundary, that boundary becomes undefined and visible block highlighting is removed.
-- A text stream must retain at least one logical line. Deleting its sole line blanks that line rather than removing the final logical-line container.
+- A text stream must retain at least one logical line. Deleting its sole line fills its existing stored character span with spaces rather than removing the final logical-line container; the stored line length therefore remains observable until later editing changes it.
 
 ### Paragraph reformatting
 

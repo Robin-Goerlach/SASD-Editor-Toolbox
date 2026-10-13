@@ -62,7 +62,7 @@
         "documents": {
           "doc-1": {
             "lines": [
-              { "text": "", "flags": [] }
+              { "text": "         ", "flags": [] }
             ]
           }
         },

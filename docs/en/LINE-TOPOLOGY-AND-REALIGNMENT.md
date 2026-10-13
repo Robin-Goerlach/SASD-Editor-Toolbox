@@ -12,7 +12,7 @@ This is a clean-room behavioral transfer. The handbook is used to identify obser
 
 The V1 audit currently transfers the following observable rules:
 
-- `EditDeleteLine` deletes the current logical line. When it is the only remaining line, the line descriptor remains and the line is blanked instead of removing the final line from the stream.
+- `EditDeleteLine` deletes the current logical line. When it is the only remaining line, the line descriptor remains and the line's existing stored character span is filled with spaces instead of removing the final line from the stream.
 - A marker that points at a deleted line becomes undefined.
 - If a deleted line is a block boundary, that boundary becomes undefined and block highlighting is removed.
 - Windows that pointed at a deleted current/top line must remain attached to a valid line.

@@ -12,7 +12,7 @@ Es handelt sich um eine Clean-Room-Übertragung des beobachtbaren Verhaltens. Da
 
 Der aktuelle V1-Audit überträgt folgende beobachtbare Regeln:
 
-- `EditDeleteLine` löscht die aktuelle logische Zeile. Ist sie die einzige verbleibende Zeile, bleibt der Zeilendeskriptor bestehen und die Zeile wird geleert, statt die letzte Zeile aus dem Textstrom zu entfernen.
+- `EditDeleteLine` löscht die aktuelle logische Zeile. Ist sie die einzige verbleibende Zeile, bleibt der Zeilendeskriptor bestehen und die bisher gespeicherte Zeichenlänge wird mit Leerzeichen gefüllt, statt die letzte Zeile aus dem Textstrom zu entfernen.
 - Ein Marker auf einer gelöschten Zeile wird undefiniert.
 - Ist die gelöschte Zeile eine Blockgrenze, wird diese Grenze undefiniert und die Blockhervorhebung abgeschaltet.
 - Fenster, deren aktuelle Zeile oder Top-Zeile gelöscht wurde, müssen anschließend weiterhin auf eine gültige Zeile zeigen.

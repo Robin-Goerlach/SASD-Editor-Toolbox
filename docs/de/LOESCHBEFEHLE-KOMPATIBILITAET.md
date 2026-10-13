@@ -37,7 +37,7 @@ Die .NET-Implementierung verwendet Unicode-fähige `char.IsLetterOrDigit`- und `
 
 ## Delete Line
 
-Auch der semantische Befehl `DeleteLine` läuft durch den Compatibility Processor. Seine Sonderregeln stehen in `ZEILENTOPOLOGIE-UND-REALIGNMENT.md`: Der einzige verbleibende logische Zeilencontainer wird erhalten und geleert, Marker auf der gelöschten Zeile werden undefiniert, das Löschen einer Blockgrenze deaktiviert die aktive Blockrepräsentation und alle überlebenden Referenzen werden realigned.
+Auch der semantische Befehl `DeleteLine` läuft durch den Compatibility Processor. Seine Sonderregeln stehen in `ZEILENTOPOLOGIE-UND-REALIGNMENT.md`: Der einzige verbleibende logische Zeilencontainer wird erhalten und seine bisher gespeicherte Zeichenlänge mit Leerzeichen gefüllt, Marker auf der gelöschten Zeile werden undefiniert, das Löschen einer Blockgrenze deaktiviert die aktive Blockrepräsentation und alle überlebenden Referenzen werden realigned.
 
 ## Virtuelle Spalten und strukturelle Normalisierung
 
