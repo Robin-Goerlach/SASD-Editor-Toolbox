@@ -41,6 +41,8 @@ Moderne Pfeiltasten sowie Home, End, Page Up und Page Down bleiben zusätzliche 
 
 Console-/Terminal-APIs melden nicht auf jedem Betriebssystem und Terminalemulator alle Steuerkombinationen identisch. Der Adapter normalisiert deshalb nur das, was der Host tatsächlich liefert; der Core bleibt davon unabhängig. Wo die Plattform es zulässt, wird Ctrl-C als normale Eingabe behandelt, damit auch die historische Belegung erreichbar ist.
 
-## Noch offen
+## Aktuelle Darstellung gestapelter Fenster
 
-Das Beispiel ist jetzt tatsächlich interaktiv, stellt aber jeweils das **aktuelle Fenster** dar und noch nicht die historische vertikal gestapelte physische Fensteraufteilung. `CreateWindow` erzeugt bereits ein logisches Editorfenster; exaktes Aufteilen/Komprimieren von Bildschirmzeilen und gleichzeitiges Multi-Window-Rendering ist der nächste Host-/Layout-Kompatibilitätsschritt.
+Das Beispiel rendert inzwischen alle übereinander angeordneten `EditorWindowFrame`-Bereiche mit eigenen Status- und Textzeilen. Das aktuelle Fenster besitzt den physischen Terminal-Cursor; `EditorSession.EnsureAllWindowCursorsHorizontallyVisible(width)` stellt **in jeder View** die horizontale Sichtbarkeit sicher, bevor gerendert wird.
+
+Damit bleiben die historische All-Fenster-Regel und die fensterspezifischen absoluten Zeilennummern Teil des wiederverwendbaren Editor-Modells. Dynamisches Terminal-Resize und plattformspezifische Tasten bleiben Host-Policy; MicroStar-Pulldown-Menüs und Pop-ups sind spätere Host-Beispiele.

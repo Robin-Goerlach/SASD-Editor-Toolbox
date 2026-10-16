@@ -42,6 +42,37 @@ public sealed class EditorWindow
     }
 
     /// <summary>
+    /// Adjusts the horizontal viewport only when the cursor would otherwise be
+    /// clipped. This is the view-local half of the historical EditHscroll rule.
+    /// </summary>
+    /// <param name="visibleColumns">Positive number of text columns supplied by the host.</param>
+    /// <remarks>
+    /// The cursor may be in virtual space beyond the stored line length. Use
+    /// cursor coordinates rather than the text length, and subtract before
+    /// comparing to avoid overflow when a cursor reaches int.MaxValue.
+    /// </remarks>
+    public void EnsureCursorHorizontallyVisible(int visibleColumns)
+    {
+        ArgumentOutOfRangeException.ThrowIfNegativeOrZero(visibleColumns);
+
+        var left = Math.Max(0, LeftColumn);
+        var column = Cursor.Column;
+        if (column < left)
+        {
+            // Keep the previously off-screen cursor at the new left edge.
+            left = column;
+        }
+        else if (column - left >= visibleColumns)
+        {
+            // Preserve the smallest shift required to show the cursor on the
+            // rightmost text column. This never depends on line text length.
+            left = column - visibleColumns + 1;
+        }
+
+        LeftColumn = left;
+    }
+
+    /// <summary>
     /// Normalizes line and viewport coordinates after a structural mutation while
     /// deliberately preserving non-negative virtual cursor columns. FIRST-ED can
     /// move the cursor beyond the current physical line length, so clamping the

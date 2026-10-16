@@ -178,6 +178,27 @@ public sealed class EditorSession
         return CurrentWindow;
     }
 
+    /// <summary>
+    /// Ensures every displayed view's cursor is visible horizontally, matching
+    /// the observable window-wide responsibility of historical EditHscroll.
+    /// </summary>
+    /// <remarks>
+    /// The terminal host has a common text-column width. Hosts with unequal
+    /// window widths can call EditorWindow.EnsureCursorHorizontallyVisible on
+    /// each view with its own width. This bounded in-memory pass intentionally
+    /// does not poll keyboard input: the original polling guarded a long
+    /// DOS-era screen walk, which the indexed model no longer performs.
+    /// </remarks>
+    public void EnsureAllWindowCursorsHorizontallyVisible(int visibleColumns)
+    {
+        // Validate before touching any view, avoiding partial state updates.
+        ArgumentOutOfRangeException.ThrowIfNegativeOrZero(visibleColumns);
+        foreach (var window in _windows)
+        {
+            window.EnsureCursorHorizontallyVisible(visibleColumns);
+        }
+    }
+
     public EditorDocument? FindDocument(Guid documentId) =>
         _windows.Select(static window => window.Document)
             .FirstOrDefault(document => document.DocumentId == documentId);

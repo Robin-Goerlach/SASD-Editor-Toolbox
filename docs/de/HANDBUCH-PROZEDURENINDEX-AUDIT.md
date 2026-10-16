@@ -10,18 +10,22 @@ Die Klassifikation beschreibt **beobachtbare Aufgaben**, keine 1:1-Abbildung his
 
 | Klassifikation | Anzahl | Bedeutung |
 |---|---:|---|
-| Implemented | 83 | Dokumentierte Aufgabe in der .NET-Referenz abgebildet. |
-| Modern replacement | 7 | Moderne Invariante/Abstraktion ersetzt historische interne Mechanik. |
+| Implemented | 84 | Dokumentierte Aufgabe in der .NET-Referenz abgebildet. |
+| Modern replacement | 8 | Moderne Invariante/Abstraktion ersetzt historische interne Mechanik. |
 | Host/sample concern | 27 | Darstellung, Prompts und Wrapper gehören nicht zum portablen Core. |
 | Not applicable | 3 | DOS-/BIOS-/Videospeichermechanik ist nicht portabel. |
 | Documented divergence | 1 | Bewusst dokumentierte moderne Abweichung. |
-| Needs review | 2 | Vollständiger Verhaltensnachweis steht noch aus. |
+| Needs review | 0 | Vollständiger Verhaltensnachweis steht noch aus. |
 | **Gesamt** | **123** | Ein Eintrag je gedruckter Funktionsbeschreibung. |
 
-## Offene Prüfungen
+## Zuordnung der letzten zwei Routinen
 
-- `EditGenlineno` (Handbuch S. 176): Verhalten und Regressionstests gegen die Originalbeschreibung prüfen.
-- `EditHscroll` (Handbuch S. 179): Verhalten und Regressionstests gegen die Originalbeschreibung prüfen.
+- `EditGenlineno` (Handbuch S. 176): Der historische Rückwärtslauf wird durch `Cursor.Line + 1` im fensterspezifischen Status ersetzt; die Berechnung ist O(1) und hat keine Darstellungs-Nebeneffekte.
+- `EditHscroll` (Handbuch S. 179): Der UI-unabhängige Kern korrigiert die horizontale Sichtbarkeit **aller** Fenster anhand einer vom Host gelieferten Breite; der Terminalhost ruft den Dienst vor dem Rendern aller Fenster auf.
+
+Siehe [Kompatibilität von Zeilennummern und horizontaler Sichtbarkeit](BILDSCHIRMPOSITION-KOMPATIBILITAET.md) einschließlich der bewusst abweichenden historischen Abbruchprüfung.
+
+In der **ersten Indexzuordnung** bleiben keine `needs-review`-Einträge übrig. Das ist ausdrücklich **keine abschließende V1-Freigabe**: Testtiefe, Host-Wrapper und alle als implementiert eingeordneten Routinen benötigen weiterhin einen gezielten Release-Audit.
 
 `EditDefineTab` ist eine dokumentierte Abweichung: historische globale Tabulatorbreite gegenüber SASD-Fensteroptionen. Für interaktive Kommandoprozessoren und Bildschirmfunktionen müssen die Host-Grenzen gesondert bewertet werden; dies ist keine Behauptung einer vollständigen DOS-Oberflächenkopie.
 
@@ -29,5 +33,5 @@ Die Klassifikation beschreibt **beobachtbare Aufgaben**, keine 1:1-Abbildung his
 
 Jeden offenen Eintrag anhand seiner eigenen Handbuchbeschreibung prüfen, die bereits vorhandenen Tests abgleichen und nur bei echten Verhaltenslücken unabhängigen Code samt Regressionstests ergänzen. Auch die als implementiert eingestuften Zuordnungen brauchen einen Randfall-/Testabgleich; künstliche Pascal-APIs sind ausdrücklich unerwünscht. Inventarliste, deutsche/englische Audit-Dokumente, Matrix und nötigenfalls sprachneutralen Vertrag/Conformance-Fälle synchron halten.
 
-Die Python-Vertragsprüfung sichert **123 eindeutige Namen**, die fortlaufenden gedruckten Seiten **118–240**, zulässige Statuswerte und existente Belegpfade. Das beweist die **Inventarvollständigkeit**, nicht die historische Verhaltensgleichheit. V1 bleibt offen, bis die weiteren fachlichen Prüfungen abgeschlossen sind.
+Die Python-Vertragsprüfung sichert **123 eindeutige Namen**, die fortlaufenden gedruckten Seiten **118–240**, zulässige Statuswerte und existente Belegpfade. Das beweist die **Inventarvollständigkeit**, nicht die historische Verhaltensgleichheit. V1 bleibt bis zum Abschluss des übergreifenden Verhaltens- und Regressionstest-Audits offen.
 

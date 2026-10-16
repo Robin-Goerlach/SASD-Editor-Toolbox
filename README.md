@@ -74,6 +74,7 @@ The current foundation contains:
 - explicit `Wrapped` semantics as a soft outgoing word-wrap boundary, aligned across automatic wrapping, reformatting and the legacy high-bit-CR file codec;
 - historical FIRST-ED begin/end/goto, top/bottom-file and viewport-aware movement semantics isolated behind compatibility processors;
 - display-row-aware line scrolling and page movement supplied with a host-visible row count;
+- a host-neutral all-window horizontal cursor visibility rule and indexed absolute-line status projection, replacing DOS-era screen-scanning helpers;
 - audited left/right character deletion, right-word deletion and line deletion, including cursor-positioned line joins and the sole-line blanking rule;
 - change-case and centering plus a clean-room FIRST-ED paragraph reformatter covering the observable responsibilities of `EditCompressLine`, `EditShiftLine`, `EditLongLine`, `EditShortLine` and `EditReformat`;
 - atomic reformat planning with margin validation, word push-down/pull-up, hard paragraph boundaries, one undo snapshot and no partial mutation for a word-too-long failure;
@@ -107,7 +108,7 @@ The current foundation contains:
 - English and German architecture/compatibility documentation;
 - automated unit tests.
 
-The final historical V1 compatibility inventory now has a [123-entry procedure/function index](docs/en/HANDBOOK-PROCEDURE-INDEX-AUDIT.md) and [German companion](docs/de/HANDBUCH-PROZEDURENINDEX-AUDIT.md); its explicitly open mappings still require review. The remaining V1 work is concentrated in finishing this compatibility inventory. Multi-line block topology, independent historical `Blockfrom`/`Blockto` endpoint state, command-boundary validation, typed errors/resources, abort/interruptibility and compound undo/navigation-state restoration are covered. The next release-gate item is an end-to-end audit of the handbook procedure/function index for small omissions or classifications. MicroStar-specific UI features can remain samples rather than dependencies of the reusable core.
+The [123-entry historical V1 procedure/function inventory](docs/en/HANDBOOK-PROCEDURE-INDEX-AUDIT.md) and [German companion](docs/de/HANDBUCH-PROZEDURENINDEX-AUDIT.md) now classify every indexed routine. This closes the first-pass inventory, **not** the final behavioral parity or regression-coverage review. Multi-line block topology, independent historical `Blockfrom`/`Blockto` endpoint state, command-boundary validation, typed errors/resources, abort/interruptibility and compound undo/navigation-state restoration are covered. The next release-gate item is a targeted verification of the first-pass handbook mappings against tests and host-level behavior. MicroStar-specific UI features can remain samples rather than dependencies of the reusable core.
 
 ## Run the interactive FIRST-ED sample
 
@@ -201,6 +202,8 @@ Future C++ and Java builds will live entirely inside their own implementation la
 - Neuformatierungs-Kompatibilität: [`docs/de/NEUFORMATIERUNG-KOMPATIBILITAET.md`](docs/de/NEUFORMATIERUNG-KOMPATIBILITAET.md)
 - Block compatibility: [`docs/en/BLOCK-COMPATIBILITY.md`](docs/en/BLOCK-COMPATIBILITY.md)
 - Block-Kompatibilität: [`docs/de/BLOCK-KOMPATIBILITAET.md`](docs/de/BLOCK-KOMPATIBILITAET.md)
+- Screen position compatibility (EN): [`docs/en/SCREEN-POSITION-COMPATIBILITY.md`](docs/en/SCREEN-POSITION-COMPATIBILITY.md)
+- Bildschirmposition-Kompatibilität (DE): [`docs/de/BILDSCHIRMPOSITION-KOMPATIBILITAET.md`](docs/de/BILDSCHIRMPOSITION-KOMPATIBILITAET.md)
 - Language-neutral V1 contract: [`spec/editor-v1.md`](spec/editor-v1.md)
 
 ## License

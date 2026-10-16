@@ -41,6 +41,8 @@ Modern arrow, Home, End, Page Up and Page Down keys remain aliases because the c
 
 Console and terminal APIs do not expose every control-key combination identically on every operating system or terminal emulator. The adapter therefore normalizes what the host actually reports and keeps the core independent of those differences. On platforms that allow it, Ctrl-C is configured as ordinary input so the historical mapping can receive it.
 
-## Still pending
+## Current stacked-window rendering
 
-The sample is now genuinely interactive, but it renders the **current window** rather than the historical vertically stacked physical window layout. `CreateWindow` already creates a logical editor window; exact screen-row splitting/compression and simultaneous multi-window rendering remain the next host/layout compatibility step.
+The sample now renders every stacked `EditorWindowFrame`, including its own status row and text rows. The active window owns the physical terminal cursor; the core's `EditorSession.EnsureAllWindowCursorsHorizontallyVisible(width)` keeps the cursor visible **in every view** before rendering, not only the active view.
+
+This arrangement keeps both the historical all-window horizontal policy and per-window line-number status projections in the reusable editor model. Modern terminal resizing and platform-specific key delivery remain host policies; MicroStar pull-down menus and pop-ups remain later host samples.

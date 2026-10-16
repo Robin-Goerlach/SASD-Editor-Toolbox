@@ -416,9 +416,9 @@
     {
       "name": "EditGenlineno",
       "handbookPage": 176,
-      "status": "needs-review",
-      "evidence": "docs/en/BORLAND-V1-COMPATIBILITY.md",
-      "note": "Inspect the handbook behavior and code/tests before claiming parity."
+      "status": "modern-replacement",
+      "evidence": "docs/en/SCREEN-POSITION-COMPATIBILITY.md",
+      "note": "Current zero-based logical line index provides O(1) absolute line number for each window; per-window status is rendered separately."
     },
     {
       "name": "EditGotoColumn",
@@ -437,9 +437,9 @@
     {
       "name": "EditHscroll",
       "handbookPage": 179,
-      "status": "needs-review",
-      "evidence": "docs/en/BORLAND-V1-COMPATIBILITY.md",
-      "note": "Inspect the handbook behavior and code/tests before claiming parity."
+      "status": "implemented",
+      "evidence": "docs/en/SCREEN-POSITION-COMPATIBILITY.md",
+      "note": "All displayed views use a host-provided text-column width and minimal LeftColumn correction, without mutating cursor or document."
     },
     {
       "name": "EditIncline",

@@ -39,10 +39,15 @@ internal sealed class ConsoleFirstEdRenderer(EditorSession session)
             return;
         }
 
+        // EditHscroll affects all displayed windows, not just the active one.
+        // The terminal supplies the current text width; no Console dependency
+        // is needed in the reusable Core to enforce horizontal visibility.
+        session.EnsureAllWindowCursorsHorizontallyVisible(width);
+
         foreach (var frame in session.WindowLayout.Frames)
         {
             var window = session.Windows.First(candidate => candidate.WindowId == frame.WindowId);
-            EnsureCursorVisible(window, frame.TextRows, width);
+            EnsureCursorVerticallyVisible(window, frame.TextRows);
             var viewport = _viewportBuilder.Build(window, frame.TextRows, width);
             var windowNumber = GetWindowNumber(window.WindowId);
             var current = window.WindowId == session.CurrentWindow.WindowId;
@@ -115,29 +120,22 @@ internal sealed class ConsoleFirstEdRenderer(EditorSession session)
         return session.WindowLayout.ResizeWorkspace(workspaceRows);
     }
 
-    private static void EnsureCursorVisible(EditorWindow window, int visibleRows, int width)
+    private static void EnsureCursorVerticallyVisible(EditorWindow window, int visibleRows)
     {
         if (visibleRows < 1)
         {
             return;
         }
 
+        // Vertical placement still uses the host's concrete text-row count.
+        // Horizontal placement is now shared by all front ends through Core.
         if (window.Cursor.Line < window.TopLine)
         {
             window.TopLine = window.Cursor.Line;
         }
-        else if (window.Cursor.Line >= window.TopLine + visibleRows)
+        else if (window.Cursor.Line - window.TopLine >= visibleRows)
         {
             window.TopLine = Math.Max(0, window.Cursor.Line - visibleRows + 1);
-        }
-
-        if (window.Cursor.Column < window.LeftColumn)
-        {
-            window.LeftColumn = window.Cursor.Column;
-        }
-        else if (window.Cursor.Column >= window.LeftColumn + width)
-        {
-            window.LeftColumn = Math.Max(0, window.Cursor.Column - width + 1);
         }
     }
 

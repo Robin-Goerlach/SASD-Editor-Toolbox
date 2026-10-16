@@ -84,6 +84,10 @@ V1 includes character/word/line movement, page movement, beginning/end/top/botto
 
 ### Viewport movement
 
+- The absolute line number displayed in each view's status is the one-based value of that view's current logical document line. A port need not traverse historical linked descriptors to calculate it; a stable index is an equivalent modern implementation.
+- Horizontal cursor visibility applies to **all** displayed views, not only the active view. For a host-supplied positive text width `w`, if the cursor lies left of `LeftColumn`, set `LeftColumn` to the cursor column; if the cursor lies at or beyond `LeftColumn + w`, move `LeftColumn` just enough for the cursor to be the rightmost visible column. Otherwise preserve the offset. Do not move the cursor or modify text, and honor virtual columns beyond line length.
+- The original `EditGenlineno`/`EditHscroll` routines could stop a long descriptor/screen pass when input arrived. In V1 these are bounded indexed/view operations; no long historical scan is performed. Input-first cooperative scheduling remains the host responsibility.
+
 - Display-dependent commands receive the number of visible text rows from the host. Line-up/down and scroll-up/down keep the cursor visible according to the historical edge rules.
 - Page-up/down move the viewport by `visibleRows - 1`. Because the handbook does not separately specify the cursor's post-page screen row, implementations must document their cursor policy; the .NET implementation preserves the relative visible row when possible.
 - Top-of-file selects the first line and first column. Bottom-of-file selects the last line and first column and places that last line at the top of the viewport.

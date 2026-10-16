@@ -36,6 +36,8 @@ Ziel ist funktionale Abdeckung, nicht eine identische Quellcode- oder API-Strukt
 | Historische Begin/End/Goto-Details | `FirstEdCompatibilityProcessor` | Implementiert |
 | Up/Down-Line mit Viewport-Nachführung | Compatibility Processor + sichtbare Zeilenzahl | Implementiert |
 | Scroll Up/Down mit Cursor-Randverhalten | `FirstEdCompatibilityProcessor` | Implementiert |
+| `EditHscroll`: horizontale Sichtbarkeit aller Fenster-Cursor | `EditorWindow.EnsureCursorHorizontallyVisible` + `EditorSession.EnsureAllWindowCursorsHorizontallyVisible` | Implementiert, Breite vom Host |
+| `EditGenlineno`: absolute Zeilennummern | indexiertes `EditorWindow.Cursor.Line` + `EditorViewportBuilder` | Moderne Ersetzung, O(1) |
 | Page Up/Down, dokumentierte Viewport-Verschiebung | Compatibility Processor, `visibleLines - 1` | Implementiert |
 | Top/Bottom File inklusive Viewport-Platzierung | Compatibility Processor | Implementiert |
 | `EditDeleteLeftChar`: Zeichen + Join zur vorherigen Zeile | Primitive Compatibility Processor + Topologie | Implementiert; Virtual-Space-Regel separat dokumentiert |
@@ -168,4 +170,4 @@ Der historische Bildschirm hatte eine feste Größe. Die Größenänderung eines
 
 ## V1-Abschlusskriterium
 
-Die C#/.NET-Implementierung deckt die großen strukturellen FIRST-ED-Bereiche inzwischen ausführbar ab, einschließlich Absatz-Neuformatierung, mehrzeiliger Block-Bulk-Topologie, unabhängiger Block-Endpunkte und atomarer Multi-Dokument-Undo-/Navigationswiederherstellung. Der [Handbuch-Prozeduren-/Funktionsindex-Audit](HANDBUCH-PROZEDURENINDEX-AUDIT.md) erfasst inzwischen alle 123 gedruckten Einträge mit ersten Klassifikationen; seine offenen Verhaltensprüfungen müssen vor V1 abgeschlossen werden. MicroStar-spezifische Demonstrationen können als Samples statt als Core-Abhängigkeiten geliefert werden.
+Die C#/.NET-Implementierung deckt die großen strukturellen FIRST-ED-Bereiche inzwischen ausführbar ab, einschließlich Absatz-Neuformatierung, mehrzeiliger Block-Bulk-Topologie, unabhängiger Block-Endpunkte und atomarer Multi-Dokument-Undo-/Navigationswiederherstellung. Der [Handbuch-Prozeduren-/Funktionsindex-Audit](HANDBUCH-PROZEDURENINDEX-AUDIT.md) erfasst inzwischen alle 123 gedruckten Einträge mit ersten Klassifikationen; die zugeordneten Routinen benötigen vor V1 noch einen abschließenden Testabdeckungs- und Host-Audit. MicroStar-spezifische Demonstrationen können als Samples statt als Core-Abhängigkeiten geliefert werden.

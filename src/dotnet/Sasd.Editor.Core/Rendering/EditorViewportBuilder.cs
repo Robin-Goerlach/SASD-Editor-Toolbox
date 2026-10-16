@@ -35,6 +35,10 @@ public sealed class EditorViewportBuilder(EditorSession session)
             lines.Add(new ViewportLine(lineIndex, snapshot.Text.Substring(start, length), snapshot.Flags));
         }
 
+        // EditGenlineno historically traversed linked descriptors to count
+        // absolute lines for every displayed window. Each modern view already
+        // stores an absolute zero-based line index, so the equivalent status
+        // value is available in O(1) without polling or mutating the document.
         var status = new EditorStatus(
             document.DisplayName,
             window.Cursor.Line + 1,
