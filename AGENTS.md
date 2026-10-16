@@ -203,12 +203,16 @@ When the user says only “continue”, “keep going” or asks Codex to work a
 
 ### P0 - V1 release-gate work
 
-The independent historical block-endpoint lifecycle, semantic command-boundary validation, typed host-neutral error/resource model, abort/interruptibility audit and compound undo/navigation-state audit are implemented. `EditorUndoManager` now records a logical command as one transaction even when it spans multiple documents, and restores command-induced view/anchor state without blindly overwriting later explicit navigation. The next unfinished release-gate item is the final handbook procedure/function-index audit.
+The independent block-endpoint, command-validation, typed-error, interruptibility and compound-undo audits are implemented. The **123-entry handbook procedure/function inventory** in `docs/handbook-procedure-index-v1.json` has also received its first-pass classification, with zero entries still marked `needs-review`. In particular, `EditGenlineno` uses indexed per-window line numbers and `EditHscroll` now has a host-neutral all-window horizontal visibility rule. **Zero unclassified entries is not the same as V1 behavioral acceptance.**
 
-1. **Final handbook procedure/function-index audit**
-   - Compare the historical procedure/function inventory against the compatibility matrix and implementation.
-   - Classify each item as Implemented, Replaced by modern invariant, Not Applicable, Sample/Host concern, or intentionally deferred.
-   - Add regression coverage for any small omissions found.
+1. **Final V1 mapping-to-regression evidence review**
+   - Recheck each historical row against its actual handbook description, the portable contract, production code and *executable* tests. A status of `implemented` in the inventory is a hypothesis about observable coverage, not conformance evidence by itself.
+   - Prioritize historical helper commands and host/sample classifications with weak test coverage. Confirm the modern replacements are intentional; do not add pointer-shaped or screen-memory APIs.
+   - For genuine behavioral gaps, add narrowly scoped, well-commented implementation and deterministic regression tests; update `spec/` and `conformance/` when portable behavior changes.
+   - Keep `docs/en/HANDBOOK-PROCEDURE-INDEX-AUDIT.md`, `docs/de/HANDBUCH-PROZEDURENINDEX-AUDIT.md` and the bilingual compatibility matrix synchronized. Record remaining evidence gaps explicitly instead of claiming V1 from inventory counts.
+2. **V1 release-readiness gate**
+   - Review public API and persistence compatibility, undo/anchor consistency, terminal smoke behavior, and CI diagnostics after the evidence audit.
+   - Publish no release or package without explicit user approval.
 ### P1 - Sample breadth after the reusable V1 gate
 
 Only after the reusable V1 release gate is in good shape, or when explicitly requested:
