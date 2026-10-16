@@ -122,6 +122,7 @@ The handbook does not separately define whether markers or other non-block ancho
 
 - Literal forward search is required.
 - The compatibility search remembers the most recent non-empty pattern for a Find Again operation.
+- Historical EditFind with an explicitly empty input repeats the remembered pattern and options. This is distinct from a missing/null semantic-command argument, which is invalid. With no prior pattern, empty Find returns no match without document mutation.
 - Find Again resumes after the previous match when the cursor is still positioned on that match.
 - FIRST-ED-compatible forward search does not wrap by default. Wrap-around remains an explicit option for hosts that want it.
 - Case-sensitive, case-insensitive and whole-word behavior are explicit options.

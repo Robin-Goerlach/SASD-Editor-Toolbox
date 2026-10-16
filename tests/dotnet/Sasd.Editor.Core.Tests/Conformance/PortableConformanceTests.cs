@@ -296,6 +296,12 @@ public sealed class PortableConformanceTests
         operation switch
         {
             "move_right_character" => EditorCommandId.CursorRight,
+            // Search operations use the public semantic-command boundary.
+            // In particular, text:"" for find_next has historical meaning;
+            // it must not be converted to an omitted/null request argument.
+            "find_next" => EditorCommandId.FindNext,
+            "find_again" => EditorCommandId.FindAgain,
+            "replace_next" => EditorCommandId.ReplaceNext,
             // Shared historical viewport commands: PageSize is the positive
             // number of host-visible text rows, never a DOS screen constant.
             "move_up_line" => EditorCommandId.CursorUp,

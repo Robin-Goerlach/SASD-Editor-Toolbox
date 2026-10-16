@@ -35,13 +35,15 @@ Die .NET-Tests laden inzwischen jede Datei aus `conformance/v1/manifest.json`, n
 
 ## Maschinengeprüfte Verweise auf ausführbare Belege
 
-Die Inventarliste unterstützt pro historischer Routine ein optionales Feld `conformanceCases`. Die Repository-Vertragsprüfung kontrolliert, ob jede referenzierte Fall-ID in einer durch das portable Manifest eingebundenen Datei vorkommt, weist doppelte oder unbekannte IDs zurück und meldet die Zahl verknüpfter Routinen. **Derzeit sind 28 von 123 Zeilen** mit konkreten portablen Fällen verknüpft. Für alle anderen bestehen zunächst nur konzeptionelle beziehungsweise dokumentierte Zuordnungen, deren Regressionstest-Abdeckung weiterhin einzeln geprüft werden muss.
+Die Inventarliste unterstützt pro historischer Routine ein optionales Feld `conformanceCases`. Die Repository-Vertragsprüfung kontrolliert, ob jede referenzierte Fall-ID in einer durch das portable Manifest eingebundenen Datei vorkommt, weist doppelte oder unbekannte IDs zurück und meldet die Zahl verknüpfter Routinen. **Derzeit sind 30 von 123 Zeilen** mit konkreten portablen Fällen verknüpft. Für alle anderen bestehen zunächst nur konzeptionelle beziehungsweise dokumentierte Zuordnungen, deren Regressionstest-Abdeckung weiterhin einzeln geprüft werden muss.
 
 Diese Verweise sind **gezielte Testbeispiele**, keine vollständigen historischen Verhaltensbeweise. Die Prüfung erzeugt bewusst keine erfundenen Tests für Einträge, die lediglich als `implemented` oder `modern-replacement` eingeordnet wurden.
 
 Neun neue portable Befehlsfolgen liefern Nachweise für zehn weitere Routinen zu unabhängigen Blockgrenzen, Zeilen-Realignment, Markeridentität und transaktionalem Undo. Erwartete Befehlsablehnungen werden explizit statt als Editierung behandelt.
 
 Die neuen Fälle in `viewport-navigation.json` liefern portable Regressionstest-Belege für acht weitere historische Navigationsroutinen: vertikale Cursorbewegungen, Scroll Up/Down, Page Up/Down und Dateigrenzen. Berücksichtigt werden verknüpfte Fenster, virtuelle Spalten, einzeilige Viewports und sehr große vom Host gelieferte Zeilenzahlen. Ihre Referenz-IDs werden anhand des Conformance-Manifests maschinell geprüft.
+
+Neue portable Befehlsfolgen in `search-and-replace.json` liefern zusätzliche Nachweise für die historischen Routinen `EditFind` und `EditReplace`. Sie unterscheiden eine ausdrücklich leere Sucheingabe von einem fehlenden Parameter und prüfen Find Again, erfolglose Suchen, Ersetzen durch leeren Text sowie Undo. Die Fälle verwenden den semantischen Dispatcher ohne Bindung an ein konkretes Tastaturlayout.
 
 ## Nächste Schritte und Abschlusskriterien
 

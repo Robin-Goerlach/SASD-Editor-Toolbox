@@ -1,0 +1,581 @@
+{
+  "formatVersion": 1,
+  "contractVersion": "v1",
+  "cases": [
+    {
+      "id": "search.empty-find-repeats-last-pattern",
+      "area": "search-and-replace",
+      "initial": {
+        "documents": [
+          {
+            "id": "doc",
+            "lines": [
+              {
+                "text": "alpha beta alpha",
+                "flags": []
+              }
+            ]
+          }
+        ],
+        "windows": [
+          {
+            "id": "view",
+            "documentId": "doc",
+            "cursor": {
+              "line": 0,
+              "column": 0
+            },
+            "topLine": 0,
+            "leftColumn": 0
+          }
+        ],
+        "currentWindowId": "view"
+      },
+      "operations": [
+        {
+          "id": "find_next",
+          "text": "alpha"
+        },
+        {
+          "id": "find_next",
+          "text": ""
+        }
+      ],
+      "expect": {
+        "documents": {
+          "doc": {
+            "lines": [
+              {
+                "text": "alpha beta alpha",
+                "flags": []
+              }
+            ],
+            "isDirty": false,
+            "version": 0
+          }
+        },
+        "windows": {
+          "view": {
+            "cursor": {
+              "line": 0,
+              "column": 11
+            }
+          }
+        },
+        "undo": {
+          "count": 0
+        }
+      }
+    },
+    {
+      "id": "search.find-again-advances-after-prior-match",
+      "area": "search-and-replace",
+      "initial": {
+        "documents": [
+          {
+            "id": "doc",
+            "lines": [
+              {
+                "text": "alpha beta alpha",
+                "flags": []
+              }
+            ]
+          }
+        ],
+        "windows": [
+          {
+            "id": "view",
+            "documentId": "doc",
+            "cursor": {
+              "line": 0,
+              "column": 0
+            },
+            "topLine": 0,
+            "leftColumn": 0
+          }
+        ],
+        "currentWindowId": "view"
+      },
+      "operations": [
+        {
+          "id": "find_next",
+          "text": "alpha"
+        },
+        {
+          "id": "find_again"
+        }
+      ],
+      "expect": {
+        "documents": {
+          "doc": {
+            "lines": [
+              {
+                "text": "alpha beta alpha",
+                "flags": []
+              }
+            ],
+            "isDirty": false,
+            "version": 0
+          }
+        },
+        "windows": {
+          "view": {
+            "cursor": {
+              "line": 0,
+              "column": 11
+            }
+          }
+        },
+        "undo": {
+          "count": 0
+        }
+      }
+    },
+    {
+      "id": "search.empty-find-with-no-prior-pattern-is-no-match",
+      "area": "search-and-replace",
+      "initial": {
+        "documents": [
+          {
+            "id": "doc",
+            "lines": [
+              {
+                "text": "alpha beta",
+                "flags": []
+              }
+            ]
+          }
+        ],
+        "windows": [
+          {
+            "id": "view",
+            "documentId": "doc",
+            "cursor": {
+              "line": 0,
+              "column": 2
+            },
+            "topLine": 0,
+            "leftColumn": 0
+          }
+        ],
+        "currentWindowId": "view"
+      },
+      "operations": [
+        {
+          "id": "find_next",
+          "text": "",
+          "commandSucceeded": false
+        }
+      ],
+      "expect": {
+        "commandSucceeded": false,
+        "documents": {
+          "doc": {
+            "lines": [
+              {
+                "text": "alpha beta",
+                "flags": []
+              }
+            ],
+            "isDirty": false,
+            "version": 0
+          }
+        },
+        "windows": {
+          "view": {
+            "cursor": {
+              "line": 0,
+              "column": 2
+            }
+          }
+        },
+        "undo": {
+          "count": 0
+        }
+      }
+    },
+    {
+      "id": "search.missing-find-pattern-is-invalid-request",
+      "area": "search-and-replace",
+      "initial": {
+        "documents": [
+          {
+            "id": "doc",
+            "lines": [
+              {
+                "text": "alpha beta",
+                "flags": []
+              }
+            ]
+          }
+        ],
+        "windows": [
+          {
+            "id": "view",
+            "documentId": "doc",
+            "cursor": {
+              "line": 0,
+              "column": 2
+            },
+            "topLine": 0,
+            "leftColumn": 0
+          }
+        ],
+        "currentWindowId": "view"
+      },
+      "operations": [
+        {
+          "id": "find_next",
+          "commandSucceeded": false
+        }
+      ],
+      "expect": {
+        "commandSucceeded": false,
+        "documents": {
+          "doc": {
+            "lines": [
+              {
+                "text": "alpha beta",
+                "flags": []
+              }
+            ],
+            "isDirty": false,
+            "version": 0
+          }
+        },
+        "windows": {
+          "view": {
+            "cursor": {
+              "line": 0,
+              "column": 2
+            }
+          }
+        },
+        "undo": {
+          "count": 0
+        },
+        "error": {
+          "id": "invalid_command_argument",
+          "code": "EDITOR_COMMAND_INVALID_ARGUMENT",
+          "resourceKey": "Editor.Errors.Command.InvalidArgument"
+        }
+      }
+    },
+    {
+      "id": "search.find-unknown-pattern-preserves-document",
+      "area": "search-and-replace",
+      "initial": {
+        "documents": [
+          {
+            "id": "doc",
+            "lines": [
+              {
+                "text": "alpha beta",
+                "flags": []
+              }
+            ]
+          }
+        ],
+        "windows": [
+          {
+            "id": "view",
+            "documentId": "doc",
+            "cursor": {
+              "line": 0,
+              "column": 2
+            },
+            "topLine": 0,
+            "leftColumn": 0
+          }
+        ],
+        "currentWindowId": "view"
+      },
+      "operations": [
+        {
+          "id": "find_next",
+          "text": "never",
+          "commandSucceeded": false
+        }
+      ],
+      "expect": {
+        "commandSucceeded": false,
+        "documents": {
+          "doc": {
+            "lines": [
+              {
+                "text": "alpha beta",
+                "flags": []
+              }
+            ],
+            "isDirty": false,
+            "version": 0
+          }
+        },
+        "windows": {
+          "view": {
+            "cursor": {
+              "line": 0,
+              "column": 2
+            }
+          }
+        },
+        "undo": {
+          "count": 0
+        }
+      }
+    },
+    {
+      "id": "search.find-again-without-saved-pattern-has-no-match",
+      "area": "search-and-replace",
+      "initial": {
+        "documents": [
+          {
+            "id": "doc",
+            "lines": [
+              {
+                "text": "alpha beta",
+                "flags": []
+              }
+            ]
+          }
+        ],
+        "windows": [
+          {
+            "id": "view",
+            "documentId": "doc",
+            "cursor": {
+              "line": 0,
+              "column": 1
+            },
+            "topLine": 0,
+            "leftColumn": 0
+          }
+        ],
+        "currentWindowId": "view"
+      },
+      "operations": [
+        {
+          "id": "find_again",
+          "commandSucceeded": false
+        }
+      ],
+      "expect": {
+        "commandSucceeded": false,
+        "documents": {
+          "doc": {
+            "lines": [
+              {
+                "text": "alpha beta",
+                "flags": []
+              }
+            ],
+            "isDirty": false,
+            "version": 0
+          }
+        },
+        "windows": {
+          "view": {
+            "cursor": {
+              "line": 0,
+              "column": 1
+            }
+          }
+        },
+        "undo": {
+          "count": 0
+        }
+      }
+    },
+    {
+      "id": "replace.empty-replacement-is-valid-edit",
+      "area": "search-and-replace",
+      "initial": {
+        "documents": [
+          {
+            "id": "doc",
+            "lines": [
+              {
+                "text": "alpha beta",
+                "flags": []
+              }
+            ]
+          }
+        ],
+        "windows": [
+          {
+            "id": "view",
+            "documentId": "doc",
+            "cursor": {
+              "line": 0,
+              "column": 0
+            },
+            "topLine": 0,
+            "leftColumn": 0
+          }
+        ],
+        "currentWindowId": "view"
+      },
+      "operations": [
+        {
+          "id": "replace_next",
+          "text": "alpha",
+          "text2": ""
+        }
+      ],
+      "expect": {
+        "documents": {
+          "doc": {
+            "lines": [
+              {
+                "text": " beta",
+                "flags": []
+              }
+            ],
+            "isDirty": true,
+            "version": 1
+          }
+        },
+        "windows": {
+          "view": {
+            "cursor": {
+              "line": 0,
+              "column": 0
+            }
+          }
+        },
+        "undo": {
+          "count": 1
+        }
+      }
+    },
+    {
+      "id": "replace.undo-restores-original-line-and-dirty-state",
+      "area": "search-and-replace",
+      "initial": {
+        "documents": [
+          {
+            "id": "doc",
+            "lines": [
+              {
+                "text": "alpha beta",
+                "flags": []
+              }
+            ]
+          }
+        ],
+        "windows": [
+          {
+            "id": "view",
+            "documentId": "doc",
+            "cursor": {
+              "line": 0,
+              "column": 0
+            },
+            "topLine": 0,
+            "leftColumn": 0
+          }
+        ],
+        "currentWindowId": "view"
+      },
+      "operations": [
+        {
+          "id": "replace_next",
+          "text": "alpha",
+          "text2": "Z"
+        },
+        {
+          "id": "undo"
+        }
+      ],
+      "expect": {
+        "documents": {
+          "doc": {
+            "lines": [
+              {
+                "text": "alpha beta",
+                "flags": []
+              }
+            ],
+            "isDirty": false,
+            "version": 0
+          }
+        },
+        "windows": {
+          "view": {
+            "cursor": {
+              "line": 0,
+              "column": 0
+            }
+          }
+        },
+        "undo": {
+          "count": 0
+        }
+      }
+    },
+    {
+      "id": "replace.missing-target-is-no-op",
+      "area": "search-and-replace",
+      "initial": {
+        "documents": [
+          {
+            "id": "doc",
+            "lines": [
+              {
+                "text": "alpha beta",
+                "flags": []
+              }
+            ]
+          }
+        ],
+        "windows": [
+          {
+            "id": "view",
+            "documentId": "doc",
+            "cursor": {
+              "line": 0,
+              "column": 0
+            },
+            "topLine": 0,
+            "leftColumn": 0
+          }
+        ],
+        "currentWindowId": "view"
+      },
+      "operations": [
+        {
+          "id": "replace_next",
+          "text": "nope",
+          "text2": "X",
+          "commandSucceeded": false
+        }
+      ],
+      "expect": {
+        "commandSucceeded": false,
+        "documents": {
+          "doc": {
+            "lines": [
+              {
+                "text": "alpha beta",
+                "flags": []
+              }
+            ],
+            "isDirty": false,
+            "version": 0
+          }
+        },
+        "windows": {
+          "view": {
+            "cursor": {
+              "line": 0,
+              "column": 0
+            }
+          }
+        },
+        "undo": {
+          "count": 0
+        }
+      }
+    }
+  ]
+}

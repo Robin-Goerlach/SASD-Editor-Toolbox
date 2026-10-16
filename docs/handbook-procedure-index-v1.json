@@ -447,7 +447,12 @@
       "handbookPage": 175,
       "status": "implemented",
       "evidence": "docs/en/SEARCH-AND-FILE-COMMANDS.md",
-      "note": "Search, replace and compatible file read/write paths."
+      "note": "Search, replace and compatible file read/write paths.",
+      "conformanceCases": [
+        "search.empty-find-repeats-last-pattern",
+        "search.find-again-advances-after-prior-match",
+        "search.missing-find-pattern-is-invalid-request"
+      ]
     },
     {
       "name": "EditGenlineno",
@@ -654,7 +659,11 @@
       "handbookPage": 201,
       "status": "implemented",
       "evidence": "docs/en/SEARCH-AND-FILE-COMMANDS.md",
-      "note": "Search, replace and compatible file read/write paths."
+      "note": "Search, replace and compatible file read/write paths.",
+      "conformanceCases": [
+        "replace.empty-replacement-is-valid-edit",
+        "replace.undo-restores-original-line-and-dirty-state"
+      ]
     },
     {
       "name": "EditRightChar",

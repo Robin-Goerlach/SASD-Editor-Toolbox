@@ -176,6 +176,10 @@ Die portablen Fälle decken inzwischen Block-Begin/-End über mehrere Befehle, M
 
 `conformance/v1/cases/viewport-navigation.json` prüft acht historische Cursor-, Scroll-, Page- und Dateigrenz-Routinen. Die Tests sichern minimale Randbewegung, die dokumentierte Regel zum relativen Cursor-Viewport-Abstand, unabhängige verknüpfte Fenster und Integer-Grenzen ab. Ein Viewport mit nur einer Textzeile besitzt **keine Page-Verschiebung**; der Dispatcher kann den gültigen Navigationsauftrag dennoch als verarbeitet melden. Die Fälle bleiben für eigenständige C++- und Java-Adapter nutzbar.
 
+## Portable Tests für Suchen und Ersetzen
+
+`conformance/v1/cases/search-and-replace.json` prüft die historische Wiederholung bei leerem Suchprompt, die Ablehnung eines fehlenden Parameters, Find Again, Ersetzen durch leeren Text sowie Undo. Damit liegen zusätzliche sprachneutrale Belege für `EditFind` und `EditReplace` vor, ohne interne Details des C#-Suchdienstes festzuschreiben.
+
 ## V1-Abschlusskriterium
 
 Die C#/.NET-Implementierung deckt die großen strukturellen FIRST-ED-Bereiche inzwischen ausführbar ab, einschließlich Absatz-Neuformatierung, mehrzeiliger Block-Bulk-Topologie, unabhängiger Block-Endpunkte und atomarer Multi-Dokument-Undo-/Navigationswiederherstellung. Der [Handbuch-Prozeduren-/Funktionsindex-Audit](HANDBUCH-PROZEDURENINDEX-AUDIT.md) erfasst inzwischen alle 123 gedruckten Einträge mit ersten Klassifikationen; die zugeordneten Routinen benötigen vor V1 noch einen abschließenden Testabdeckungs- und Host-Audit. MicroStar-spezifische Demonstrationen können als Samples statt als Core-Abhängigkeiten geliefert werden.
