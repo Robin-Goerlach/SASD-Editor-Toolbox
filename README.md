@@ -106,7 +106,7 @@ The current foundation contains:
 - English and German architecture/compatibility documentation;
 - automated unit tests.
 
-The remaining V1 work is now concentrated in the final compatibility inventory. Multi-line block topology, independent historical `Blockfrom`/`Blockto` endpoint state, command-boundary validation, typed errors/resources, abort/interruptibility and compound undo/navigation-state restoration are covered. The next release-gate item is an end-to-end audit of the handbook procedure/function index for small omissions or classifications. MicroStar-specific UI features can remain samples rather than dependencies of the reusable core.
+The final historical V1 compatibility inventory now has a [123-entry procedure/function index](docs/en/HANDBOOK-PROCEDURE-INDEX-AUDIT.md) and [German companion](docs/de/HANDBUCH-PROZEDURENINDEX-AUDIT.md); its explicitly open mappings still require review. The remaining V1 work is concentrated in finishing this compatibility inventory. Multi-line block topology, independent historical `Blockfrom`/`Blockto` endpoint state, command-boundary validation, typed errors/resources, abort/interruptibility and compound undo/navigation-state restoration are covered. The next release-gate item is an end-to-end audit of the handbook procedure/function index for small omissions or classifications. MicroStar-specific UI features can remain samples rather than dependencies of the reusable core.
 
 ## Run the interactive FIRST-ED sample
 

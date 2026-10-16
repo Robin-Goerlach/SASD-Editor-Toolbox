@@ -33,24 +33,26 @@ The semantic `DeleteLine` command now passes through `FirstEdPrimitiveCompatibil
 
 ## Block-boundary policy
 
-The historical editor can represent `Blockfrom` and `Blockto` independently and set one pointer to `nil`. The current V1 .NET model uses a complete `EditorBlock` pair. Therefore, when a deleted line is one of the two block limits, the .NET implementation clears the complete active block and its highlighting rather than manufacturing a half-defined block object.
+The current `EditorBlockState` holds independently nullable `Start` and `End` endpoints. Deleting a boundary invalidates **only the affected endpoint**, preserving its counterpart for a later compatible Begin/End command. A complete `EditorBlock` exists only when both endpoints define an ordered range within the same document; incomplete state is not highlighted. Insertions and deletions realign surviving endpoints independently.
 
-This is a deliberate conservative representation choice, not a claim that the 1985 implementation destroyed both pointers. A future block-anchor model may represent independently defined start/end limits if exact low-level parity becomes useful.
-
-Deleting a line *inside* a block does not clear the block. The later boundary is shifted so the block continues to cover the same surviving logical lines.
+Deleting a line *inside* a block retains both surviving endpoints; later anchors shift to preserve the intended logical span. See [block compatibility](BLOCK-COMPATIBILITY.md) and `BlockEndpointStateTests`.
 
 ## Undo and dirty state
 
-Compatibility line deletion captures one snapshot before the mutation, marks the document dirty and leaves one undo entry. This is intentionally simpler than the historical line-by-line undo representation. The snapshot backend is a correctness-first implementation detail behind the existing undo boundary and can be optimized later.
+Compatibility line deletion is one logical mutation in a transactional snapshot-undo model. `BeginTransaction` captures pre-command state; `Commit` records one history item after the text, topology and command-induced navigation are finalized. Undo restores matching document and anchor state without overwriting later independent user navigation. See [undo transactions](UNDO-TRANSACTIONS.md).
 
 ## Current integration boundary
 
-The topology service is now used by:
+`EditorLineTopology` is used by the audited structural command paths:
 
-- the semantic `DeleteLine` compatibility path;
-- compatibility file insertion through `EditorFileService`.
+- compatibility `DeleteLine`, including final-line blanking;
+- compatibility file insertion through `EditorFileService`;
+- `InsertLine`, `NewLine`, and generic newline/automatic wrap;
+- deletion-side joins and line removal;
+- expansion/contraction during paragraph reformat;
+- multi-line block copy/move/delete, including cross-document operations.
 
-It is not yet the universal mutation gateway for every structural operation. Newline insertion, automatic wrapping, line joining, block copy/move/delete and paragraph reformatting still require a procedure-by-procedure topology audit. Until that audit is complete, the compatibility matrix describes `EditDelline`/`EditRealign` parity as an expanding foundation rather than complete coverage.
+This is still an **explicit coordination boundary**, not an automatic interceptor for every future `ITextBuffer` mutation. New structural commands must invoke topology and add regression tests. The [compatibility matrix](BORLAND-V1-COMPATIBILITY.md) records audited coverage, not Pascal pointer equivalence.
 
 ## Tests
 
@@ -59,12 +61,12 @@ It is not yet the universal mutation gateway for every structural operation. New
 - marker invalidation on a deleted line;
 - shifting a later marker;
 - cursor and top-line realignment in multiple linked windows;
-- block-boundary deletion and highlight cleanup;
+- independent block-endpoint invalidation and highlight cleanup;
 - deletion inside an existing block;
 - the one-line blank-but-do-not-remove rule;
 - compatibility file insertion realigning linked views, markers and block limits while preserving the initiating cursor.
 
-The tests intentionally validate observable editor behavior, not Pascal pointer layout.
+Additional coverage in `BlockEndpointStateTests`, `BlockCompatibilityTests`, `ReformatCompatibilityTests` and `CompoundUndoCompatibilityTests` exercises bulk realignment and undo. Tests intentionally validate observable editor behavior, not Pascal pointer layout.
 
 ## Performance policy
 

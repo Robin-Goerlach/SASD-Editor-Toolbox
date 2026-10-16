@@ -60,6 +60,8 @@ The .NET implementation is the current executable reference because it is furthe
 
 See [MULTI-LANGUAGE-DEVELOPMENT.md](MULTI-LANGUAGE-DEVELOPMENT.md) for source-of-truth, synchronization, CI and porting rules.
 
-## Deliberately postponed
+## Current V1 gate and deliberate deferrals
 
-The next V1 steps include the historical WordStar-compatible key map and prefixed dispatcher, a full interactive FIRST-ED-style host, remaining compatibility details, richer search, MicroStar-style samples, and performance backends such as a piece table or rope.
+The FIRST-ED/WordStar key mapping, prefix dispatcher and interactive terminal reference host are already implemented. The remaining reusable V1 release gate is the [handbook procedure/function index audit](HANDBOOK-PROCEDURE-INDEX-AUDIT.md), which distinguishes observable gaps from obsolete Pascal/DOS mechanisms.
+
+MicroStar-style menus, pop-up helpers and background-printing demonstrations remain host/sample work. Piece Table/Rope backends and speculative optimization are deferred until measurable need is established.

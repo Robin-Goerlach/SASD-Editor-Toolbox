@@ -35,7 +35,7 @@ For ASCII text, the implementation reproduces the handbook's three visible class
 
 The Turbo Editor Toolbox marker is line-oriented. The first .NET version now represents a marker as document identity plus logical line index instead of document identity plus complete cursor position. A jump changes the line but not the target window's existing column.
 
-The historical implementation used line-descriptor pointers, so a marker naturally followed that descriptor while other lines were inserted around it. The .NET implementation currently stores an index. Maintaining marker identity through every low-level line-topology mutation belongs to the upcoming `EditDelline`/`EditRealign` audit and is **not** claimed as complete yet.
+The historical implementation used line-descriptor pointers, so a marker naturally followed that descriptor while other lines were inserted around it. The .NET implementation stores a logical index and realigns it through `EditorLineTopology` on the audited insertion, deletion, join, reformat and bulk-block paths. This describes audited command paths, not an assertion that every future internal mutation automatically participates. See [line topology](LINE-TOPOLOGY-AND-REALIGNMENT.md).
 
 ## Block highlighting model
 
@@ -66,12 +66,12 @@ This distinction matters for recovery from stale or corrupted block highlighting
 
 ## Next low-level audit
 
-The next group should concentrate on line topology rather than raw Pascal memory management:
+The later line-topology, reformat, command-boundary validation and typed error/resource audits have been implemented and tested. Consult the focused documents for their current status:
 
-1. `EditDelline` and the observable anchor rules for window cursor/top line, block limits and markers;
-2. `EditRealign` and viewport repair after lines are inserted or removed;
-3. the `EditLongLine`, `EditShortLine` and `EditShiftLine` helpers used by paragraph reformatting;
-4. direct command-boundary details such as `EditSetUndoLimit` and remaining parameter validation;
-5. historical error codes/resources where they materially affect command behavior.
+- [Line topology](LINE-TOPOLOGY-AND-REALIGNMENT.md)
+- [Reformat compatibility](REFORMAT-COMPATIBILITY.md)
+- [Command-boundary validation](COMMAND-BOUNDARY-VALIDATION.md)
+- [Error model](ERROR-MODEL.md)
 
-`EditDestxtdes` itself is a memory-release primitive and should not be recreated as a public C# pointer/free-list API.
+The remaining V1 review follows the [full handbook procedure/function inventory](HANDBOOK-PROCEDURE-INDEX-AUDIT.md). `EditDestxtdes` is a memory-release primitive, not a C# pointer API to recreate.
+

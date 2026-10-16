@@ -35,7 +35,7 @@ Für ASCII-Text entspricht die Implementierung direkt den drei Klassen des Handb
 
 Der historische Marker ist zeilenorientiert. Die erste .NET-Implementierung speichert nun Dokumentidentität plus logischen Zeilenindex statt einer vollständigen Cursorposition. Beim Sprung wird die Zeile geändert, aber nicht die vorhandene Spalte des Zielfensters.
 
-Die historische Implementierung verwendete Zeilendeskriptor-Zeiger. Dadurch folgte ein Marker seinem Deskriptor automatisch, wenn davor oder dahinter andere Zeilen eingefügt wurden. Die .NET-Implementierung speichert derzeit einen Index. Die stabile Markeridentität bei allen Low-Level-Änderungen der Zeilenstruktur gehört in den kommenden `EditDelline`-/`EditRealign`-Audit und wird **noch nicht** als vollständig behauptet.
+Die historische Implementierung verwendete Zeilendeskriptor-Zeiger. Die .NET-Implementierung speichert dagegen einen logischen Index und korrigiert ihn für die auditierten Einfüge-, Lösch-, Join-, Reformat- und Block-Bulk-Pfade zentral über `EditorLineTopology`. Das bezieht sich auf geprüfte Befehlspfade, nicht automatisch auf jede zukünftige interne Mutation. Siehe [Zeilentopologie](ZEILENTOPOLOGIE-UND-REALIGNMENT.md).
 
 ## Block-Markierungsmodell
 
@@ -66,12 +66,12 @@ Diese Trennung ist für die Reparatur veralteter oder inkonsistenter Blockmarkie
 
 ## Nächster Low-Level-Audit
 
-Als nächste Gruppe sollten wir uns auf die Zeilenstruktur statt auf Pascal-Speicherverwaltung konzentrieren:
+Zeilentopologie, Reformatierung, Befehlsgrenzen sowie das typisierte Fehler-/Ressourcenmodell sind inzwischen implementiert und getestet. Maßgeblich sind die neueren Fachtexte:
 
-1. `EditDelline` und die sichtbaren Regeln für Fenster-Cursor/TopLine, Blockgrenzen und Marker;
-2. `EditRealign` und die Viewport-Reparatur nach dem Einfügen oder Entfernen von Zeilen;
-3. die Reformat-Helfer `EditLongLine`, `EditShortLine` und `EditShiftLine`;
-4. direkte Command-Grenzfälle wie `EditSetUndoLimit` und weitere Parameterprüfungen;
-5. historische Fehlercodes/-ressourcen, soweit sie das Befehlsverhalten beeinflussen.
+- [Zeilentopologie](ZEILENTOPOLOGIE-UND-REALIGNMENT.md)
+- [Reformat-Kompatibilität](NEUFORMATIERUNG-KOMPATIBILITAET.md)
+- [Befehlsgrenzen](BEFEHLSGRENZEN-VALIDIERUNG.md)
+- [Fehlermodell](FEHLERMODELL.md)
 
-`EditDestxtdes` selbst ist eine Speicherfreigabe-Routine und sollte nicht als öffentliche C#-Pointer-/Freelist-API nachgebaut werden.
+Der verbleibende V1-Audit nutzt das [vollständige historische Prozedureninventar](HANDBUCH-PROZEDURENINDEX-AUDIT.md). `EditDestxtdes` bleibt eine Speicherfreigaberoutine, keine nachzubauende C#-Pointer-API.
+

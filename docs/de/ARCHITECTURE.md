@@ -38,6 +38,8 @@ Die .NET-Implementierung ist derzeit die ausführbare Referenz, weil sie am weit
 
 Weitere Regeln zu Source of Truth, Synchronisierung, CI und Portierung stehen in [MEHRSPRACHIGE-ENTWICKLUNG.md](MEHRSPRACHIGE-ENTWICKLUNG.md).
 
-## Bewusst später
+## Aktueller V1-Abschluss und bewusste Verschiebungen
 
-Als nächste V1-Schritte folgen insbesondere die vollständige historische WordStar-Tastenzuordnung mit Prefix-Dispatcher, ein interaktiver FIRST-ED-artiger Host, restliche Kompatibilitätsdetails, erweiterte Suche, MicroStar-artige Beispiele und später Performance-Backends wie Piece Table oder Rope.
+Die FIRST-ED-/WordStar-Tastenzuordnung, der Prefix-Dispatcher und ein interaktiver Terminal-Referenzhost sind bereits implementiert. Als nächstes V1-Release-Gate folgt der [historische Prozeduren-/Funktionsindex-Audit](HANDBUCH-PROZEDURENINDEX-AUDIT.md), der echte beobachtbare Lücken von überholter Pascal-/DOS-Technik trennt.
+
+MicroStar-Menüs, Pop-ups und Hintergrunddruck bleiben Host-/Sample-Aufgaben. Piece Table, Rope und spekulative Optimierung folgen erst bei nachgewiesenem Bedarf.

@@ -33,24 +33,26 @@ Der semantische Befehl `DeleteLine` läuft nun über `FirstEdPrimitiveCompatibil
 
 ## Policy für Blockgrenzen
 
-Der historische Editor kann `Blockfrom` und `Blockto` unabhängig voneinander darstellen und einen einzelnen Pointer auf `nil` setzen. Das gegenwärtige .NET-V1-Modell verwendet dagegen ein vollständiges `EditorBlock`-Paar. Wird eine der beiden Blockgrenzen gelöscht, entfernt die .NET-Implementierung deshalb den vollständigen aktiven Block einschließlich Hervorhebung, statt künstlich ein halb definiertes Blockobjekt zu erzeugen.
+Das aktuelle `EditorBlockState` hält unabhängig nullable `Start`- und `End`-Endpunkte. Das Löschen einer Grenzzeile macht **nur den betroffenen Endpunkt** ungültig; der andere bleibt für einen späteren Begin-/End-Befehl erhalten. Ein vollständiger `EditorBlock` entsteht nur bei zwei gültigen, geordneten Grenzen desselben Dokuments; unvollständige Blöcke werden nicht hervorgehoben. Einfügungen und Löschungen realignen vorhandene Grenzen getrennt.
 
-Das ist eine bewusst konservative Repräsentationsentscheidung und keine Behauptung, dass die Implementierung von 1985 beide Pointer gelöscht hätte. Ein späteres Block-Ankermodell kann unabhängig definierte Start-/Endgrenzen darstellen, falls diese Low-Level-Parität sinnvoll wird.
-
-Wird dagegen eine Zeile *innerhalb* eines Blocks gelöscht, bleibt der Block bestehen. Die spätere Grenze wird verschoben, sodass der Block weiterhin dieselben überlebenden logischen Zeilen umfasst.
+Wird eine Zeile *innerhalb* eines Blocks gelöscht, bleiben die überlebenden Grenzen bestehen und spätere Anker werden entsprechend verschoben. Siehe [Block-Kompatibilität](BLOCK-KOMPATIBILITAET.md) und `BlockEndpointStateTests`.
 
 ## Undo und Dirty-State
 
-Das kompatible Zeilenlöschen erzeugt vor der Mutation einen Snapshot, markiert das Dokument als geändert und hinterlässt einen Undo-Eintrag. Das ist bewusst einfacher als die historische zeilenweise Undo-Repräsentation. Das Snapshot-Backend ist ein korrektheitsorientiertes Implementierungsdetail hinter der vorhandenen Undo-Grenze und kann später optimiert werden.
+Kompatibles Zeilenlöschen ist ein logischer Befehl im transaktionalen Snapshot-Undo. `BeginTransaction` erfasst den Zustand vorher; `Commit` speichert nach Textänderung, Topologiekorrektur und befehlsbedingter Navigation einen History-Eintrag. Undo stellt passende Dokument- und Ankerzustände wieder her, ohne unabhängige spätere Benutzernavigation zu überschreiben. Siehe [Undo-Transaktionen](UNDO-TRANSAKTIONEN.md).
 
 ## Aktuelle Integrationsgrenze
 
-Die Topologieschicht wird jetzt verwendet durch:
+`EditorLineTopology` ist in folgende auditierte Strukturpfade integriert:
 
-- den semantischen `DeleteLine`-Kompatibilitätspfad;
-- das kompatible Einfügen eingelesener Dateien über `EditorFileService`.
+- kompatibles `DeleteLine` einschließlich Ein-Zeilen-Sonderfall;
+- Datei-Einfügen über `EditorFileService`;
+- `InsertLine`, `NewLine` und generisches Newline/automatisches Wrapping;
+- zeilenentfernende Lösch- und Join-Befehle;
+- Expansion/Kontraktion bei der Absatz-Reformatierung;
+- mehrzeiliges Block Copy/Move/Delete einschließlich dokumentübergreifender Änderungen.
 
-Sie ist noch nicht das universelle Mutation-Gateway für jede strukturelle Operation. Neue Zeile, automatisches Word-Wrap, Zeilen-Join, Block Copy/Move/Delete und Absatz-Reformatierung benötigen weiterhin einen Prozedur-für-Prozedur-Audit. Bis dieser abgeschlossen ist, bezeichnet die Kompatibilitätsmatrix `EditDelline`/`EditRealign` bewusst als wachsende Grundlage und nicht als vollständige Parität.
+Das ist eine **explizite Koordinationsgrenze**, kein automatischer Abfangmechanismus für jede zukünftige `ITextBuffer`-Mutation. Neue Strukturoperationen müssen den Dienst aufrufen und Regressionstests ergänzen. Die [Kompatibilitätsmatrix](BORLAND-V1-KOMPATIBILITAET.md) beschreibt auditierte Pfade, nicht Pascal-Pointergleichheit.
 
 ## Tests
 
@@ -59,12 +61,12 @@ Sie ist noch nicht das universelle Mutation-Gateway für jede strukturelle Opera
 - Ungültigmachen eines Markers auf einer gelöschten Zeile;
 - Verschieben eines späteren Markers;
 - Cursor- und TopLine-Realignment in mehreren verknüpften Fenstern;
-- Löschen einer Blockgrenze und Bereinigung der Hervorhebung;
+- unabhängige Ungültigmachung einer Blockgrenze und Bereinigung der Hervorhebung;
 - Löschen innerhalb eines bestehenden Blocks;
 - die Ein-Zeilen-Regel „leeren, aber nicht entfernen“;
 - Datei-Insert mit Realignment von verknüpften Fenstern, Markern und Blockgrenzen bei unverändertem auslösenden Cursor.
 
-Die Tests validieren bewusst beobachtbares Editorverhalten und keine Pascal-Pointerstruktur.
+Ergänzende Tests in `BlockEndpointStateTests`, `BlockCompatibilityTests`, `ReformatCompatibilityTests` und `CompoundUndoCompatibilityTests` prüfen Bulk-Realignment und Undo. Die Tests validieren beobachtbares Editorverhalten statt Pascal-Pointerstrukturen.
 
 ## Performance-Policy
 
