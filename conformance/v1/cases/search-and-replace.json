@@ -1119,7 +1119,7 @@
       }
     },
     {
-      "id": "replace.case-insensitive-literal-matches-accented-letters",
+      "id": "replace.case-insensitive-literal-matches-ascii-case",
       "area": "search-and-replace",
       "initial": {
         "documents": [
@@ -1127,7 +1127,7 @@
             "id": "a",
             "lines": [
               {
-                "text": "Äpfel äPFEL",
+                "text": "Alpha aLPHA",
                 "flags": []
               }
             ]
@@ -1149,15 +1149,15 @@
       },
       "operation": {
         "id": "replace_next",
-        "text": "äpfel",
-        "text2": "Obst"
+        "text": "alpha",
+        "text2": "Item"
       },
       "expect": {
         "documents": {
           "a": {
             "lines": [
               {
-                "text": "Obst äPFEL",
+                "text": "Item aLPHA",
                 "flags": []
               }
             ],

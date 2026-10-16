@@ -179,6 +179,9 @@ The shared `conformance/v1/cases/viewport-navigation.json` fixture now covers ei
 
 ## Portable search/replace evidence
 
+Portable case-insensitive literals use ASCII examples; locale-dependent Unicode case-folding is not defined by the shared V1 fixtures. Any additional Unicode behavior should be documented as an implementation-specific extension before independent C++ and Java ports adopt it.
+
+
 The `conformance/v1/cases/search-and-replace.json` manifest tests the historical empty-prompt repetition behavior, missing-pattern rejection, Find Again, empty-string replacements and Undo. It contributes focused cross-language evidence for `EditFind` and `EditReplace` without coupling conformance to the .NET search-service internals.
 
 ## Portable file-read topology evidence
