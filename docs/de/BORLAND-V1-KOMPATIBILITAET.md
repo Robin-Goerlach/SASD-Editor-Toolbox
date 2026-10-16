@@ -9,6 +9,7 @@ Ziel ist funktionale Abdeckung, nicht eine identische Quellcode- oder API-Strukt
 | Textzeilen / Text Streams | `ITextBuffer`, `EditorDocument` | Implementiert |
 | Verkettete Zeilen | `LinkedLineTextBuffer` | Implementiert |
 | Zeilenflags Block / Wrapped / Sonderfarbe | `EditorLineFlags` | Implementiert |
+| `EditColorLine` / `EditColorFile`: Benutzerfarbe | `EditorSession.ColorCurrentLine` / `ColorCurrentDocument` | Implementiert; Darstellungs-Policy dokumentiert |
 | `Wrapped` als weiche ausgehende Zeilengrenze | Zeilenflags + Engine/Reformat/Dateicodec | Implementiert |
 | Mehrere Fenster | `EditorSession`, `EditorWindow` | Implementiert |
 | Verknüpfte Fenster auf denselben Text | mehrere Fenster auf einem `EditorDocument` | Implementiert |

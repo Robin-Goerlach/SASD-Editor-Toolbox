@@ -143,16 +143,16 @@
     {
       "name": "EditColorFile",
       "handbookPage": 137,
-      "status": "needs-review",
-      "evidence": "docs/en/BORLAND-V1-COMPATIBILITY.md",
-      "note": "Inspect the handbook behavior and code/tests before claiming parity."
+      "status": "implemented",
+      "evidence": "docs/en/LINE-COLOR-COMPATIBILITY.md",
+      "note": "Sets UserColored while preserving unrelated line flags; see tested display-only policy."
     },
     {
       "name": "EditColorLine",
       "handbookPage": 138,
-      "status": "needs-review",
-      "evidence": "docs/en/BORLAND-V1-COMPATIBILITY.md",
-      "note": "Inspect the handbook behavior and code/tests before claiming parity."
+      "status": "implemented",
+      "evidence": "docs/en/LINE-COLOR-COMPATIBILITY.md",
+      "note": "Sets UserColored while preserving unrelated line flags; see tested display-only policy."
     },
     {
       "name": "EditCompressLine",

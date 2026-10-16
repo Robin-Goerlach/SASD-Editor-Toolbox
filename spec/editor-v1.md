@@ -6,6 +6,8 @@ This document defines behavior that every language implementation should preserv
 
 - A document contains one or more logical lines.
 - A line carries text plus flags for block membership, a soft word-wrap boundary and user-defined highlighting.
+- Coloring the current line or all lines of the current text stream sets the `UserColored` flag without clearing other line flags. It affects the shared document metadata, so linked windows observe the same result. The operations do not switch the active window or move its cursor.
+- As an explicit modern policy, user-color annotations are presentation-only: setting an already set flag is idempotent, and coloring does not set text dirty state, change the document text version or add an Undo history item. The historical handbook defines setting the flag but not how this annotation participates in modern text persistence/Undo.
 - `Wrapped` belongs to the flagged line's **outgoing boundary**. If line N is wrapped, the boundary from line N to line N+1 is a soft word-wrap continuation rather than an explicit paragraph-ending newline.
 - A storage implementation must support line read/replace/insert/remove and a stable snapshot operation.
 - The storage mechanism is replaceable. The first .NET implementation uses linked logical lines because this closely matches the historical model while keeping later rope/piece-table work possible.

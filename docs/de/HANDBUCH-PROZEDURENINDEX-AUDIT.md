@@ -10,18 +10,16 @@ Die Klassifikation beschreibt **beobachtbare Aufgaben**, keine 1:1-Abbildung his
 
 | Klassifikation | Anzahl | Bedeutung |
 |---|---:|---|
-| Implemented | 81 | Dokumentierte Aufgabe in der .NET-Referenz abgebildet. |
+| Implemented | 83 | Dokumentierte Aufgabe in der .NET-Referenz abgebildet. |
 | Modern replacement | 7 | Moderne Invariante/Abstraktion ersetzt historische interne Mechanik. |
 | Host/sample concern | 27 | Darstellung, Prompts und Wrapper gehören nicht zum portablen Core. |
 | Not applicable | 3 | DOS-/BIOS-/Videospeichermechanik ist nicht portabel. |
 | Documented divergence | 1 | Bewusst dokumentierte moderne Abweichung. |
-| Needs review | 4 | Vollständiger Verhaltensnachweis steht noch aus. |
+| Needs review | 2 | Vollständiger Verhaltensnachweis steht noch aus. |
 | **Gesamt** | **123** | Ein Eintrag je gedruckter Funktionsbeschreibung. |
 
 ## Offene Prüfungen
 
-- `EditColorFile` (Handbuch S. 137): Verhalten und Regressionstests gegen die Originalbeschreibung prüfen.
-- `EditColorLine` (Handbuch S. 138): Verhalten und Regressionstests gegen die Originalbeschreibung prüfen.
 - `EditGenlineno` (Handbuch S. 176): Verhalten und Regressionstests gegen die Originalbeschreibung prüfen.
 - `EditHscroll` (Handbuch S. 179): Verhalten und Regressionstests gegen die Originalbeschreibung prüfen.
 

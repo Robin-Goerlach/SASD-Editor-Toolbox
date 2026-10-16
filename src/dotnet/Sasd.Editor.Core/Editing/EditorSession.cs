@@ -339,6 +339,48 @@ public sealed class EditorSession
         }
     }
 
+    /// <summary>
+    /// Sets the user-color flag on the current logical line, independently of
+    /// block and wrap flags. This is the observable portion of EditColorLine.
+    /// </summary>
+    public void ColorCurrentLine()
+    {
+        EnsureWindow();
+        var document = CurrentWindow.Document;
+        ColorLine(document, CurrentWindow.Cursor.Line);
+    }
+
+    /// <summary>
+    /// Colors every logical line in the current document, as EditColorFile did
+    /// for the current text stream. Linked views see the same line metadata.
+    /// </summary>
+    public void ColorCurrentDocument()
+    {
+        EnsureWindow();
+        var document = CurrentWindow.Document;
+        for (var line = 0; line < document.Buffer.LineCount; line++)
+        {
+            ColorLine(document, line);
+        }
+    }
+
+    /// <summary>
+    /// User coloring is a presentation annotation, not a text edit: setting
+    /// this flag must not change the document's dirty state or create undo
+    /// history. The historical handbook documents setting the flag but does
+    /// not specify persistence or undo semantics; this is SASD's explicit
+    /// modern policy. Keeping the metadata on the document also ensures that
+    /// linked windows do not disagree about a line's user-color state.
+    /// </summary>
+    private static void ColorLine(EditorDocument document, int line)
+    {
+        var current = document.Buffer.GetLine(line).Flags;
+        if ((current & EditorLineFlags.UserColored) == 0)
+        {
+            document.Buffer.SetFlags(line, current | EditorLineFlags.UserColored);
+        }
+    }
+
     public void ClearBlock()
     {
         // Clearing stale block bits globally is intentionally stronger than only

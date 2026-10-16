@@ -9,6 +9,7 @@ The goal is behavioral coverage, not source-level or public-name identity.
 | Text as lines / text streams | `ITextBuffer`, `EditorDocument` | Implemented |
 | Linked-line storage | `LinkedLineTextBuffer` | Implemented |
 | Line flags: block / wrapped / special color | `EditorLineFlags` | Implemented |
+| `EditColorLine` / `EditColorFile` user-color flags | `EditorSession.ColorCurrentLine` / `ColorCurrentDocument` | Implemented; presentation-only policy |
 | `Wrapped` as soft outgoing line boundary | line flags + engine/reformat/file codec | Implemented |
 | Multiple windows | `EditorSession`, `EditorWindow` | Implemented |
 | Linked windows sharing one stream | multiple `EditorWindow` objects over one `EditorDocument` | Implemented |

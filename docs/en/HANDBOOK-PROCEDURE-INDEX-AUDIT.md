@@ -10,18 +10,16 @@ The classification describes **observable responsibility**, never source-level P
 
 | Classification | Count | Interpretation |
 |---|---:|---|
-| Implemented | 81 | Documented conceptual behavior is present in the .NET reference. |
+| Implemented | 83 | Documented conceptual behavior is present in the .NET reference. |
 | Modern replacement | 7 | A host-neutral invariant or newer abstraction replaces an internal historical mechanism. |
 | Host/sample concern | 27 | Presentation, prompting or command wrapper responsibility is outside the portable core. |
 | Not applicable | 3 | Platform-dependent DOS/BIOS/video-memory machinery is not portable. |
 | Documented divergence | 1 | Historical behavior differs from a documented modern policy. |
-| Needs review | 4 | The present evidence does not justify a complete compatibility claim. |
+| Needs review | 2 | The present evidence does not justify a complete compatibility claim. |
 | **Total** | **123** | One entry for each printed routine description page. |
 
 ## Open checks
 
-- `EditColorFile` (manual p. 137): verify exact observable behavior and test/code coverage.
-- `EditColorLine` (manual p. 138): verify exact observable behavior and test/code coverage.
 - `EditGenlineno` (manual p. 176): verify exact observable behavior and test/code coverage.
 - `EditHscroll` (manual p. 179): verify exact observable behavior and test/code coverage.
 

@@ -61,6 +61,7 @@ See the English and German multi-language architecture documents for the porting
 The current foundation contains:
 
 - a line-oriented text-buffer abstraction with a linked-line implementation;
+- historical user-colored line/stream annotations as UI-neutral flags, preserving block/wrap metadata across linked windows;
 - document and multi-window/session models, including linked windows over one document;
 - host-neutral stacked-window geometry through `EditorWindowLayout` / `EditorWindowFrame`;
 - historical Create Window compression/splitting and Delete Window row-reclamation rules with a three-row minimum per displayed window;
