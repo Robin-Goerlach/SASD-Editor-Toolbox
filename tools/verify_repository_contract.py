@@ -110,11 +110,23 @@ def verify_conformance() -> int:
         raise ContractError("Conformance manifest requires a non-empty 'caseFiles' array")
 
     seen_ids: set[str] = set()
+    seen_case_files: set[str] = set()
     case_count = 0
 
     for relative in case_files:
         if not isinstance(relative, str) or not relative:
             raise ContractError("Every conformance case file path must be a non-empty string")
+        # The .NET adapter packages the contents of the shared v1/cases/
+        # directory into its test output. Only files in this subtree can be
+        # reached without bypassing that layout or traversing parent folders.
+        prefix = "conformance/v1/cases/"
+        if not relative.startswith(prefix) or any(
+            part in ("", ".", "..") for part in relative.split("/")
+        ) or "\\\\" in relative:
+            raise ContractError(f"Invalid conformance case file path: {relative}")
+        if relative in seen_case_files:
+            raise ContractError(f"Duplicate conformance case file: {relative}")
+        seen_case_files.add(relative)
         path = require_repo_path(relative, "Conformance case file")
         data = load_json(path)
 
@@ -158,7 +170,7 @@ def verify_conformance() -> int:
     return case_count
 
 
-def verify_handbook_inventory() -> tuple[int, int]:
+def verify_handbook_inventory() -> tuple[int, int, int]:
     """Check historical inventory integrity, not behavioral equivalence.
 
     The printed handbook's index has one description per page from 118 to 240.
@@ -180,8 +192,18 @@ def verify_handbook_inventory() -> tuple[int, int]:
         "implemented", "modern-replacement", "host-sample",
         "not-applicable", "documented-divergence", "needs-review",
     }
+    # Cross-reference only actual case IDs listed in the shared manifest.
+    # This is a traceability check, not a claim that the cited case exhausts
+    # every historical edge case of the procedure.
+    manifest = load_json(CONFORMANCE_MANIFEST)
+    portable_ids: set[str] = set()
+    for case_file in manifest["caseFiles"]:
+        case_data = load_json(require_repo_path(case_file, "Conformance case file"))
+        portable_ids.update(case["id"] for case in case_data["cases"])
+
     seen: set[str] = set()
     pending = 0
+    linked_rows = 0
     for page, entry in enumerate(entries, start=118):
         if not isinstance(entry, dict):
             raise ContractError(f"Handbook index page {page}: non-object entry")
@@ -208,16 +230,30 @@ def verify_handbook_inventory() -> tuple[int, int]:
         if entry["status"] == "needs-review":
             pending += 1
 
+        # Optional executable references must be real, distinct portable
+        # case IDs. Evidence remains opt-in so missing coverage is visible
+        # instead of being replaced with invented tests or false confidence.
+        evidence_cases = entry.get("conformanceCases")
+        if evidence_cases is not None:
+            if not isinstance(evidence_cases, list) or not evidence_cases:
+                raise ContractError(f"{name}: conformanceCases must be a non-empty list")
+            if any(not isinstance(case, str) or case not in portable_ids
+                   for case in evidence_cases):
+                raise ContractError(f"{name}: conformanceCases contains an unknown case ID")
+            if len(set(evidence_cases)) != len(evidence_cases):
+                raise ContractError(f"{name}: duplicate conformance case reference")
+            linked_rows += 1
+
     require_repo_path("docs/en/HANDBOOK-PROCEDURE-INDEX-AUDIT.md", "Handbook audit EN")
     require_repo_path("docs/de/HANDBUCH-PROZEDURENINDEX-AUDIT.md", "Handbook audit DE")
-    return len(entries), pending
+    return len(entries), pending, linked_rows
 
 
 def main() -> int:
     try:
         implementation_ids = verify_implementations()
         case_count = verify_conformance()
-        handbook_count, pending = verify_handbook_inventory()
+        handbook_count, pending, linked_rows = verify_handbook_inventory()
     except ContractError as exc:
         print(f"Repository contract FAILED: {exc}", file=sys.stderr)
         return 1
@@ -226,7 +262,8 @@ def main() -> int:
         "Repository contract OK: "
         f"{len(implementation_ids)} implementation lanes "
         f"({', '.join(implementation_ids)}), {case_count} V1 conformance cases, "
-        f"{handbook_count} handbook routines ({pending} pending review)."
+        f"{handbook_count} handbook routines ({pending} pending review, "
+        f"{linked_rows} linked to portable test cases)."
     )
     return 0
 

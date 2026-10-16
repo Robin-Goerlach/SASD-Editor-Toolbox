@@ -33,6 +33,12 @@ No rows remain under `needs-review` in this **first-pass mapping inventory**. Th
 
 The repository now reads every declared file in `conformance/v1/manifest.json`, rather than silently limiting .NET execution to `core-smoke.json`. The new `screen-and-annotations.json` cases cover observable outcomes mapped to `EditGenlineno`, `EditHscroll`, `EditColorFile` and `EditColorLine`, including linked views, flags and text/Undo invariants. This is **specific executable evidence for these mappings**, not a certificate that all 123 historical routines have been checked to the same depth.
 
+## Machine-checked links to executable evidence
+
+The inventory may include an optional `conformanceCases` array on a historical routine. The repository contract validator verifies that each referenced case ID occurs in a file declared by the portable manifest, rejects duplicate or unknown IDs, and reports the number of rows with links. **Currently 10 of 123 rows** link to specific portable cases; the other rows retain conceptual/documentation evidence and still require individual regression review.
+
+These links represent **focused examples**, not exhaustive proof of historical behavior. The verifier deliberately does not fabricate conformance evidence for a procedure merely because its conceptual mapping is marked `implemented` or `modern-replacement`.
+
 ## Next review and acceptance criteria
 
 For each *needs-review* row, examine its individual handbook description, check the existing architecture and tests, add focused regression coverage for genuine behavior gaps, then independently implement only those gaps. Revisit the conceptual *implemented* mappings and identify any missing tests without fabricating Pascal-shaped APIs. Keep the English and German audit, compatibility matrix, and any affected shared specification/conformance cases synchronized.

@@ -33,6 +33,12 @@ In der **ersten Indexzuordnung** bleiben keine `needs-review`-Einträge übrig. 
 
 Die .NET-Tests laden inzwischen jede Datei aus `conformance/v1/manifest.json`, nicht mehr stillschweigend nur `core-smoke.json`. Die neuen Fälle in `screen-and-annotations.json` prüfen das beobachtbare Verhalten zu `EditGenlineno`, `EditHscroll`, `EditColorFile` und `EditColorLine`, einschließlich verknüpfter Fenster, Flags sowie Text-/Undo-Invarianten. Das ist **gezielte ausführbare Evidenz für diese Zuordnungen**, kein Nachweis für sämtliche 123 historischen Routinen.
 
+## Maschinengeprüfte Verweise auf ausführbare Belege
+
+Die Inventarliste unterstützt pro historischer Routine ein optionales Feld `conformanceCases`. Die Repository-Vertragsprüfung kontrolliert, ob jede referenzierte Fall-ID in einer durch das portable Manifest eingebundenen Datei vorkommt, weist doppelte oder unbekannte IDs zurück und meldet die Zahl verknüpfter Routinen. **Derzeit sind 10 von 123 Zeilen** mit konkreten portablen Fällen verknüpft. Für alle anderen bestehen zunächst nur konzeptionelle beziehungsweise dokumentierte Zuordnungen, deren Regressionstest-Abdeckung weiterhin einzeln geprüft werden muss.
+
+Diese Verweise sind **gezielte Testbeispiele**, keine vollständigen historischen Verhaltensbeweise. Die Prüfung erzeugt bewusst keine erfundenen Tests für Einträge, die lediglich als `implemented` oder `modern-replacement` eingeordnet wurden.
+
 ## Nächste Schritte und Abschlusskriterien
 
 Jeden offenen Eintrag anhand seiner eigenen Handbuchbeschreibung prüfen, die bereits vorhandenen Tests abgleichen und nur bei echten Verhaltenslücken unabhängigen Code samt Regressionstests ergänzen. Auch die als implementiert eingestuften Zuordnungen brauchen einen Randfall-/Testabgleich; künstliche Pascal-APIs sind ausdrücklich unerwünscht. Inventarliste, deutsche/englische Audit-Dokumente, Matrix und nötigenfalls sprachneutralen Vertrag/Conformance-Fälle synchron halten.

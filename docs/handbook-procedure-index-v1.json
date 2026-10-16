@@ -68,7 +68,10 @@
       "handbookPage": 126,
       "status": "implemented",
       "evidence": "docs/en/BLOCK-COMPATIBILITY.md",
-      "note": "Whole-line block operations and independent endpoints."
+      "note": "Whole-line block operations and independent endpoints.",
+      "conformanceCases": [
+        "blocks.begin-alone-is-incomplete-and-hidden"
+      ]
     },
     {
       "name": "EditBlockCopy",
@@ -145,14 +148,20 @@
       "handbookPage": 137,
       "status": "implemented",
       "evidence": "docs/en/LINE-COLOR-COMPATIBILITY.md",
-      "note": "Sets UserColored while preserving unrelated line flags; see tested display-only policy."
+      "note": "Sets UserColored while preserving unrelated line flags; see tested display-only policy.",
+      "conformanceCases": [
+        "annotations.color-whole-document-keeps-other-stream-unchanged"
+      ]
     },
     {
       "name": "EditColorLine",
       "handbookPage": 138,
       "status": "implemented",
       "evidence": "docs/en/LINE-COLOR-COMPATIBILITY.md",
-      "note": "Sets UserColored while preserving unrelated line flags; see tested display-only policy."
+      "note": "Sets UserColored while preserving unrelated line flags; see tested display-only policy.",
+      "conformanceCases": [
+        "annotations.color-current-line-preserves-wrap-and-block"
+      ]
     },
     {
       "name": "EditCompressLine",
@@ -320,7 +329,10 @@
       "handbookPage": 162,
       "status": "implemented",
       "evidence": "docs/en/DELETION-COMPATIBILITY.md",
-      "note": "Character/word/line deletion and joining."
+      "note": "Character/word/line deletion and joining.",
+      "conformanceCases": [
+        "editing.delete-sole-line-retains-blank-line"
+      ]
     },
     {
       "name": "EditDeleteRightChar",
@@ -418,7 +430,10 @@
       "handbookPage": 176,
       "status": "modern-replacement",
       "evidence": "docs/en/SCREEN-POSITION-COMPATIBILITY.md",
-      "note": "Current zero-based logical line index provides O(1) absolute line number for each window; per-window status is rendered separately."
+      "note": "Current zero-based logical line index provides O(1) absolute line number for each window; per-window status is rendered separately.",
+      "conformanceCases": [
+        "viewport.status-projection-uses-per-window-absolute-line"
+      ]
     },
     {
       "name": "EditGotoColumn",
@@ -432,14 +447,23 @@
       "handbookPage": 178,
       "status": "implemented",
       "evidence": "docs/en/FIRST-ED-COMMAND-MAP.md",
-      "note": "Semantic FIRST-ED editing/navigation commands."
+      "note": "Semantic FIRST-ED editing/navigation commands.",
+      "conformanceCases": [
+        "navigation.goto-line-zero-is-rejected"
+      ]
     },
     {
       "name": "EditHscroll",
       "handbookPage": 179,
       "status": "implemented",
       "evidence": "docs/en/SCREEN-POSITION-COMPATIBILITY.md",
-      "note": "All displayed views use a host-provided text-column width and minimal LeftColumn correction, without mutating cursor or document."
+      "note": "All displayed views use a host-provided text-column width and minimal LeftColumn correction, without mutating cursor or document.",
+      "conformanceCases": [
+        "viewport.horizontal-visibility-all-linked-views",
+        "viewport.horizontal-inside-visible-range-does-not-move",
+        "viewport.right-edge-is-inclusive",
+        "viewport.right-outside-scrolls-minimally"
+      ]
     },
     {
       "name": "EditIncline",
@@ -523,7 +547,10 @@
       "handbookPage": 191,
       "status": "implemented",
       "evidence": "docs/en/LINE-INSERTION-AND-NEWLINE.md",
-      "note": "Separate new-line and insert-line commands."
+      "note": "Separate new-line and insert-line commands.",
+      "conformanceCases": [
+        "editing.new-line-insert-mode-splits-and-moves-cursor"
+      ]
     },
     {
       "name": "EditO",
@@ -600,7 +627,10 @@
       "handbookPage": 202,
       "status": "implemented",
       "evidence": "docs/en/KERNEL-COMPATIBILITY-AUDIT.md",
-      "note": "Compatibility navigation and tab rules."
+      "note": "Compatibility navigation and tab rules.",
+      "conformanceCases": [
+        "editing.move-right-enters-virtual-column"
+      ]
     },
     {
       "name": "EditRightWord",
@@ -656,7 +686,10 @@
       "handbookPage": 210,
       "status": "implemented",
       "evidence": "docs/en/COMMAND-BOUNDARY-VALIDATION.md",
-      "note": "Undo limit validation and command boundary."
+      "note": "Undo limit validation and command boundary.",
+      "conformanceCases": [
+        "settings.undo-limit-zero-is-rejected"
+      ]
     },
     {
       "name": "EditShiftLine",

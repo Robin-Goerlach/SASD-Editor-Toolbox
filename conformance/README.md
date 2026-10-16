@@ -22,6 +22,10 @@ Each case has a stable `id`, an `area`, an `initial` portable state, one semanti
 
 The initial smoke cases intentionally cover small, well-established invariants. More cases should be added as command-boundary behavior is finalized. Avoid encoding implementation details such as C# GUID types, pointer addresses, collection classes or exception class names.
 
+## Historical audit traceability
+
+Individual rows in `docs/handbook-procedure-index-v1.json` may refer to concrete portable case IDs through `conformanceCases`. The repository contract checker verifies that each link targets an actual declared case. Unlinked rows are **not silently counted as covered**; the remaining evidence review is part of the V1 release gate. A link provides focused regression evidence only, not complete historical parity.
+
 ## Validation
 
 Run:
