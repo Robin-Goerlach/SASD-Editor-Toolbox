@@ -4,6 +4,7 @@
   "contract": "spec/editor-v1.md",
   "caseFiles": [
     "conformance/v1/cases/core-smoke.json",
-    "conformance/v1/cases/screen-and-annotations.json"
+    "conformance/v1/cases/screen-and-annotations.json",
+    "conformance/v1/cases/block-topology-and-undo.json"
   ]
 }

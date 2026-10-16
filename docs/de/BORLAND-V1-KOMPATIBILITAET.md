@@ -168,6 +168,10 @@ Das Handbuch legt fest, dass Page-Bewegungen das Fenster um eine Zeile weniger a
 
 Der historische Bildschirm hatte eine feste Größe. Die Größenänderung eines modernen Terminals ist deshalb keine historische Kompatibilitätsregel. Die .NET-Referenzimplementierung gibt zusätzliche Zeilen an das unterste Fenster und entzieht freie Zeilen von unten nach oben, ohne das Drei-Zeilen-Minimum zu unterschreiten. Diese Policy ist getrennt von der Kompatibilitätssemantik von `EditWindowCreate`/`EditWindowDelete` dokumentiert.
 
+## Portable Tests für mehrstufige Befehle
+
+Die portablen Fälle decken inzwischen Block-Begin/-End über mehrere Befehle, Markeridentität bei Zeilentopologie-Änderungen, Block-Kopieren/Verschieben/Löschen und atomaren dokumentübergreifenden Undo ab. Die Fälle stehen in `conformance/v1/cases/block-topology-and-undo.json` und sind den historischen Routinen einzeln zugeordnet. Dies ist gezielte Verhaltensevidenz, kein vollständiger Beweis für Pascal-Implementierungsparität.
+
 ## V1-Abschlusskriterium
 
 Die C#/.NET-Implementierung deckt die großen strukturellen FIRST-ED-Bereiche inzwischen ausführbar ab, einschließlich Absatz-Neuformatierung, mehrzeiliger Block-Bulk-Topologie, unabhängiger Block-Endpunkte und atomarer Multi-Dokument-Undo-/Navigationswiederherstellung. Der [Handbuch-Prozeduren-/Funktionsindex-Audit](HANDBUCH-PROZEDURENINDEX-AUDIT.md) erfasst inzwischen alle 123 gedruckten Einträge mit ersten Klassifikationen; die zugeordneten Routinen benötigen vor V1 noch einen abschließenden Testabdeckungs- und Host-Audit. MicroStar-spezifische Demonstrationen können als Samples statt als Core-Abhängigkeiten geliefert werden.

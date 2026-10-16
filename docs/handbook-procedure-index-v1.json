@@ -78,21 +78,30 @@
       "handbookPage": 127,
       "status": "implemented",
       "evidence": "docs/en/BLOCK-COMPATIBILITY.md",
-      "note": "Whole-line block operations and independent endpoints."
+      "note": "Whole-line block operations and independent endpoints.",
+      "conformanceCases": [
+        "blocks.copy-before-source-retains-original-block-anchors"
+      ]
     },
     {
       "name": "EditBlockDelete",
       "handbookPage": 128,
       "status": "implemented",
       "evidence": "docs/en/BLOCK-COMPATIBILITY.md",
-      "note": "Whole-line block operations and independent endpoints."
+      "note": "Whole-line block operations and independent endpoints.",
+      "conformanceCases": [
+        "blocks.deleting-entire-stream-keeps-a-blank-descriptor"
+      ]
     },
     {
       "name": "EditBlockEnd",
       "handbookPage": 129,
       "status": "implemented",
       "evidence": "docs/en/BLOCK-COMPATIBILITY.md",
-      "note": "Whole-line block operations and independent endpoints."
+      "note": "Whole-line block operations and independent endpoints.",
+      "conformanceCases": [
+        "blocks.end-then-begin-defines-ordered-highlight"
+      ]
     },
     {
       "name": "EditBlockHide",
@@ -106,7 +115,11 @@
       "handbookPage": 131,
       "status": "implemented",
       "evidence": "docs/en/BLOCK-COMPATIBILITY.md",
-      "note": "Whole-line block operations and independent endpoints."
+      "note": "Whole-line block operations and independent endpoints.",
+      "conformanceCases": [
+        "blocks.cross-document-move-undo-restores-both-streams",
+        "blocks.move-into-own-source-range-is-rejected"
+      ]
     },
     {
       "name": "EditBottomBlock",
@@ -360,7 +373,10 @@
       "handbookPage": 166,
       "status": "implemented",
       "evidence": "docs/en/LINE-TOPOLOGY-AND-REALIGNMENT.md",
-      "note": "Explicit logical-line reference repair."
+      "note": "Explicit logical-line reference repair.",
+      "conformanceCases": [
+        "blocks.delete-begin-boundary-preserves-other-endpoint"
+      ]
     },
     {
       "name": "EditDestxtdes",
@@ -491,7 +507,10 @@
       "handbookPage": 183,
       "status": "implemented",
       "evidence": "docs/en/LINE-INSERTION-AND-NEWLINE.md",
-      "note": "Separate new-line and insert-line commands."
+      "note": "Separate new-line and insert-line commands.",
+      "conformanceCases": [
+        "blocks.standalone-endpoint-follows-line-insertion"
+      ]
     },
     {
       "name": "EditJoinLine",
@@ -505,7 +524,10 @@
       "handbookPage": 185,
       "status": "implemented",
       "evidence": "docs/en/KERNEL-COMPATIBILITY-AUDIT.md",
-      "note": "Logical-line markers and jump behavior."
+      "note": "Logical-line markers and jump behavior.",
+      "conformanceCases": [
+        "markers.line-insertion-follows-surviving-logical-line"
+      ]
     },
     {
       "name": "EditK",
@@ -599,7 +621,11 @@
       "handbookPage": 198,
       "status": "implemented",
       "evidence": "docs/en/LINE-TOPOLOGY-AND-REALIGNMENT.md",
-      "note": "Explicit logical-line reference repair."
+      "note": "Explicit logical-line reference repair.",
+      "conformanceCases": [
+        "blocks.standalone-endpoint-follows-line-insertion",
+        "markers.line-insertion-follows-surviving-logical-line"
+      ]
     },
     {
       "name": "EditReatxtfil",
@@ -672,7 +698,10 @@
       "handbookPage": 208,
       "status": "implemented",
       "evidence": "docs/en/KERNEL-COMPATIBILITY-AUDIT.md",
-      "note": "Logical-line markers and jump behavior."
+      "note": "Logical-line markers and jump behavior.",
+      "conformanceCases": [
+        "markers.line-insertion-follows-surviving-logical-line"
+      ]
     },
     {
       "name": "EditSetRightMargin",
@@ -752,7 +781,11 @@
       "handbookPage": 219,
       "status": "implemented",
       "evidence": "docs/en/UNDO-TRANSACTIONS.md",
-      "note": "Transactional undo restores one logical operation."
+      "note": "Transactional undo restores one logical operation.",
+      "conformanceCases": [
+        "blocks.cross-document-move-undo-restores-both-streams",
+        "undo.delete-boundary-restores-anchors-of-linked-windows"
+      ]
     },
     {
       "name": "EditUpcase",

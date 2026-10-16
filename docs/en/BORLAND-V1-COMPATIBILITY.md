@@ -169,6 +169,10 @@ The handbook states that page movement slides the window by one less than the nu
 
 The historical screen was fixed-size. Resizing a modern terminal is therefore not a historical compatibility rule. The .NET reference implementation gives growth to the bottom window and removes spare rows from bottom to top while preserving the three-row minimum. This policy is documented separately from `EditWindowCreate`/`EditWindowDelete` compatibility semantics.
 
+## Portable sequence regression evidence
+
+The portable suite now exercises multi-step block Begin/End, marker identity through line topology changes, block copy/move/delete and atomic cross-document Undo. These cases live in `conformance/v1/cases/block-topology-and-undo.json` and are individually linked from the historical procedure inventory. They are targeted behavioral evidence, not proof of complete Pascal implementation equivalence.
+
 ## V1 release gate
 
 The C#/.NET implementation now has executable coverage for the major FIRST-ED structural areas, including paragraph reformatting, whole-line block bulk topology, independent block endpoints and atomic multi-document undo/navigation restoration. The [handbook procedure/function index audit](HANDBOOK-PROCEDURE-INDEX-AUDIT.md) now records all 123 printed entries with first-pass classifications; its mapped behavior still requires a final regression-coverage and host-interface audit before calling V1 complete. MicroStar-specific demonstrations may ship as samples rather than core dependencies.

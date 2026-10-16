@@ -1,0 +1,1011 @@
+{
+  "formatVersion": 1,
+  "contractVersion": "v1",
+  "cases": [
+    {
+      "id": "blocks.end-then-begin-defines-ordered-highlight",
+      "area": "blocks",
+      "initial": {
+        "documents": [
+          {
+            "id": "a",
+            "lines": [
+              {
+                "text": "a",
+                "flags": []
+              },
+              {
+                "text": "b",
+                "flags": []
+              },
+              {
+                "text": "c",
+                "flags": []
+              },
+              {
+                "text": "d",
+                "flags": []
+              }
+            ]
+          }
+        ],
+        "windows": [
+          {
+            "id": "w",
+            "documentId": "a",
+            "cursor": {
+              "line": 3,
+              "column": 0
+            },
+            "topLine": 0,
+            "leftColumn": 0
+          }
+        ],
+        "currentWindowId": "w"
+      },
+      "operations": [
+        {
+          "id": "end_block"
+        },
+        {
+          "id": "position_cursor",
+          "line": 1,
+          "column": 0
+        },
+        {
+          "id": "begin_block"
+        }
+      ],
+      "expect": {
+        "blockState": {
+          "start": {
+            "documentId": "a",
+            "line": 1
+          },
+          "end": {
+            "documentId": "a",
+            "line": 3
+          },
+          "hidden": false,
+          "complete": true
+        },
+        "documents": {
+          "a": {
+            "lines": [
+              {
+                "text": "a",
+                "flags": []
+              },
+              {
+                "text": "b",
+                "flags": [
+                  "in_block"
+                ]
+              },
+              {
+                "text": "c",
+                "flags": [
+                  "in_block"
+                ]
+              },
+              {
+                "text": "d",
+                "flags": [
+                  "in_block"
+                ]
+              }
+            ],
+            "isDirty": false,
+            "version": 0
+          }
+        },
+        "undo": {
+          "count": 0
+        }
+      }
+    },
+    {
+      "id": "blocks.delete-begin-boundary-preserves-other-endpoint",
+      "area": "blocks",
+      "initial": {
+        "documents": [
+          {
+            "id": "a",
+            "lines": [
+              {
+                "text": "a",
+                "flags": []
+              },
+              {
+                "text": "b",
+                "flags": []
+              },
+              {
+                "text": "c",
+                "flags": []
+              },
+              {
+                "text": "d",
+                "flags": []
+              }
+            ]
+          }
+        ],
+        "windows": [
+          {
+            "id": "w",
+            "documentId": "a",
+            "cursor": {
+              "line": 1,
+              "column": 2
+            },
+            "topLine": 0,
+            "leftColumn": 0
+          }
+        ],
+        "currentWindowId": "w"
+      },
+      "operations": [
+        {
+          "id": "begin_block"
+        },
+        {
+          "id": "position_cursor",
+          "line": 3,
+          "column": 0
+        },
+        {
+          "id": "end_block"
+        },
+        {
+          "id": "position_cursor",
+          "line": 1,
+          "column": 2
+        },
+        {
+          "id": "delete_line"
+        }
+      ],
+      "expect": {
+        "documents": {
+          "a": {
+            "lines": [
+              {
+                "text": "a",
+                "flags": []
+              },
+              {
+                "text": "c",
+                "flags": []
+              },
+              {
+                "text": "d",
+                "flags": []
+              }
+            ],
+            "isDirty": true,
+            "version": 1
+          }
+        },
+        "blockState": {
+          "start": null,
+          "end": {
+            "documentId": "a",
+            "line": 2
+          },
+          "hidden": true,
+          "complete": false
+        },
+        "windows": {
+          "w": {
+            "cursor": {
+              "line": 1,
+              "column": 2
+            }
+          }
+        },
+        "undo": {
+          "count": 1
+        }
+      }
+    },
+    {
+      "id": "blocks.standalone-endpoint-follows-line-insertion",
+      "area": "topology",
+      "initial": {
+        "documents": [
+          {
+            "id": "a",
+            "lines": [
+              {
+                "text": "a",
+                "flags": []
+              },
+              {
+                "text": "b",
+                "flags": []
+              },
+              {
+                "text": "c",
+                "flags": []
+              }
+            ]
+          }
+        ],
+        "windows": [
+          {
+            "id": "w",
+            "documentId": "a",
+            "cursor": {
+              "line": 2,
+              "column": 0
+            },
+            "topLine": 0,
+            "leftColumn": 0
+          }
+        ],
+        "currentWindowId": "w"
+      },
+      "operations": [
+        {
+          "id": "begin_block"
+        },
+        {
+          "id": "position_cursor",
+          "line": 0,
+          "column": 0
+        },
+        {
+          "id": "insert_line"
+        }
+      ],
+      "expect": {
+        "documents": {
+          "a": {
+            "lines": [
+              {
+                "text": "",
+                "flags": []
+              },
+              {
+                "text": "a",
+                "flags": []
+              },
+              {
+                "text": "b",
+                "flags": []
+              },
+              {
+                "text": "c",
+                "flags": []
+              }
+            ],
+            "isDirty": true,
+            "version": 1
+          }
+        },
+        "blockState": {
+          "start": {
+            "documentId": "a",
+            "line": 3
+          },
+          "end": null,
+          "hidden": true,
+          "complete": false
+        },
+        "windows": {
+          "w": {
+            "cursor": {
+              "line": 0,
+              "column": 0
+            }
+          }
+        },
+        "undo": {
+          "count": 1
+        }
+      }
+    },
+    {
+      "id": "markers.line-insertion-follows-surviving-logical-line",
+      "area": "topology",
+      "initial": {
+        "documents": [
+          {
+            "id": "a",
+            "lines": [
+              {
+                "text": "a",
+                "flags": []
+              },
+              {
+                "text": "b",
+                "flags": []
+              },
+              {
+                "text": "c",
+                "flags": []
+              },
+              {
+                "text": "d",
+                "flags": []
+              }
+            ]
+          }
+        ],
+        "windows": [
+          {
+            "id": "w",
+            "documentId": "a",
+            "cursor": {
+              "line": 3,
+              "column": 7
+            },
+            "topLine": 0,
+            "leftColumn": 0
+          }
+        ],
+        "currentWindowId": "w"
+      },
+      "operations": [
+        {
+          "id": "set_marker",
+          "number": 1
+        },
+        {
+          "id": "position_cursor",
+          "line": 0,
+          "column": 0
+        },
+        {
+          "id": "insert_line"
+        },
+        {
+          "id": "jump_marker",
+          "number": 1
+        }
+      ],
+      "expect": {
+        "documents": {
+          "a": {
+            "lines": [
+              {
+                "text": "",
+                "flags": []
+              },
+              {
+                "text": "a",
+                "flags": []
+              },
+              {
+                "text": "b",
+                "flags": []
+              },
+              {
+                "text": "c",
+                "flags": []
+              },
+              {
+                "text": "d",
+                "flags": []
+              }
+            ],
+            "isDirty": true,
+            "version": 1
+          }
+        },
+        "windows": {
+          "w": {
+            "cursor": {
+              "line": 4,
+              "column": 0
+            }
+          }
+        },
+        "undo": {
+          "count": 1
+        }
+      }
+    },
+    {
+      "id": "blocks.copy-before-source-retains-original-block-anchors",
+      "area": "blocks",
+      "initial": {
+        "documents": [
+          {
+            "id": "a",
+            "lines": [
+              {
+                "text": "a",
+                "flags": []
+              },
+              {
+                "text": "b",
+                "flags": []
+              },
+              {
+                "text": "c",
+                "flags": []
+              },
+              {
+                "text": "d",
+                "flags": []
+              }
+            ]
+          }
+        ],
+        "windows": [
+          {
+            "id": "w",
+            "documentId": "a",
+            "cursor": {
+              "line": 1,
+              "column": 0
+            },
+            "topLine": 0,
+            "leftColumn": 0
+          }
+        ],
+        "currentWindowId": "w"
+      },
+      "operations": [
+        {
+          "id": "begin_block"
+        },
+        {
+          "id": "position_cursor",
+          "line": 2,
+          "column": 0
+        },
+        {
+          "id": "end_block"
+        },
+        {
+          "id": "position_cursor",
+          "line": 0,
+          "column": 0
+        },
+        {
+          "id": "copy_block"
+        }
+      ],
+      "expect": {
+        "documents": {
+          "a": {
+            "lines": [
+              {
+                "text": "b",
+                "flags": []
+              },
+              {
+                "text": "c",
+                "flags": []
+              },
+              {
+                "text": "a",
+                "flags": []
+              },
+              {
+                "text": "b",
+                "flags": [
+                  "in_block"
+                ]
+              },
+              {
+                "text": "c",
+                "flags": [
+                  "in_block"
+                ]
+              },
+              {
+                "text": "d",
+                "flags": []
+              }
+            ],
+            "isDirty": true,
+            "version": 1
+          }
+        },
+        "blockState": {
+          "start": {
+            "documentId": "a",
+            "line": 3
+          },
+          "end": {
+            "documentId": "a",
+            "line": 4
+          },
+          "hidden": false,
+          "complete": true
+        },
+        "windows": {
+          "w": {
+            "cursor": {
+              "line": 2,
+              "column": 0
+            }
+          }
+        },
+        "undo": {
+          "count": 1
+        }
+      }
+    },
+    {
+      "id": "blocks.cross-document-move-undo-restores-both-streams",
+      "area": "undo",
+      "initial": {
+        "documents": [
+          {
+            "id": "source",
+            "lines": [
+              {
+                "text": "a",
+                "flags": []
+              },
+              {
+                "text": "b",
+                "flags": []
+              },
+              {
+                "text": "c",
+                "flags": []
+              },
+              {
+                "text": "d",
+                "flags": []
+              }
+            ]
+          },
+          {
+            "id": "target",
+            "lines": [
+              {
+                "text": "x",
+                "flags": []
+              },
+              {
+                "text": "y",
+                "flags": []
+              }
+            ]
+          }
+        ],
+        "windows": [
+          {
+            "id": "src",
+            "documentId": "source",
+            "cursor": {
+              "line": 1,
+              "column": 0
+            },
+            "topLine": 0,
+            "leftColumn": 0
+          },
+          {
+            "id": "dst",
+            "documentId": "target",
+            "cursor": {
+              "line": 1,
+              "column": 4
+            },
+            "topLine": 0,
+            "leftColumn": 0
+          }
+        ],
+        "currentWindowId": "src"
+      },
+      "operations": [
+        {
+          "id": "begin_block"
+        },
+        {
+          "id": "position_cursor",
+          "line": 2,
+          "column": 0
+        },
+        {
+          "id": "end_block"
+        },
+        {
+          "id": "select_window",
+          "windowId": "dst"
+        },
+        {
+          "id": "move_block"
+        },
+        {
+          "id": "undo"
+        }
+      ],
+      "expect": {
+        "documents": {
+          "source": {
+            "lines": [
+              {
+                "text": "a",
+                "flags": []
+              },
+              {
+                "text": "b",
+                "flags": [
+                  "in_block"
+                ]
+              },
+              {
+                "text": "c",
+                "flags": [
+                  "in_block"
+                ]
+              },
+              {
+                "text": "d",
+                "flags": []
+              }
+            ],
+            "isDirty": false,
+            "version": 0
+          },
+          "target": {
+            "lines": [
+              {
+                "text": "x",
+                "flags": []
+              },
+              {
+                "text": "y",
+                "flags": []
+              }
+            ],
+            "isDirty": false,
+            "version": 0
+          }
+        },
+        "blockState": {
+          "start": {
+            "documentId": "source",
+            "line": 1
+          },
+          "end": {
+            "documentId": "source",
+            "line": 2
+          },
+          "hidden": false,
+          "complete": true
+        },
+        "windows": {
+          "dst": {
+            "cursor": {
+              "line": 1,
+              "column": 4
+            }
+          }
+        },
+        "currentWindowId": "dst",
+        "undo": {
+          "count": 0
+        }
+      }
+    },
+    {
+      "id": "blocks.deleting-entire-stream-keeps-a-blank-descriptor",
+      "area": "blocks",
+      "initial": {
+        "documents": [
+          {
+            "id": "a",
+            "lines": [
+              {
+                "text": "a",
+                "flags": []
+              },
+              {
+                "text": "b",
+                "flags": []
+              }
+            ]
+          }
+        ],
+        "windows": [
+          {
+            "id": "w",
+            "documentId": "a",
+            "cursor": {
+              "line": 0,
+              "column": 0
+            },
+            "topLine": 0,
+            "leftColumn": 0
+          }
+        ],
+        "currentWindowId": "w"
+      },
+      "operations": [
+        {
+          "id": "begin_block"
+        },
+        {
+          "id": "position_cursor",
+          "line": 1,
+          "column": 0
+        },
+        {
+          "id": "end_block"
+        },
+        {
+          "id": "delete_block"
+        }
+      ],
+      "expect": {
+        "documents": {
+          "a": {
+            "lines": [
+              {
+                "text": "",
+                "flags": []
+              }
+            ],
+            "isDirty": true,
+            "version": 1
+          }
+        },
+        "blockState": {
+          "start": null,
+          "end": null,
+          "hidden": true,
+          "complete": false
+        },
+        "undo": {
+          "count": 1
+        }
+      }
+    },
+    {
+      "id": "undo.delete-boundary-restores-anchors-of-linked-windows",
+      "area": "undo",
+      "initial": {
+        "documents": [
+          {
+            "id": "a",
+            "lines": [
+              {
+                "text": "a",
+                "flags": []
+              },
+              {
+                "text": "b",
+                "flags": []
+              },
+              {
+                "text": "c",
+                "flags": []
+              },
+              {
+                "text": "d",
+                "flags": []
+              }
+            ]
+          }
+        ],
+        "windows": [
+          {
+            "id": "w",
+            "documentId": "a",
+            "cursor": {
+              "line": 1,
+              "column": 0
+            },
+            "topLine": 0,
+            "leftColumn": 0
+          },
+          {
+            "id": "linked",
+            "documentId": "a",
+            "cursor": {
+              "line": 3,
+              "column": 8
+            },
+            "topLine": 3,
+            "leftColumn": 2
+          }
+        ],
+        "currentWindowId": "w"
+      },
+      "operations": [
+        {
+          "id": "begin_block"
+        },
+        {
+          "id": "position_cursor",
+          "line": 2,
+          "column": 0
+        },
+        {
+          "id": "end_block"
+        },
+        {
+          "id": "position_cursor",
+          "line": 1,
+          "column": 5
+        },
+        {
+          "id": "delete_line"
+        },
+        {
+          "id": "undo"
+        }
+      ],
+      "expect": {
+        "documents": {
+          "a": {
+            "lines": [
+              {
+                "text": "a",
+                "flags": []
+              },
+              {
+                "text": "b",
+                "flags": [
+                  "in_block"
+                ]
+              },
+              {
+                "text": "c",
+                "flags": [
+                  "in_block"
+                ]
+              },
+              {
+                "text": "d",
+                "flags": []
+              }
+            ],
+            "isDirty": false,
+            "version": 0
+          }
+        },
+        "blockState": {
+          "start": {
+            "documentId": "a",
+            "line": 1
+          },
+          "end": {
+            "documentId": "a",
+            "line": 2
+          },
+          "hidden": false,
+          "complete": true
+        },
+        "windows": {
+          "w": {
+            "cursor": {
+              "line": 1,
+              "column": 5
+            }
+          },
+          "linked": {
+            "cursor": {
+              "line": 3,
+              "column": 8
+            },
+            "topLine": 3,
+            "leftColumn": 2
+          }
+        },
+        "undo": {
+          "count": 0
+        }
+      }
+    },
+    {
+      "id": "blocks.move-into-own-source-range-is-rejected",
+      "area": "command-boundary",
+      "initial": {
+        "documents": [
+          {
+            "id": "a",
+            "lines": [
+              {
+                "text": "a",
+                "flags": []
+              },
+              {
+                "text": "b",
+                "flags": []
+              },
+              {
+                "text": "c",
+                "flags": []
+              }
+            ]
+          }
+        ],
+        "windows": [
+          {
+            "id": "w",
+            "documentId": "a",
+            "cursor": {
+              "line": 1,
+              "column": 0
+            },
+            "topLine": 0,
+            "leftColumn": 0
+          }
+        ],
+        "currentWindowId": "w"
+      },
+      "operations": [
+        {
+          "id": "begin_block"
+        },
+        {
+          "id": "position_cursor",
+          "line": 2,
+          "column": 0
+        },
+        {
+          "id": "end_block"
+        },
+        {
+          "id": "position_cursor",
+          "line": 1,
+          "column": 0
+        },
+        {
+          "id": "move_block",
+          "commandSucceeded": false
+        }
+      ],
+      "expect": {
+        "commandSucceeded": false,
+        "documents": {
+          "a": {
+            "lines": [
+              {
+                "text": "a",
+                "flags": []
+              },
+              {
+                "text": "b",
+                "flags": [
+                  "in_block"
+                ]
+              },
+              {
+                "text": "c",
+                "flags": [
+                  "in_block"
+                ]
+              }
+            ],
+            "isDirty": false,
+            "version": 0
+          }
+        },
+        "blockState": {
+          "start": {
+            "documentId": "a",
+            "line": 1
+          },
+          "end": {
+            "documentId": "a",
+            "line": 2
+          },
+          "hidden": false,
+          "complete": true
+        },
+        "windows": {
+          "w": {
+            "cursor": {
+              "line": 1,
+              "column": 0
+            }
+          }
+        },
+        "undo": {
+          "count": 0
+        }
+      }
+    }
+  ]
+}
