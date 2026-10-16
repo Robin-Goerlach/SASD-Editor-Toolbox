@@ -47,7 +47,7 @@ The historical file routines use a carriage-return byte with the high bit set, d
 - the codec is explicitly an 8-bit Latin-1 compatibility codec.
 - CR, LF and `0x8D` are reserved delimiter bytes and cannot appear as literal characters *within* an `EditorLineSnapshot.Text`. Encoding rejects these values and non-Latin-1 characters before it opens/truncates the target file; the regression suite checks that existing file bytes are not lost.
 
-The existing `FileTextStorage` is intentionally **not** changed. It remains the modern UTF-8 whole-document storage provider. Historical compatibility and modern persistence therefore do not constrain each other.
+`FileTextStorage` remains the modern UTF-8 whole-document storage provider; its byte encoding and newline policy are independent of the historical 8-bit codec. Both providers now share the same safe save-acknowledgement rule through `EditorDocument.MarkSnapshotSaved` without mixing their file formats.
 
 ## Write and Save semantics
 
@@ -55,9 +55,9 @@ The existing `FileTextStorage` is intentionally **not** changed. It remains the 
 
 `SaveFile` writes to the document's associated path and clears the dirty flag only when the saved snapshot still matches the document. An explicit path may also be supplied by a modern host. This is a deliberate integration adaptation: the handbook clearly documents direct read/write behavior, while SASD's document identity is a modern abstraction rather than a Pascal global/window field.
 
-## Still pending
+## Subsequent V1 work
 
-The remaining major V1 gaps are now primarily lifecycle and display concerns: editor rundown/exit confirmation, exact display-dependent scroll/page semantics, physical Create Window layout, the interactive FIRST-ED host, and later MicroStar demonstration features.
+Lifecycle, viewport movement, window layout and terminal FIRST-ED host contracts are now maintained and tested in their own compatibility modules. This file focuses on search/file semantics; the remaining V1 gate is a routine-by-routine behavioral evidence audit rather than assuming those previously documented milestones remain unimplemented.
 
 
 ## Interruption and cancellation

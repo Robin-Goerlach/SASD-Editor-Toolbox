@@ -47,7 +47,7 @@ Die historischen Datei-Routinen verwenden ein Carriage-Return-Byte mit gesetztem
 - der Codec ist bewusst ein 8-Bit-Latin-1-Kompatibilitätscodec.
 - CR, LF und `0x8D` sind ausschließlich Zeilentrenner und dürfen nicht als Klartextzeichen **innerhalb** eines `EditorLineSnapshot.Text` vorkommen. Der Encoder lehnt solche und nicht in Latin-1 darstellbare Zeichen vor dem Öffnen/Überschreiben der Zieldatei ab. Regressionstests prüfen, dass vorhandene Datei-Bytes erhalten bleiben.
 
-`FileTextStorage` wird absichtlich **nicht** verändert. Es bleibt der moderne UTF-8-Provider für vollständige Dokumente. Historische Kompatibilität und moderne Persistenz können sich so unabhängig entwickeln.
+`FileTextStorage` bleibt der moderne UTF-8-Provider für vollständige Dokumente. Sein Byteformat und die Behandlung der Zeilenenden bleiben vom historischen 8-Bit-Codec unabhängig. Beide Speicherwege verwenden aber inzwischen dieselbe sichere Bestätigung eines gespeicherten Snapshots über `EditorDocument.MarkSnapshotSaved`, ohne die Dateiformate zu vermischen.
 
 ## Write- und Save-Semantik
 
@@ -55,9 +55,9 @@ Die historischen Datei-Routinen verwenden ein Carriage-Return-Byte mit gesetztem
 
 `SaveFile` schreibt an den dem Dokument zugeordneten Pfad und löscht anschließend das Dirty-Flag **nur, wenn während des Schreibens keine neueren Dokumentänderungen eingetroffen sind**. Ein moderner Host darf auch explizit einen Pfad mitgeben. Das ist bewusst als moderne Integrationsentscheidung dokumentiert, weil die Dokumentidentität in SASD eine moderne Abstraktion und kein Pascal-Globalzustand ist.
 
-## Noch offen
+## Weitere V1-Arbeit
 
-Die wesentlichen V1-Lücken liegen jetzt vor allem bei Lifecycle und Darstellung: Rundown/Exit-Bestätigung, exakte bildschirmabhängige Scroll-/Page-Semantik, physische Create-Window-Anordnung, der interaktive FIRST-ED-Host und später die MicroStar-Demofunktionen.
+Lifecycle, Viewport-Bewegung, Fensterlayout und die FIRST-ED-Terminaloberfläche werden inzwischen in eigenen Kompatibilitätsmodulen entwickelt und getestet. Dieses Dokument behandelt Such- und Datei-Semantik; offen bleibt der systematische Nachweis der Verhaltensabdeckung aller historischen Routinen statt einer pauschalen Behauptung, die genannten Meilensteine seien noch unimplementiert.
 
 
 ## Unterbrechung und Cancellation

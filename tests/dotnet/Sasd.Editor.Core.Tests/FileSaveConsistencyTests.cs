@@ -1,3 +1,4 @@
+using System.Text;
 using Sasd.Editor.Editing;
 using Sasd.Editor.IO;
 using Sasd.Editor.Model;
@@ -79,6 +80,59 @@ public sealed class FileSaveConsistencyTests
         document.Buffer.ReplaceLine(0, "different");
         Assert.False(document.MarkSnapshotSaved(oldVersion, savedLines));
         Assert.Equal("different", document.Buffer.GetLine(0).Text);
+    }
+
+    [Fact]
+    public async Task DirectWriteFile_DoesNotResetDirtyOrAssociateAFileName()
+    {
+        var codec = new PausingWriteCodec();
+        var session = new EditorSession(fileCodec: codec);
+        var window = session.CreateDocument("before");
+        session.Engine.InsertText("new ");
+        Assert.True(window.Document.IsDirty);
+        Assert.Null(window.Document.FilePath);
+
+        var write = session.Files.WriteCurrentWindowAsync("portable-target.txt").AsTask();
+        await codec.Started;
+        codec.Complete();
+        await write;
+
+        // Historical direct Write File is not modern Save As. It must not
+        // acknowledge the persisted snapshot or silently rename the stream.
+        Assert.Equal("new before", Assert.Single(codec.WrittenLines!).Text);
+        Assert.True(window.Document.IsDirty);
+        Assert.Null(window.Document.FilePath);
+        Assert.Equal(1, session.Undo.Count);
+    }
+
+    [Fact]
+    public async Task ModernUtf8Storage_PreservesCrlfAndAcknowledgesWrittenSnapshot()
+    {
+        var path = Path.Combine(Path.GetTempPath(), $"sasd-utf8-{Guid.NewGuid():N}.txt");
+        try
+        {
+            await File.WriteAllTextAsync(path, "grün\r\nalt\r\n", new UTF8Encoding(false));
+            var storage = new FileTextStorage();
+            var document = await storage.LoadAsync(path);
+
+            Assert.Equal("\r\n", document.NewLine);
+            Assert.Equal(3, document.Buffer.LineCount);
+            Assert.False(document.IsDirty);
+
+            document.Buffer.ReplaceLine(1, "neu");
+            document.MarkChanged();
+            await storage.SaveAsync(document);
+
+            Assert.Equal("grün\r\nneu\r\n",
+                await File.ReadAllTextAsync(path, Encoding.UTF8));
+            Assert.False(document.IsDirty);
+            Assert.Equal(1, document.Version);
+            Assert.Equal(Path.GetFullPath(path), document.FilePath);
+        }
+        finally
+        {
+            File.Delete(path);
+        }
     }
 
     private sealed class PausingWriteCodec : IEditorFileCodec
