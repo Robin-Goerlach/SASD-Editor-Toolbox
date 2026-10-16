@@ -180,6 +180,8 @@ Die portablen Fälle decken inzwischen Block-Begin/-End über mehrere Befehle, M
 
 `conformance/v1/cases/search-and-replace.json` prüft die historische Wiederholung bei leerem Suchprompt, die Ablehnung eines fehlenden Parameters, Find Again, Ersetzen durch leeren Text sowie Undo. Damit liegen zusätzliche sprachneutrale Belege für `EditFind` und `EditReplace` vor, ohne interne Details des C#-Suchdienstes festzuschreiben.
 
+Die sprachneutralen Fälle prüfen die Groß-/Kleinschreibung bewusst anhand von ASCII. Locale-abhängige Unicode-Fallumwandlung ist kein stillschweigend vorgeschriebener Bestandteil des gemeinsamen V1-Vertrags; zusätzliche Unicode-Unterstützung bleibt eine dokumentierte Erweiterung der jeweiligen Sprachimplementierung.
+
 ## Portable Belege für die Dateieinfügung
 
 `conformance/v1/cases/file-read-topology.json` testet die sprachneutrale Read-File-Semantik mit bereits dekodierten logischen Zeilen. Die Fälle prüfen Einfügeposition, Undo, unabhängige Dokumente, Metadaten und Zeilen-Realignment. Dateisystem und Bytes werden absichtlich ausgeklammert; die historische High-Bit-CR-Dekodierung besitzt eigene .NET-Codec-Tests.
