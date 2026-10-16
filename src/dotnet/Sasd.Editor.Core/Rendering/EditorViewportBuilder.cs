@@ -24,13 +24,24 @@ public sealed class EditorViewportBuilder(EditorSession session)
 
         var document = window.Document;
         var firstLine = Math.Clamp(window.TopLine, 0, document.Buffer.LineCount - 1);
-        var lastExclusive = Math.Min(document.Buffer.LineCount, firstLine + height);
-        var lines = new List<ViewportLine>(lastExclusive - firstLine);
 
-        for (var lineIndex = firstLine; lineIndex < lastExclusive; lineIndex++)
+        // Subtract before taking the minimum. Using firstLine + height here
+        // would overflow with an int.MaxValue-sized host viewport even when
+        // the document itself only contains a handful of logical lines.
+        var visibleCount = Math.Min(height, document.Buffer.LineCount - firstLine);
+        var lines = new List<ViewportLine>(visibleCount);
+        var horizontalOffset = Math.Max(0, window.LeftColumn);
+
+        for (var row = 0; row < visibleCount; row++)
         {
+            var lineIndex = firstLine + row;
             var snapshot = document.Buffer.GetLine(lineIndex);
-            var start = Math.Min(window.LeftColumn, snapshot.Text.Length);
+
+            // Hosts are expected to normalize viewport coordinates. A stale
+            // negative horizontal offset should nevertheless be harmless when
+            // constructing a read-only projection: do not mutate view state
+            // or pass a negative index to Substring.
+            var start = Math.Min(horizontalOffset, snapshot.Text.Length);
             var length = Math.Min(width, snapshot.Text.Length - start);
             lines.Add(new ViewportLine(lineIndex, snapshot.Text.Substring(start, length), snapshot.Flags));
         }

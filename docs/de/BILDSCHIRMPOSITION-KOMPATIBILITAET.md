@@ -29,3 +29,6 @@ Die Prüfung durch Subtraktion vermeidet Overflow nahe `int.MaxValue`. Virtuelle
 
 `ScreenPositionCompatibilityTests` prüft linke/rechte Sichtgrenze, verknüpfte und unabhängige Fenster, Idempotenz, fehlerhafte Breiten, große virtuelle Spalten, gekürzten Viewporttext und fensterbezogene absolute Zeilennummern.
 
+## Defensive Grenzen der Viewport-Projektion
+
+`EditorViewportBuilder` begrenzt eine angeforderte positive Höhe nun auf die **ab der obersten Zeile tatsächlich verbleibenden Dokumentzeilen**, statt eine möglicherweise überlaufende Host-Höhe zur TopLine zu addieren. Ein veralteter negativer `LeftColumn`-Wert wird nur für die read-only Projektion wie null behandelt, ohne den Fensterzustand heimlich zu ändern. Null- und negative Dimensionen werden abgewiesen. Das sind moderne defensive API-Regeln und keine Behauptung historischer DOS-Kompatibilität. `ViewportBoundaryTests` sichert die Fälle ab; die portablen Conformance-Fälle enthalten ebenfalls eine Projektion mit sehr großer Höhe.

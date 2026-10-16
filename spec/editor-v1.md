@@ -190,6 +190,10 @@ Error notifications use stable semantic categories independent of UI wording. A 
 
 The core does not write directly to console/video memory. It exposes viewport/status projections for individual windows plus host-neutral window frames. WPF, WinForms, terminal, web and other hosts decide how those projections are drawn.
 
+- A viewport requested with positive `height` and `width` projects at most the remaining logical document lines. Its row count must not overflow integer arithmetic when a host reports a very large positive height; zero and negative dimensions are invalid.
+- Projecting a viewport is observational. It must not change the document, dirty state, cursor, top line, horizontal offset or Undo history.
+- A stale negative horizontal offset is normalized to zero **for the projection only** as a defensive modern .NET policy. Hosts remain responsible for maintaining nonnegative view state; this is not a claimed historical 1985 rule.
+
 ## 12. Persistence and compatibility file I/O
 
 - Modern document persistence is abstracted. The first .NET `ITextStorage` provider supports UTF-8 files and preserves the detected newline convention for subsequent saves.

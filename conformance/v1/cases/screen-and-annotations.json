@@ -626,6 +626,70 @@
           "count": 0
         }
       }
+    },
+    {
+      "id": "viewport.very-large-height-caps-remaining-lines",
+      "area": "viewport",
+      "initial": {
+        "documents": [
+          {
+            "id": "doc",
+            "lines": [
+              {
+                "text": "one"
+              },
+              {
+                "text": "two"
+              },
+              {
+                "text": "three"
+              }
+            ]
+          }
+        ],
+        "windows": [
+          {
+            "id": "win",
+            "documentId": "doc",
+            "cursor": {
+              "line": 1,
+              "column": 0
+            },
+            "topLine": 1,
+            "leftColumn": 0
+          }
+        ],
+        "currentWindowId": "win"
+      },
+      "operation": {
+        "id": "project_viewports"
+      },
+      "expect": {
+        "viewports": {
+          "win": {
+            "height": 2147483647,
+            "width": 3,
+            "statusLine": 2,
+            "lines": [
+              "two",
+              "thr"
+            ]
+          }
+        },
+        "windows": {
+          "win": {
+            "cursor": {
+              "line": 1,
+              "column": 0
+            },
+            "topLine": 1,
+            "leftColumn": 0
+          }
+        },
+        "undo": {
+          "count": 0
+        }
+      }
     }
   ]
 }

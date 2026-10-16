@@ -29,3 +29,6 @@ The subtraction-based check avoids overflow near `int.MaxValue`. Virtual columns
 
 `ScreenPositionCompatibilityTests` covers both edges of the horizontal viewport, all linked and independent windows, idempotence, invalid widths, large virtual columns, viewport text clipping and per-window absolute status line numbers.
 
+## Defensive projection boundaries
+
+The `EditorViewportBuilder` now caps a requested positive height by the **number of document lines remaining after the top line**, rather than adding a potentially overflowing host height to the top-line index. A stale negative `LeftColumn` is interpreted as zero for read-only rendering without silently rewriting the window's state. Zero or negative viewport dimensions are rejected. These are modern defensive API rules, not DOS-era historical compatibility claims. `ViewportBoundaryTests` covers the edge cases, and the shared conformance suite includes a very-large-height projection fixture.

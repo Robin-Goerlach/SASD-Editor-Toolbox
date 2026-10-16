@@ -104,7 +104,7 @@ The current foundation contains:
 - `EditorScheduler` and `EditorSystemLoop` implementing input-first cooperative scheduling and the repeated schedule-until-rundown main-loop model;
 - `IEditorInputPump` as the host boundary for keyboard, terminal, scripted or other input sources;
 - extension hooks inspired by the historical `UserCommand`, `UserError`, `UserStatusLine`, `UserReplace` and `UserTask` integration points;
-- a UI-neutral viewport/status model with a specific-window projection for simultaneous multi-window rendering;
+- a UI-neutral viewport/status model with a specific-window projection for simultaneous multi-window rendering and overflow-safe height clipping;
 - an **interactive stacked FIRST-ED terminal reference host** whose physical and macro input share the editor-owned typeahead path before key mapping and dispatch;
 - English and German architecture/compatibility documentation;
 - automated unit tests.
