@@ -122,7 +122,7 @@ def verify_conformance() -> int:
         prefix = "conformance/v1/cases/"
         if not relative.startswith(prefix) or any(
             part in ("", ".", "..") for part in relative.split("/")
-        ) or "\\\\" in relative:
+        ) or "\\" in relative:
             raise ContractError(f"Invalid conformance case file path: {relative}")
         if relative in seen_case_files:
             raise ContractError(f"Duplicate conformance case file: {relative}")
