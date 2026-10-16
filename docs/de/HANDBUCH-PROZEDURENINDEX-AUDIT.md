@@ -47,6 +47,8 @@ Neue portable Befehlsfolgen in `search-and-replace.json` liefern zusätzliche Na
 
 Die portablen Fälle in `file-read-topology.json` verknüpfen `EditFileRead` und `EditReatxtfil` mit einem eingespeisten **bereits dekodierten Zeilenbestand** und dem öffentlichen Read-File-Befehl. Geprüft werden ursprüngliches Fenster/Cursor, verknüpfte Ansichten, Block-/Marker-Realignment, Wrapped-Flags, leere Eingaben und ein einzelnes Undo. Da das Byteformat separat getestet wird, beweisen diese Links nicht automatisch jedes historische Detail des 0x8D-Dateiformats.
 
+Acht weitere portable Such-/Ersetzungstests sichern die standardmäßig groß-/kleinschreibungsunabhängige Suche, Find Again ohne automatischen Umbruch, unabhängige verknüpfte Ansichten, Dokumentwechsel zwischen normalen Befehlen, sehr große virtuelle Spalten und Find Again nach einer Ersetzung ab. Die separaten asynchronen Host-Regressionstests des .NET-Kerns bleiben dafür zusätzlich notwendig.
+
 ## Nächste Schritte und Abschlusskriterien
 
 Jeden offenen Eintrag anhand seiner eigenen Handbuchbeschreibung prüfen, die bereits vorhandenen Tests abgleichen und nur bei echten Verhaltenslücken unabhängigen Code samt Regressionstests ergänzen. Auch die als implementiert eingestuften Zuordnungen brauchen einen Randfall-/Testabgleich; künstliche Pascal-APIs sind ausdrücklich unerwünscht. Inventarliste, deutsche/englische Audit-Dokumente, Matrix und nötigenfalls sprachneutralen Vertrag/Conformance-Fälle synchron halten.

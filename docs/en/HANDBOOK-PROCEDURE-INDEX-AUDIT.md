@@ -47,6 +47,8 @@ The new `search-and-replace.json` portable command-sequence cases add concrete e
 
 The portable `file-read-topology.json` fixtures now trace `EditFileRead` and `EditReatxtfil` through an injected **decoded-line provider** and the public Read File command. They cover source window/cursor anchoring, linked views, block/marker realignment, Wrapped flags, empty input and single-step Undo. Because byte-level file decoding is tested separately, these links do not by themselves certify every aspect of the historical 0x8D format.
 
+Eight additional portable search/replace cases check the case-insensitive default, non-wrapping Find Again, isolated linked views, document changes between ordinary commands, very large virtual columns and subsequent Find Again after replacement. These augment, but do not replace, the separate .NET asynchronous-host interleaving tests.
+
 ## Next review and acceptance criteria
 
 For each *needs-review* row, examine its individual handbook description, check the existing architecture and tests, add focused regression coverage for genuine behavior gaps, then independently implement only those gaps. Revisit the conceptual *implemented* mappings and identify any missing tests without fabricating Pascal-shaped APIs. Keep the English and German audit, compatibility matrix, and any affected shared specification/conformance cases synchronized.

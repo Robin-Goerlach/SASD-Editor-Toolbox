@@ -576,6 +576,607 @@
           "count": 0
         }
       }
+    },
+    {
+      "id": "search.case-insensitive-default-finds-differently-cased-match",
+      "area": "search-and-replace",
+      "initial": {
+        "documents": [
+          {
+            "id": "a",
+            "lines": [
+              {
+                "text": "Alpha alpha",
+                "flags": []
+              }
+            ]
+          }
+        ],
+        "windows": [
+          {
+            "id": "w",
+            "documentId": "a",
+            "cursor": {
+              "line": 0,
+              "column": 0
+            },
+            "topLine": 0,
+            "leftColumn": 0
+          }
+        ],
+        "currentWindowId": "w"
+      },
+      "operations": [
+        {
+          "id": "find_next",
+          "text": "alpha"
+        },
+        {
+          "id": "find_again"
+        }
+      ],
+      "expect": {
+        "documents": {
+          "a": {
+            "lines": [
+              {
+                "text": "Alpha alpha",
+                "flags": []
+              }
+            ],
+            "isDirty": false,
+            "version": 0
+          }
+        },
+        "windows": {
+          "w": {
+            "cursor": {
+              "line": 0,
+              "column": 6
+            }
+          }
+        },
+        "undo": {
+          "count": 0
+        }
+      }
+    },
+    {
+      "id": "search.find-again-does-not-wrap-by-default",
+      "area": "search-and-replace",
+      "initial": {
+        "documents": [
+          {
+            "id": "a",
+            "lines": [
+              {
+                "text": "alpha beta alpha",
+                "flags": []
+              }
+            ]
+          }
+        ],
+        "windows": [
+          {
+            "id": "w",
+            "documentId": "a",
+            "cursor": {
+              "line": 0,
+              "column": 0
+            },
+            "topLine": 0,
+            "leftColumn": 0
+          }
+        ],
+        "currentWindowId": "w"
+      },
+      "operations": [
+        {
+          "id": "find_next",
+          "text": "alpha"
+        },
+        {
+          "id": "find_again"
+        },
+        {
+          "id": "find_again",
+          "commandSucceeded": false
+        }
+      ],
+      "expect": {
+        "commandSucceeded": false,
+        "documents": {
+          "a": {
+            "lines": [
+              {
+                "text": "alpha beta alpha",
+                "flags": []
+              }
+            ],
+            "isDirty": false,
+            "version": 0
+          }
+        },
+        "windows": {
+          "w": {
+            "cursor": {
+              "line": 0,
+              "column": 11
+            }
+          }
+        },
+        "undo": {
+          "count": 0
+        }
+      }
+    },
+    {
+      "id": "search.linked-views-retain-independent-cursors",
+      "area": "search-and-replace",
+      "initial": {
+        "documents": [
+          {
+            "id": "a",
+            "lines": [
+              {
+                "text": "alpha middle alpha",
+                "flags": []
+              }
+            ]
+          }
+        ],
+        "windows": [
+          {
+            "id": "w1",
+            "documentId": "a",
+            "cursor": {
+              "line": 0,
+              "column": 0
+            },
+            "topLine": 0,
+            "leftColumn": 0
+          },
+          {
+            "id": "w2",
+            "documentId": "a",
+            "cursor": {
+              "line": 0,
+              "column": 8
+            },
+            "topLine": 0,
+            "leftColumn": 0
+          }
+        ],
+        "currentWindowId": "w2"
+      },
+      "operation": {
+        "id": "find_next",
+        "text": "alpha"
+      },
+      "expect": {
+        "currentWindowId": "w2",
+        "documents": {
+          "a": {
+            "lines": [
+              {
+                "text": "alpha middle alpha",
+                "flags": []
+              }
+            ],
+            "isDirty": false,
+            "version": 0
+          }
+        },
+        "windows": {
+          "w1": {
+            "cursor": {
+              "line": 0,
+              "column": 0
+            }
+          },
+          "w2": {
+            "cursor": {
+              "line": 0,
+              "column": 13
+            }
+          }
+        },
+        "undo": {
+          "count": 0
+        }
+      }
+    },
+    {
+      "id": "search.find-again-new-document-searches-that-document",
+      "area": "search-and-replace",
+      "initial": {
+        "documents": [
+          {
+            "id": "a",
+            "lines": [
+              {
+                "text": "alpha",
+                "flags": []
+              }
+            ]
+          },
+          {
+            "id": "b",
+            "lines": [
+              {
+                "text": "zz alpha",
+                "flags": []
+              }
+            ]
+          }
+        ],
+        "windows": [
+          {
+            "id": "wa",
+            "documentId": "a",
+            "cursor": {
+              "line": 0,
+              "column": 0
+            },
+            "topLine": 0,
+            "leftColumn": 0
+          },
+          {
+            "id": "wb",
+            "documentId": "b",
+            "cursor": {
+              "line": 0,
+              "column": 0
+            },
+            "topLine": 0,
+            "leftColumn": 0
+          }
+        ],
+        "currentWindowId": "wa"
+      },
+      "operations": [
+        {
+          "id": "find_next",
+          "text": "alpha"
+        },
+        {
+          "id": "select_window",
+          "windowId": "wb"
+        },
+        {
+          "id": "find_again"
+        }
+      ],
+      "expect": {
+        "currentWindowId": "wb",
+        "documents": {
+          "a": {
+            "lines": [
+              {
+                "text": "alpha",
+                "flags": []
+              }
+            ],
+            "isDirty": false,
+            "version": 0
+          },
+          "b": {
+            "lines": [
+              {
+                "text": "zz alpha",
+                "flags": []
+              }
+            ],
+            "isDirty": false,
+            "version": 0
+          }
+        },
+        "windows": {
+          "wa": {
+            "cursor": {
+              "line": 0,
+              "column": 0
+            }
+          },
+          "wb": {
+            "cursor": {
+              "line": 0,
+              "column": 3
+            }
+          }
+        },
+        "undo": {
+          "count": 0
+        }
+      }
+    },
+    {
+      "id": "search.virtual-column-beyond-line-never-overflows-or-mutates",
+      "area": "search-and-replace",
+      "initial": {
+        "documents": [
+          {
+            "id": "a",
+            "lines": [
+              {
+                "text": "short",
+                "flags": []
+              }
+            ]
+          }
+        ],
+        "windows": [
+          {
+            "id": "w",
+            "documentId": "a",
+            "cursor": {
+              "line": 0,
+              "column": 2147483647
+            },
+            "topLine": 0,
+            "leftColumn": 0
+          }
+        ],
+        "currentWindowId": "w"
+      },
+      "operation": {
+        "id": "find_next",
+        "text": "short",
+        "commandSucceeded": false
+      },
+      "expect": {
+        "commandSucceeded": false,
+        "documents": {
+          "a": {
+            "lines": [
+              {
+                "text": "short",
+                "flags": []
+              }
+            ],
+            "isDirty": false,
+            "version": 0
+          }
+        },
+        "windows": {
+          "w": {
+            "cursor": {
+              "line": 0,
+              "column": 2147483647
+            }
+          }
+        },
+        "undo": {
+          "count": 0
+        }
+      }
+    },
+    {
+      "id": "replace.other-document-isolated-from-unselected-view",
+      "area": "search-and-replace",
+      "initial": {
+        "documents": [
+          {
+            "id": "a",
+            "lines": [
+              {
+                "text": "alpha",
+                "flags": []
+              }
+            ]
+          },
+          {
+            "id": "b",
+            "lines": [
+              {
+                "text": "alpha",
+                "flags": []
+              }
+            ]
+          }
+        ],
+        "windows": [
+          {
+            "id": "wa",
+            "documentId": "a",
+            "cursor": {
+              "line": 0,
+              "column": 0
+            },
+            "topLine": 0,
+            "leftColumn": 0
+          },
+          {
+            "id": "wb",
+            "documentId": "b",
+            "cursor": {
+              "line": 0,
+              "column": 0
+            },
+            "topLine": 0,
+            "leftColumn": 0
+          }
+        ],
+        "currentWindowId": "wa"
+      },
+      "operations": [
+        {
+          "id": "select_window",
+          "windowId": "wb"
+        },
+        {
+          "id": "replace_next",
+          "text": "alpha",
+          "text2": "Z"
+        }
+      ],
+      "expect": {
+        "currentWindowId": "wb",
+        "documents": {
+          "a": {
+            "lines": [
+              {
+                "text": "alpha",
+                "flags": []
+              }
+            ],
+            "isDirty": false,
+            "version": 0
+          },
+          "b": {
+            "lines": [
+              {
+                "text": "Z",
+                "flags": []
+              }
+            ],
+            "isDirty": true,
+            "version": 1
+          }
+        },
+        "windows": {
+          "wa": {
+            "cursor": {
+              "line": 0,
+              "column": 0
+            }
+          },
+          "wb": {
+            "cursor": {
+              "line": 0,
+              "column": 1
+            }
+          }
+        },
+        "undo": {
+          "count": 1
+        }
+      }
+    },
+    {
+      "id": "replace.find-again-after-edit-locates-next-unchanged-match",
+      "area": "search-and-replace",
+      "initial": {
+        "documents": [
+          {
+            "id": "a",
+            "lines": [
+              {
+                "text": "alpha beta alpha",
+                "flags": []
+              }
+            ]
+          }
+        ],
+        "windows": [
+          {
+            "id": "w",
+            "documentId": "a",
+            "cursor": {
+              "line": 0,
+              "column": 0
+            },
+            "topLine": 0,
+            "leftColumn": 0
+          }
+        ],
+        "currentWindowId": "w"
+      },
+      "operations": [
+        {
+          "id": "replace_next",
+          "text": "alpha",
+          "text2": "X"
+        },
+        {
+          "id": "find_again"
+        }
+      ],
+      "expect": {
+        "documents": {
+          "a": {
+            "lines": [
+              {
+                "text": "X beta alpha",
+                "flags": []
+              }
+            ],
+            "isDirty": true,
+            "version": 1
+          }
+        },
+        "windows": {
+          "w": {
+            "cursor": {
+              "line": 0,
+              "column": 7
+            }
+          }
+        },
+        "undo": {
+          "count": 1
+        }
+      }
+    },
+    {
+      "id": "replace.case-insensitive-literal-matches-accented-letters",
+      "area": "search-and-replace",
+      "initial": {
+        "documents": [
+          {
+            "id": "a",
+            "lines": [
+              {
+                "text": "Äpfel äPFEL",
+                "flags": []
+              }
+            ]
+          }
+        ],
+        "windows": [
+          {
+            "id": "w",
+            "documentId": "a",
+            "cursor": {
+              "line": 0,
+              "column": 0
+            },
+            "topLine": 0,
+            "leftColumn": 0
+          }
+        ],
+        "currentWindowId": "w"
+      },
+      "operation": {
+        "id": "replace_next",
+        "text": "äpfel",
+        "text2": "Obst"
+      },
+      "expect": {
+        "documents": {
+          "a": {
+            "lines": [
+              {
+                "text": "Obst äPFEL",
+                "flags": []
+              }
+            ],
+            "isDirty": true,
+            "version": 1
+          }
+        },
+        "windows": {
+          "w": {
+            "cursor": {
+              "line": 0,
+              "column": 4
+            }
+          }
+        },
+        "undo": {
+          "count": 1
+        }
+      }
     }
   ]
 }
