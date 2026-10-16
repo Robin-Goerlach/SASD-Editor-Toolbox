@@ -32,7 +32,8 @@ Commands that historically asked the user for a filename, number, search string 
 | Ctrl-Z | Scroll down |
 | Ctrl-P | Insert control character (host prompt) |
 | Ctrl-J | Beginning/end of line toggle |
-| Enter / Ctrl-N | Insert line |
+| Enter | New Line: Insert-mode split / Overtype-mode movement; honors autoindent |
+| Ctrl-N | Insert Line: splits or inserts while retaining the upper-line cursor |
 | Ctrl-G / Delete | Delete right character |
 | Backspace / Ctrl-H | Delete left character |
 | Ctrl-R | Page up |
@@ -83,7 +84,7 @@ Arrow, Home, End and Page keys are also accepted as modern aliases. They do not 
 | Ctrl-O S | Set undo limit |
 | Ctrl-O 1..9 | Go to numbered window |
 
-The historical create-window command asked for both a size and a source window. SASD records the two-value requirement now; actual screen-layout semantics remain a later host/rendering milestone.
+The historical create-window command asks for both a size and a source window. SASD now enforces the actual three-row-minimum split/compression semantics through `EditorWindowLayout`; the terminal reference host renders all stacked windows.
 
 ## Ctrl-Q prefix
 
@@ -104,4 +105,4 @@ The historical create-window command asked for both a size and a source window. 
 
 ## Current transfer status
 
-This milestone implements the complete FIRST-ED **input mapping contract** and tests the prefix state machine. Some semantic commands already have command processors in `EditorCommandDispatcher`; prompt-driven file/window/search details are intentionally transferred in later, separately testable steps. This prevents UI prompting and historical keyboard conventions from leaking into the editor engine.
+The FIRST-ED **input mapping contract**, prefix state machine and associated semantic command paths now have regression coverage, including prompt-driven file, window and search commands. The interactive terminal host owns prompts; `EditorCommandDispatcher` and services remain UI-independent. New portable conformance cases are discovered from the shared manifest, not inferred from the .NET key mapping.

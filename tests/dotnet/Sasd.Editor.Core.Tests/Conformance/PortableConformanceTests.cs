@@ -4,6 +4,7 @@ using Sasd.Editor.Document;
 using Sasd.Editor.Editing;
 using Sasd.Editor.Hooks;
 using Sasd.Editor.Model;
+using Sasd.Editor.Rendering;
 using Sasd.Editor.Windows;
 using Xunit;
 
@@ -21,28 +22,55 @@ namespace Sasd.Editor.Core.Tests.Conformance;
 /// </remarks>
 public sealed class PortableConformanceTests
 {
-    public static IEnumerable<object[]> CoreSmokeCases()
+    /// <summary>
+    /// Discovers shared conformance files from the normative manifest.
+    /// Reading only core-smoke.json would silently skip new cross-language
+    /// behavior cases even when the repository contract validator accepts them.
+    /// </summary>
+    public static IEnumerable<object[]> PortableCases()
     {
-        var path = Path.Combine(
-            AppContext.BaseDirectory,
-            "conformance",
-            "cases",
-            "core-smoke.json");
+        var root = Path.Combine(AppContext.BaseDirectory, "conformance");
+        using var manifest = JsonDocument.Parse(
+            File.ReadAllText(Path.Combine(root, "manifest.json")));
 
-        using var document = JsonDocument.Parse(File.ReadAllText(path));
-        foreach (var testCase in document.RootElement.GetProperty("cases").EnumerateArray())
+        const string sourcePrefix = "conformance/v1/";
+        foreach (var entry in manifest.RootElement.GetProperty("caseFiles").EnumerateArray())
         {
-            yield return
-            [
-                testCase.GetProperty("id").GetString()!,
-                testCase.GetRawText()
-            ];
+            var sourcePath = entry.GetString()
+                ?? throw new InvalidDataException("Conformance manifest contains a null path.");
+
+            // The output layout deliberately omits v1/, because the test
+            // project's Link metadata copies cases under conformance/cases/.
+            // Reject traversal components rather than allowing arbitrary
+            // manifest paths to escape the packaged conformance directory.
+            if (!sourcePath.StartsWith(sourcePrefix, StringComparison.Ordinal))
+            {
+                throw new InvalidDataException($"Unexpected conformance path: {sourcePath}");
+            }
+
+            var relative = sourcePath[sourcePrefix.Length..];
+            var parts = relative.Split('/');
+            if (parts.Any(static part => part is "" or "." or ".." || part.Contains('\\')))
+            {
+                throw new InvalidDataException($"Unsafe conformance path: {sourcePath}");
+            }
+
+            var caseFile = Path.Combine(root, Path.Combine(parts));
+            using var document = JsonDocument.Parse(File.ReadAllText(caseFile));
+            foreach (var testCase in document.RootElement.GetProperty("cases").EnumerateArray())
+            {
+                yield return
+                [
+                    testCase.GetProperty("id").GetString()!,
+                    testCase.GetRawText()
+                ];
+            }
         }
     }
 
     [Theory]
-    [MemberData(nameof(CoreSmokeCases))]
-    public async Task SharedCoreSmokeCase_MatchesDotNetImplementation(
+    [MemberData(nameof(PortableCases))]
+    public async Task SharedPortableCase_MatchesDotNetImplementation(
         string caseId,
         string caseJson)
     {
@@ -53,8 +81,7 @@ public sealed class PortableConformanceTests
 
         var context = BuildInitialState(testCase.GetProperty("initial"));
         var operation = testCase.GetProperty("operation");
-        var request = BuildRequest(operation);
-        var executed = await new EditorCommandDispatcher(context.Session).ExecuteAsync(request);
+        var executed = await ExecuteOperationAsync(context, operation);
 
         AssertExpectedState(context, testCase.GetProperty("expect"), executed);
     }
@@ -174,6 +201,37 @@ public sealed class PortableConformanceTests
         return result;
     }
 
+    /// <summary>
+    /// Some portable operations are session/view services rather than keyboard
+    /// commands. Keep them out of EditorCommandId to preserve the separation
+    /// between host-neutral behavior and the historical FIRST-ED key map.
+    /// </summary>
+    private static async ValueTask<bool> ExecuteOperationAsync(
+        TestContext context,
+        JsonElement operation)
+    {
+        switch (RequireString(operation, "id"))
+        {
+            case "color_current_line":
+                context.Session.ColorCurrentLine();
+                return true;
+            case "color_current_document":
+                context.Session.ColorCurrentDocument();
+                return true;
+            case "ensure_horizontal_visibility":
+                context.Session.EnsureAllWindowCursorsHorizontallyVisible(
+                    operation.GetProperty("visibleColumns").GetInt32());
+                return true;
+            case "project_viewports":
+                // Building a viewport is observational: it must not change
+                // the cursor, text, undo history or currently selected view.
+                return true;
+            default:
+                return await new EditorCommandDispatcher(context.Session)
+                    .ExecuteAsync(BuildRequest(operation));
+        }
+    }
+
     private static EditorCommandRequest BuildRequest(JsonElement operation)
     {
         var operationId = RequireString(operation, "id");
@@ -238,15 +296,69 @@ public sealed class PortableConformanceTests
             AssertExpectedBlockState(context, blockState);
         }
 
-        if (expected.TryGetProperty("undo", out var undo)
-            && undo.TryGetProperty("limit", out var undoLimit))
+        if (expected.TryGetProperty("undo", out var undo))
         {
-            Assert.Equal(undoLimit.GetInt32(), context.Session.Undo.Limit);
+            if (undo.TryGetProperty("limit", out var undoLimit))
+            {
+                Assert.Equal(undoLimit.GetInt32(), context.Session.Undo.Limit);
+            }
+
+            if (undo.TryGetProperty("count", out var undoCount))
+            {
+                Assert.Equal(undoCount.GetInt32(), context.Session.Undo.Count);
+            }
+        }
+
+        if (expected.TryGetProperty("currentWindowId", out var current))
+        {
+            var selected = context.Windows[RequireString(expected, "currentWindowId")];
+            Assert.Equal(selected.WindowId, context.Session.CurrentWindow.WindowId);
+        }
+
+        if (expected.TryGetProperty("viewports", out var viewports))
+        {
+            AssertExpectedViewports(context, viewports);
         }
 
         if (expected.TryGetProperty("error", out var error))
         {
             AssertExpectedError(context, error);
+        }
+    }
+
+    /// <summary>
+    /// Portable projections check only the requested fields, so other
+    /// language implementations can have independent renderer/status types.
+    /// </summary>
+    private static void AssertExpectedViewports(TestContext context, JsonElement viewports)
+    {
+        var builder = new EditorViewportBuilder(context.Session);
+        foreach (var portableView in viewports.EnumerateObject())
+        {
+            var requested = portableView.Value;
+            var window = context.Windows[portableView.Name];
+            var viewport = builder.Build(
+                window,
+                requested.GetProperty("height").GetInt32(),
+                requested.GetProperty("width").GetInt32());
+
+            if (requested.TryGetProperty("statusLine", out var line))
+            {
+                Assert.Equal(line.GetInt32(), viewport.Status.Line);
+            }
+
+            if (requested.TryGetProperty("statusColumn", out var column))
+            {
+                Assert.Equal(column.GetInt32(), viewport.Status.Column);
+            }
+
+            if (requested.TryGetProperty("lines", out var lines))
+            {
+                var expectedLines = lines.EnumerateArray()
+                    .Select(static item => item.GetString()!)
+                    .ToArray();
+                Assert.Equal(expectedLines, viewport.Lines.Select(static item => item.Text));
+            }
         }
     }
 
@@ -286,6 +398,16 @@ public sealed class PortableConformanceTests
 
     private static void AssertExpectedDocument(EditorDocument document, JsonElement expected)
     {
+        if (expected.TryGetProperty("isDirty", out var dirty))
+        {
+            Assert.Equal(dirty.GetBoolean(), document.IsDirty);
+        }
+
+        if (expected.TryGetProperty("version", out var version))
+        {
+            Assert.Equal(version.GetInt64(), document.Version);
+        }
+
         if (!expected.TryGetProperty("lines", out var expectedLines))
         {
             return;

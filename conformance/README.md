@@ -32,4 +32,6 @@ python3 tools/verify_repository_contract.py
 
 This validates implementation-lane declarations, required directory roots, conformance manifests and the basic case envelope.
 
-The .NET test lane already contains a conformance adapter that executes every case in `v1/cases/core-smoke.json` through the public semantic command layer. C++ and Java should follow the same adapter pattern when those implementations begin.
+The .NET test lane reads **every case file listed in `v1/manifest.json`** and runs it through a native adapter. Semantic editor commands use the public dispatcher. Portable session/view operations such as user-color flags, horizontal visibility and viewport projection use the corresponding public core services instead of inventing keyboard bindings. C++ and Java should follow the same separation when their independent implementations begin.
+
+The shared `screen-and-annotations.json` cases exercise all-window horizontal scrolling, independent linked-view coordinates, per-window absolute line status, and non-dirty user-color metadata. All snapshots and expected fields are language-neutral; no CLR types or terminal coordinates are serialized.

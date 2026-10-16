@@ -32,7 +32,8 @@ Befehle, die historisch nach Dateiname, Zahl, Suchtext oder Bestätigung gefragt
 | Ctrl-Z | Nach unten scrollen |
 | Ctrl-P | Steuerzeichen einfügen (Host-Abfrage) |
 | Ctrl-J | Zeilenanfang/-ende umschalten |
-| Enter / Ctrl-N | Zeile einfügen |
+| Enter | Neue Zeile: Split im Insert-Modus / Bewegung im Overtype-Modus; berücksichtigt Autoindent |
+| Ctrl-N | Zeile einfügen: Split oder Insert bei erhaltener Cursorposition in der oberen Zeile |
 | Ctrl-G / Entf | Zeichen rechts löschen |
 | Rücktaste / Ctrl-H | Zeichen links löschen |
 | Ctrl-R | Seite nach oben |
@@ -83,7 +84,7 @@ Pfeiltasten, Pos1/Ende und Bild-auf/Bild-ab werden zusätzlich als moderne Alias
 | Ctrl-O S | Undo-Limit setzen |
 | Ctrl-O 1..9 | Zu nummeriertem Fenster springen |
 
-Der historische Create-Window-Befehl fragte sowohl nach einer Größe als auch nach einem Quellfenster. SASD modelliert deshalb bereits die Zwei-Werte-Anforderung; die konkrete Bildschirmaufteilung folgt später in der Host-/Rendering-Schicht.
+Der historische Create-Window-Befehl fragt sowohl nach einer Größe als auch nach einem Quellfenster. SASD setzt inzwischen die Split-/Komprimierungsregeln mit Drei-Zeilen-Minimum über `EditorWindowLayout` um; der Terminal-Referenzhost zeigt alle gestapelten Fenster.
 
 ## Ctrl-Q-Prefix
 
@@ -104,4 +105,4 @@ Der historische Create-Window-Befehl fragte sowohl nach einer Größe als auch n
 
 ## Stand der Übertragung
 
-Dieser Schritt implementiert die vollständige FIRST-ED-**Eingabezuordnung** und testet den Zustand der Prefix-Kommandos. Ein Teil der semantischen Befehle besitzt bereits Prozessoren im `EditorCommandDispatcher`; Abfragen und die noch fehlenden Datei-/Fenster-/Suchdetails werden absichtlich in weiteren, getrennt testbaren Schritten übertragen. So gelangen weder UI-Abfragen noch historische Tastaturdetails in den Editor-Kern.
+Die FIRST-ED-**Eingabezuordnung**, Prefix-Zustandsmaschine und zugehörigen semantischen Befehlspfade werden inzwischen durch Regressionstests abgesichert, auch für Datei-, Fenster- und Suchbefehle mit Host-Abfragen. Der interaktive Terminalhost besitzt die Dialoge; `EditorCommandDispatcher` und Dienste bleiben UI-unabhängig. Neue portable Conformance-Fälle werden über das gemeinsame Manifest entdeckt und nicht aus der .NET-Tastenbelegung abgeleitet.

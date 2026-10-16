@@ -1,0 +1,631 @@
+{
+  "formatVersion": 1,
+  "contractVersion": "v1",
+  "cases": [
+    {
+      "id": "annotations.color-current-line-preserves-wrap-and-block",
+      "area": "annotations",
+      "initial": {
+        "documents": [
+          {
+            "id": "doc-1",
+            "lines": [
+              {
+                "text": "alpha",
+                "flags": []
+              },
+              {
+                "text": "beta",
+                "flags": [
+                  "wrapped",
+                  "in_block"
+                ]
+              },
+              {
+                "text": "gamma",
+                "flags": []
+              }
+            ]
+          }
+        ],
+        "windows": [
+          {
+            "id": "win-1",
+            "documentId": "doc-1",
+            "cursor": {
+              "line": 1,
+              "column": 9
+            },
+            "leftColumn": 0,
+            "topLine": 0
+          }
+        ],
+        "currentWindowId": "win-1"
+      },
+      "operation": {
+        "id": "color_current_line"
+      },
+      "expect": {
+        "documents": {
+          "doc-1": {
+            "lines": [
+              {
+                "text": "alpha",
+                "flags": []
+              },
+              {
+                "text": "beta",
+                "flags": [
+                  "wrapped",
+                  "in_block",
+                  "user_colored"
+                ]
+              },
+              {
+                "text": "gamma",
+                "flags": []
+              }
+            ],
+            "isDirty": false,
+            "version": 0
+          }
+        },
+        "windows": {
+          "win-1": {
+            "cursor": {
+              "line": 1,
+              "column": 9
+            }
+          }
+        },
+        "undo": {
+          "count": 0
+        },
+        "currentWindowId": "win-1"
+      }
+    },
+    {
+      "id": "annotations.color-whole-document-keeps-other-stream-unchanged",
+      "area": "annotations",
+      "initial": {
+        "documents": [
+          {
+            "id": "doc-1",
+            "lines": [
+              {
+                "text": "one",
+                "flags": [
+                  "wrapped"
+                ]
+              },
+              {
+                "text": "two",
+                "flags": [
+                  "user_colored"
+                ]
+              }
+            ]
+          },
+          {
+            "id": "doc-2",
+            "lines": [
+              {
+                "text": "untouched",
+                "flags": []
+              }
+            ]
+          }
+        ],
+        "windows": [
+          {
+            "id": "win-1",
+            "documentId": "doc-1",
+            "cursor": {
+              "line": 0,
+              "column": 0
+            },
+            "leftColumn": 0,
+            "topLine": 0
+          },
+          {
+            "id": "win-2",
+            "documentId": "doc-1",
+            "cursor": {
+              "line": 1,
+              "column": 7
+            },
+            "leftColumn": 0,
+            "topLine": 0
+          },
+          {
+            "id": "win-3",
+            "documentId": "doc-2",
+            "cursor": {
+              "line": 0,
+              "column": 0
+            },
+            "leftColumn": 0,
+            "topLine": 0
+          }
+        ],
+        "currentWindowId": "win-2"
+      },
+      "operation": {
+        "id": "color_current_document"
+      },
+      "expect": {
+        "documents": {
+          "doc-1": {
+            "lines": [
+              {
+                "text": "one",
+                "flags": [
+                  "wrapped",
+                  "user_colored"
+                ]
+              },
+              {
+                "text": "two",
+                "flags": [
+                  "user_colored"
+                ]
+              }
+            ],
+            "isDirty": false,
+            "version": 0
+          },
+          "doc-2": {
+            "lines": [
+              {
+                "text": "untouched",
+                "flags": []
+              }
+            ],
+            "isDirty": false,
+            "version": 0
+          }
+        },
+        "windows": {
+          "win-1": {
+            "cursor": {
+              "line": 0,
+              "column": 0
+            }
+          },
+          "win-2": {
+            "cursor": {
+              "line": 1,
+              "column": 7
+            }
+          }
+        },
+        "currentWindowId": "win-2",
+        "undo": {
+          "count": 0
+        }
+      }
+    },
+    {
+      "id": "viewport.horizontal-visibility-all-linked-views",
+      "area": "viewport",
+      "initial": {
+        "documents": [
+          {
+            "id": "doc-1",
+            "lines": [
+              {
+                "text": "left",
+                "flags": []
+              },
+              {
+                "text": "right",
+                "flags": []
+              }
+            ]
+          },
+          {
+            "id": "doc-2",
+            "lines": [
+              {
+                "text": "other",
+                "flags": []
+              }
+            ]
+          }
+        ],
+        "windows": [
+          {
+            "id": "win-1",
+            "documentId": "doc-1",
+            "cursor": {
+              "line": 0,
+              "column": 2
+            },
+            "leftColumn": 7,
+            "topLine": 0
+          },
+          {
+            "id": "win-2",
+            "documentId": "doc-1",
+            "cursor": {
+              "line": 1,
+              "column": 14
+            },
+            "leftColumn": 0,
+            "topLine": 0
+          },
+          {
+            "id": "win-3",
+            "documentId": "doc-2",
+            "cursor": {
+              "line": 0,
+              "column": 4
+            },
+            "leftColumn": 0,
+            "topLine": 0
+          }
+        ],
+        "currentWindowId": "win-3"
+      },
+      "operation": {
+        "id": "ensure_horizontal_visibility",
+        "visibleColumns": 5
+      },
+      "expect": {
+        "windows": {
+          "win-1": {
+            "leftColumn": 2,
+            "cursor": {
+              "line": 0,
+              "column": 2
+            }
+          },
+          "win-2": {
+            "leftColumn": 10,
+            "cursor": {
+              "line": 1,
+              "column": 14
+            }
+          },
+          "win-3": {
+            "leftColumn": 0
+          }
+        },
+        "documents": {
+          "doc-1": {
+            "lines": [
+              {
+                "text": "left",
+                "flags": []
+              },
+              {
+                "text": "right",
+                "flags": []
+              }
+            ],
+            "isDirty": false,
+            "version": 0
+          },
+          "doc-2": {
+            "lines": [
+              {
+                "text": "other",
+                "flags": []
+              }
+            ],
+            "isDirty": false,
+            "version": 0
+          }
+        },
+        "currentWindowId": "win-3",
+        "undo": {
+          "count": 0
+        }
+      }
+    },
+    {
+      "id": "viewport.horizontal-inside-visible-range-does-not-move",
+      "area": "viewport",
+      "initial": {
+        "documents": [
+          {
+            "id": "doc-1",
+            "lines": [
+              {
+                "text": "long enough",
+                "flags": []
+              }
+            ]
+          }
+        ],
+        "windows": [
+          {
+            "id": "win-1",
+            "documentId": "doc-1",
+            "cursor": {
+              "line": 0,
+              "column": 4
+            },
+            "leftColumn": 3,
+            "topLine": 0
+          }
+        ],
+        "currentWindowId": "win-1"
+      },
+      "operation": {
+        "id": "ensure_horizontal_visibility",
+        "visibleColumns": 4
+      },
+      "expect": {
+        "windows": {
+          "win-1": {
+            "leftColumn": 3,
+            "cursor": {
+              "line": 0,
+              "column": 4
+            }
+          }
+        },
+        "undo": {
+          "count": 0
+        }
+      }
+    },
+    {
+      "id": "viewport.right-edge-is-inclusive",
+      "area": "viewport",
+      "initial": {
+        "documents": [
+          {
+            "id": "doc-1",
+            "lines": [
+              {
+                "text": "abcdef",
+                "flags": []
+              }
+            ]
+          }
+        ],
+        "windows": [
+          {
+            "id": "win-1",
+            "documentId": "doc-1",
+            "cursor": {
+              "line": 0,
+              "column": 4
+            },
+            "leftColumn": 0,
+            "topLine": 0
+          }
+        ],
+        "currentWindowId": "win-1"
+      },
+      "operation": {
+        "id": "ensure_horizontal_visibility",
+        "visibleColumns": 5
+      },
+      "expect": {
+        "windows": {
+          "win-1": {
+            "leftColumn": 0,
+            "cursor": {
+              "line": 0,
+              "column": 4
+            }
+          }
+        }
+      }
+    },
+    {
+      "id": "viewport.right-outside-scrolls-minimally",
+      "area": "viewport",
+      "initial": {
+        "documents": [
+          {
+            "id": "doc-1",
+            "lines": [
+              {
+                "text": "abcdefg",
+                "flags": []
+              }
+            ]
+          }
+        ],
+        "windows": [
+          {
+            "id": "win-1",
+            "documentId": "doc-1",
+            "cursor": {
+              "line": 0,
+              "column": 6
+            },
+            "leftColumn": 1,
+            "topLine": 0
+          }
+        ],
+        "currentWindowId": "win-1"
+      },
+      "operation": {
+        "id": "ensure_horizontal_visibility",
+        "visibleColumns": 4
+      },
+      "expect": {
+        "windows": {
+          "win-1": {
+            "leftColumn": 3,
+            "cursor": {
+              "line": 0,
+              "column": 6
+            }
+          }
+        }
+      }
+    },
+    {
+      "id": "viewport.status-projection-uses-per-window-absolute-line",
+      "area": "viewport",
+      "initial": {
+        "documents": [
+          {
+            "id": "doc-1",
+            "lines": [
+              {
+                "text": "abCD",
+                "flags": []
+              },
+              {
+                "text": "efGH",
+                "flags": []
+              },
+              {
+                "text": "ijkl",
+                "flags": []
+              },
+              {
+                "text": "mnop",
+                "flags": []
+              }
+            ]
+          }
+        ],
+        "windows": [
+          {
+            "id": "win-1",
+            "documentId": "doc-1",
+            "cursor": {
+              "line": 2,
+              "column": 8
+            },
+            "leftColumn": 2,
+            "topLine": 1
+          },
+          {
+            "id": "win-2",
+            "documentId": "doc-1",
+            "cursor": {
+              "line": 0,
+              "column": 1
+            },
+            "leftColumn": 0,
+            "topLine": 0
+          }
+        ],
+        "currentWindowId": "win-2"
+      },
+      "operation": {
+        "id": "project_viewports"
+      },
+      "expect": {
+        "viewports": {
+          "win-1": {
+            "height": 2,
+            "width": 4,
+            "statusLine": 3,
+            "statusColumn": 9,
+            "lines": [
+              "GH",
+              "kl"
+            ]
+          },
+          "win-2": {
+            "height": 2,
+            "width": 4,
+            "statusLine": 1,
+            "statusColumn": 2,
+            "lines": [
+              "abCD",
+              "efGH"
+            ]
+          }
+        },
+        "documents": {
+          "doc-1": {
+            "lines": [
+              {
+                "text": "abCD",
+                "flags": []
+              },
+              {
+                "text": "efGH",
+                "flags": []
+              },
+              {
+                "text": "ijkl",
+                "flags": []
+              },
+              {
+                "text": "mnop",
+                "flags": []
+              }
+            ],
+            "isDirty": false,
+            "version": 0
+          }
+        },
+        "currentWindowId": "win-2",
+        "undo": {
+          "count": 0
+        }
+      }
+    },
+    {
+      "id": "viewport.horizontal-position-controls-rendered-text",
+      "area": "viewport",
+      "initial": {
+        "documents": [
+          {
+            "id": "doc-1",
+            "lines": [
+              {
+                "text": "abcdefghijk",
+                "flags": []
+              }
+            ]
+          }
+        ],
+        "windows": [
+          {
+            "id": "win-1",
+            "documentId": "doc-1",
+            "cursor": {
+              "line": 0,
+              "column": 8
+            },
+            "leftColumn": 0,
+            "topLine": 0
+          }
+        ],
+        "currentWindowId": "win-1"
+      },
+      "operation": {
+        "id": "ensure_horizontal_visibility",
+        "visibleColumns": 4
+      },
+      "expect": {
+        "windows": {
+          "win-1": {
+            "leftColumn": 5,
+            "cursor": {
+              "line": 0,
+              "column": 8
+            }
+          }
+        },
+        "viewports": {
+          "win-1": {
+            "height": 1,
+            "width": 4,
+            "statusLine": 1,
+            "statusColumn": 9,
+            "lines": [
+              "fghi"
+            ]
+          }
+        },
+        "undo": {
+          "count": 0
+        }
+      }
+    }
+  ]
+}

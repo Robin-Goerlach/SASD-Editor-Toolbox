@@ -75,6 +75,7 @@ The current foundation contains:
 - historical FIRST-ED begin/end/goto, top/bottom-file and viewport-aware movement semantics isolated behind compatibility processors;
 - display-row-aware line scrolling and page movement supplied with a host-visible row count;
 - a host-neutral all-window horizontal cursor visibility rule and indexed absolute-line status projection, replacing DOS-era screen-scanning helpers;
+- manifest-driven, portable cross-language conformance cases for historical line metadata and linked-window viewport behavior;
 - audited left/right character deletion, right-word deletion and line deletion, including cursor-positioned line joins and the sole-line blanking rule;
 - change-case and centering plus a clean-room FIRST-ED paragraph reformatter covering the observable responsibilities of `EditCompressLine`, `EditShiftLine`, `EditLongLine`, `EditShortLine` and `EditReformat`;
 - atomic reformat planning with margin validation, word push-down/pull-up, hard paragraph boundaries, one undo snapshot and no partial mutation for a word-too-long failure;
