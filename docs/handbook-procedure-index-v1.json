@@ -1,0 +1,872 @@
+{
+  "formatVersion": 1,
+  "source": "Turbo Editor Toolbox Owner's Handbook (1985), Procedures and Functions Index, printed pages 243-244",
+  "sourcePages": {
+    "first": 118,
+    "last": 240
+  },
+  "auditScope": "First-pass behavioral traceability for the .NET reference; not a V1 release sign-off or Pascal source-level equivalence.",
+  "entries": [
+    {
+      "name": "Advance",
+      "handbookPage": 118,
+      "status": "modern-replacement",
+      "evidence": "docs/en/KERNEL-COMPATIBILITY-AUDIT.md",
+      "note": "Internal word-step helper maps to compatibility word navigation."
+    },
+    {
+      "name": "EditAbort",
+      "handbookPage": 119,
+      "status": "implemented",
+      "evidence": "docs/en/INTERRUPTIBILITY.md",
+      "note": "Input interruption and cooperative checkpoint behavior."
+    },
+    {
+      "name": "EditAppchar",
+      "handbookPage": 120,
+      "status": "host-sample",
+      "evidence": "docs/en/INTERACTIVE-FIRST-ED-HOST.md",
+      "note": "Prompt/command-line display belongs to the host."
+    },
+    {
+      "name": "EditAppcmdnam",
+      "handbookPage": 121,
+      "status": "host-sample",
+      "evidence": "docs/en/INTERACTIVE-FIRST-ED-HOST.md",
+      "note": "Prompt/command-line display belongs to the host."
+    },
+    {
+      "name": "EditAskfor",
+      "handbookPage": 122,
+      "status": "host-sample",
+      "evidence": "docs/en/INTERACTIVE-FIRST-ED-HOST.md",
+      "note": "Prompt/command-line display belongs to the host."
+    },
+    {
+      "name": "EditBackground",
+      "handbookPage": 123,
+      "status": "implemented",
+      "evidence": "docs/en/LIFECYCLE-AND-SCROLLING.md",
+      "note": "Cooperative scheduler and lifecycle behavior."
+    },
+    {
+      "name": "EditBeginningEndLine",
+      "handbookPage": 124,
+      "status": "implemented",
+      "evidence": "docs/en/FIRST-ED-COMMAND-MAP.md",
+      "note": "Semantic FIRST-ED editing/navigation commands."
+    },
+    {
+      "name": "EditBeginningLine",
+      "handbookPage": 125,
+      "status": "implemented",
+      "evidence": "docs/en/FIRST-ED-COMMAND-MAP.md",
+      "note": "Semantic FIRST-ED editing/navigation commands."
+    },
+    {
+      "name": "EditBlockBegin",
+      "handbookPage": 126,
+      "status": "implemented",
+      "evidence": "docs/en/BLOCK-COMPATIBILITY.md",
+      "note": "Whole-line block operations and independent endpoints."
+    },
+    {
+      "name": "EditBlockCopy",
+      "handbookPage": 127,
+      "status": "implemented",
+      "evidence": "docs/en/BLOCK-COMPATIBILITY.md",
+      "note": "Whole-line block operations and independent endpoints."
+    },
+    {
+      "name": "EditBlockDelete",
+      "handbookPage": 128,
+      "status": "implemented",
+      "evidence": "docs/en/BLOCK-COMPATIBILITY.md",
+      "note": "Whole-line block operations and independent endpoints."
+    },
+    {
+      "name": "EditBlockEnd",
+      "handbookPage": 129,
+      "status": "implemented",
+      "evidence": "docs/en/BLOCK-COMPATIBILITY.md",
+      "note": "Whole-line block operations and independent endpoints."
+    },
+    {
+      "name": "EditBlockHide",
+      "handbookPage": 130,
+      "status": "implemented",
+      "evidence": "docs/en/BLOCK-COMPATIBILITY.md",
+      "note": "Whole-line block operations and independent endpoints."
+    },
+    {
+      "name": "EditBlockMove",
+      "handbookPage": 131,
+      "status": "implemented",
+      "evidence": "docs/en/BLOCK-COMPATIBILITY.md",
+      "note": "Whole-line block operations and independent endpoints."
+    },
+    {
+      "name": "EditBottomBlock",
+      "handbookPage": 132,
+      "status": "implemented",
+      "evidence": "docs/en/BLOCK-COMPATIBILITY.md",
+      "note": "Whole-line block operations and independent endpoints."
+    },
+    {
+      "name": "EditBreathe",
+      "handbookPage": 133,
+      "status": "implemented",
+      "evidence": "docs/en/INTERRUPTIBILITY.md",
+      "note": "Input interruption and cooperative checkpoint behavior."
+    },
+    {
+      "name": "EditCenterLine",
+      "handbookPage": 134,
+      "status": "implemented",
+      "evidence": "docs/en/FIRST-ED-COMMAND-MAP.md",
+      "note": "Semantic FIRST-ED editing/navigation commands."
+    },
+    {
+      "name": "EditChangeCase",
+      "handbookPage": 135,
+      "status": "implemented",
+      "evidence": "docs/en/FIRST-ED-COMMAND-MAP.md",
+      "note": "Semantic FIRST-ED editing/navigation commands."
+    },
+    {
+      "name": "EditClsinp",
+      "handbookPage": 136,
+      "status": "modern-replacement",
+      "evidence": "docs/en/TYPEAHEAD-AND-WINDOW-TEXT.md",
+      "note": "Normalized input-origin handling replaces low-level byte routing."
+    },
+    {
+      "name": "EditColorFile",
+      "handbookPage": 137,
+      "status": "needs-review",
+      "evidence": "docs/en/BORLAND-V1-COMPATIBILITY.md",
+      "note": "Inspect the handbook behavior and code/tests before claiming parity."
+    },
+    {
+      "name": "EditColorLine",
+      "handbookPage": 138,
+      "status": "needs-review",
+      "evidence": "docs/en/BORLAND-V1-COMPATIBILITY.md",
+      "note": "Inspect the handbook behavior and code/tests before claiming parity."
+    },
+    {
+      "name": "EditCompressLine",
+      "handbookPage": 139,
+      "status": "implemented",
+      "evidence": "docs/en/REFORMAT-COMPATIBILITY.md",
+      "note": "Paragraph planning/reflow replaces historical helper code."
+    },
+    {
+      "name": "EditCpcrewin",
+      "handbookPage": 140,
+      "status": "host-sample",
+      "evidence": "docs/en/COMMAND-PROCESSOR-TRANSFER.md",
+      "note": "The historical interactive Cp wrapper maps to commands and host prompts."
+    },
+    {
+      "name": "EditCpdelwin",
+      "handbookPage": 141,
+      "status": "host-sample",
+      "evidence": "docs/en/COMMAND-PROCESSOR-TRANSFER.md",
+      "note": "The historical interactive Cp wrapper maps to commands and host prompts."
+    },
+    {
+      "name": "EditCpexit",
+      "handbookPage": 142,
+      "status": "host-sample",
+      "evidence": "docs/en/COMMAND-PROCESSOR-TRANSFER.md",
+      "note": "The historical interactive Cp wrapper maps to commands and host prompts."
+    },
+    {
+      "name": "EditCpFileSave",
+      "handbookPage": 143,
+      "status": "host-sample",
+      "evidence": "docs/en/COMMAND-PROCESSOR-TRANSFER.md",
+      "note": "The historical interactive Cp wrapper maps to commands and host prompts."
+    },
+    {
+      "name": "EditCpFind",
+      "handbookPage": 144,
+      "status": "host-sample",
+      "evidence": "docs/en/COMMAND-PROCESSOR-TRANSFER.md",
+      "note": "The historical interactive Cp wrapper maps to commands and host prompts."
+    },
+    {
+      "name": "EditCpgotocl",
+      "handbookPage": 145,
+      "status": "host-sample",
+      "evidence": "docs/en/COMMAND-PROCESSOR-TRANSFER.md",
+      "note": "The historical interactive Cp wrapper maps to commands and host prompts."
+    },
+    {
+      "name": "EditCpgotoln",
+      "handbookPage": 146,
+      "status": "host-sample",
+      "evidence": "docs/en/COMMAND-PROCESSOR-TRANSFER.md",
+      "note": "The historical interactive Cp wrapper maps to commands and host prompts."
+    },
+    {
+      "name": "EditCpgotowin",
+      "handbookPage": 147,
+      "status": "host-sample",
+      "evidence": "docs/en/COMMAND-PROCESSOR-TRANSFER.md",
+      "note": "The historical interactive Cp wrapper maps to commands and host prompts."
+    },
+    {
+      "name": "EditCpjmpmrk",
+      "handbookPage": 148,
+      "status": "host-sample",
+      "evidence": "docs/en/COMMAND-PROCESSOR-TRANSFER.md",
+      "note": "The historical interactive Cp wrapper maps to commands and host prompts."
+    },
+    {
+      "name": "EditCplnkwin",
+      "handbookPage": 149,
+      "status": "host-sample",
+      "evidence": "docs/en/COMMAND-PROCESSOR-TRANSFER.md",
+      "note": "The historical interactive Cp wrapper maps to commands and host prompts."
+    },
+    {
+      "name": "EditCpReplace",
+      "handbookPage": 150,
+      "status": "host-sample",
+      "evidence": "docs/en/COMMAND-PROCESSOR-TRANSFER.md",
+      "note": "The historical interactive Cp wrapper maps to commands and host prompts."
+    },
+    {
+      "name": "EditCprfw",
+      "handbookPage": 151,
+      "status": "host-sample",
+      "evidence": "docs/en/COMMAND-PROCESSOR-TRANSFER.md",
+      "note": "The historical interactive Cp wrapper maps to commands and host prompts."
+    },
+    {
+      "name": "EditCpsetlm",
+      "handbookPage": 152,
+      "status": "host-sample",
+      "evidence": "docs/en/COMMAND-PROCESSOR-TRANSFER.md",
+      "note": "The historical interactive Cp wrapper maps to commands and host prompts."
+    },
+    {
+      "name": "EditCpsetmrk",
+      "handbookPage": 153,
+      "status": "host-sample",
+      "evidence": "docs/en/COMMAND-PROCESSOR-TRANSFER.md",
+      "note": "The historical interactive Cp wrapper maps to commands and host prompts."
+    },
+    {
+      "name": "EditCpsetrm",
+      "handbookPage": 154,
+      "status": "host-sample",
+      "evidence": "docs/en/COMMAND-PROCESSOR-TRANSFER.md",
+      "note": "The historical interactive Cp wrapper maps to commands and host prompts."
+    },
+    {
+      "name": "EditCptabdef",
+      "handbookPage": 155,
+      "status": "host-sample",
+      "evidence": "docs/en/COMMAND-PROCESSOR-TRANSFER.md",
+      "note": "The historical interactive Cp wrapper maps to commands and host prompts."
+    },
+    {
+      "name": "EditCpundlim",
+      "handbookPage": 156,
+      "status": "host-sample",
+      "evidence": "docs/en/COMMAND-PROCESSOR-TRANSFER.md",
+      "note": "The historical interactive Cp wrapper maps to commands and host prompts."
+    },
+    {
+      "name": "EditCpwfw",
+      "handbookPage": 157,
+      "status": "host-sample",
+      "evidence": "docs/en/COMMAND-PROCESSOR-TRANSFER.md",
+      "note": "The historical interactive Cp wrapper maps to commands and host prompts."
+    },
+    {
+      "name": "EditCvts2i",
+      "handbookPage": 158,
+      "status": "host-sample",
+      "evidence": "docs/en/COMMAND-PROCESSOR-TRANSFER.md",
+      "note": "The historical interactive Cp wrapper maps to commands and host prompts."
+    },
+    {
+      "name": "EditDecline",
+      "handbookPage": 159,
+      "status": "modern-replacement",
+      "evidence": "docs/en/LINE-TOPOLOGY-AND-REALIGNMENT.md",
+      "note": "Logical line indices and view state replace cached Pascal counters."
+    },
+    {
+      "name": "EditDefineTab",
+      "handbookPage": 160,
+      "status": "documented-divergence",
+      "evidence": "docs/en/KERNEL-COMPATIBILITY-AUDIT.md",
+      "note": "Historical global Tabsize becomes per-window TabSize."
+    },
+    {
+      "name": "EditDeleteLeftChar",
+      "handbookPage": 161,
+      "status": "implemented",
+      "evidence": "docs/en/DELETION-COMPATIBILITY.md",
+      "note": "Character/word/line deletion and joining."
+    },
+    {
+      "name": "EditDeleteLine",
+      "handbookPage": 162,
+      "status": "implemented",
+      "evidence": "docs/en/DELETION-COMPATIBILITY.md",
+      "note": "Character/word/line deletion and joining."
+    },
+    {
+      "name": "EditDeleteRightChar",
+      "handbookPage": 163,
+      "status": "implemented",
+      "evidence": "docs/en/DELETION-COMPATIBILITY.md",
+      "note": "Character/word/line deletion and joining."
+    },
+    {
+      "name": "EditDeleteRightWord",
+      "handbookPage": 164,
+      "status": "implemented",
+      "evidence": "docs/en/DELETION-COMPATIBILITY.md",
+      "note": "Character/word/line deletion and joining."
+    },
+    {
+      "name": "EditDeleteTextRight",
+      "handbookPage": 165,
+      "status": "implemented",
+      "evidence": "docs/en/DELETION-COMPATIBILITY.md",
+      "note": "Character/word/line deletion and joining."
+    },
+    {
+      "name": "EditDelline",
+      "handbookPage": 166,
+      "status": "implemented",
+      "evidence": "docs/en/LINE-TOPOLOGY-AND-REALIGNMENT.md",
+      "note": "Explicit logical-line reference repair."
+    },
+    {
+      "name": "EditDestxtdes",
+      "handbookPage": 167,
+      "status": "modern-replacement",
+      "evidence": "docs/en/ARCHITECTURE.md",
+      "note": "Managed document ownership replaces explicit descriptor-free routines."
+    },
+    {
+      "name": "EditDownLine",
+      "handbookPage": 168,
+      "status": "implemented",
+      "evidence": "docs/en/FIRST-ED-COMMAND-MAP.md",
+      "note": "Semantic FIRST-ED editing/navigation commands."
+    },
+    {
+      "name": "EditDownPage",
+      "handbookPage": 169,
+      "status": "implemented",
+      "evidence": "docs/en/FIRST-ED-COMMAND-MAP.md",
+      "note": "Semantic FIRST-ED editing/navigation commands."
+    },
+    {
+      "name": "EditEndLine",
+      "handbookPage": 170,
+      "status": "implemented",
+      "evidence": "docs/en/FIRST-ED-COMMAND-MAP.md",
+      "note": "Semantic FIRST-ED editing/navigation commands."
+    },
+    {
+      "name": "EditErrormsg",
+      "handbookPage": 171,
+      "status": "modern-replacement",
+      "evidence": "docs/en/ERROR-MODEL.md",
+      "note": "Typed errors/resource keys replace numeric display calls."
+    },
+    {
+      "name": "EditExit",
+      "handbookPage": 172,
+      "status": "implemented",
+      "evidence": "docs/en/LIFECYCLE-AND-SCROLLING.md",
+      "note": "Cooperative scheduler and lifecycle behavior."
+    },
+    {
+      "name": "EditFileRead",
+      "handbookPage": 173,
+      "status": "implemented",
+      "evidence": "docs/en/SEARCH-AND-FILE-COMMANDS.md",
+      "note": "Search, replace and compatible file read/write paths."
+    },
+    {
+      "name": "EditFileWrite",
+      "handbookPage": 174,
+      "status": "implemented",
+      "evidence": "docs/en/SEARCH-AND-FILE-COMMANDS.md",
+      "note": "Search, replace and compatible file read/write paths."
+    },
+    {
+      "name": "EditFind",
+      "handbookPage": 175,
+      "status": "implemented",
+      "evidence": "docs/en/SEARCH-AND-FILE-COMMANDS.md",
+      "note": "Search, replace and compatible file read/write paths."
+    },
+    {
+      "name": "EditGenlineno",
+      "handbookPage": 176,
+      "status": "needs-review",
+      "evidence": "docs/en/BORLAND-V1-COMPATIBILITY.md",
+      "note": "Inspect the handbook behavior and code/tests before claiming parity."
+    },
+    {
+      "name": "EditGotoColumn",
+      "handbookPage": 177,
+      "status": "implemented",
+      "evidence": "docs/en/FIRST-ED-COMMAND-MAP.md",
+      "note": "Semantic FIRST-ED editing/navigation commands."
+    },
+    {
+      "name": "EditGotoLine",
+      "handbookPage": 178,
+      "status": "implemented",
+      "evidence": "docs/en/FIRST-ED-COMMAND-MAP.md",
+      "note": "Semantic FIRST-ED editing/navigation commands."
+    },
+    {
+      "name": "EditHscroll",
+      "handbookPage": 179,
+      "status": "needs-review",
+      "evidence": "docs/en/BORLAND-V1-COMPATIBILITY.md",
+      "note": "Inspect the handbook behavior and code/tests before claiming parity."
+    },
+    {
+      "name": "EditIncline",
+      "handbookPage": 180,
+      "status": "modern-replacement",
+      "evidence": "docs/en/LINE-TOPOLOGY-AND-REALIGNMENT.md",
+      "note": "Logical line indices and view state replace cached Pascal counters."
+    },
+    {
+      "name": "EditInitialize",
+      "handbookPage": 181,
+      "status": "host-sample",
+      "evidence": "docs/en/INTERACTIVE-FIRST-ED-HOST.md",
+      "note": "Initialization of the terminal UI belongs to a host/sample."
+    },
+    {
+      "name": "EditInsertCtrlChar",
+      "handbookPage": 182,
+      "status": "implemented",
+      "evidence": "docs/en/FIRST-ED-COMMAND-MAP.md",
+      "note": "Normalized control-character insertion."
+    },
+    {
+      "name": "EditInsertLine",
+      "handbookPage": 183,
+      "status": "implemented",
+      "evidence": "docs/en/LINE-INSERTION-AND-NEWLINE.md",
+      "note": "Separate new-line and insert-line commands."
+    },
+    {
+      "name": "EditJoinLine",
+      "handbookPage": 184,
+      "status": "implemented",
+      "evidence": "docs/en/DELETION-COMPATIBILITY.md",
+      "note": "Character/word/line deletion and joining."
+    },
+    {
+      "name": "EditJumpMarker",
+      "handbookPage": 185,
+      "status": "implemented",
+      "evidence": "docs/en/KERNEL-COMPATIBILITY-AUDIT.md",
+      "note": "Logical-line markers and jump behavior."
+    },
+    {
+      "name": "EditK",
+      "handbookPage": 186,
+      "status": "implemented",
+      "evidence": "docs/en/FIRST-ED-COMMAND-MAP.md",
+      "note": "Typed keys and prefix command mapping."
+    },
+    {
+      "name": "EditLeftChar",
+      "handbookPage": 187,
+      "status": "implemented",
+      "evidence": "docs/en/KERNEL-COMPATIBILITY-AUDIT.md",
+      "note": "Compatibility navigation and tab rules."
+    },
+    {
+      "name": "EditLeftWord",
+      "handbookPage": 188,
+      "status": "implemented",
+      "evidence": "docs/en/KERNEL-COMPATIBILITY-AUDIT.md",
+      "note": "Compatibility navigation and tab rules."
+    },
+    {
+      "name": "EditLongLine",
+      "handbookPage": 189,
+      "status": "implemented",
+      "evidence": "docs/en/REFORMAT-COMPATIBILITY.md",
+      "note": "Paragraph planning/reflow replaces historical helper code."
+    },
+    {
+      "name": "EditMarkblock",
+      "handbookPage": 190,
+      "status": "implemented",
+      "evidence": "docs/en/BLOCK-COMPATIBILITY.md",
+      "note": "Whole-line block operations and independent endpoints."
+    },
+    {
+      "name": "EditNewLine",
+      "handbookPage": 191,
+      "status": "implemented",
+      "evidence": "docs/en/LINE-INSERTION-AND-NEWLINE.md",
+      "note": "Separate new-line and insert-line commands."
+    },
+    {
+      "name": "EditO",
+      "handbookPage": 192,
+      "status": "implemented",
+      "evidence": "docs/en/FIRST-ED-COMMAND-MAP.md",
+      "note": "Typed keys and prefix command mapping."
+    },
+    {
+      "name": "EditOffblock",
+      "handbookPage": 193,
+      "status": "implemented",
+      "evidence": "docs/en/BLOCK-COMPATIBILITY.md",
+      "note": "Whole-line block operations and independent endpoints."
+    },
+    {
+      "name": "EditPrccmd",
+      "handbookPage": 194,
+      "status": "implemented",
+      "evidence": "docs/en/COMMAND-PROCESSOR-TRANSFER.md",
+      "note": "Semantic command dispatch and text insertion."
+    },
+    {
+      "name": "EditPrctxt",
+      "handbookPage": 195,
+      "status": "implemented",
+      "evidence": "docs/en/COMMAND-PROCESSOR-TRANSFER.md",
+      "note": "Semantic command dispatch and text insertion."
+    },
+    {
+      "name": "EditPushtbf",
+      "handbookPage": 196,
+      "status": "implemented",
+      "evidence": "docs/en/TYPEAHEAD-AND-WINDOW-TEXT.md",
+      "note": "Bounded logical typeahead and front/host insertion."
+    },
+    {
+      "name": "EditQ",
+      "handbookPage": 197,
+      "status": "implemented",
+      "evidence": "docs/en/FIRST-ED-COMMAND-MAP.md",
+      "note": "Typed keys and prefix command mapping."
+    },
+    {
+      "name": "EditRealign",
+      "handbookPage": 198,
+      "status": "implemented",
+      "evidence": "docs/en/LINE-TOPOLOGY-AND-REALIGNMENT.md",
+      "note": "Explicit logical-line reference repair."
+    },
+    {
+      "name": "EditReatxtfil",
+      "handbookPage": 199,
+      "status": "implemented",
+      "evidence": "docs/en/SEARCH-AND-FILE-COMMANDS.md",
+      "note": "Search, replace and compatible file read/write paths."
+    },
+    {
+      "name": "EditReformat",
+      "handbookPage": 200,
+      "status": "implemented",
+      "evidence": "docs/en/REFORMAT-COMPATIBILITY.md",
+      "note": "Paragraph planning/reflow replaces historical helper code."
+    },
+    {
+      "name": "EditReplace",
+      "handbookPage": 201,
+      "status": "implemented",
+      "evidence": "docs/en/SEARCH-AND-FILE-COMMANDS.md",
+      "note": "Search, replace and compatible file read/write paths."
+    },
+    {
+      "name": "EditRightChar",
+      "handbookPage": 202,
+      "status": "implemented",
+      "evidence": "docs/en/KERNEL-COMPATIBILITY-AUDIT.md",
+      "note": "Compatibility navigation and tab rules."
+    },
+    {
+      "name": "EditRightWord",
+      "handbookPage": 203,
+      "status": "implemented",
+      "evidence": "docs/en/KERNEL-COMPATIBILITY-AUDIT.md",
+      "note": "Compatibility navigation and tab rules."
+    },
+    {
+      "name": "EditSchedule",
+      "handbookPage": 204,
+      "status": "implemented",
+      "evidence": "docs/en/LIFECYCLE-AND-SCROLLING.md",
+      "note": "Cooperative scheduler and lifecycle behavior."
+    },
+    {
+      "name": "EditScrollDown",
+      "handbookPage": 205,
+      "status": "implemented",
+      "evidence": "docs/en/FIRST-ED-COMMAND-MAP.md",
+      "note": "Semantic FIRST-ED editing/navigation commands."
+    },
+    {
+      "name": "EditScrollUp",
+      "handbookPage": 206,
+      "status": "implemented",
+      "evidence": "docs/en/FIRST-ED-COMMAND-MAP.md",
+      "note": "Semantic FIRST-ED editing/navigation commands."
+    },
+    {
+      "name": "EditSetLeftMargin",
+      "handbookPage": 207,
+      "status": "implemented",
+      "evidence": "docs/en/FIRST-ED-COMMAND-MAP.md",
+      "note": "Semantic FIRST-ED editing/navigation commands."
+    },
+    {
+      "name": "EditSetMarker",
+      "handbookPage": 208,
+      "status": "implemented",
+      "evidence": "docs/en/KERNEL-COMPATIBILITY-AUDIT.md",
+      "note": "Logical-line markers and jump behavior."
+    },
+    {
+      "name": "EditSetRightMargin",
+      "handbookPage": 209,
+      "status": "implemented",
+      "evidence": "docs/en/FIRST-ED-COMMAND-MAP.md",
+      "note": "Semantic FIRST-ED editing/navigation commands."
+    },
+    {
+      "name": "EditSetUndoLimit",
+      "handbookPage": 210,
+      "status": "implemented",
+      "evidence": "docs/en/COMMAND-BOUNDARY-VALIDATION.md",
+      "note": "Undo limit validation and command boundary."
+    },
+    {
+      "name": "EditShiftLine",
+      "handbookPage": 211,
+      "status": "implemented",
+      "evidence": "docs/en/REFORMAT-COMPATIBILITY.md",
+      "note": "Paragraph planning/reflow replaces historical helper code."
+    },
+    {
+      "name": "EditShortLine",
+      "handbookPage": 212,
+      "status": "implemented",
+      "evidence": "docs/en/REFORMAT-COMPATIBILITY.md",
+      "note": "Paragraph planning/reflow replaces historical helper code."
+    },
+    {
+      "name": "EditSystem",
+      "handbookPage": 213,
+      "status": "implemented",
+      "evidence": "docs/en/LIFECYCLE-AND-SCROLLING.md",
+      "note": "Cooperative scheduler and lifecycle behavior."
+    },
+    {
+      "name": "EditTab",
+      "handbookPage": 214,
+      "status": "implemented",
+      "evidence": "docs/en/KERNEL-COMPATIBILITY-AUDIT.md",
+      "note": "Compatibility navigation and tab rules."
+    },
+    {
+      "name": "EditToggleAutoindent",
+      "handbookPage": 215,
+      "status": "implemented",
+      "evidence": "docs/en/FIRST-ED-COMMAND-MAP.md",
+      "note": "Semantic FIRST-ED editing/navigation commands."
+    },
+    {
+      "name": "EditToggleInsert",
+      "handbookPage": 216,
+      "status": "implemented",
+      "evidence": "docs/en/FIRST-ED-COMMAND-MAP.md",
+      "note": "Semantic FIRST-ED editing/navigation commands."
+    },
+    {
+      "name": "EditToggleWordwrap",
+      "handbookPage": 217,
+      "status": "implemented",
+      "evidence": "docs/en/FIRST-ED-COMMAND-MAP.md",
+      "note": "Semantic FIRST-ED editing/navigation commands."
+    },
+    {
+      "name": "EditTopBlock",
+      "handbookPage": 218,
+      "status": "implemented",
+      "evidence": "docs/en/BLOCK-COMPATIBILITY.md",
+      "note": "Whole-line block operations and independent endpoints."
+    },
+    {
+      "name": "EditUndo",
+      "handbookPage": 219,
+      "status": "implemented",
+      "evidence": "docs/en/UNDO-TRANSACTIONS.md",
+      "note": "Transactional undo restores one logical operation."
+    },
+    {
+      "name": "EditUpcase",
+      "handbookPage": 220,
+      "status": "host-sample",
+      "evidence": "docs/en/KERNEL-COMPATIBILITY-AUDIT.md",
+      "note": "Pascal Varstring uppercase helper is not a portable public core API."
+    },
+    {
+      "name": "EditUpdphyscr",
+      "handbookPage": 221,
+      "status": "modern-replacement",
+      "evidence": "docs/en/ARCHITECTURE.md",
+      "note": "Viewport/host renderer replaces a physical video-memory update."
+    },
+    {
+      "name": "EditUpdrowasm",
+      "handbookPage": 222,
+      "status": "not-applicable",
+      "evidence": "docs/en/ARCHITECTURE.md",
+      "note": "Physical DOS video-memory copy and inline assembly are obsolete."
+    },
+    {
+      "name": "EditUpdwindow",
+      "handbookPage": 223,
+      "status": "host-sample",
+      "evidence": "docs/en/ARCHITECTURE.md",
+      "note": "Window status and screen projection are host/renderer responsibilities."
+    },
+    {
+      "name": "EditUpdwinsl",
+      "handbookPage": 224,
+      "status": "host-sample",
+      "evidence": "docs/en/ARCHITECTURE.md",
+      "note": "Window status and screen projection are host/renderer responsibilities."
+    },
+    {
+      "name": "EditUpLine",
+      "handbookPage": 225,
+      "status": "implemented",
+      "evidence": "docs/en/FIRST-ED-COMMAND-MAP.md",
+      "note": "Semantic FIRST-ED editing/navigation commands."
+    },
+    {
+      "name": "EditUpPage",
+      "handbookPage": 226,
+      "status": "implemented",
+      "evidence": "docs/en/FIRST-ED-COMMAND-MAP.md",
+      "note": "Semantic FIRST-ED editing/navigation commands."
+    },
+    {
+      "name": "EditUserpush",
+      "handbookPage": 227,
+      "status": "implemented",
+      "evidence": "docs/en/TYPEAHEAD-AND-WINDOW-TEXT.md",
+      "note": "Bounded logical typeahead and front/host insertion."
+    },
+    {
+      "name": "EditWindowBottomFile",
+      "handbookPage": 228,
+      "status": "implemented",
+      "evidence": "docs/en/LIFECYCLE-AND-SCROLLING.md",
+      "note": "File-boundary viewport navigation."
+    },
+    {
+      "name": "EditWindowCreate",
+      "handbookPage": 229,
+      "status": "implemented",
+      "evidence": "docs/en/WINDOW-GEOMETRY.md",
+      "note": "Window lifecycle and linked document views."
+    },
+    {
+      "name": "EditWindowDelete",
+      "handbookPage": 230,
+      "status": "implemented",
+      "evidence": "docs/en/WINDOW-GEOMETRY.md",
+      "note": "Window lifecycle and linked document views."
+    },
+    {
+      "name": "EditWindowDeleteText",
+      "handbookPage": 231,
+      "status": "implemented",
+      "evidence": "docs/en/WINDOW-GEOMETRY.md",
+      "note": "Window lifecycle and linked document views."
+    },
+    {
+      "name": "EditWindowDown",
+      "handbookPage": 232,
+      "status": "implemented",
+      "evidence": "docs/en/WINDOW-GEOMETRY.md",
+      "note": "Window lifecycle and linked document views."
+    },
+    {
+      "name": "EditWindowGoto",
+      "handbookPage": 233,
+      "status": "implemented",
+      "evidence": "docs/en/WINDOW-GEOMETRY.md",
+      "note": "Window lifecycle and linked document views."
+    },
+    {
+      "name": "EditWindowLink",
+      "handbookPage": 234,
+      "status": "implemented",
+      "evidence": "docs/en/WINDOW-GEOMETRY.md",
+      "note": "Window lifecycle and linked document views."
+    },
+    {
+      "name": "EditWindowTopFile",
+      "handbookPage": 235,
+      "status": "implemented",
+      "evidence": "docs/en/LIFECYCLE-AND-SCROLLING.md",
+      "note": "File-boundary viewport navigation."
+    },
+    {
+      "name": "EditWindowUp",
+      "handbookPage": 236,
+      "status": "implemented",
+      "evidence": "docs/en/WINDOW-GEOMETRY.md",
+      "note": "Window lifecycle and linked document views."
+    },
+    {
+      "name": "EditZapcmdnam",
+      "handbookPage": 237,
+      "status": "host-sample",
+      "evidence": "docs/en/INTERACTIVE-FIRST-ED-HOST.md",
+      "note": "Prompt/command-line display belongs to the host."
+    },
+    {
+      "name": "MoveFromScreen",
+      "handbookPage": 238,
+      "status": "not-applicable",
+      "evidence": "docs/en/ARCHITECTURE.md",
+      "note": "Physical DOS video-memory copy and inline assembly are obsolete."
+    },
+    {
+      "name": "MoveToScreen",
+      "handbookPage": 239,
+      "status": "not-applicable",
+      "evidence": "docs/en/ARCHITECTURE.md",
+      "note": "Physical DOS video-memory copy and inline assembly are obsolete."
+    },
+    {
+      "name": "Pokechr",
+      "handbookPage": 240,
+      "status": "implemented",
+      "evidence": "docs/en/TYPEAHEAD-AND-WINDOW-TEXT.md",
+      "note": "Bounded logical typeahead and front/host insertion."
+    }
+  ]
+}

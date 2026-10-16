@@ -16,6 +16,7 @@ from typing import Any
 ROOT = Path(__file__).resolve().parents[1]
 IMPLEMENTATIONS_FILE = ROOT / "implementations.json"
 CONFORMANCE_MANIFEST = ROOT / "conformance" / "v1" / "manifest.json"
+HANDBOOK_INVENTORY = ROOT / "docs" / "handbook-procedure-index-v1.json"
 
 
 class ContractError(RuntimeError):
@@ -157,10 +158,66 @@ def verify_conformance() -> int:
     return case_count
 
 
+def verify_handbook_inventory() -> tuple[int, int]:
+    """Check historical inventory integrity, not behavioral equivalence.
+
+    The printed handbook's index has one description per page from 118 to 240.
+    This contract check protects traceability from accidental omissions while
+    leaving historical meaning to documentation and regression-test review.
+    """
+    data = load_json(HANDBOOK_INVENTORY)
+    if not isinstance(data, dict) or data.get("formatVersion") != 1:
+        raise ContractError("Handbook index needs formatVersion 1")
+
+    if data.get("sourcePages") != {"first": 118, "last": 240}:
+        raise ContractError("Handbook index must target printed pages 118..240")
+
+    entries = data.get("entries")
+    if not isinstance(entries, list) or len(entries) != 123:
+        raise ContractError("Handbook index must contain all 123 routine entries")
+
+    allowed = {
+        "implemented", "modern-replacement", "host-sample",
+        "not-applicable", "documented-divergence", "needs-review",
+    }
+    seen: set[str] = set()
+    pending = 0
+    for page, entry in enumerate(entries, start=118):
+        if not isinstance(entry, dict):
+            raise ContractError(f"Handbook index page {page}: non-object entry")
+        name = entry.get("name")
+        if not isinstance(name, str) or not name.isidentifier():
+            raise ContractError(f"Handbook index page {page}: invalid name")
+        if name in seen:
+            raise ContractError(f"Duplicate handbook routine: {name}")
+        seen.add(name)
+        if type(entry.get("handbookPage")) is not int or entry["handbookPage"] != page:
+            raise ContractError(f"{name}: expected printed page {page}")
+        if entry.get("status") not in allowed:
+            raise ContractError(f"{name}: unknown classification")
+        evidence = entry.get("evidence")
+        if not isinstance(evidence, str) or not evidence.startswith("docs/en/"):
+            raise ContractError(f"{name}: invalid evidence reference")
+        # Never let a JSON path escape the repository with parent components.
+        if Path(evidence).is_absolute() or ".." in Path(evidence).parts:
+            raise ContractError(f"{name}: evidence path escapes repository")
+        require_repo_path(evidence, f"Handbook entry {name}")
+        note = entry.get("note")
+        if not isinstance(note, str) or not note.strip():
+            raise ContractError(f"{name}: missing classification rationale")
+        if entry["status"] == "needs-review":
+            pending += 1
+
+    require_repo_path("docs/en/HANDBOOK-PROCEDURE-INDEX-AUDIT.md", "Handbook audit EN")
+    require_repo_path("docs/de/HANDBUCH-PROZEDURENINDEX-AUDIT.md", "Handbook audit DE")
+    return len(entries), pending
+
+
 def main() -> int:
     try:
         implementation_ids = verify_implementations()
         case_count = verify_conformance()
+        handbook_count, pending = verify_handbook_inventory()
     except ContractError as exc:
         print(f"Repository contract FAILED: {exc}", file=sys.stderr)
         return 1
@@ -168,7 +225,8 @@ def main() -> int:
     print(
         "Repository contract OK: "
         f"{len(implementation_ids)} implementation lanes "
-        f"({', '.join(implementation_ids)}), {case_count} V1 conformance cases."
+        f"({', '.join(implementation_ids)}), {case_count} V1 conformance cases, "
+        f"{handbook_count} handbook routines ({pending} pending review)."
     )
     return 0
 
