@@ -90,7 +90,7 @@ public static class EditorCommandValidator
                 ValidateControlCharacter(request),
 
             EditorCommandId.FindNext =>
-                RequireNonEmptyText(request),
+                RequirePresentText(request),
 
             EditorCommandId.ReplaceNext =>
                 ValidateReplaceArguments(request),
@@ -151,6 +151,18 @@ public static class EditorCommandValidator
                 nameof(EditorCommandRequest.Text),
                 $"Command {request.Id} requires exactly one UTF-16 character.");
     }
+
+    /// <summary>
+    /// Distinguish an omitted search prompt (null, invalid request) from an
+    /// explicitly submitted empty string (repeat the saved FIRST-ED pattern).
+    /// </summary>
+    private static EditorCommandValidationFailure? RequirePresentText(EditorCommandRequest request) =>
+        request.Text is null
+            ? Failure(
+                EditorCommandValidationCode.MissingText,
+                nameof(EditorCommandRequest.Text),
+                $"Command {request.Id} requires a search value (empty repeats the previous pattern).")
+            : null;
 
     private static EditorCommandValidationFailure? RequireNonEmptyText(EditorCommandRequest request) =>
         string.IsNullOrEmpty(request.Text)

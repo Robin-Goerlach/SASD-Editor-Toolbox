@@ -120,7 +120,7 @@ public sealed class EditorCommandDispatcher(EditorSession session)
                 case EditorCommandId.JumpMarker: return session.JumpToMarker(RequireNumber(command));
                 case EditorCommandId.FindNext:
                     return await session.Search
-                        .FindNextAsync(RequireText(command), new SearchOptions(), cancellationToken)
+                        .FindNextAsync(command.Text!, new SearchOptions(), cancellationToken)
                         .ConfigureAwait(false) is not null;
                 case EditorCommandId.FindAgain:
                     return await session.Search

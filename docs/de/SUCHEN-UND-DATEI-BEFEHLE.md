@@ -11,6 +11,7 @@ Das Handbuch bleibt die Verhaltensreferenz; der Code wird unabhängig neu implem
 Das historische `EditFind` fragt nach einem Suchmuster. Wird dabei eine leere Zeichenfolge eingegeben, wird das vorherige Suchmuster erneut verwendet. FIRST-ED besitzt außerdem einen Befehl zum Wiederholen der Suche. SASD bildet das explizit im `EditorSearchService` ab:
 
 - `FindNext(pattern, options)` merkt sich Muster und Optionen;
+- eine explizit leere Suchzeichenfolge (`FindNext("")` bzw. `FindNextAsync("")`, auch im Command Dispatcher) wiederholt das gespeicherte Muster einschließlich der ursprünglichen Suchoptionen. Ein fehlender/null-Wert ist weiterhin ein ungültiger Befehl; ohne zuvor gesetztes Muster entsteht bei leerer Eingabe einfach kein Treffer;
 - `FindAgain()` wiederholt die gemerkte Suche;
 - steht der Cursor noch auf dem vorherigen Treffer, beginnt Find Again hinter diesem Treffer und liefert nicht immer wieder dieselbe Fundstelle;
 - die FIRST-ED-kompatible Vorwärtssuche springt standardmäßig nicht zum Dateianfang zurück;
@@ -51,7 +52,7 @@ Die historischen Datei-Routinen verwenden ein Carriage-Return-Byte mit gesetztem
 
 `WriteFile` schreibt den aktuellen Text-Stream an einen expliziten Pfad, benennt das Dokument aber nicht um und löscht das Dirty-Flag nicht. Das entspricht der direkten historischen Write-Operation mit Dateinamen.
 
-`SaveFile` schreibt an den dem Dokument zugeordneten Pfad und löscht anschließend das Dirty-Flag. Ein moderner Host darf auch explizit einen Pfad mitgeben. Das ist bewusst als moderne Integrationsentscheidung dokumentiert, weil die Dokumentidentität in SASD eine moderne Abstraktion und kein Pascal-Globalzustand ist.
+`SaveFile` schreibt an den dem Dokument zugeordneten Pfad und löscht anschließend das Dirty-Flag **nur, wenn während des Schreibens keine neueren Dokumentänderungen eingetroffen sind**. Ein moderner Host darf auch explizit einen Pfad mitgeben. Das ist bewusst als moderne Integrationsentscheidung dokumentiert, weil die Dokumentidentität in SASD eine moderne Abstraktion und kein Pascal-Globalzustand ist.
 
 ## Noch offen
 
@@ -67,3 +68,9 @@ Bei Read File werden dekodierte Zeilen erst eingefügt, nachdem der Codec erfolg
 Write/Save reichen denselben verknüpften Token an den Codec weiter. Ein abgebrochener externer Dateischreibvorgang kann auf Dateisystem-/Provider-Ebene trotzdem teilweise sichtbar sein; Editor-Dokumentzustand wird erst nach erfolgreichem Abschluss aktualisiert. Save löscht bei Unterbrechung den Dirty-Zustand nicht.
 
 Semantisches Find/Find Again verwendet den unterbrechbaren Suchpfad. Der Scan prüft einmal pro logischer Zeile und übernimmt Cursor sowie gemerkten Suchzustand erst nach erfolgreichem Abschluss. Direkte synchrone Service-Methoden bleiben für Anwendungen verfügbar, die bewusst einen nicht unterbrechbaren In-Process-Aufruf wünschen.
+
+## Konsistenz beim Speichern während weiterer Bearbeitung
+
+Ein Host kann während einer asynchronen Dateioperation weiter schreiben, auch in einem zweiten verknüpften Fenster. Vor dem Save werden deshalb die Dokumentversion und der genaue Zeilen-Snapshot erfasst. Nach erfolgreichem Schreiben entfernt `EditorDocument.MarkSnapshotSaved` die Dirty-Kennzeichnung **nur**, wenn aktuelle Version und Zeileninhalt weiterhin dem wirklich geschriebenen Snapshot entsprechen. Der zugeordnete Dateipfad darf nach einem erfolgreichen Schreibvorgang aktualisiert werden; neuere, nicht gespeicherte Änderungen bleiben als Dirty erkennbar.
+
+Dasselbe Schutzverhalten gilt sowohl im FIRST-ED-Dateidienst als auch in der modernen UTF-8-Persistenz. `WriteFile` bleibt eine direkte Ausgabe ohne Änderung von Dateiname oder Dirty-Status. Diese zusätzliche Absicherung ist eine moderne Architekturentscheidung, keine Behauptung über den kooperativen DOS-Editor von 1985.

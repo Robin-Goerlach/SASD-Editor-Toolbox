@@ -25,6 +25,14 @@ public sealed class EditorSearchService
 
     public TextPosition? FindNext(string pattern, SearchOptions? options = null)
     {
+        // FIRST-ED EditFind interprets an empty *entered* search string as
+        // "find again". Preserve the last pattern and its previous options;
+        // do not overwrite them with defaults from an empty prompt.
+        if (pattern == string.Empty)
+        {
+            return FindAgain();
+        }
+
         ValidatePattern(pattern);
         options ??= new SearchOptions();
 
@@ -54,6 +62,13 @@ public sealed class EditorSearchService
         SearchOptions? options = null,
         CancellationToken cancellationToken = default)
     {
+        // This is the same historical empty-prompt path as synchronous
+        // FindNext, but repeat through the interruptible async scan.
+        if (pattern == string.Empty)
+        {
+            return await FindAgainAsync(cancellationToken).ConfigureAwait(false);
+        }
+
         ValidatePattern(pattern);
         options ??= new SearchOptions();
 

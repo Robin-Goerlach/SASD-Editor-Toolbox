@@ -11,6 +11,7 @@ The handbook remains the behavioral reference; the implementation is independent
 The historical `EditFind` asks for a pattern and, when the supplied string is empty, reuses the previous search string. FIRST-ED also exposes a dedicated repeat-search command. SASD represents that behavior explicitly in `EditorSearchService`:
 
 - `FindNext(pattern, options)` records the pattern and options;
+- an explicitly empty pattern (`FindNext("")` or `FindNextAsync("")`, including through the command dispatcher) repeats the remembered search and options. An omitted/null command text is still invalid, and an empty pattern with no prior search simply reports no match;
 - `FindAgain()` repeats the recorded search;
 - if the cursor is still on the previous match, Find Again resumes after that match instead of returning the same occurrence again;
 - forward search does not wrap by default in the FIRST-ED compatibility path;
@@ -51,7 +52,7 @@ The existing `FileTextStorage` is intentionally **not** changed. It remains the 
 
 `WriteFile` writes the current text stream to an explicit path but does not rename the document and does not clear the dirty flag. This corresponds to the direct named-file write operation.
 
-`SaveFile` writes to the document's associated path and clears the dirty flag. An explicit path may also be supplied by a modern host. This is a deliberate integration adaptation: the handbook clearly documents direct read/write behavior, while SASD's document identity is a modern abstraction rather than a Pascal global/window field.
+`SaveFile` writes to the document's associated path and clears the dirty flag only when the saved snapshot still matches the document. An explicit path may also be supplied by a modern host. This is a deliberate integration adaptation: the handbook clearly documents direct read/write behavior, while SASD's document identity is a modern abstraction rather than a Pascal global/window field.
 
 ## Still pending
 

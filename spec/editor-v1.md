@@ -131,7 +131,7 @@ The handbook does not separately define whether markers or other non-block ancho
 ## 7. Undo and dirty state
 
 - Every ordinary text mutation marks the document dirty.
-- Successful persistence clears dirty state when the operation is semantically a save.
+- Successful persistence clears dirty state when the operation is semantically a save **and** the document still matches the version and line snapshot that was actually written. If editing continues while asynchronous I/O is in progress, the successful write may update file association but must not hide unsaved newer edits. Direct Write File leaves the identity/dirty state alone.
 - A direct compatibility Write File operation does not implicitly change document identity.
 - Undo is a replaceable service. Correctness is more important than storage efficiency in the first implementation.
 - The handbook's historical `EditUndo` is a line-stack operation rather than a general command journal. SASD's command-oriented snapshot undo is therefore a documented modernization boundary, not a claim of storage-level historical equivalence.
@@ -153,7 +153,7 @@ The handbook does not separately define whether markers or other non-block ancho
 - The semantic command boundary validates request shape and stable ranges before mutation or file I/O. Invalid requests fail without applying the command.
 - One-based line/column/window values, tab width and the FIRST-ED undo-limit command require values of at least 1. Create Window additionally requires a size of at least 3 rows. Numbered markers are restricted to 1..20.
 - A supplied visible-page size must contain at least one text row.
-- Find requires a non-empty pattern. Replace requires a non-empty pattern and a replacement value; an empty replacement is valid. Portable request models represent pattern and replacement as separate textual arguments.
+- Find requires a supplied textual pattern. An explicitly empty Find string repeats the remembered search pattern/options (historical EditFind behavior); an omitted/null pattern is invalid. When there is no remembered search, an empty Find simply reports no match. Replace requires a non-empty pattern and a replacement value; an empty replacement is valid. Portable request models represent pattern and replacement as separate textual arguments.
 - Read/Write file commands require a non-blank resolved path. Save may omit a path when the document already has an associated path.
 - Stateful constraints, such as a left margin not exceeding the current right margin or a donor window retaining its three-row minimum, are validated by the service that owns that state after the request envelope has passed boundary validation.
 - The engine itself must remain callable directly by application code.

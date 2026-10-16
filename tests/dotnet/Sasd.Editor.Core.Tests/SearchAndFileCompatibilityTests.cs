@@ -9,6 +9,57 @@ namespace Sasd.Editor.Core.Tests;
 public sealed class SearchAndFileCompatibilityTests
 {
     [Fact]
+    public async Task FindNext_EmptyPromptRepeatsPreviousSearchInsteadOfRejectingIt()
+    {
+        var session = new EditorSession();
+        var window = session.CreateDocument("alpha beta alpha");
+        var dispatcher = new EditorCommandDispatcher(session);
+
+        Assert.True(await dispatcher.ExecuteAsync(new(EditorCommandId.FindNext, Text: "alpha")));
+        Assert.Equal(new TextPosition(0, 0), window.Cursor);
+        Assert.True(await dispatcher.ExecuteAsync(new(EditorCommandId.FindNext, Text: "")));
+
+        Assert.Equal("alpha", session.Search.LastPattern);
+        Assert.Equal(new TextPosition(0, 11), window.Cursor);
+        Assert.False(window.Document.IsDirty);
+        Assert.Equal(0, session.Undo.Count);
+    }
+
+    [Fact]
+    public async Task FindNext_EmptyPromptWithNoSavedPatternIsHarmless()
+    {
+        var session = new EditorSession();
+        var window = session.CreateDocument("alpha");
+        window.Cursor = new TextPosition(0, 2);
+
+        Assert.False(await new EditorCommandDispatcher(session).ExecuteAsync(
+            new(EditorCommandId.FindNext, Text: string.Empty)));
+
+        Assert.Null(session.Search.LastPattern);
+        Assert.Equal(new TextPosition(0, 2), window.Cursor);
+        Assert.False(window.Document.IsDirty);
+    }
+
+    [Fact]
+    public void FindNext_EmptyPatternReusesRememberedOptionsInDirectService()
+    {
+        var session = new EditorSession();
+        var window = session.CreateDocument("Alpha alpha ALPHA");
+        var options = new Sasd.Editor.Search.SearchOptions(CaseSensitive: true);
+        var first = session.Search.FindNext("alpha", options);
+
+        Assert.Equal(new TextPosition(0, 6), first);
+
+        // Ignore the new argument options for the empty prompt: the historical
+        // repeat request must preserve case-sensitive semantics.
+        window.Cursor = new TextPosition(0, 10);
+        var next = session.Search.FindNext("", new Sasd.Editor.Search.SearchOptions());
+        Assert.Null(next);
+        Assert.Equal(new TextPosition(0, 10), window.Cursor);
+        Assert.Equal("alpha", session.Search.LastPattern);
+    }
+
+    [Fact]
     public async Task FindAgain_ContinuesAfterPreviousMatch()
     {
         var session = new EditorSession();
