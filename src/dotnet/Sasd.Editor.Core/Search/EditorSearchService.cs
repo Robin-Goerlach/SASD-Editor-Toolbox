@@ -169,10 +169,21 @@ public sealed class EditorSearchService
     {
         ArgumentNullException.ThrowIfNull(replacement);
         ValidatePattern(pattern);
+
+        // Find can yield to the host before the replacement confirmation even
+        // starts. Retain that initiating view, not the potentially different
+        // CurrentWindow selected when FindNextAsync returns.
+        var initiatingWindow = _session.CurrentWindow;
         var match = await FindNextAsync(pattern, options, cancellationToken).ConfigureAwait(false);
         if (match is null)
         {
             return false;
+        }
+
+        if (!ReferenceEquals(_session.CurrentWindow, initiatingWindow))
+        {
+            throw new InvalidOperationException(
+                "The replacement window changed while searching for the match.");
         }
 
         // The Find result is already committed to its originating view.
