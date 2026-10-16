@@ -66,7 +66,7 @@ internal static class FirstEdCompatibilityProcessor
             return false;
         }
 
-        var lastDisplayedLine = Math.Min(lastDocumentLine, window.TopLine + visibleLines - 1);
+        var lastDisplayedLine = LastDisplayedLine(window, visibleLines, lastDocumentLine);
         if (window.Cursor.Line == lastDisplayedLine)
         {
             window.TopLine = Math.Min(lastDocumentLine, window.TopLine + 1);
@@ -86,7 +86,7 @@ internal static class FirstEdCompatibilityProcessor
         }
 
         var lastDocumentLine = window.Document.Buffer.LineCount - 1;
-        var lastDisplayedLine = Math.Min(lastDocumentLine, window.TopLine + visibleLines - 1);
+        var lastDisplayedLine = LastDisplayedLine(window, visibleLines, lastDocumentLine);
         if (window.Cursor.Line == lastDisplayedLine)
         {
             window.Cursor = window.Cursor with { Line = Math.Max(0, window.Cursor.Line - 1) };
@@ -128,7 +128,10 @@ internal static class FirstEdCompatibilityProcessor
         var step = Math.Max(1, visibleLines - 1);
         window.TopLine = Math.Max(0, window.TopLine - step);
         var lastDocumentLine = window.Document.Buffer.LineCount - 1;
-        window.Cursor = window.Cursor with { Line = Math.Min(lastDocumentLine, window.TopLine + relativeRow) };
+        window.Cursor = window.Cursor with
+        {
+            Line = (int)Math.Min(lastDocumentLine, (long)window.TopLine + relativeRow)
+        };
         return true;
     }
 
@@ -144,8 +147,13 @@ internal static class FirstEdCompatibilityProcessor
 
         var relativeRow = VisibleCursorRow(window, visibleLines);
         var step = Math.Max(1, visibleLines - 1);
-        window.TopLine = Math.Min(lastDocumentLine, window.TopLine + step);
-        window.Cursor = window.Cursor with { Line = Math.Min(lastDocumentLine, window.TopLine + relativeRow) };
+        // Widen before adding the host-provided page size. The viewport may
+        // be much taller than the document, but its index must never wrap.
+        window.TopLine = (int)Math.Min(lastDocumentLine, (long)window.TopLine + step);
+        window.Cursor = window.Cursor with
+        {
+            Line = (int)Math.Min(lastDocumentLine, (long)window.TopLine + relativeRow)
+        };
         return true;
     }
 
@@ -366,6 +374,13 @@ internal static class FirstEdCompatibilityProcessor
         session.Undo.Limit = limit;
         return true;
     }
+
+    /// <summary>
+    /// Finds the final displayed line without overflowing when the host
+    /// reports more visible rows than the document actually contains.
+    /// </summary>
+    private static int LastDisplayedLine(EditorWindow window, int visibleLines, int lastDocumentLine) =>
+        (int)Math.Min(lastDocumentLine, (long)window.TopLine + visibleLines - 1);
 
     private static int VisibleCursorRow(EditorWindow window, int visibleLines) =>
         Math.Clamp(window.Cursor.Line - window.TopLine, 0, visibleLines - 1);
