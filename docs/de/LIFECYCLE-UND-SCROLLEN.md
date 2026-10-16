@@ -59,3 +59,7 @@ Die physische Erzeugung und Komprimierung von Fenstern bleibt Aufgabe eines Layo
 ## Sehr große Host-Viewport-Höhen
 
 Die FIRST-ED-Kompatibilitätsschicht berechnet die letzte sichtbare Zeile und Page-Ziele jetzt mit einem größeren Integer-Zwischentyp und begrenzt die Ergebnisse erst anschließend auf die tatsächlich letzte Dokumentzeile. Eine positive `PageSize` kann selbst bei wenigen Textzeilen nahe `int.MaxValue` liegen. `ScrollUp` erkennt weiterhin die letzte Dokumentzeile als unteren Sichtrand, und `PageDown` kann keinen negativen Offset durch Overflow erzeugen. Vier `ViewportNavigationOverflowTests` prüfen diese Fälle. Dies ist eine moderne defensive API-Regel, keine historische 16-Bit-Zeilenbegrenzung.
+
+## Einzeilige Page-Bewegung und portable Tests
+
+Ist nur eine Textzeile sichtbar, ergibt `visibleRows - 1` den Wert null. Page Up und Page Down verändern daher Cursor und oberste Zeile nicht; der Dispatcher kann den gültigen Befehl dennoch als verarbeitet melden. `conformance/v1/cases/viewport-navigation.json` prüft das gemeinsam mit regulären und extrem großen Viewport-Höhen sowie dem unabhängigen Zustand verknüpfter Fenster.

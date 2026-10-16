@@ -35,11 +35,13 @@ The repository now reads every declared file in `conformance/v1/manifest.json`, 
 
 ## Machine-checked links to executable evidence
 
-The inventory may include an optional `conformanceCases` array on a historical routine. The repository contract validator verifies that each referenced case ID occurs in a file declared by the portable manifest, rejects duplicate or unknown IDs, and reports the number of rows with links. **Currently 20 of 123 rows** link to specific portable cases; the other rows retain conceptual/documentation evidence and still require individual regression review.
+The inventory may include an optional `conformanceCases` array on a historical routine. The repository contract validator verifies that each referenced case ID occurs in a file declared by the portable manifest, rejects duplicate or unknown IDs, and reports the number of rows with links. **Currently 28 of 123 rows** link to specific portable cases; the other rows retain conceptual/documentation evidence and still require individual regression review.
 
 These links represent **focused examples**, not exhaustive proof of historical behavior. The verifier deliberately does not fabricate conformance evidence for a procedure merely because its conceptual mapping is marked `implemented` or `modern-replacement`.
 
 The nine new portable command-sequence cases add evidence links for ten more routines covering independent block endpoints, line realignment, marker identity and compound Undo. Rejections are checked explicitly rather than treated as edits.
+
+The new `viewport-navigation.json` fixtures provide focused portable regression evidence for eight additional historical navigation routines: vertical cursor movement, scroll up/down, page up/down and file boundaries. They include linked windows, virtual columns, one-row viewports and very large host-provided row counts. Their reference IDs are checked against the declared conformance manifest.
 
 ## Next review and acceptance criteria
 

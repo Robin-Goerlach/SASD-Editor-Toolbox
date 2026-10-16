@@ -390,14 +390,22 @@
       "handbookPage": 168,
       "status": "implemented",
       "evidence": "docs/en/FIRST-ED-COMMAND-MAP.md",
-      "note": "Semantic FIRST-ED editing/navigation commands."
+      "note": "Semantic FIRST-ED editing/navigation commands.",
+      "conformanceCases": [
+        "navigation.down-line-scrolls-at-lower-visible-edge"
+      ]
     },
     {
       "name": "EditDownPage",
       "handbookPage": 169,
       "status": "implemented",
       "evidence": "docs/en/FIRST-ED-COMMAND-MAP.md",
-      "note": "Semantic FIRST-ED editing/navigation commands."
+      "note": "Semantic FIRST-ED editing/navigation commands.",
+      "conformanceCases": [
+        "navigation.page-down-moves-visible-rows-minus-one",
+        "navigation.page-down-bounds-int-max-host-height",
+        "navigation.single-row-page-down-has-no-displacement"
+      ]
     },
     {
       "name": "EditEndLine",
@@ -677,14 +685,21 @@
       "handbookPage": 205,
       "status": "implemented",
       "evidence": "docs/en/FIRST-ED-COMMAND-MAP.md",
-      "note": "Semantic FIRST-ED editing/navigation commands."
+      "note": "Semantic FIRST-ED editing/navigation commands.",
+      "conformanceCases": [
+        "navigation.scroll-down-moves-top-edge-cursor"
+      ]
     },
     {
       "name": "EditScrollUp",
       "handbookPage": 206,
       "status": "implemented",
       "evidence": "docs/en/FIRST-ED-COMMAND-MAP.md",
-      "note": "Semantic FIRST-ED editing/navigation commands."
+      "note": "Semantic FIRST-ED editing/navigation commands.",
+      "conformanceCases": [
+        "navigation.scroll-up-moves-bottom-edge-cursor",
+        "navigation.scroll-up-uses-real-end-with-int-max-height"
+      ]
     },
     {
       "name": "EditSetLeftMargin",
@@ -827,14 +842,22 @@
       "handbookPage": 225,
       "status": "implemented",
       "evidence": "docs/en/FIRST-ED-COMMAND-MAP.md",
-      "note": "Semantic FIRST-ED editing/navigation commands."
+      "note": "Semantic FIRST-ED editing/navigation commands.",
+      "conformanceCases": [
+        "navigation.up-line-scrolls-at-upper-visible-edge"
+      ]
     },
     {
       "name": "EditUpPage",
       "handbookPage": 226,
       "status": "implemented",
       "evidence": "docs/en/FIRST-ED-COMMAND-MAP.md",
-      "note": "Semantic FIRST-ED editing/navigation commands."
+      "note": "Semantic FIRST-ED editing/navigation commands.",
+      "conformanceCases": [
+        "navigation.page-up-moves-visible-rows-minus-one",
+        "navigation.page-up-bounds-int-max-host-height",
+        "navigation.single-row-page-up-has-no-displacement"
+      ]
     },
     {
       "name": "EditUserpush",
@@ -848,7 +871,10 @@
       "handbookPage": 228,
       "status": "implemented",
       "evidence": "docs/en/LIFECYCLE-AND-SCROLLING.md",
-      "note": "File-boundary viewport navigation."
+      "note": "File-boundary viewport navigation.",
+      "conformanceCases": [
+        "navigation.bottom-of-file-places-final-line-at-top"
+      ]
     },
     {
       "name": "EditWindowCreate",
@@ -897,7 +923,10 @@
       "handbookPage": 235,
       "status": "implemented",
       "evidence": "docs/en/LIFECYCLE-AND-SCROLLING.md",
-      "note": "File-boundary viewport navigation."
+      "note": "File-boundary viewport navigation.",
+      "conformanceCases": [
+        "navigation.top-of-file-resets-logical-position"
+      ]
     },
     {
       "name": "EditWindowUp",

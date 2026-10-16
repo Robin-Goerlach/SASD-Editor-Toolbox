@@ -296,6 +296,16 @@ public sealed class PortableConformanceTests
         operation switch
         {
             "move_right_character" => EditorCommandId.CursorRight,
+            // Shared historical viewport commands: PageSize is the positive
+            // number of host-visible text rows, never a DOS screen constant.
+            "move_up_line" => EditorCommandId.CursorUp,
+            "move_down_line" => EditorCommandId.CursorDown,
+            "scroll_up" => EditorCommandId.ScrollUp,
+            "scroll_down" => EditorCommandId.ScrollDown,
+            "page_up" => EditorCommandId.PageUp,
+            "page_down" => EditorCommandId.PageDown,
+            "top_of_file" => EditorCommandId.TopOfFile,
+            "bottom_of_file" => EditorCommandId.BottomOfFile,
             "insert_line" => EditorCommandId.InsertLine,
             "end_block" => EditorCommandId.EndBlock,
             "copy_block" => EditorCommandId.CopyBlock,

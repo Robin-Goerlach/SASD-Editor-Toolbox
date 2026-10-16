@@ -89,7 +89,7 @@ V1 includes character/word/line movement, page movement, beginning/end/top/botto
 - The original `EditGenlineno`/`EditHscroll` routines could stop a long descriptor/screen pass when input arrived. In V1 these are bounded indexed/view operations; no long historical scan is performed. Input-first cooperative scheduling remains the host responsibility.
 
 - Display-dependent commands receive the number of visible text rows from the host. Line-up/down and scroll-up/down keep the cursor visible according to the historical edge rules.
-- Page-up/down move the viewport by `visibleRows - 1`. Because the handbook does not separately specify the cursor's post-page screen row, implementations must document their cursor policy; the .NET implementation preserves the relative visible row when possible.
+- Page-up/down move the viewport by `visibleRows - 1`. Because the handbook does not separately specify the cursor's post-page screen row, implementations must document their cursor policy; the .NET implementation preserves the relative visible row when possible. With exactly one visible row, this displacement is zero: no view/cursor state changes (a semantic dispatcher may nevertheless report a valid command as handled).
 - A positive host-reported row count may greatly exceed a document's line count; page navigation and last-visible-row checks must clamp to the last logical document line without integer overflow or document/Undo mutation.
 - Top-of-file selects the first line and first column. Bottom-of-file selects the last line and first column and places that last line at the top of the viewport.
 

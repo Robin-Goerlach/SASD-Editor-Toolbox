@@ -1,0 +1,1184 @@
+{
+  "formatVersion": 1,
+  "contractVersion": "v1",
+  "cases": [
+    {
+      "id": "navigation.down-line-scrolls-at-lower-visible-edge",
+      "area": "viewport-navigation",
+      "initial": {
+        "documents": [
+          {
+            "id": "doc",
+            "lines": [
+              {
+                "text": "line-0",
+                "flags": []
+              },
+              {
+                "text": "line-1",
+                "flags": []
+              },
+              {
+                "text": "line-2",
+                "flags": []
+              },
+              {
+                "text": "line-3",
+                "flags": []
+              },
+              {
+                "text": "line-4",
+                "flags": []
+              },
+              {
+                "text": "line-5",
+                "flags": []
+              },
+              {
+                "text": "line-6",
+                "flags": []
+              },
+              {
+                "text": "line-7",
+                "flags": []
+              }
+            ]
+          }
+        ],
+        "windows": [
+          {
+            "id": "main",
+            "documentId": "doc",
+            "cursor": {
+              "line": 3,
+              "column": 7
+            },
+            "topLine": 1,
+            "leftColumn": 0
+          }
+        ],
+        "currentWindowId": "main"
+      },
+      "operation": {
+        "id": "move_down_line",
+        "pageSize": 3
+      },
+      "expect": {
+        "documents": {
+          "doc": {
+            "isDirty": false,
+            "version": 0
+          }
+        },
+        "windows": {
+          "main": {
+            "topLine": 2,
+            "cursor": {
+              "line": 4,
+              "column": 7
+            }
+          }
+        },
+        "currentWindowId": "main",
+        "undo": {
+          "count": 0
+        }
+      }
+    },
+    {
+      "id": "navigation.up-line-scrolls-at-upper-visible-edge",
+      "area": "viewport-navigation",
+      "initial": {
+        "documents": [
+          {
+            "id": "doc",
+            "lines": [
+              {
+                "text": "line-0",
+                "flags": []
+              },
+              {
+                "text": "line-1",
+                "flags": []
+              },
+              {
+                "text": "line-2",
+                "flags": []
+              },
+              {
+                "text": "line-3",
+                "flags": []
+              },
+              {
+                "text": "line-4",
+                "flags": []
+              },
+              {
+                "text": "line-5",
+                "flags": []
+              },
+              {
+                "text": "line-6",
+                "flags": []
+              },
+              {
+                "text": "line-7",
+                "flags": []
+              }
+            ]
+          }
+        ],
+        "windows": [
+          {
+            "id": "main",
+            "documentId": "doc",
+            "cursor": {
+              "line": 2,
+              "column": 7
+            },
+            "topLine": 2,
+            "leftColumn": 0
+          }
+        ],
+        "currentWindowId": "main"
+      },
+      "operation": {
+        "id": "move_up_line",
+        "pageSize": 3
+      },
+      "expect": {
+        "documents": {
+          "doc": {
+            "isDirty": false,
+            "version": 0
+          }
+        },
+        "windows": {
+          "main": {
+            "topLine": 1,
+            "cursor": {
+              "line": 1,
+              "column": 7
+            }
+          }
+        },
+        "currentWindowId": "main",
+        "undo": {
+          "count": 0
+        }
+      }
+    },
+    {
+      "id": "navigation.scroll-up-moves-bottom-edge-cursor",
+      "area": "viewport-navigation",
+      "initial": {
+        "documents": [
+          {
+            "id": "doc",
+            "lines": [
+              {
+                "text": "line-0",
+                "flags": []
+              },
+              {
+                "text": "line-1",
+                "flags": []
+              },
+              {
+                "text": "line-2",
+                "flags": []
+              },
+              {
+                "text": "line-3",
+                "flags": []
+              },
+              {
+                "text": "line-4",
+                "flags": []
+              },
+              {
+                "text": "line-5",
+                "flags": []
+              },
+              {
+                "text": "line-6",
+                "flags": []
+              },
+              {
+                "text": "line-7",
+                "flags": []
+              }
+            ]
+          }
+        ],
+        "windows": [
+          {
+            "id": "main",
+            "documentId": "doc",
+            "cursor": {
+              "line": 4,
+              "column": 8
+            },
+            "topLine": 2,
+            "leftColumn": 0
+          }
+        ],
+        "currentWindowId": "main"
+      },
+      "operation": {
+        "id": "scroll_up",
+        "pageSize": 3
+      },
+      "expect": {
+        "documents": {
+          "doc": {
+            "isDirty": false,
+            "version": 0
+          }
+        },
+        "windows": {
+          "main": {
+            "topLine": 1,
+            "cursor": {
+              "line": 3,
+              "column": 8
+            }
+          }
+        },
+        "currentWindowId": "main",
+        "undo": {
+          "count": 0
+        }
+      }
+    },
+    {
+      "id": "navigation.scroll-down-moves-top-edge-cursor",
+      "area": "viewport-navigation",
+      "initial": {
+        "documents": [
+          {
+            "id": "doc",
+            "lines": [
+              {
+                "text": "line-0",
+                "flags": []
+              },
+              {
+                "text": "line-1",
+                "flags": []
+              },
+              {
+                "text": "line-2",
+                "flags": []
+              },
+              {
+                "text": "line-3",
+                "flags": []
+              },
+              {
+                "text": "line-4",
+                "flags": []
+              },
+              {
+                "text": "line-5",
+                "flags": []
+              },
+              {
+                "text": "line-6",
+                "flags": []
+              },
+              {
+                "text": "line-7",
+                "flags": []
+              }
+            ]
+          }
+        ],
+        "windows": [
+          {
+            "id": "main",
+            "documentId": "doc",
+            "cursor": {
+              "line": 1,
+              "column": 8
+            },
+            "topLine": 1,
+            "leftColumn": 0
+          }
+        ],
+        "currentWindowId": "main"
+      },
+      "operation": {
+        "id": "scroll_down",
+        "pageSize": 3
+      },
+      "expect": {
+        "documents": {
+          "doc": {
+            "isDirty": false,
+            "version": 0
+          }
+        },
+        "windows": {
+          "main": {
+            "topLine": 2,
+            "cursor": {
+              "line": 2,
+              "column": 8
+            }
+          }
+        },
+        "currentWindowId": "main",
+        "undo": {
+          "count": 0
+        }
+      }
+    },
+    {
+      "id": "navigation.page-down-moves-visible-rows-minus-one",
+      "area": "viewport-navigation",
+      "initial": {
+        "documents": [
+          {
+            "id": "doc",
+            "lines": [
+              {
+                "text": "line-0",
+                "flags": []
+              },
+              {
+                "text": "line-1",
+                "flags": []
+              },
+              {
+                "text": "line-2",
+                "flags": []
+              },
+              {
+                "text": "line-3",
+                "flags": []
+              },
+              {
+                "text": "line-4",
+                "flags": []
+              },
+              {
+                "text": "line-5",
+                "flags": []
+              },
+              {
+                "text": "line-6",
+                "flags": []
+              },
+              {
+                "text": "line-7",
+                "flags": []
+              }
+            ]
+          }
+        ],
+        "windows": [
+          {
+            "id": "main",
+            "documentId": "doc",
+            "cursor": {
+              "line": 1,
+              "column": 3
+            },
+            "topLine": 0,
+            "leftColumn": 0
+          }
+        ],
+        "currentWindowId": "main"
+      },
+      "operation": {
+        "id": "page_down",
+        "pageSize": 4
+      },
+      "expect": {
+        "documents": {
+          "doc": {
+            "isDirty": false,
+            "version": 0
+          }
+        },
+        "windows": {
+          "main": {
+            "topLine": 3,
+            "cursor": {
+              "line": 4,
+              "column": 3
+            }
+          }
+        },
+        "currentWindowId": "main",
+        "undo": {
+          "count": 0
+        }
+      }
+    },
+    {
+      "id": "navigation.page-up-moves-visible-rows-minus-one",
+      "area": "viewport-navigation",
+      "initial": {
+        "documents": [
+          {
+            "id": "doc",
+            "lines": [
+              {
+                "text": "line-0",
+                "flags": []
+              },
+              {
+                "text": "line-1",
+                "flags": []
+              },
+              {
+                "text": "line-2",
+                "flags": []
+              },
+              {
+                "text": "line-3",
+                "flags": []
+              },
+              {
+                "text": "line-4",
+                "flags": []
+              },
+              {
+                "text": "line-5",
+                "flags": []
+              },
+              {
+                "text": "line-6",
+                "flags": []
+              },
+              {
+                "text": "line-7",
+                "flags": []
+              }
+            ]
+          }
+        ],
+        "windows": [
+          {
+            "id": "main",
+            "documentId": "doc",
+            "cursor": {
+              "line": 4,
+              "column": 3
+            },
+            "topLine": 3,
+            "leftColumn": 0
+          }
+        ],
+        "currentWindowId": "main"
+      },
+      "operation": {
+        "id": "page_up",
+        "pageSize": 4
+      },
+      "expect": {
+        "documents": {
+          "doc": {
+            "isDirty": false,
+            "version": 0
+          }
+        },
+        "windows": {
+          "main": {
+            "topLine": 0,
+            "cursor": {
+              "line": 1,
+              "column": 3
+            }
+          }
+        },
+        "currentWindowId": "main",
+        "undo": {
+          "count": 0
+        }
+      }
+    },
+    {
+      "id": "navigation.top-of-file-resets-logical-position",
+      "area": "viewport-navigation",
+      "initial": {
+        "documents": [
+          {
+            "id": "doc",
+            "lines": [
+              {
+                "text": "line-0",
+                "flags": []
+              },
+              {
+                "text": "line-1",
+                "flags": []
+              },
+              {
+                "text": "line-2",
+                "flags": []
+              },
+              {
+                "text": "line-3",
+                "flags": []
+              },
+              {
+                "text": "line-4",
+                "flags": []
+              },
+              {
+                "text": "line-5",
+                "flags": []
+              },
+              {
+                "text": "line-6",
+                "flags": []
+              },
+              {
+                "text": "line-7",
+                "flags": []
+              }
+            ]
+          }
+        ],
+        "windows": [
+          {
+            "id": "main",
+            "documentId": "doc",
+            "cursor": {
+              "line": 5,
+              "column": 9
+            },
+            "topLine": 4,
+            "leftColumn": 0
+          }
+        ],
+        "currentWindowId": "main"
+      },
+      "operation": {
+        "id": "top_of_file"
+      },
+      "expect": {
+        "documents": {
+          "doc": {
+            "isDirty": false,
+            "version": 0
+          }
+        },
+        "windows": {
+          "main": {
+            "topLine": 0,
+            "cursor": {
+              "line": 0,
+              "column": 0
+            }
+          }
+        },
+        "currentWindowId": "main",
+        "undo": {
+          "count": 0
+        }
+      }
+    },
+    {
+      "id": "navigation.bottom-of-file-places-final-line-at-top",
+      "area": "viewport-navigation",
+      "initial": {
+        "documents": [
+          {
+            "id": "doc",
+            "lines": [
+              {
+                "text": "line-0",
+                "flags": []
+              },
+              {
+                "text": "line-1",
+                "flags": []
+              },
+              {
+                "text": "line-2",
+                "flags": []
+              },
+              {
+                "text": "line-3",
+                "flags": []
+              },
+              {
+                "text": "line-4",
+                "flags": []
+              },
+              {
+                "text": "line-5",
+                "flags": []
+              },
+              {
+                "text": "line-6",
+                "flags": []
+              },
+              {
+                "text": "line-7",
+                "flags": []
+              }
+            ]
+          }
+        ],
+        "windows": [
+          {
+            "id": "main",
+            "documentId": "doc",
+            "cursor": {
+              "line": 1,
+              "column": 9
+            },
+            "topLine": 0,
+            "leftColumn": 0
+          }
+        ],
+        "currentWindowId": "main"
+      },
+      "operation": {
+        "id": "bottom_of_file"
+      },
+      "expect": {
+        "documents": {
+          "doc": {
+            "isDirty": false,
+            "version": 0
+          }
+        },
+        "windows": {
+          "main": {
+            "topLine": 7,
+            "cursor": {
+              "line": 7,
+              "column": 0
+            }
+          }
+        },
+        "currentWindowId": "main",
+        "undo": {
+          "count": 0
+        }
+      }
+    },
+    {
+      "id": "navigation.page-down-bounds-int-max-host-height",
+      "area": "viewport-navigation",
+      "initial": {
+        "documents": [
+          {
+            "id": "doc",
+            "lines": [
+              {
+                "text": "line-0",
+                "flags": []
+              },
+              {
+                "text": "line-1",
+                "flags": []
+              },
+              {
+                "text": "line-2",
+                "flags": []
+              },
+              {
+                "text": "line-3",
+                "flags": []
+              },
+              {
+                "text": "line-4",
+                "flags": []
+              },
+              {
+                "text": "line-5",
+                "flags": []
+              },
+              {
+                "text": "line-6",
+                "flags": []
+              },
+              {
+                "text": "line-7",
+                "flags": []
+              }
+            ]
+          }
+        ],
+        "windows": [
+          {
+            "id": "main",
+            "documentId": "doc",
+            "cursor": {
+              "line": 3,
+              "column": 7
+            },
+            "topLine": 2,
+            "leftColumn": 0
+          }
+        ],
+        "currentWindowId": "main"
+      },
+      "operation": {
+        "id": "page_down",
+        "pageSize": 2147483647
+      },
+      "expect": {
+        "documents": {
+          "doc": {
+            "isDirty": false,
+            "version": 0
+          }
+        },
+        "windows": {
+          "main": {
+            "topLine": 7,
+            "cursor": {
+              "line": 7,
+              "column": 7
+            }
+          }
+        },
+        "currentWindowId": "main",
+        "undo": {
+          "count": 0
+        }
+      }
+    },
+    {
+      "id": "navigation.scroll-up-uses-real-end-with-int-max-height",
+      "area": "viewport-navigation",
+      "initial": {
+        "documents": [
+          {
+            "id": "doc",
+            "lines": [
+              {
+                "text": "line-0",
+                "flags": []
+              },
+              {
+                "text": "line-1",
+                "flags": []
+              },
+              {
+                "text": "line-2",
+                "flags": []
+              },
+              {
+                "text": "line-3",
+                "flags": []
+              },
+              {
+                "text": "line-4",
+                "flags": []
+              },
+              {
+                "text": "line-5",
+                "flags": []
+              },
+              {
+                "text": "line-6",
+                "flags": []
+              },
+              {
+                "text": "line-7",
+                "flags": []
+              }
+            ]
+          }
+        ],
+        "windows": [
+          {
+            "id": "main",
+            "documentId": "doc",
+            "cursor": {
+              "line": 7,
+              "column": 9
+            },
+            "topLine": 2,
+            "leftColumn": 0
+          }
+        ],
+        "currentWindowId": "main"
+      },
+      "operation": {
+        "id": "scroll_up",
+        "pageSize": 2147483647
+      },
+      "expect": {
+        "documents": {
+          "doc": {
+            "isDirty": false,
+            "version": 0
+          }
+        },
+        "windows": {
+          "main": {
+            "topLine": 1,
+            "cursor": {
+              "line": 6,
+              "column": 9
+            }
+          }
+        },
+        "currentWindowId": "main",
+        "undo": {
+          "count": 0
+        }
+      }
+    },
+    {
+      "id": "navigation.page-up-bounds-int-max-host-height",
+      "area": "viewport-navigation",
+      "initial": {
+        "documents": [
+          {
+            "id": "doc",
+            "lines": [
+              {
+                "text": "line-0",
+                "flags": []
+              },
+              {
+                "text": "line-1",
+                "flags": []
+              },
+              {
+                "text": "line-2",
+                "flags": []
+              },
+              {
+                "text": "line-3",
+                "flags": []
+              },
+              {
+                "text": "line-4",
+                "flags": []
+              },
+              {
+                "text": "line-5",
+                "flags": []
+              },
+              {
+                "text": "line-6",
+                "flags": []
+              },
+              {
+                "text": "line-7",
+                "flags": []
+              }
+            ]
+          }
+        ],
+        "windows": [
+          {
+            "id": "main",
+            "documentId": "doc",
+            "cursor": {
+              "line": 3,
+              "column": 9
+            },
+            "topLine": 2,
+            "leftColumn": 0
+          }
+        ],
+        "currentWindowId": "main"
+      },
+      "operation": {
+        "id": "page_up",
+        "pageSize": 2147483647
+      },
+      "expect": {
+        "documents": {
+          "doc": {
+            "isDirty": false,
+            "version": 0
+          }
+        },
+        "windows": {
+          "main": {
+            "topLine": 0,
+            "cursor": {
+              "line": 1,
+              "column": 9
+            }
+          }
+        },
+        "currentWindowId": "main",
+        "undo": {
+          "count": 0
+        }
+      }
+    },
+    {
+      "id": "navigation.page-down-keeps-other-linked-view-unchanged",
+      "area": "viewport-navigation",
+      "initial": {
+        "documents": [
+          {
+            "id": "doc",
+            "lines": [
+              {
+                "text": "line-0",
+                "flags": []
+              },
+              {
+                "text": "line-1",
+                "flags": []
+              },
+              {
+                "text": "line-2",
+                "flags": []
+              },
+              {
+                "text": "line-3",
+                "flags": []
+              },
+              {
+                "text": "line-4",
+                "flags": []
+              },
+              {
+                "text": "line-5",
+                "flags": []
+              },
+              {
+                "text": "line-6",
+                "flags": []
+              },
+              {
+                "text": "line-7",
+                "flags": []
+              }
+            ]
+          }
+        ],
+        "windows": [
+          {
+            "id": "main",
+            "documentId": "doc",
+            "cursor": {
+              "line": 1,
+              "column": 2
+            },
+            "topLine": 0,
+            "leftColumn": 0
+          },
+          {
+            "id": "linked",
+            "documentId": "doc",
+            "cursor": {
+              "line": 5,
+              "column": 14
+            },
+            "topLine": 4,
+            "leftColumn": 5
+          }
+        ],
+        "currentWindowId": "main"
+      },
+      "operation": {
+        "id": "page_down",
+        "pageSize": 4
+      },
+      "expect": {
+        "documents": {
+          "doc": {
+            "isDirty": false,
+            "version": 0
+          }
+        },
+        "windows": {
+          "main": {
+            "topLine": 3,
+            "cursor": {
+              "line": 4,
+              "column": 2
+            }
+          },
+          "linked": {
+            "topLine": 4,
+            "leftColumn": 5,
+            "cursor": {
+              "line": 5,
+              "column": 14
+            }
+          }
+        },
+        "currentWindowId": "main",
+        "undo": {
+          "count": 0
+        }
+      }
+    },
+    {
+      "id": "navigation.single-row-page-down-has-no-displacement",
+      "area": "viewport-navigation",
+      "initial": {
+        "documents": [
+          {
+            "id": "doc",
+            "lines": [
+              {
+                "text": "line-0",
+                "flags": []
+              },
+              {
+                "text": "line-1",
+                "flags": []
+              },
+              {
+                "text": "line-2",
+                "flags": []
+              },
+              {
+                "text": "line-3",
+                "flags": []
+              },
+              {
+                "text": "line-4",
+                "flags": []
+              },
+              {
+                "text": "line-5",
+                "flags": []
+              },
+              {
+                "text": "line-6",
+                "flags": []
+              },
+              {
+                "text": "line-7",
+                "flags": []
+              }
+            ]
+          }
+        ],
+        "windows": [
+          {
+            "id": "main",
+            "documentId": "doc",
+            "cursor": {
+              "line": 3,
+              "column": 11
+            },
+            "topLine": 2,
+            "leftColumn": 0
+          }
+        ],
+        "currentWindowId": "main"
+      },
+      "operation": {
+        "id": "page_down",
+        "pageSize": 1
+      },
+      "expect": {
+        "documents": {
+          "doc": {
+            "isDirty": false,
+            "version": 0
+          }
+        },
+        "windows": {
+          "main": {
+            "topLine": 2,
+            "cursor": {
+              "line": 3,
+              "column": 11
+            }
+          }
+        },
+        "currentWindowId": "main",
+        "undo": {
+          "count": 0
+        }
+      }
+    },
+    {
+      "id": "navigation.single-row-page-up-has-no-displacement",
+      "area": "viewport-navigation",
+      "initial": {
+        "documents": [
+          {
+            "id": "doc",
+            "lines": [
+              {
+                "text": "line-0",
+                "flags": []
+              },
+              {
+                "text": "line-1",
+                "flags": []
+              },
+              {
+                "text": "line-2",
+                "flags": []
+              },
+              {
+                "text": "line-3",
+                "flags": []
+              },
+              {
+                "text": "line-4",
+                "flags": []
+              },
+              {
+                "text": "line-5",
+                "flags": []
+              },
+              {
+                "text": "line-6",
+                "flags": []
+              },
+              {
+                "text": "line-7",
+                "flags": []
+              }
+            ]
+          }
+        ],
+        "windows": [
+          {
+            "id": "main",
+            "documentId": "doc",
+            "cursor": {
+              "line": 3,
+              "column": 11
+            },
+            "topLine": 2,
+            "leftColumn": 0
+          }
+        ],
+        "currentWindowId": "main"
+      },
+      "operation": {
+        "id": "page_up",
+        "pageSize": 1
+      },
+      "expect": {
+        "documents": {
+          "doc": {
+            "isDirty": false,
+            "version": 0
+          }
+        },
+        "windows": {
+          "main": {
+            "topLine": 2,
+            "cursor": {
+              "line": 3,
+              "column": 11
+            }
+          }
+        },
+        "currentWindowId": "main",
+        "undo": {
+          "count": 0
+        }
+      }
+    }
+  ]
+}

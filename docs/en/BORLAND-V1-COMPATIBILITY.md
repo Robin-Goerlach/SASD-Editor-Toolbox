@@ -173,6 +173,10 @@ The historical screen was fixed-size. Resizing a modern terminal is therefore no
 
 The portable suite now exercises multi-step block Begin/End, marker identity through line topology changes, block copy/move/delete and atomic cross-document Undo. These cases live in `conformance/v1/cases/block-topology-and-undo.json` and are individually linked from the historical procedure inventory. They are targeted behavioral evidence, not proof of complete Pascal implementation equivalence.
 
+## Portable viewport navigation evidence
+
+The shared `conformance/v1/cases/viewport-navigation.json` fixture now covers eight historical cursor, vertical scroll, page and file-boundary routines. It checks minimal edge movement, the documented relative-row policy, linked-view isolation and arithmetic limits. The one-row viewport case has **zero page displacement**, while the dispatcher may still consider a valid navigation request successfully handled. These are observable fixtures for future independent C++ and Java adapters, not DOS API translations.
+
 ## V1 release gate
 
 The C#/.NET implementation now has executable coverage for the major FIRST-ED structural areas, including paragraph reformatting, whole-line block bulk topology, independent block endpoints and atomic multi-document undo/navigation restoration. The [handbook procedure/function index audit](HANDBOOK-PROCEDURE-INDEX-AUDIT.md) now records all 123 printed entries with first-pass classifications; its mapped behavior still requires a final regression-coverage and host-interface audit before calling V1 complete. MicroStar-specific demonstrations may ship as samples rather than core dependencies.

@@ -59,3 +59,7 @@ Physical window creation/compression still belongs to a layout-aware host becaus
 ## Oversized host viewport boundary
 
 The FIRST-ED compatibility processor now calculates last-visible-line and page destinations using widened intermediate arithmetic before clamping to the document's actual final line. A positive `PageSize` can approach `int.MaxValue` even for a short document. `ScrollUp` still recognizes the final document line as its bottom edge; `PageDown` cannot wrap the top line into a negative coordinate. `ViewportNavigationOverflowTests` documents four focused regressions. This is defensive modern API behavior, not a historical 16-bit line-limit requirement.
+
+## One-row page behavior and portable fixtures
+
+When only one text row is visible, `visibleRows - 1` is zero. Page Up and Page Down therefore leave the cursor and top line unchanged; the dispatcher may still acknowledge the valid request. `conformance/v1/cases/viewport-navigation.json` makes this explicit alongside standard and extremely large viewport sizes, and covers the all-window independence of linked views.
