@@ -21,13 +21,32 @@ public sealed class EditorFileService
 
     /// <summary>
     /// Reads a file and inserts its logical lines immediately after the current
-    /// line. The cursor is intentionally preserved, matching EditReatxtfil.
+    /// line. With no intervening navigation, the cursor is preserved as in
+    /// EditReatxtfil; later explicit navigation is never overwritten.
     /// </summary>
+    /// <remarks>
+    /// Modern async hosts may select another view while decoding is pending.
+    /// The target is the initiating view, not the view selected at completion.
+    /// If that destination is destroyed, reattached or edited meanwhile, the
+    /// import is rejected before mutation because its saved line anchor may no
+    /// longer identify the intended location.
+    /// </remarks>
     public async ValueTask<int> ReadIntoCurrentWindowAsync(
         string path,
         CancellationToken cancellationToken = default)
     {
         ArgumentException.ThrowIfNullOrWhiteSpace(path);
+
+        // A file decoder may suspend for I/O while a host continues processing
+        // input in other windows. Bind the command to the initiating view and
+        // insertion anchor BEFORE the first await; using CurrentWindow after
+        // decoding would silently import into whichever document is active then.
+        var window = _session.CurrentWindow;
+        var document = window.Document;
+        var insertionLine = window.Cursor.Line + 1;
+        var originalVersion = document.Version;
+        var originalLines = document.Buffer.Snapshot();
+
         var lines = await _session.Interruption
             .RunInterruptibleAsync(
                 token => _codec.ReadAsync(path, token),
@@ -38,13 +57,20 @@ public sealed class EditorFileService
             return 0;
         }
 
-        // The entire compatibility file is decoded before editor mutation starts.
-        // A Ctrl-U detected during the awaited read therefore cancels I/O and
-        // leaves document text, cursor, dirty state and undo history untouched.
-        var window = _session.CurrentWindow;
-        var document = window.Document;
-        var originalCursor = window.Cursor;
-        var insertionLine = window.Cursor.Line + 1;
+        // The entire compatibility file is decoded before editor mutation.
+        // A Ctrl-U detected during I/O has already aborted the operation.
+        // If the initiating view disappeared, was reattached to another
+        // stream, or its text changed, the saved numeric line index can no
+        // longer be trusted as the original insertion anchor. Reject rather
+        // than risking a write into the wrong document or logical line.
+        if (!_session.Windows.Any(candidate => ReferenceEquals(candidate, window))
+            || !ReferenceEquals(window.Document, document)
+            || document.Version != originalVersion
+            || !document.Buffer.Snapshot().SequenceEqual(originalLines))
+        {
+            throw new InvalidOperationException(
+                "The file-read destination changed while input was being decoded.");
+        }
 
         var undo = _session.Undo.BeginTransaction(_session, window, "Read file");
 
@@ -61,7 +87,11 @@ public sealed class EditorFileService
         _session.Topology.LinesInserted(document, insertionLine, lines.Count);
 
         document.MarkChanged();
-        window.Cursor = originalCursor;
+
+        // Do not restore the initiating cursor blindly: the host may have
+        // explicitly navigated while I/O was pending. Topology realignment
+        // preserves that surviving-line anchor, and an unchanged cursor stays
+        // on the original source line without any special assignment.
         _session.RefreshBlockFlags();
         undo.Commit();
         return lines.Count;
