@@ -1,5 +1,7 @@
+using Sasd.Editor.Document;
 using Sasd.Editor.Hooks;
 using Sasd.Editor.Model;
+using Sasd.Editor.Windows;
 
 namespace Sasd.Editor.Search;
 
@@ -15,6 +17,7 @@ public sealed class EditorSearchService
     private SearchOptions _lastOptions = new();
     private TextPosition? _lastMatch;
     private Guid? _lastDocumentId;
+    private long _searchRevision;
 
     internal EditorSearchService(Editing.EditorSession session)
     {
@@ -72,14 +75,18 @@ public sealed class EditorSearchService
         ValidatePattern(pattern);
         options ??= new SearchOptions();
 
-        var window = _session.CurrentWindow;
-        var start = window.Cursor;
-        var match = await FindFromAsync(start, pattern, options, cancellationToken).ConfigureAwait(false);
+        var context = CaptureContext();
+        var match = await FindFromAsync(
+            context.Lines, context.Cursor, pattern, options, cancellationToken).ConfigureAwait(false);
 
-        Remember(pattern, options, match, window.Document.DocumentId);
+        // An EditBreathe-style host callback can switch windows, change the
+        // document or perform another search while this scan is suspended.
+        // Never apply an obsolete result to the newly selected window.
+        EnsureContextUnchanged(context);
+        Remember(pattern, options, match, context.Document.DocumentId);
         if (match is not null)
         {
-            window.Cursor = match.Value;
+            context.Window.Cursor = match.Value;
         }
 
         return match;
@@ -103,7 +110,7 @@ public sealed class EditorSearchService
             && _lastMatch.HasValue
             && _lastMatch.Value == window.Cursor)
         {
-            start = AdvancePastMatch(window.Cursor, _lastPattern.Length);
+            start = AdvancePastMatch(window.Document, window.Cursor, _lastPattern.Length);
         }
 
         var match = FindFrom(start, _lastPattern, _lastOptions);
@@ -128,25 +135,27 @@ public sealed class EditorSearchService
             return null;
         }
 
-        var window = _session.CurrentWindow;
-        var start = window.Cursor;
-        if (_lastDocumentId == window.Document.DocumentId
+        var context = CaptureContext();
+        var pattern = _lastPattern;
+        var options = _lastOptions;
+        var start = context.Cursor;
+        if (_lastDocumentId == context.Document.DocumentId
             && _lastMatch.HasValue
-            && _lastMatch.Value == window.Cursor)
+            && _lastMatch.Value == context.Cursor)
         {
-            start = AdvancePastMatch(window.Cursor, _lastPattern.Length);
+            start = AdvancePastMatch(context.Document, context.Cursor, pattern.Length);
         }
 
         var match = await FindFromAsync(
-            start,
-            _lastPattern,
-            _lastOptions,
-            cancellationToken).ConfigureAwait(false);
+            context.Lines, start, pattern, options, cancellationToken).ConfigureAwait(false);
 
-        Remember(_lastPattern, _lastOptions, match, window.Document.DocumentId);
+        // Repeated search must not overwrite a newer Find/Find Again request
+        // that completed while this one was waiting at a host checkpoint.
+        EnsureContextUnchanged(context);
+        Remember(pattern, options, match, context.Document.DocumentId);
         if (match is not null)
         {
-            window.Cursor = match.Value;
+            context.Window.Cursor = match.Value;
         }
 
         return match;
@@ -159,12 +168,18 @@ public sealed class EditorSearchService
         CancellationToken cancellationToken = default)
     {
         ArgumentNullException.ThrowIfNull(replacement);
+        ValidatePattern(pattern);
         var match = await FindNextAsync(pattern, options, cancellationToken).ConfigureAwait(false);
         if (match is null)
         {
             return false;
         }
 
+        // The Find result is already committed to its originating view.
+        // Capture that exact document and matched position before asking the
+        // host for permission to replace. The hook is awaited and can change
+        // the selection, text or cursor in the meantime.
+        var context = CaptureContext();
         var candidate = new ReplaceCandidate(match.Value, pattern, replacement);
         var decision = await _session.Hooks.BeforeReplaceAsync(_session, candidate, cancellationToken).ConfigureAwait(false);
         if (decision == ReplaceDecision.Cancel)
@@ -172,10 +187,20 @@ public sealed class EditorSearchService
             return false;
         }
 
+        EnsureContextUnchanged(context);
         if (decision == ReplaceDecision.Skip)
         {
-            _session.CurrentWindow.Cursor = AdvancePastMatch(match.Value, Math.Max(1, pattern.Length));
+            context.Window.Cursor = AdvancePastMatch(context.Document, match.Value, pattern.Length);
             return false;
+        }
+
+        // EditorEngine's synchronous mutation API acts on CurrentWindow.
+        // Do not redirect it to a different view just because the host
+        // changed focus while it was displaying a replace confirmation.
+        if (!ReferenceEquals(_session.CurrentWindow, context.Window))
+        {
+            throw new InvalidOperationException(
+                "The replacement window changed while awaiting host confirmation.");
         }
 
         _session.Engine.ReplaceSingleLineRange(match.Value, pattern.Length, replacement);
@@ -271,20 +296,23 @@ public sealed class EditorSearchService
     }
 
     private async ValueTask<TextPosition?> FindFromAsync(
+        IReadOnlyList<EditorLineSnapshot> lines,
         TextPosition start,
         string pattern,
         SearchOptions options,
         CancellationToken cancellationToken)
     {
-        var window = _session.CurrentWindow;
-        var buffer = window.Document.Buffer;
+        // Scan the initiating document's immutable logical-line snapshot.
+        // Looking up CurrentWindow after a checkpoint would make the second
+        // half of a search run in a different document after focus changes.
         var comparison = options.CaseSensitive ? StringComparison.Ordinal : StringComparison.OrdinalIgnoreCase;
-        var startLine = Math.Clamp(start.Line, 0, buffer.LineCount - 1);
+        var startLine = Math.Clamp(start.Line, 0, lines.Count - 1);
         var startColumn = Math.Max(0, start.Column);
 
         var match = await FindInRangeAsync(
+            lines,
             startLine,
-            buffer.LineCount - 1,
+            lines.Count - 1,
             startColumn,
             pattern,
             options,
@@ -294,6 +322,7 @@ public sealed class EditorSearchService
         if (match is null && options.WrapAround)
         {
             match = await FindInRangeAsync(
+                lines,
                 0,
                 startLine,
                 0,
@@ -307,12 +336,13 @@ public sealed class EditorSearchService
         return match;
     }
 
-    private TextPosition AdvancePastMatch(TextPosition position, int length)
+    private static TextPosition AdvancePastMatch(EditorDocument document, TextPosition position, int length)
     {
-        var buffer = _session.CurrentWindow.Document.Buffer;
+        var buffer = document.Buffer;
         var line = Math.Clamp(position.Line, 0, buffer.LineCount - 1);
         var text = buffer.GetLine(line).Text;
-        var column = Math.Clamp(position.Column + Math.Max(1, length), 0, text.Length);
+        // Virtual columns and very long patterns must not overflow int.
+        var column = (int)Math.Clamp((long)position.Column + Math.Max(1, length), 0, text.Length);
         return new TextPosition(line, column);
     }
 
@@ -360,6 +390,7 @@ public sealed class EditorSearchService
     /// EditBreathe inside a potentially long loop.
     /// </summary>
     private async ValueTask<TextPosition?> FindInRangeAsync(
+        IReadOnlyList<EditorLineSnapshot> lines,
         int startLine,
         int endLine,
         int startColumn,
@@ -369,12 +400,11 @@ public sealed class EditorSearchService
         CancellationToken cancellationToken,
         int? stopColumnExclusive = null)
     {
-        var buffer = _session.CurrentWindow.Document.Buffer;
         for (var lineIndex = startLine; lineIndex <= endLine; lineIndex++)
         {
             await _session.Interruption.CheckpointAsync(cancellationToken).ConfigureAwait(false);
 
-            var text = buffer.GetLine(lineIndex).Text;
+            var text = lines[lineIndex].Text;
             var column = lineIndex == startLine ? Math.Clamp(startColumn, 0, text.Length) : 0;
             var limit = lineIndex == endLine && stopColumnExclusive.HasValue
                 ? Math.Clamp(stopColumnExclusive.Value, 0, text.Length)
@@ -406,7 +436,43 @@ public sealed class EditorSearchService
         _lastOptions = options;
         _lastMatch = match;
         _lastDocumentId = documentId;
+        _searchRevision++;
     }
+
+    /// <summary>
+    /// Captures everything that gives an asynchronous search result meaning.
+    /// Search/checkpoint hooks may run arbitrary host logic before completion.
+    /// </summary>
+    private SearchContext CaptureContext()
+    {
+        var window = _session.CurrentWindow;
+        var document = window.Document;
+        return new SearchContext(
+            window, document, window.Cursor, document.Version,
+            document.Buffer.Snapshot(), _searchRevision);
+    }
+
+    private void EnsureContextUnchanged(SearchContext context)
+    {
+        if (!_session.Windows.Any(view => ReferenceEquals(view, context.Window))
+            || !ReferenceEquals(context.Window.Document, context.Document)
+            || context.Window.Cursor != context.Cursor
+            || context.Document.Version != context.Version
+            || _searchRevision != context.SearchRevision
+            || !context.Document.Buffer.Snapshot().SequenceEqual(context.Lines))
+        {
+            throw new InvalidOperationException(
+                "The search destination or document changed during an awaited editor operation.");
+        }
+    }
+
+    private sealed record SearchContext(
+        EditorWindow Window,
+        EditorDocument Document,
+        TextPosition Cursor,
+        long Version,
+        IReadOnlyList<EditorLineSnapshot> Lines,
+        long SearchRevision);
 
     private static void ValidatePattern(string pattern)
     {
