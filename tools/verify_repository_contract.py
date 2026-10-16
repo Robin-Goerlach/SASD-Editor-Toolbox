@@ -150,7 +150,7 @@ def verify_conformance() -> int:
                 raise ContractError(f"Duplicate conformance case id: {case_id}")
             seen_ids.add(case_id)
 
-            for field in ("area", "initial", "operation", "expect"):
+            for field in ("area", "initial", "expect"):
                 if field not in case:
                     raise ContractError(f"Case '{case_id}' is missing '{field}'")
 
@@ -161,9 +161,22 @@ def verify_conformance() -> int:
             if not isinstance(case["expect"], dict):
                 raise ContractError(f"Case '{case_id}' expected state must be an object")
 
-            operation = case["operation"]
-            if not isinstance(operation, dict) or not isinstance(operation.get("id"), str) or not operation["id"]:
-                raise ContractError(f"Case '{case_id}' requires operation.id")
+            # Preserve all original single-operation cases, but allow a
+            # mutually exclusive multi-command sequence for stateful behavior.
+            has_single = "operation" in case
+            has_sequence = "operations" in case
+            if has_single == has_sequence:
+                raise ContractError(
+                    f"Case '{case_id}' requires exactly one of operation or operations"
+                )
+            operations = [case["operation"]] if has_single else case["operations"]
+            if not isinstance(operations, list) or not operations:
+                raise ContractError(f"Case '{case_id}' operations must be nonempty")
+            for step, operation in enumerate(operations):
+                if not isinstance(operation, dict) or not isinstance(operation.get("id"), str) or not operation["id"]:
+                    raise ContractError(f"Case '{case_id}' step {step} requires operation.id")
+                if "commandSucceeded" in operation and type(operation["commandSucceeded"]) is not bool:
+                    raise ContractError(f"Case '{case_id}' step {step} expected result must be boolean")
 
             case_count += 1
 

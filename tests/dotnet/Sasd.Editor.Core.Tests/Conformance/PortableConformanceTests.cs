@@ -80,8 +80,7 @@ public sealed class PortableConformanceTests
         var testCase = parsed.RootElement;
 
         var context = BuildInitialState(testCase.GetProperty("initial"));
-        var operation = testCase.GetProperty("operation");
-        var executed = await ExecuteOperationAsync(context, operation);
+        var executed = await ExecuteCaseAsync(context, testCase);
 
         AssertExpectedState(context, testCase.GetProperty("expect"), executed);
     }
@@ -202,6 +201,36 @@ public sealed class PortableConformanceTests
     }
 
     /// <summary>
+    /// Command sequences run against one session so linked-window realignment,
+    /// independent block endpoints and undo can be tested portably. A rejected
+    /// intermediate command must be explicitly marked as expected; otherwise
+    /// it fails immediately instead of being hidden by a later success.
+    /// </summary>
+    private static async ValueTask<bool> ExecuteCaseAsync(TestContext context, JsonElement testCase)
+    {
+        if (!testCase.TryGetProperty("operations", out var operations))
+        {
+            return await ExecuteOperationAsync(context, testCase.GetProperty("operation"));
+        }
+
+        var succeeded = true;
+        foreach (var operation in operations.EnumerateArray())
+        {
+            succeeded = await ExecuteOperationAsync(context, operation);
+            if (operation.TryGetProperty("commandSucceeded", out var expected))
+            {
+                Assert.Equal(expected.GetBoolean(), succeeded);
+            }
+            else
+            {
+                Assert.True(succeeded, $"Portable command failed: {RequireString(operation, "id")}");
+            }
+        }
+
+        return succeeded;
+    }
+
+    /// <summary>
     /// Some portable operations are session/view services rather than keyboard
     /// commands. Keep them out of EditorCommandId to preserve the separation
     /// between host-neutral behavior and the historical FIRST-ED key map.
@@ -212,6 +241,25 @@ public sealed class PortableConformanceTests
     {
         switch (RequireString(operation, "id"))
         {
+            case "select_window":
+                // Fixture view selection must not manufacture an editor key.
+                context.Session.SetCurrentWindow(
+                    context.Windows[RequireString(operation, "windowId")].WindowId);
+                return true;
+            case "position_cursor":
+            {
+                var window = context.Session.CurrentWindow;
+                var line = operation.GetProperty("line").GetInt32();
+                var column = operation.GetProperty("column").GetInt32();
+                if (line < 0 || line >= window.Document.Buffer.LineCount || column < 0)
+                {
+                    throw new InvalidDataException("Portable cursor line/column is out of range.");
+                }
+
+                // Historical virtual columns beyond EOL are valid view state.
+                window.Cursor = new TextPosition(line, column);
+                return true;
+            }
             case "color_current_line":
                 context.Session.ColorCurrentLine();
                 return true;
@@ -248,6 +296,14 @@ public sealed class PortableConformanceTests
         operation switch
         {
             "move_right_character" => EditorCommandId.CursorRight,
+            "insert_line" => EditorCommandId.InsertLine,
+            "end_block" => EditorCommandId.EndBlock,
+            "copy_block" => EditorCommandId.CopyBlock,
+            "move_block" => EditorCommandId.MoveBlock,
+            "delete_block" => EditorCommandId.DeleteBlock,
+            "set_marker" => EditorCommandId.SetMarker,
+            "jump_marker" => EditorCommandId.JumpMarker,
+            "undo" => EditorCommandId.Undo,
             "delete_line" => EditorCommandId.DeleteLine,
             "begin_block" => EditorCommandId.BeginBlock,
             "new_line" => EditorCommandId.NewLine,

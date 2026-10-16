@@ -18,9 +18,11 @@ Operation identifiers are test-harness vocabulary, not required public API names
 
 ## Case shape
 
-Each case has a stable `id`, an `area`, an `initial` portable state, one semantic `operation`, and an `expect` object containing the subset of state that must match. An operation may carry portable `text`, `text2`, `number`, `number2` or `pageSize` fields. Expectations may include `commandSucceeded` so invalid-boundary behavior can be tested without depending on target-language exception types. They may also include one `error` object with portable `id`, stable machine `code` and `resourceKey`; language adapters map those values to their native typed error model.
+Each case has a stable `id`, an `area`, an `initial` portable state and an `expect` object. A case has **either** one semantic `operation` **or** a nonempty array `operations` of steps against the same state. Steps must succeed by default; an expected negative result is declared on that step with `commandSucceeded: false`. The outer `expect.commandSucceeded` describes the last step's outcome. An operation may carry portable `text`, `text2`, `number`, `number2` or `pageSize` fields. Expectations may include `commandSucceeded` so invalid-boundary behavior can be tested without depending on target-language exception types. They may also include one `error` object with portable `id`, stable machine `code` and `resourceKey`; language adapters map those values to their native typed error model.
 
 The initial smoke cases intentionally cover small, well-established invariants. More cases should be added as command-boundary behavior is finalized. Avoid encoding implementation details such as C# GUID types, pointer addresses, collection classes or exception class names.
+
+Multi-step portable fixtures may use `position_cursor` and `select_window` for test-only view navigation. These are not FIRST-ED command IDs; they are host-neutral fixture operations that preserve virtual cursor columns. Semantic operations such as `begin_block`, `end_block`, `insert_line`, `move_block`, `delete_block` and `undo` go through the same command dispatcher as ordinary UI actions. This keeps native C++, Java and C# implementations independent.
 
 ## Historical audit traceability
 
