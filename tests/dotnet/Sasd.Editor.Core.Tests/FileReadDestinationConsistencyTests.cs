@@ -122,6 +122,63 @@ public sealed class FileReadDestinationConsistencyTests
         Assert.Equal(EditorErrorId.OperationFailed, Assert.Single(hooks.Errors).Id);
     }
 
+    [Fact]
+    public async Task ReadFile_ReattachingSourceViewDuringIo_RejectsStaleDestination()
+    {
+        var codec = new PausingReadCodec(new EditorLineSnapshot("import"));
+        var hooks = new ErrorHooks();
+        var session = new EditorSession(hooks, codec);
+        var source = session.CreateDocument("source");
+        var other = session.CreateDocument("other");
+        session.SetCurrentWindow(source.WindowId);
+        var dispatcher = new EditorCommandDispatcher(session);
+
+        var pending = dispatcher.ExecuteAsync(
+            new(EditorCommandId.ReadFile, Text: "fixture")).AsTask();
+        await codec.Started;
+
+        // An independently valid Link Window command reattaches the original
+        // view to a different stream while the decoded lines are pending.
+        // This must never turn the old read into an edit of the new stream.
+        Assert.True(await dispatcher.ExecuteAsync(
+            new(EditorCommandId.LinkWindow, Number: 1, Number2: 2)));
+        Assert.Same(other.Document, source.Document);
+        codec.Complete();
+
+        Assert.False(await pending);
+        Assert.Equal("other", other.Document.Buffer.GetLine(0).Text);
+        Assert.Equal("other", source.Document.Buffer.GetLine(0).Text);
+        Assert.Equal(0, session.Undo.Count);
+        Assert.Equal(EditorErrorId.OperationFailed, Assert.Single(hooks.Errors).Id);
+    }
+
+    [Fact]
+    public async Task ReadFile_DirectBufferMutationDuringIo_RejectsEvenWhenVersionIsUnchanged()
+    {
+        var codec = new PausingReadCodec(new EditorLineSnapshot("import"));
+        var hooks = new ErrorHooks();
+        var session = new EditorSession(hooks, codec);
+        var source = session.CreateDocument("source\ntail");
+        var originalVersion = source.Document.Version;
+        var pending = new EditorCommandDispatcher(session).ExecuteAsync(
+            new(EditorCommandId.ReadFile, Text: "fixture")).AsTask();
+        await codec.Started;
+
+        // Extension code may use the public ITextBuffer directly rather than
+        // signaling MarkChanged. The document version alone cannot prove an
+        // insertion anchor is safe; compare logical-line snapshots as well.
+        source.Document.Buffer.ReplaceLine(1, "changed");
+        Assert.Equal(originalVersion, source.Document.Version);
+        codec.Complete();
+
+        Assert.False(await pending);
+        Assert.Equal(new[] { "source", "changed" },
+            source.Document.Buffer.Snapshot().Select(static line => line.Text));
+        Assert.Equal(originalVersion, source.Document.Version);
+        Assert.Equal(0, session.Undo.Count);
+        Assert.Equal(EditorErrorId.OperationFailed, Assert.Single(hooks.Errors).Id);
+    }
+
     private sealed class ErrorHooks : IEditorHooks
     {
         public List<EditorError> Errors { get; } = [];
