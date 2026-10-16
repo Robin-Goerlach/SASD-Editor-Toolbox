@@ -124,8 +124,16 @@ internal static class FirstEdCompatibilityProcessor
             return false;
         }
 
+        // A single visible text row provides zero page displacement.
+        // Returning a no-op keeps the V1 visibleRows-1 contract exact and
+        // prevents a cursor jump in one-row host viewports.
+        if (visibleLines == 1)
+        {
+            return false;
+        }
+
         var relativeRow = VisibleCursorRow(window, visibleLines);
-        var step = Math.Max(1, visibleLines - 1);
+        var step = visibleLines - 1;
         window.TopLine = Math.Max(0, window.TopLine - step);
         var lastDocumentLine = window.Document.Buffer.LineCount - 1;
         window.Cursor = window.Cursor with
@@ -145,8 +153,16 @@ internal static class FirstEdCompatibilityProcessor
             return false;
         }
 
+        // A single visible text row provides zero page displacement.
+        // Returning a no-op keeps the V1 visibleRows-1 contract exact and
+        // prevents a cursor jump in one-row host viewports.
+        if (visibleLines == 1)
+        {
+            return false;
+        }
+
         var relativeRow = VisibleCursorRow(window, visibleLines);
-        var step = Math.Max(1, visibleLines - 1);
+        var step = visibleLines - 1;
         // Widen before adding the host-provided page size. The viewport may
         // be much taller than the document, but its index must never wrap.
         window.TopLine = (int)Math.Min(lastDocumentLine, (long)window.TopLine + step);
