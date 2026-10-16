@@ -90,6 +90,7 @@ V1 includes character/word/line movement, page movement, beginning/end/top/botto
 
 - Display-dependent commands receive the number of visible text rows from the host. Line-up/down and scroll-up/down keep the cursor visible according to the historical edge rules.
 - Page-up/down move the viewport by `visibleRows - 1`. Because the handbook does not separately specify the cursor's post-page screen row, implementations must document their cursor policy; the .NET implementation preserves the relative visible row when possible.
+- A positive host-reported row count may greatly exceed a document's line count; page navigation and last-visible-row checks must clamp to the last logical document line without integer overflow or document/Undo mutation.
 - Top-of-file selects the first line and first column. Bottom-of-file selects the last line and first column and places that last line at the top of the viewport.
 
 The historical implementation's 16-bit integer ceiling is not a portable document-size requirement. Target-language overflow must be guarded without artificially limiting modern documents to Turbo Pascal's `Maxint`.

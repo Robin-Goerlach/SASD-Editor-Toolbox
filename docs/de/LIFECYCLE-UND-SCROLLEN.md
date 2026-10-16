@@ -55,3 +55,7 @@ Das Handbuch definiert für die Page-Befehle ausdrücklich die Verschiebung des 
 ## Noch offene Host-Arbeit
 
 Die physische Erzeugung und Komprimierung von Fenstern bleibt Aufgabe eines Layout-fähigen Hosts, da die historische Routine direkt Bildschirmzeilen manipuliert. Außerdem muss das interaktive FIRST-ED-Beispiel noch eine reale Eingabequelle, Prompt-Schicht und einen Renderer mit den nun vorhandenen Core-Verträgen verbinden.
+
+## Sehr große Host-Viewport-Höhen
+
+Die FIRST-ED-Kompatibilitätsschicht berechnet die letzte sichtbare Zeile und Page-Ziele jetzt mit einem größeren Integer-Zwischentyp und begrenzt die Ergebnisse erst anschließend auf die tatsächlich letzte Dokumentzeile. Eine positive `PageSize` kann selbst bei wenigen Textzeilen nahe `int.MaxValue` liegen. `ScrollUp` erkennt weiterhin die letzte Dokumentzeile als unteren Sichtrand, und `PageDown` kann keinen negativen Offset durch Overflow erzeugen. Vier `ViewportNavigationOverflowTests` prüfen diese Fälle. Dies ist eine moderne defensive API-Regel, keine historische 16-Bit-Zeilenbegrenzung.

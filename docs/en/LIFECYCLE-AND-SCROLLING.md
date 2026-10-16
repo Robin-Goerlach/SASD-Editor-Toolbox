@@ -55,3 +55,7 @@ The handbook explicitly defines the viewport displacement for page commands but 
 ## Remaining host work
 
 Physical window creation/compression still belongs to a layout-aware host because the historical routine manipulates screen rows directly. The interactive FIRST-ED sample also still needs to connect a real input source, prompt service and renderer to the now-implemented core contracts.
+
+## Oversized host viewport boundary
+
+The FIRST-ED compatibility processor now calculates last-visible-line and page destinations using widened intermediate arithmetic before clamping to the document's actual final line. A positive `PageSize` can approach `int.MaxValue` even for a short document. `ScrollUp` still recognizes the final document line as its bottom edge; `PageDown` cannot wrap the top line into a negative coordinate. `ViewportNavigationOverflowTests` documents four focused regressions. This is defensive modern API behavior, not a historical 16-bit line-limit requirement.

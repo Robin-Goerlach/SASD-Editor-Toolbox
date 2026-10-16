@@ -74,6 +74,7 @@ The current foundation contains:
 - explicit `Wrapped` semantics as a soft outgoing word-wrap boundary, aligned across automatic wrapping, reformatting and the legacy high-bit-CR file codec;
 - historical FIRST-ED begin/end/goto, top/bottom-file and viewport-aware movement semantics isolated behind compatibility processors;
 - display-row-aware line scrolling and page movement supplied with a host-visible row count;
+- overflow-safe FIRST-ED viewport navigation for oversized host row counts;
 - a host-neutral all-window horizontal cursor visibility rule and indexed absolute-line status projection, replacing DOS-era screen-scanning helpers;
 - manifest-driven, portable cross-language conformance cases for line flags, linked-window viewports and multi-command block/topology/Undo behavior;
 - audited left/right character deletion, right-word deletion and line deletion, including cursor-positioned line joins and the sole-line blanking rule;
