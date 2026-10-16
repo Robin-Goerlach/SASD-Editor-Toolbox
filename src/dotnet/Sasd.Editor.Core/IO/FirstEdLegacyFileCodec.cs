@@ -100,6 +100,17 @@ public sealed class FirstEdLegacyFileCodec : IEditorFileCodec
             var line = lines[lineIndex];
             foreach (var character in line.Text)
             {
+                // These are physical separator bytes in the FIRST-ED stream,
+                // not representable literal characters *inside* one logical
+                // line. Writing them verbatim would silently split the line
+                // or manufacture a Wrapped boundary when reading it back.
+                // Validate before File.WriteAllBytesAsync truncates its target.
+                if (character is '\r' or '\n' or (char)WrappedLineTerminator)
+                {
+                    throw new EncoderFallbackException(
+                        "The FIRST-ED compatibility format reserves CR, LF and 0x8D for line boundaries.");
+                }
+
                 if (character > byte.MaxValue)
                 {
                     throw new EncoderFallbackException(

@@ -1,3 +1,4 @@
+using System.Text;
 using Sasd.Editor.Commands;
 using Sasd.Editor.Editing;
 using Sasd.Editor.IO;
@@ -82,6 +83,73 @@ public sealed class SearchAndFileCompatibilityTests
 
         Assert.False(await dispatcher.ExecuteAsync(new(EditorCommandId.FindAgain)));
         Assert.Equal(new TextPosition(0, 0), session.CurrentWindow.Cursor);
+    }
+
+    /// <summary>
+    /// A delimiter hidden inside line content must not become a second
+    /// logical line after decoding. Encode runs before the destination is
+    /// touched, so every rejected input must preserve its previous bytes.
+    /// </summary>
+    [Theory]
+    [InlineData("\r")]
+    [InlineData("\n")]
+    [InlineData("\u008D")]
+    [InlineData("\u0100")]
+    public async Task LegacyCodec_RejectsUnrepresentableLineTextWithoutTruncatingFile(string invalid)
+    {
+        var path = Path.GetTempFileName();
+        try
+        {
+            var originalBytes = new byte[] { (byte)'o', (byte)'l', (byte)'d' };
+            await File.WriteAllBytesAsync(path, originalBytes);
+
+            var codec = new FirstEdLegacyFileCodec();
+            await Assert.ThrowsAsync<EncoderFallbackException>(
+                async () => await codec.WriteAsync(path, [new EditorLineSnapshot("a" + invalid + "b")]));
+
+            Assert.Equal(originalBytes, await File.ReadAllBytesAsync(path));
+        }
+        finally
+        {
+            File.Delete(path);
+        }
+    }
+
+    [Fact]
+    public async Task LegacyCodec_RoundTripsLatin1AndMixedHardSoftBoundaries()
+    {
+        var path = Path.GetTempFileName();
+        try
+        {
+            var codec = new FirstEdLegacyFileCodec();
+            await codec.WriteAsync(path,
+            [
+                new EditorLineSnapshot("grün", EditorLineFlags.Wrapped),
+                new EditorLineSnapshot("älter"),
+                new EditorLineSnapshot("Ende")
+            ]);
+
+            var expected = new byte[]
+            {
+                (byte)'g', (byte)'r', 0xFC, (byte)'n', 0x8D,
+                0xE4, (byte)'l', (byte)'t', (byte)'e', (byte)'r',
+                (byte)'\r', (byte)'\n',
+                (byte)'E', (byte)'n', (byte)'d', (byte)'e'
+            };
+            Assert.Equal(expected, await File.ReadAllBytesAsync(path));
+
+            var decoded = await codec.ReadAsync(path);
+            Assert.Equal(3, decoded.Count);
+            Assert.Equal("grün", decoded[0].Text);
+            Assert.Equal(EditorLineFlags.Wrapped, decoded[0].Flags);
+            Assert.Equal("älter", decoded[1].Text);
+            Assert.Equal(EditorLineFlags.None, decoded[1].Flags);
+            Assert.Equal("Ende", decoded[2].Text);
+        }
+        finally
+        {
+            File.Delete(path);
+        }
     }
 
     [Fact]

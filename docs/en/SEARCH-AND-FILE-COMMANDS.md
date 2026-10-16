@@ -45,6 +45,7 @@ The historical file routines use a carriage-return byte with the high bit set, d
 - ordinary CR/LF and LF are accepted as ordinary line boundaries;
 - writing a wrapped logical line emits `0x8D` instead of the ordinary CR/LF separator;
 - the codec is explicitly an 8-bit Latin-1 compatibility codec.
+- CR, LF and `0x8D` are reserved delimiter bytes and cannot appear as literal characters *within* an `EditorLineSnapshot.Text`. Encoding rejects these values and non-Latin-1 characters before it opens/truncates the target file; the regression suite checks that existing file bytes are not lost.
 
 The existing `FileTextStorage` is intentionally **not** changed. It remains the modern UTF-8 whole-document storage provider. Historical compatibility and modern persistence therefore do not constrain each other.
 

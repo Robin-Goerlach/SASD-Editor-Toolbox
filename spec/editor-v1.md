@@ -201,6 +201,7 @@ The core does not write directly to console/video memory. It exposes viewport/st
 - Modern document persistence is abstracted. The first .NET `ITextStorage` provider supports UTF-8 files and preserves the detected newline convention for subsequent saves.
 - Compatibility file commands use a separate file-codec boundary so historical formats do not become mandatory modern storage formats.
 - The Turbo Editor Toolbox wrapped-line marker is a high-bit carriage return (`0x8D`, decimal 141). Decoding it marks the preceding logical line's outgoing boundary as wrapped; encoding a wrapped boundary emits it after that line.
+- The compatibility writer must reject embedded CR, LF and `0x8D` inside logical line text: these bytes are structural separators, and writing them as content would silently corrupt line topology on readback. Non-Latin-1 characters are likewise rejected before the destination is changed.
 - The FIRST-ED-compatible read operation inserts decoded lines after the current line and preserves the current cursor position.
 - Existing window, marker and block references to logical lines following a read insertion must be realigned to those same surviving logical lines.
 - Hosts collect filenames; core file services receive resolved paths and perform no UI prompting.

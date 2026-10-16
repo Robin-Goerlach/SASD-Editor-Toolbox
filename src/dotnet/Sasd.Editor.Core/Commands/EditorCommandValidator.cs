@@ -164,14 +164,6 @@ public static class EditorCommandValidator
                 $"Command {request.Id} requires a search value (empty repeats the previous pattern).")
             : null;
 
-    private static EditorCommandValidationFailure? RequireNonEmptyText(EditorCommandRequest request) =>
-        string.IsNullOrEmpty(request.Text)
-            ? Failure(
-                EditorCommandValidationCode.MissingText,
-                nameof(EditorCommandRequest.Text),
-                $"Command {request.Id} requires non-empty text.")
-            : null;
-
     private static EditorCommandValidationFailure? ValidateReplaceArguments(EditorCommandRequest request)
     {
         if (request.Text2 is not null)

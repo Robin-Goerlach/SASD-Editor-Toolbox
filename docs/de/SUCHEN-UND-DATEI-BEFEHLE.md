@@ -45,6 +45,7 @@ Die historischen Datei-Routinen verwenden ein Carriage-Return-Byte mit gesetztem
 - normale CR/LF- und LF-Zeilenenden werden als normale Zeilengrenzen akzeptiert;
 - beim Schreiben wird für Wrapped-Zeilen `0x8D` statt des normalen CR/LF-Trenners ausgegeben;
 - der Codec ist bewusst ein 8-Bit-Latin-1-Kompatibilitätscodec.
+- CR, LF und `0x8D` sind ausschließlich Zeilentrenner und dürfen nicht als Klartextzeichen **innerhalb** eines `EditorLineSnapshot.Text` vorkommen. Der Encoder lehnt solche und nicht in Latin-1 darstellbare Zeichen vor dem Öffnen/Überschreiben der Zieldatei ab. Regressionstests prüfen, dass vorhandene Datei-Bytes erhalten bleiben.
 
 `FileTextStorage` wird absichtlich **nicht** verändert. Es bleibt der moderne UTF-8-Provider für vollständige Dokumente. Historische Kompatibilität und moderne Persistenz können sich so unabhängig entwickeln.
 
