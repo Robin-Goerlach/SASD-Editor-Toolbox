@@ -35,9 +35,14 @@ public sealed class FileTextStorage(Encoding? encoding = null) : ITextStorage
             throw new InvalidOperationException("A target path is required for a document that has not been named.");
         }
 
-        var content = string.Join(document.NewLine, document.Buffer.Snapshot().Select(static line => line.Text));
+        // Keep modern UTF-8 storage subject to the same in-flight edit rule
+        // as the historical FIRST-ED codec: saving yesterday's snapshot must
+        // never mark today's document clean.
+        var versionAtWrite = document.Version;
+        var snapshot = document.Buffer.Snapshot();
+        var content = string.Join(document.NewLine, snapshot.Select(static line => line.Text));
         await File.WriteAllTextAsync(target, content, _encoding, cancellationToken).ConfigureAwait(false);
-        document.MarkSaved(target);
+        document.MarkSnapshotSaved(versionAtWrite, snapshot, target);
     }
 
     private static string DetectNewLine(string text)

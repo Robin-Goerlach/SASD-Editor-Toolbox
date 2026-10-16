@@ -67,3 +67,9 @@ For Read File, decoded lines are not inserted until the codec operation has comp
 Write/Save pass the same linked token to the codec. A cancelled external file write can still be partially visible at the filesystem/provider level; editor document state is updated only after successful completion. Save does not clear dirty state if the write is interrupted.
 
 Semantic Find/Find Again use the interruptible search path. Scanning checkpoints once per logical line and only commits the cursor and remembered-search state after a successful scan. Direct synchronous service methods remain available for applications that deliberately want an in-process non-interruptible call.
+
+## Save consistency during concurrent editing
+
+A host may edit a document, including through another linked window, while asynchronous file I/O is still in progress. The file service and modern UTF-8 storage now capture the document version and logical-line snapshot before writing. After I/O successfully completes, `EditorDocument.MarkSnapshotSaved` clears the dirty flag **only** when the current lines and version still match the snapshot that was written. A successful write still associates the requested file path even if a newer edit leaves the document dirty. `WriteFile` continues to leave both file identity and dirty state alone.
+
+This is a modern persistence-safety guarantee rather than a claim about cooperative single-threaded DOS behavior. `FileSaveConsistencyTests` uses an intentionally paused codec to prove that newer edits are not mislabeled as persisted.

@@ -59,6 +59,45 @@ public sealed class EditorDocument
         IsDirty = false;
     }
 
+    /// <summary>
+    /// Acknowledges a completed write only if the document still represents
+    /// the snapshot which was handed to the storage provider.
+    /// </summary>
+    /// <remarks>
+    /// File writes can be asynchronous while a linked editor view remains
+    /// editable. Setting IsDirty to false unconditionally after an older
+    /// snapshot reaches disk would incorrectly hide newer unsaved edits.
+    /// Version is checked for the fast common case; line snapshots are also
+    /// compared because Undo or a custom buffer can restore a prior version
+    /// without guaranteeing that its current content equals the saved bytes.
+    /// A successful write may still establish the document's file association
+    /// even if its contents have changed during I/O.
+    /// </remarks>
+    /// <returns>True only if the current content was the snapshot written.</returns>
+    public bool MarkSnapshotSaved(
+        long snapshotVersion,
+        IReadOnlyList<EditorLineSnapshot> snapshotLines,
+        string? filePath = null)
+    {
+        ArgumentNullException.ThrowIfNull(snapshotLines);
+
+        if (!string.IsNullOrWhiteSpace(filePath))
+        {
+            FilePath = Path.GetFullPath(filePath);
+        }
+
+        if (Version != snapshotVersion
+            || !Buffer.Snapshot().SequenceEqual(snapshotLines))
+        {
+            // The persisted snapshot is not the current editor document.
+            // In particular, never clear a dirty flag set by a later edit.
+            return false;
+        }
+
+        IsDirty = false;
+        return true;
+    }
+
     public void SetPersistenceMetadata(string? filePath, string? newLine = null)
     {
         FilePath = string.IsNullOrWhiteSpace(filePath) ? null : Path.GetFullPath(filePath);

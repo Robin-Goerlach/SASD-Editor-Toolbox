@@ -99,13 +99,20 @@ public sealed class EditorFileService
             return false;
         }
 
+        // Capture the version together with the exact lines being written.
+        // A host can keep editing this document (including in another linked
+        // window) while the codec awaits filesystem I/O.
+        var versionAtWrite = document.Version;
         var snapshot = document.Buffer.Snapshot();
         await _session.Interruption
             .RunInterruptibleAsync(
                 token => _codec.WriteAsync(target, snapshot, token),
                 cancellationToken)
             .ConfigureAwait(false);
-        document.MarkSaved(target);
+
+        // The write itself succeeded. Mark the document clean only if no
+        // newer text/metadata has replaced the persisted snapshot.
+        document.MarkSnapshotSaved(versionAtWrite, snapshot, target);
         return true;
     }
 }
