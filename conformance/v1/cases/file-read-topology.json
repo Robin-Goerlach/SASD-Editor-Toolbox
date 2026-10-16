@@ -1,0 +1,678 @@
+{
+  "formatVersion": 1,
+  "contractVersion": "v1",
+  "cases": [
+    {
+      "id": "files.read-after-cursor-line-preserves-cursor",
+      "area": "file-read",
+      "initial": {
+        "documents": [
+          {
+            "id": "d",
+            "lines": [
+              {
+                "text": "before",
+                "flags": []
+              },
+              {
+                "text": "after",
+                "flags": []
+              }
+            ]
+          }
+        ],
+        "windows": [
+          {
+            "id": "w",
+            "documentId": "d",
+            "cursor": {
+              "line": 0,
+              "column": 3
+            },
+            "topLine": 0,
+            "leftColumn": 0
+          }
+        ],
+        "currentWindowId": "w",
+        "fileReadLines": [
+          {
+            "text": "inserted",
+            "flags": []
+          },
+          {
+            "text": "more",
+            "flags": []
+          }
+        ]
+      },
+      "operation": {
+        "id": "read_file",
+        "text": "fixture"
+      },
+      "expect": {
+        "documents": {
+          "d": {
+            "lines": [
+              {
+                "text": "before",
+                "flags": []
+              },
+              {
+                "text": "inserted",
+                "flags": []
+              },
+              {
+                "text": "more",
+                "flags": []
+              },
+              {
+                "text": "after",
+                "flags": []
+              }
+            ],
+            "isDirty": true,
+            "version": 1
+          }
+        },
+        "windows": {
+          "w": {
+            "cursor": {
+              "line": 0,
+              "column": 3
+            }
+          }
+        },
+        "undo": {
+          "count": 1
+        }
+      }
+    },
+    {
+      "id": "files.read-preserves-wrapped-but-strips-ephemeral-in-block",
+      "area": "file-read",
+      "initial": {
+        "documents": [
+          {
+            "id": "d",
+            "lines": [
+              {
+                "text": "initial",
+                "flags": []
+              }
+            ]
+          }
+        ],
+        "windows": [
+          {
+            "id": "w",
+            "documentId": "d",
+            "cursor": {
+              "line": 0,
+              "column": 4
+            },
+            "topLine": 0,
+            "leftColumn": 0
+          }
+        ],
+        "currentWindowId": "w",
+        "fileReadLines": [
+          {
+            "text": "soft",
+            "flags": [
+              "wrapped",
+              "in_block"
+            ]
+          },
+          {
+            "text": "hard",
+            "flags": [
+              "user_colored"
+            ]
+          }
+        ]
+      },
+      "operation": {
+        "id": "read_file",
+        "text": "fixture"
+      },
+      "expect": {
+        "documents": {
+          "d": {
+            "lines": [
+              {
+                "text": "initial",
+                "flags": []
+              },
+              {
+                "text": "soft",
+                "flags": [
+                  "wrapped"
+                ]
+              },
+              {
+                "text": "hard",
+                "flags": [
+                  "user_colored"
+                ]
+              }
+            ],
+            "isDirty": true,
+            "version": 1
+          }
+        },
+        "windows": {
+          "w": {
+            "cursor": {
+              "line": 0,
+              "column": 4
+            }
+          }
+        },
+        "undo": {
+          "count": 1
+        }
+      }
+    },
+    {
+      "id": "files.read-empty-input-is-observational",
+      "area": "file-read",
+      "initial": {
+        "documents": [
+          {
+            "id": "d",
+            "lines": [
+              {
+                "text": "a",
+                "flags": []
+              },
+              {
+                "text": "b",
+                "flags": []
+              }
+            ]
+          }
+        ],
+        "windows": [
+          {
+            "id": "w",
+            "documentId": "d",
+            "cursor": {
+              "line": 0,
+              "column": 2
+            },
+            "topLine": 0,
+            "leftColumn": 0
+          }
+        ],
+        "currentWindowId": "w",
+        "fileReadLines": []
+      },
+      "operation": {
+        "id": "read_file",
+        "text": "fixture"
+      },
+      "expect": {
+        "documents": {
+          "d": {
+            "lines": [
+              {
+                "text": "a",
+                "flags": []
+              },
+              {
+                "text": "b",
+                "flags": []
+              }
+            ],
+            "isDirty": false,
+            "version": 0
+          }
+        },
+        "windows": {
+          "w": {
+            "cursor": {
+              "line": 0,
+              "column": 2
+            }
+          }
+        },
+        "undo": {
+          "count": 0
+        }
+      }
+    },
+    {
+      "id": "files.read-appends-after-last-line",
+      "area": "file-read",
+      "initial": {
+        "documents": [
+          {
+            "id": "d",
+            "lines": [
+              {
+                "text": "alpha",
+                "flags": []
+              },
+              {
+                "text": "omega",
+                "flags": []
+              }
+            ]
+          }
+        ],
+        "windows": [
+          {
+            "id": "w",
+            "documentId": "d",
+            "cursor": {
+              "line": 1,
+              "column": 9
+            },
+            "topLine": 0,
+            "leftColumn": 0
+          }
+        ],
+        "currentWindowId": "w",
+        "fileReadLines": [
+          {
+            "text": "tail",
+            "flags": []
+          }
+        ]
+      },
+      "operation": {
+        "id": "read_file",
+        "text": "fixture"
+      },
+      "expect": {
+        "documents": {
+          "d": {
+            "lines": [
+              {
+                "text": "alpha",
+                "flags": []
+              },
+              {
+                "text": "omega",
+                "flags": []
+              },
+              {
+                "text": "tail",
+                "flags": []
+              }
+            ],
+            "isDirty": true,
+            "version": 1
+          }
+        },
+        "windows": {
+          "w": {
+            "cursor": {
+              "line": 1,
+              "column": 9
+            }
+          }
+        },
+        "undo": {
+          "count": 1
+        }
+      }
+    },
+    {
+      "id": "files.read-preserves-other-document-and-view",
+      "area": "file-read",
+      "initial": {
+        "documents": [
+          {
+            "id": "source",
+            "lines": [
+              {
+                "text": "one",
+                "flags": []
+              },
+              {
+                "text": "two",
+                "flags": []
+              }
+            ]
+          },
+          {
+            "id": "other",
+            "lines": [
+              {
+                "text": "untouched",
+                "flags": []
+              }
+            ]
+          }
+        ],
+        "windows": [
+          {
+            "id": "src",
+            "documentId": "source",
+            "cursor": {
+              "line": 0,
+              "column": 5
+            },
+            "topLine": 0,
+            "leftColumn": 0
+          },
+          {
+            "id": "other-view",
+            "documentId": "other",
+            "cursor": {
+              "line": 0,
+              "column": 4
+            },
+            "topLine": 0,
+            "leftColumn": 2
+          }
+        ],
+        "currentWindowId": "src",
+        "fileReadLines": [
+          {
+            "text": "import",
+            "flags": []
+          }
+        ]
+      },
+      "operation": {
+        "id": "read_file",
+        "text": "fixture"
+      },
+      "expect": {
+        "documents": {
+          "source": {
+            "lines": [
+              {
+                "text": "one",
+                "flags": []
+              },
+              {
+                "text": "import",
+                "flags": []
+              },
+              {
+                "text": "two",
+                "flags": []
+              }
+            ],
+            "isDirty": true,
+            "version": 1
+          },
+          "other": {
+            "lines": [
+              {
+                "text": "untouched",
+                "flags": []
+              }
+            ],
+            "isDirty": false,
+            "version": 0
+          }
+        },
+        "windows": {
+          "src": {
+            "cursor": {
+              "line": 0,
+              "column": 5
+            }
+          },
+          "other-view": {
+            "cursor": {
+              "line": 0,
+              "column": 4
+            },
+            "topLine": 0,
+            "leftColumn": 2
+          }
+        },
+        "currentWindowId": "src",
+        "undo": {
+          "count": 1
+        }
+      }
+    },
+    {
+      "id": "files.read-realigns-linked-view-block-and-markers",
+      "area": "file-read",
+      "initial": {
+        "documents": [
+          {
+            "id": "d",
+            "lines": [
+              {
+                "text": "zero",
+                "flags": []
+              },
+              {
+                "text": "one",
+                "flags": []
+              },
+              {
+                "text": "two",
+                "flags": []
+              }
+            ]
+          }
+        ],
+        "windows": [
+          {
+            "id": "src",
+            "documentId": "d",
+            "cursor": {
+              "line": 0,
+              "column": 4
+            },
+            "topLine": 0,
+            "leftColumn": 0
+          },
+          {
+            "id": "linked",
+            "documentId": "d",
+            "cursor": {
+              "line": 2,
+              "column": 6
+            },
+            "topLine": 1,
+            "leftColumn": 2
+          }
+        ],
+        "currentWindowId": "src",
+        "fileReadLines": [
+          {
+            "text": "in-a",
+            "flags": []
+          },
+          {
+            "text": "in-b",
+            "flags": []
+          }
+        ]
+      },
+      "operations": [
+        {
+          "id": "position_cursor",
+          "line": 2,
+          "column": 0
+        },
+        {
+          "id": "set_marker",
+          "number": 1
+        },
+        {
+          "id": "position_cursor",
+          "line": 1,
+          "column": 0
+        },
+        {
+          "id": "begin_block"
+        },
+        {
+          "id": "position_cursor",
+          "line": 2,
+          "column": 0
+        },
+        {
+          "id": "end_block"
+        },
+        {
+          "id": "position_cursor",
+          "line": 0,
+          "column": 4
+        },
+        {
+          "id": "read_file",
+          "text": "fixture"
+        },
+        {
+          "id": "jump_marker",
+          "number": 1
+        }
+      ],
+      "expect": {
+        "documents": {
+          "d": {
+            "lines": [
+              {
+                "text": "zero",
+                "flags": []
+              },
+              {
+                "text": "in-a",
+                "flags": []
+              },
+              {
+                "text": "in-b",
+                "flags": []
+              },
+              {
+                "text": "one",
+                "flags": [
+                  "in_block"
+                ]
+              },
+              {
+                "text": "two",
+                "flags": [
+                  "in_block"
+                ]
+              }
+            ],
+            "isDirty": true,
+            "version": 1
+          }
+        },
+        "windows": {
+          "src": {
+            "cursor": {
+              "line": 4,
+              "column": 4
+            }
+          },
+          "linked": {
+            "cursor": {
+              "line": 4,
+              "column": 6
+            },
+            "topLine": 3,
+            "leftColumn": 2
+          }
+        },
+        "blockState": {
+          "start": {
+            "documentId": "d",
+            "line": 3
+          },
+          "end": {
+            "documentId": "d",
+            "line": 4
+          },
+          "hidden": false,
+          "complete": true
+        },
+        "undo": {
+          "count": 1
+        }
+      }
+    },
+    {
+      "id": "files.read-one-undo-restores-original-text",
+      "area": "file-read",
+      "initial": {
+        "documents": [
+          {
+            "id": "d",
+            "lines": [
+              {
+                "text": "one",
+                "flags": []
+              },
+              {
+                "text": "two",
+                "flags": []
+              }
+            ]
+          }
+        ],
+        "windows": [
+          {
+            "id": "w",
+            "documentId": "d",
+            "cursor": {
+              "line": 0,
+              "column": 2
+            },
+            "topLine": 0,
+            "leftColumn": 0
+          }
+        ],
+        "currentWindowId": "w",
+        "fileReadLines": [
+          {
+            "text": "three",
+            "flags": []
+          }
+        ]
+      },
+      "operations": [
+        {
+          "id": "read_file",
+          "text": "fixture"
+        },
+        {
+          "id": "undo"
+        }
+      ],
+      "expect": {
+        "documents": {
+          "d": {
+            "lines": [
+              {
+                "text": "one",
+                "flags": []
+              },
+              {
+                "text": "two",
+                "flags": []
+              }
+            ],
+            "isDirty": false,
+            "version": 0
+          }
+        },
+        "windows": {
+          "w": {
+            "cursor": {
+              "line": 0,
+              "column": 2
+            }
+          }
+        },
+        "undo": {
+          "count": 0
+        }
+      }
+    }
+  ]
+}

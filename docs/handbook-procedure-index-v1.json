@@ -433,7 +433,11 @@
       "handbookPage": 173,
       "status": "implemented",
       "evidence": "docs/en/SEARCH-AND-FILE-COMMANDS.md",
-      "note": "Search, replace and compatible file read/write paths."
+      "note": "Search, replace and compatible file read/write paths.",
+      "conformanceCases": [
+        "files.read-after-cursor-line-preserves-cursor",
+        "files.read-preserves-wrapped-but-strips-ephemeral-in-block"
+      ]
     },
     {
       "name": "EditFileWrite",
@@ -645,7 +649,12 @@
       "handbookPage": 199,
       "status": "implemented",
       "evidence": "docs/en/SEARCH-AND-FILE-COMMANDS.md",
-      "note": "Search, replace and compatible file read/write paths."
+      "note": "Search, replace and compatible file read/write paths.",
+      "conformanceCases": [
+        "files.read-after-cursor-line-preserves-cursor",
+        "files.read-realigns-linked-view-block-and-markers",
+        "files.read-one-undo-restores-original-text"
+      ]
     },
     {
       "name": "EditReformat",

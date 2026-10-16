@@ -3,6 +3,7 @@ using Sasd.Editor.Commands;
 using Sasd.Editor.Document;
 using Sasd.Editor.Editing;
 using Sasd.Editor.Hooks;
+using Sasd.Editor.IO;
 using Sasd.Editor.Model;
 using Sasd.Editor.Rendering;
 using Sasd.Editor.Windows;
@@ -88,7 +89,16 @@ public sealed class PortableConformanceTests
     private static TestContext BuildInitialState(JsonElement initial)
     {
         var hooks = new RecordingHooks();
-        var session = new EditorSession(hooks);
+
+        // Portable file-read cases supply *decoded* lines, not a local
+        // filename. A deterministic codec translates those fixture lines
+        // into the same public ReadFile command used by real editor hosts.
+        // This tests file insertion without host filesystem dependencies
+        // or committing either language to the .NET byte codec.
+        IEditorFileCodec? fileCodec = initial.TryGetProperty("fileReadLines", out var decoded)
+            ? new FixtureReadCodec(decoded.EnumerateArray().Select(ParseLine).ToArray())
+            : null;
+        var session = new EditorSession(hooks, fileCodec);
         var documents = new Dictionary<string, EditorDocument>(StringComparer.Ordinal);
         var windows = new Dictionary<string, EditorWindow>(StringComparer.Ordinal);
 
@@ -299,6 +309,7 @@ public sealed class PortableConformanceTests
             // Search operations use the public semantic-command boundary.
             // In particular, text:"" for find_next has historical meaning;
             // it must not be converted to an omitted/null request argument.
+            "read_file" => EditorCommandId.ReadFile,
             "find_next" => EditorCommandId.FindNext,
             "find_again" => EditorCommandId.FindAgain,
             "replace_next" => EditorCommandId.ReplaceNext,
@@ -567,6 +578,27 @@ public sealed class PortableConformanceTests
         IReadOnlyDictionary<string, EditorDocument> Documents,
         IReadOnlyDictionary<string, EditorWindow> Windows,
         RecordingHooks Hooks);
+
+    /// <summary>
+    /// A storage-free, deterministic decoded-line provider for portable
+    /// semantic ReadFile tests. Byte-level 0x8D/CRLF compatibility remains
+    /// covered by the separate legacy codec regressions.
+    /// </summary>
+    private sealed class FixtureReadCodec(IReadOnlyList<EditorLineSnapshot> lines) : IEditorFileCodec
+    {
+        public ValueTask<IReadOnlyList<EditorLineSnapshot>> ReadAsync(
+            string path, CancellationToken cancellationToken = default)
+        {
+            cancellationToken.ThrowIfCancellationRequested();
+            return ValueTask.FromResult(lines);
+        }
+
+        public ValueTask WriteAsync(
+            string path,
+            IReadOnlyList<EditorLineSnapshot> snapshots,
+            CancellationToken cancellationToken = default) =>
+            throw new NotSupportedException("Portable file-read fixtures do not write files.");
+    }
 
     private sealed class RecordingHooks : IEditorHooks
     {

@@ -181,6 +181,10 @@ The shared `conformance/v1/cases/viewport-navigation.json` fixture now covers ei
 
 The `conformance/v1/cases/search-and-replace.json` manifest tests the historical empty-prompt repetition behavior, missing-pattern rejection, Find Again, empty-string replacements and Undo. It contributes focused cross-language evidence for `EditFind` and `EditReplace` without coupling conformance to the .NET search-service internals.
 
+## Portable file-read topology evidence
+
+`conformance/v1/cases/file-read-topology.json` adds cross-language semantic Read File tests based on decoded logical lines. The fixtures verify insertion placement, undo, per-document isolation, metadata and line-anchor realignment. They intentionally avoid filesystem paths and bytes; real FIRST-ED high-bit carriage-return decoding remains verified by dedicated .NET codec tests.
+
 ## V1 release gate
 
 The C#/.NET implementation now has executable coverage for the major FIRST-ED structural areas, including paragraph reformatting, whole-line block bulk topology, independent block endpoints and atomic multi-document undo/navigation restoration. The [handbook procedure/function index audit](HANDBOOK-PROCEDURE-INDEX-AUDIT.md) now records all 123 printed entries with first-pass classifications; its mapped behavior still requires a final regression-coverage and host-interface audit before calling V1 complete. MicroStar-specific demonstrations may ship as samples rather than core dependencies.

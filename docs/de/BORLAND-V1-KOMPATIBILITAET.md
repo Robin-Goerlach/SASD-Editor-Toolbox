@@ -180,6 +180,10 @@ Die portablen Fälle decken inzwischen Block-Begin/-End über mehrere Befehle, M
 
 `conformance/v1/cases/search-and-replace.json` prüft die historische Wiederholung bei leerem Suchprompt, die Ablehnung eines fehlenden Parameters, Find Again, Ersetzen durch leeren Text sowie Undo. Damit liegen zusätzliche sprachneutrale Belege für `EditFind` und `EditReplace` vor, ohne interne Details des C#-Suchdienstes festzuschreiben.
 
+## Portable Belege für die Dateieinfügung
+
+`conformance/v1/cases/file-read-topology.json` testet die sprachneutrale Read-File-Semantik mit bereits dekodierten logischen Zeilen. Die Fälle prüfen Einfügeposition, Undo, unabhängige Dokumente, Metadaten und Zeilen-Realignment. Dateisystem und Bytes werden absichtlich ausgeklammert; die historische High-Bit-CR-Dekodierung besitzt eigene .NET-Codec-Tests.
+
 ## V1-Abschlusskriterium
 
 Die C#/.NET-Implementierung deckt die großen strukturellen FIRST-ED-Bereiche inzwischen ausführbar ab, einschließlich Absatz-Neuformatierung, mehrzeiliger Block-Bulk-Topologie, unabhängiger Block-Endpunkte und atomarer Multi-Dokument-Undo-/Navigationswiederherstellung. Der [Handbuch-Prozeduren-/Funktionsindex-Audit](HANDBUCH-PROZEDURENINDEX-AUDIT.md) erfasst inzwischen alle 123 gedruckten Einträge mit ersten Klassifikationen; die zugeordneten Routinen benötigen vor V1 noch einen abschließenden Testabdeckungs- und Host-Audit. MicroStar-spezifische Demonstrationen können als Samples statt als Core-Abhängigkeiten geliefert werden.
