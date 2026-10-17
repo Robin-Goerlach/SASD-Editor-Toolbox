@@ -133,7 +133,7 @@ The handbook does not separately define whether markers or other non-block ancho
 - Replace-next may await a host confirmation after matching. It must not mutate or advance the cursor if the initiating view, cursor, document snapshot or remembered search has changed while the confirmation was pending; an explicitly cancelled confirmation performs no replacement. In the .NET reference, confirmation-time focus changes also reject replacement because the synchronous editing engine targets the active view. These are modern safe asynchronous-host policies, not claimed 1985 DOS timing semantics.
 - Literal search patterns and replacements operate **within a single logical line** in V1. Embedded CR or LF in a literal pattern or replacement is rejected before any cursor, remembered-search, buffer or Undo mutation; empty replacement remains valid. Multi-line replacement requires a future structural editing API that preserves line topology and anchored views.
 - Replace-next and replace-all are services above the buffer layer.
-- Hosts may intercept a replacement decision.
+- Hosts may intercept a replacement decision. The candidate supplied for confirmation contains the **actual matched document substring**, not the potentially differently cased literal search pattern; the original substring is captured before awaiting the host and revalidated before modification.
 
 ## 7. Undo and dirty state
 

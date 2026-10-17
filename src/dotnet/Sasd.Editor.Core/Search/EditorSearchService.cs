@@ -192,7 +192,15 @@ public sealed class EditorSearchService
         // host for permission to replace. The hook is awaited and can change
         // the selection, text or cursor in the meantime.
         var context = CaptureContext();
-        var candidate = new ReplaceCandidate(match.Value, pattern, replacement);
+
+        // A case-insensitive Find may match different spelling from the
+        // user's query ("alpha" can match "Alpha"). The host confirmation
+        // must display the exact text that would be removed, not the search
+        // pattern. Use the same captured snapshot that we validate again
+        // after the awaited hook to prevent stale-confirmation edits.
+        var actualMatch = context.Lines[match.Value.Line].Text.Substring(
+            match.Value.Column, pattern.Length);
+        var candidate = new ReplaceCandidate(match.Value, actualMatch, replacement);
         var decision = await _session.Hooks.BeforeReplaceAsync(_session, candidate, cancellationToken).ConfigureAwait(false);
         if (decision == ReplaceDecision.Cancel)
         {

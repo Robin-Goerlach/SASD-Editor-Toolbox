@@ -199,6 +199,10 @@ The search history is separate from the snapshot Undo journal. Restoring a docum
 
 Single-line literal Find/Replace rejects embedded CR/LF before modifying search state, document text or Undo. Direct service and semantic dispatcher tests distinguish the normal typed invalid-argument response from structural editing. Future multiline replacement remains outside V1 until a separate topology-safe contract is designed.
 
+## Replacement-confirmation accuracy
+
+Host hooks now receive the actual selected document substring instead of an input pattern whose letter case may differ; the candidate is extracted from the guarded search snapshot before asynchronous confirmation. Focused tests verify confirm, skip, cancel and no-match behavior across case-insensitive and whole-word searches.
+
 ## V1 release gate
 
 The C#/.NET implementation now has executable coverage for the major FIRST-ED structural areas, including paragraph reformatting, whole-line block bulk topology, independent block endpoints and atomic multi-document undo/navigation restoration. The [handbook procedure/function index audit](HANDBOOK-PROCEDURE-INDEX-AUDIT.md) now records all 123 printed entries with first-pass classifications; its mapped behavior still requires a final regression-coverage and host-interface audit before calling V1 complete. MicroStar-specific demonstrations may ship as samples rather than core dependencies.
