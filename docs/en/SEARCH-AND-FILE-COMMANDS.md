@@ -103,3 +103,5 @@ This is a documented V1 boundary, not a claim that all future editors are prohib
 ## Wrap-around boundary semantics
 
 `SearchOptions(WrapAround: true)` is an opt-in modern-host behavior. A forward scan first considers match **start positions** from the cursor onward, then wraps to earlier starting positions. An occurrence that begins before the original cursor and extends beyond it is still a valid wrapped match. The cursor divides candidate starting positions, **not** the text of an occurrence. `EditorSearchService` now uses one well-commented per-line matcher for synchronous and interruptible searches so their whole-word, case and boundary decisions cannot drift. This is an explicit modern option; historical FIRST-ED search still defaults to no wrap-around.
+
+The shared conformance runner now also accepts `find_next_with_options` to exercise these modern host settings independently from the default FIRST-ED semantic command. This preserves the historical key mapping while making opt-in wrap, whole-word and case settings portable for future C++/Java implementation lanes.

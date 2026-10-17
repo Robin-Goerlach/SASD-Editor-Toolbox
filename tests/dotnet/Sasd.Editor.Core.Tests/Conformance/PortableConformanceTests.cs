@@ -6,6 +6,7 @@ using Sasd.Editor.Hooks;
 using Sasd.Editor.IO;
 using Sasd.Editor.Model;
 using Sasd.Editor.Rendering;
+using Sasd.Editor.Search;
 using Sasd.Editor.Windows;
 using Xunit;
 
@@ -256,6 +257,23 @@ public sealed class PortableConformanceTests
                 context.Session.SetCurrentWindow(
                     context.Windows[RequireString(operation, "windowId")].WindowId);
                 return true;
+            case "find_next_with_options":
+            {
+                // The FIRST-ED semantic command uses its historical default
+                // options. This portable adapter instead addresses the public
+                // host-neutral search service so modern optional wrap/word
+                // behavior can be tested without changing the key map.
+                var flags = operation.GetProperty("searchOptions");
+                var options = new SearchOptions(
+                    CaseSensitive: flags.TryGetProperty("caseSensitive", out var sensitive)
+                        && sensitive.GetBoolean(),
+                    WholeWord: flags.TryGetProperty("wholeWord", out var whole)
+                        && whole.GetBoolean(),
+                    WrapAround: flags.TryGetProperty("wrapAround", out var wrap)
+                        && wrap.GetBoolean());
+                return await context.Session.Search.FindNextAsync(
+                    RequireString(operation, "text"), options) is not null;
+            }
             case "position_cursor":
             {
                 var window = context.Session.CurrentWindow;

@@ -53,3 +53,7 @@ Additional `search-and-replace.json` cases cover linked-view cursor independence
 Portable `search-and-replace.json` now also includes error cases for CR/LF in literal search patterns and replacements. Invalid input must return the same host-neutral invalid-argument code without changing cursor, document version, dirty state or Undo. This is a single-logical-line contract, separate from any future topology-aware multiline editor command.
 
 The `search-and-replace.json` suite also covers Find Again after document Undo, empty replacements that expose a new occurrence at the old cursor, Undo in an unrelated document and replacement within a selected block shown by linked windows. These are ordinary semantic-command sequences, independent of the .NET implementation's search-history object model.
+
+## Portable search options (modern host service)
+
+The conceptual `find_next_with_options` operation calls the language's **ordinary reusable search service**, rather than changing the historical FIRST-ED command mapping. Its `searchOptions` object accepts optional `caseSensitive`, `wholeWord` and `wrapAround` booleans (omission means false). The returned match is observed through the current view's cursor; no disk, UI prompt or C# API naming is required. A following `find_again` still uses the remembered options. New V1 fixtures use this adapter to prove that a wrapped match is selected by its *starting position*, even if the matched text extends across the cursor.

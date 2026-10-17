@@ -1818,6 +1818,466 @@
           "count": 1
         }
       }
+    },
+    {
+      "id": "search.wrap-returns-match-starting-before-cursor-crossing-it",
+      "area": "search-and-replace",
+      "initial": {
+        "documents": [
+          {
+            "id": "d",
+            "lines": [
+              {
+                "text": "xxABCDEF",
+                "flags": []
+              }
+            ]
+          }
+        ],
+        "windows": [
+          {
+            "id": "w",
+            "documentId": "d",
+            "cursor": {
+              "line": 0,
+              "column": 4
+            },
+            "topLine": 0,
+            "leftColumn": 0
+          }
+        ],
+        "currentWindowId": "w"
+      },
+      "operation": {
+        "id": "find_next_with_options",
+        "text": "ABCDEF",
+        "searchOptions": {
+          "caseSensitive": true,
+          "wrapAround": true
+        }
+      },
+      "expect": {
+        "documents": {
+          "d": {
+            "lines": [
+              {
+                "text": "xxABCDEF",
+                "flags": []
+              }
+            ],
+            "isDirty": false,
+            "version": 0
+          }
+        },
+        "windows": {
+          "w": {
+            "cursor": {
+              "line": 0,
+              "column": 2
+            }
+          }
+        },
+        "undo": {
+          "count": 0
+        }
+      }
+    },
+    {
+      "id": "search.wrap-match-start-zero-even-if-end-after-cursor",
+      "area": "search-and-replace",
+      "initial": {
+        "documents": [
+          {
+            "id": "d",
+            "lines": [
+              {
+                "text": "abcde",
+                "flags": []
+              }
+            ]
+          }
+        ],
+        "windows": [
+          {
+            "id": "w",
+            "documentId": "d",
+            "cursor": {
+              "line": 0,
+              "column": 2
+            },
+            "topLine": 0,
+            "leftColumn": 0
+          }
+        ],
+        "currentWindowId": "w"
+      },
+      "operation": {
+        "id": "find_next_with_options",
+        "text": "abcde",
+        "searchOptions": {
+          "wrapAround": true
+        }
+      },
+      "expect": {
+        "documents": {
+          "d": {
+            "lines": [
+              {
+                "text": "abcde",
+                "flags": []
+              }
+            ],
+            "isDirty": false,
+            "version": 0
+          }
+        },
+        "windows": {
+          "w": {
+            "cursor": {
+              "line": 0,
+              "column": 0
+            }
+          }
+        },
+        "undo": {
+          "count": 0
+        }
+      }
+    },
+    {
+      "id": "search.no-wrap-does-not-return-overlapping-earlier-hit",
+      "area": "search-and-replace",
+      "initial": {
+        "documents": [
+          {
+            "id": "d",
+            "lines": [
+              {
+                "text": "xxABCDEF",
+                "flags": []
+              }
+            ]
+          }
+        ],
+        "windows": [
+          {
+            "id": "w",
+            "documentId": "d",
+            "cursor": {
+              "line": 0,
+              "column": 4
+            },
+            "topLine": 0,
+            "leftColumn": 0
+          }
+        ],
+        "currentWindowId": "w"
+      },
+      "operation": {
+        "id": "find_next_with_options",
+        "text": "ABCDEF",
+        "searchOptions": {
+          "caseSensitive": true,
+          "wrapAround": false
+        },
+        "commandSucceeded": false
+      },
+      "expect": {
+        "commandSucceeded": false,
+        "documents": {
+          "d": {
+            "lines": [
+              {
+                "text": "xxABCDEF",
+                "flags": []
+              }
+            ],
+            "isDirty": false,
+            "version": 0
+          }
+        },
+        "windows": {
+          "w": {
+            "cursor": {
+              "line": 0,
+              "column": 4
+            }
+          }
+        },
+        "undo": {
+          "count": 0
+        }
+      }
+    },
+    {
+      "id": "search.wrap-still-honors-whole-word",
+      "area": "search-and-replace",
+      "initial": {
+        "documents": [
+          {
+            "id": "d",
+            "lines": [
+              {
+                "text": "xabc",
+                "flags": []
+              }
+            ]
+          }
+        ],
+        "windows": [
+          {
+            "id": "w",
+            "documentId": "d",
+            "cursor": {
+              "line": 0,
+              "column": 2
+            },
+            "topLine": 0,
+            "leftColumn": 0
+          }
+        ],
+        "currentWindowId": "w"
+      },
+      "operation": {
+        "id": "find_next_with_options",
+        "text": "abc",
+        "searchOptions": {
+          "wholeWord": true,
+          "wrapAround": true
+        },
+        "commandSucceeded": false
+      },
+      "expect": {
+        "commandSucceeded": false,
+        "documents": {
+          "d": {
+            "lines": [
+              {
+                "text": "xabc",
+                "flags": []
+              }
+            ],
+            "isDirty": false,
+            "version": 0
+          }
+        },
+        "windows": {
+          "w": {
+            "cursor": {
+              "line": 0,
+              "column": 2
+            }
+          }
+        },
+        "undo": {
+          "count": 0
+        }
+      }
+    },
+    {
+      "id": "search.wrap-valid-whole-word-overlaps-original-column",
+      "area": "search-and-replace",
+      "initial": {
+        "documents": [
+          {
+            "id": "d",
+            "lines": [
+              {
+                "text": " abcdef",
+                "flags": []
+              }
+            ]
+          }
+        ],
+        "windows": [
+          {
+            "id": "w",
+            "documentId": "d",
+            "cursor": {
+              "line": 0,
+              "column": 3
+            },
+            "topLine": 0,
+            "leftColumn": 0
+          }
+        ],
+        "currentWindowId": "w"
+      },
+      "operation": {
+        "id": "find_next_with_options",
+        "text": "abcdef",
+        "searchOptions": {
+          "wholeWord": true,
+          "wrapAround": true
+        }
+      },
+      "expect": {
+        "documents": {
+          "d": {
+            "lines": [
+              {
+                "text": " abcdef",
+                "flags": []
+              }
+            ],
+            "isDirty": false,
+            "version": 0
+          }
+        },
+        "windows": {
+          "w": {
+            "cursor": {
+              "line": 0,
+              "column": 1
+            }
+          }
+        },
+        "undo": {
+          "count": 0
+        }
+      }
+    },
+    {
+      "id": "search.wrap-visits-prior-lines-before-current-prefix",
+      "area": "search-and-replace",
+      "initial": {
+        "documents": [
+          {
+            "id": "d",
+            "lines": [
+              {
+                "text": "target",
+                "flags": []
+              },
+              {
+                "text": "xx target",
+                "flags": []
+              }
+            ]
+          }
+        ],
+        "windows": [
+          {
+            "id": "w",
+            "documentId": "d",
+            "cursor": {
+              "line": 1,
+              "column": 4
+            },
+            "topLine": 0,
+            "leftColumn": 0
+          }
+        ],
+        "currentWindowId": "w"
+      },
+      "operation": {
+        "id": "find_next_with_options",
+        "text": "target",
+        "searchOptions": {
+          "wrapAround": true
+        }
+      },
+      "expect": {
+        "documents": {
+          "d": {
+            "lines": [
+              {
+                "text": "target",
+                "flags": []
+              },
+              {
+                "text": "xx target",
+                "flags": []
+              }
+            ],
+            "isDirty": false,
+            "version": 0
+          }
+        },
+        "windows": {
+          "w": {
+            "cursor": {
+              "line": 0,
+              "column": 0
+            }
+          }
+        },
+        "undo": {
+          "count": 0
+        }
+      }
+    },
+    {
+      "id": "search.find-again-remembers-explicit-wrap-option",
+      "area": "search-and-replace",
+      "initial": {
+        "documents": [
+          {
+            "id": "d",
+            "lines": [
+              {
+                "text": "xxABCDEF",
+                "flags": []
+              }
+            ]
+          }
+        ],
+        "windows": [
+          {
+            "id": "w",
+            "documentId": "d",
+            "cursor": {
+              "line": 0,
+              "column": 0
+            },
+            "topLine": 0,
+            "leftColumn": 0
+          }
+        ],
+        "currentWindowId": "w"
+      },
+      "operations": [
+        {
+          "id": "find_next_with_options",
+          "text": "ABCDEF",
+          "searchOptions": {
+            "wrapAround": true
+          }
+        },
+        {
+          "id": "position_cursor",
+          "line": 0,
+          "column": 4
+        },
+        {
+          "id": "find_again"
+        }
+      ],
+      "expect": {
+        "documents": {
+          "d": {
+            "lines": [
+              {
+                "text": "xxABCDEF",
+                "flags": []
+              }
+            ],
+            "isDirty": false,
+            "version": 0
+          }
+        },
+        "windows": {
+          "w": {
+            "cursor": {
+              "line": 0,
+              "column": 2
+            }
+          }
+        },
+        "undo": {
+          "count": 0
+        }
+      }
     }
   ]
 }

@@ -106,3 +106,5 @@ Das ist eine dokumentierte V1-Grenze und kein Ausschluss zukünftiger mehrzeilig
 ## Suchgrenzen bei Wrap-around
 
 `SearchOptions(WrapAround: true)` ist eine ausdrücklich aktivierte moderne Host-Option. Die Vorwärtssuche prüft zunächst Treffer-**Startpositionen** ab dem Cursor und nach dem Umbruch die davorliegenden Startpositionen. Beginnt ein Treffer vor dem ursprünglichen Cursor und reicht mit seinem Text darüber hinaus, ist er dennoch ein gültiger Treffer nach dem Umbruch. Die Cursorposition trennt also mögliche Trefferanfänge, **nicht** die Textbereiche. Synchrone und unterbrechbare Suche verwenden jetzt dieselbe kommentierte Hilfsfunktion, damit Groß-/Kleinschreibung, Wortgrenzen und Wrap-around übereinstimmen. Für FIRST-ED bleibt der Umbruch standardmäßig deaktiviert.
+
+Der gemeinsame Conformance-Adapter kennt nun `find_next_with_options`, um diese modernen Host-Optionen getrennt vom FIRST-ED-Standardbefehl zu testen. So bleibt die historische Tastaturbelegung unangetastet, während optionales Wrap-around, Wortgrenzen und Groß-/Kleinschreibung für spätere C++-/Java-Implementierungen sprachneutral prüfbar werden.

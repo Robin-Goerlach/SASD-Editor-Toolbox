@@ -53,6 +53,8 @@ Four additional portable rejection cases protect the single-logical-line search/
 
 Portable command-sequence regression evidence now includes Find Again after Undo and empty replacements, unrelated-document Undo isolation and replacement inside visible blocks with linked views. The shared fixtures specify observable behavior, while the .NET-only tests cover asynchronous host interleavings.
 
+Seven additional portable fixtures in `search-and-replace.json` exercise the modern opt-in wrap-around search service via `find_next_with_options`. This remains separate from historical FIRST-ED's default non-wrapping search. Tests check match-start boundaries, whole-word filtering, preceding-line order and remembering options across Find Again.
+
 ## Next review and acceptance criteria
 
 For each *needs-review* row, examine its individual handbook description, check the existing architecture and tests, add focused regression coverage for genuine behavior gaps, then independently implement only those gaps. Revisit the conceptual *implemented* mappings and identify any missing tests without fabricating Pascal-shaped APIs. Keep the English and German audit, compatibility matrix, and any affected shared specification/conformance cases synchronized.

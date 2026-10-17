@@ -53,6 +53,8 @@ Vier neue portable Ablehnungsfälle sichern die einzeilige Such-/Ersetzungsgrenz
 
 Portable Befehlsfolgen prüfen jetzt Find Again nach Undo und leerer Ersetzung, Undo-Isolation zwischen Dokumenten sowie Ersetzung innerhalb markierter Blöcke mit verknüpften Fenstern. Diese gemeinsamen Tests beschreiben nur beobachtbares Verhalten; asynchrone Host-Zwischenfälle bleiben zusätzlich durch .NET-Tests abgesichert.
 
+Sieben weitere portable Testfälle in `search-and-replace.json` prüfen das optionale Wrap-around des modernen Suchdienstes über `find_next_with_options`. Die historische FIRST-ED-Suche bleibt standardmäßig ohne Umbruch. Getestet werden Trefferstartgrenzen, ganze Wörter, die Suchreihenfolge über mehrere Zeilen und die für Find Again gespeicherten Optionen.
+
 ## Nächste Schritte und Abschlusskriterien
 
 Jeden offenen Eintrag anhand seiner eigenen Handbuchbeschreibung prüfen, die bereits vorhandenen Tests abgleichen und nur bei echten Verhaltenslücken unabhängigen Code samt Regressionstests ergänzen. Auch die als implementiert eingestuften Zuordnungen brauchen einen Randfall-/Testabgleich; künstliche Pascal-APIs sind ausdrücklich unerwünscht. Inventarliste, deutsche/englische Audit-Dokumente, Matrix und nötigenfalls sprachneutralen Vertrag/Conformance-Fälle synchron halten.
