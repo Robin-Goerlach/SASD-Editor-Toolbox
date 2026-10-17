@@ -14,7 +14,7 @@ namespace Sasd.Editor.Core.Tests;
 public sealed class SearchUndoConsistencyTests
 {
     [Fact]
-    public void FindAgain_AfterDeletingMatchedTextAtSameColumn_FindsNewlyExposedHit()
+    public async Task FindAgain_AfterDeletingMatchedTextAtSameColumn_FindsNewlyExposedHit()
     {
         var session = new EditorSession();
         var window = session.CreateDocument("aa");
@@ -22,7 +22,7 @@ public sealed class SearchUndoConsistencyTests
 
         // Empty replacement leaves the cursor at the old match column, but
         // the first remaining 'a' is now a different occurrence.
-        Assert.True(session.Search.ReplaceNextAsync("a", "").AsTask().GetAwaiter().GetResult());
+        Assert.True(await session.Search.ReplaceNextAsync("a", ""));
         Assert.Equal("a", window.Document.Buffer.GetLine(0).Text);
         Assert.Equal(new TextPosition(0, 0), window.Cursor);
 
@@ -81,6 +81,28 @@ public sealed class SearchUndoConsistencyTests
         session.SetCurrentWindow(first.WindowId);
         first.Cursor = new TextPosition(0, 0);
         Assert.Equal(new TextPosition(0, 0), session.Search.FindAgain());
+        Assert.Equal("a", session.Search.LastPattern);
+    }
+
+    [Fact]
+    public void FindAgain_IdenticalTextAfterStructuralInsertionDoesNotSkipNewOccurrence()
+    {
+        var session = new EditorSession();
+        var original = session.CreateDocument("a\na");
+        original.Cursor = new TextPosition(1, 0);
+        Assert.Equal(new TextPosition(1, 0), session.Search.FindNext("a"));
+
+        var linked = session.LinkWindow(original);
+        linked.Cursor = new TextPosition(0, 0);
+        session.Engine.InsertNewLine(); // Splits first line into "" followed by "a".
+
+        // The logical line now occupying the remembered index is another
+        // identical "a". Text comparison alone cannot distinguish the two.
+        session.SetCurrentWindow(original.WindowId);
+        original.Cursor = new TextPosition(1, 0);
+        Assert.Equal("a", original.Document.Buffer.GetLine(1).Text);
+
+        Assert.Equal(new TextPosition(1, 0), session.Search.FindAgain());
         Assert.Equal("a", session.Search.LastPattern);
     }
 

@@ -19,6 +19,7 @@ public sealed class EditorSearchService
     // A remembered coordinate is not sufficient evidence that the same
     // match still exists after editing or restoring a previous text snapshot.
     private string? _lastMatchLineText;
+    private long? _lastMatchDocumentVersion;
     private Guid? _lastDocumentId;
     private long _searchRevision;
 
@@ -442,9 +443,10 @@ public sealed class EditorSearchService
 
     /// <summary>
     /// A previous search hit may be skipped only if the exact logical line
-    /// that supplied it still exists unchanged at its old position. Keeping
-    /// just the numeric offset would lose the next match after an in-place
-    /// deletion, especially when replacing the match with an empty string.
+    /// that supplied it still exists unchanged at its old position and version.
+    /// Keeping just the numeric offset or even the line text would lose a
+    /// different identical match after a structural insertion at that index,
+    /// especially when replacing a hit with an empty string.
     /// </summary>
     private bool CanAdvancePastPreviousMatch(EditorDocument document, TextPosition cursor)
     {
@@ -452,6 +454,7 @@ public sealed class EditorSearchService
             || !_lastMatch.HasValue
             || _lastMatch.Value != cursor
             || _lastMatchLineText is null
+            || _lastMatchDocumentVersion != document.Version
             || cursor.Line < 0
             || cursor.Line >= document.Buffer.LineCount)
         {
@@ -474,6 +477,7 @@ public sealed class EditorSearchService
         _lastMatchLineText = match is null
             ? null
             : document.Buffer.GetLine(match.Value.Line).Text;
+        _lastMatchDocumentVersion = match is null ? null : document.Version;
         _lastDocumentId = document.DocumentId;
         _searchRevision++;
     }
@@ -491,6 +495,7 @@ public sealed class EditorSearchService
         {
             _lastMatch = null;
             _lastMatchLineText = null;
+            _lastMatchDocumentVersion = null;
         }
 
         _searchRevision++;
