@@ -377,20 +377,10 @@ public sealed class EditorSearchService
                 ? Math.Clamp(stopColumnExclusive.Value, 0, text.Length)
                 : text.Length;
 
-            while (column <= limit - pattern.Length)
+            var found = FindInLine(text, column, limit, pattern, options, comparison);
+            if (found is not null)
             {
-                var index = text.IndexOf(pattern, column, comparison);
-                if (index < 0 || index >= limit)
-                {
-                    break;
-                }
-
-                if (!options.WholeWord || IsWholeWord(text, index, pattern.Length))
-                {
-                    return new TextPosition(lineIndex, index);
-                }
-
-                column = index + 1;
+                return new TextPosition(lineIndex, found.Value);
             }
         }
 
@@ -423,21 +413,52 @@ public sealed class EditorSearchService
                 ? Math.Clamp(stopColumnExclusive.Value, 0, text.Length)
                 : text.Length;
 
-            while (column <= limit - pattern.Length)
+            var found = FindInLine(text, column, limit, pattern, options, comparison);
+            if (found is not null)
             {
-                var index = text.IndexOf(pattern, column, comparison);
-                if (index < 0 || index >= limit)
-                {
-                    break;
-                }
-
-                if (!options.WholeWord || IsWholeWord(text, index, pattern.Length))
-                {
-                    return new TextPosition(lineIndex, index);
-                }
-
-                column = index + 1;
+                return new TextPosition(lineIndex, found.Value);
             }
+        }
+
+        return null;
+    }
+
+    /// <summary>
+    /// Searches for match *starting offsets* within one logical line.
+    /// </summary>
+    /// <remarks>
+    /// For the wrap-around prefix, the exclusive limit is the original cursor
+    /// column. A match may start before that column and end after it: the
+    /// boundary partitions candidate START positions, not character spans.
+    /// Checking "limit - pattern.Length" would drop valid overlapping matches.
+    /// Sharing this helper keeps sync Find and checkpointed async Find aligned.
+    /// </remarks>
+    private static int? FindInLine(
+        string text,
+        int startColumn,
+        int stopStartExclusive,
+        string pattern,
+        SearchOptions options,
+        StringComparison comparison)
+    {
+        var column = startColumn;
+        var lastValidStart = text.Length - pattern.Length;
+
+        while (column < stopStartExclusive && column <= lastValidStart)
+        {
+            var index = text.IndexOf(pattern, column, comparison);
+            if (index < 0 || index >= stopStartExclusive)
+            {
+                return null;
+            }
+
+            if (!options.WholeWord || IsWholeWord(text, index, pattern.Length))
+            {
+                return index;
+            }
+
+            // A rejected whole-word candidate cannot exclude a later one.
+            column = index + 1;
         }
 
         return null;
