@@ -194,6 +194,10 @@ Unterbrechbare Suchvorgänge behalten ihre ursprüngliche Ansicht und einen unve
 
 Der Suchverlauf ist unabhängig vom Snapshot-Undo. Beim Wiederherstellen eines Dokuments wird dessen veralteter Trefferanker gelöscht, während Suchmuster und Optionen erhalten bleiben. Ein unveränderter Treffer darf bei der Wiederholung weiterhin übersprungen werden; eine veränderte Zeile darf keinen neu entstandenen Treffer verdecken. Undo macht außerdem noch laufende asynchrone Suchvorgänge ungültig. Zusätzliche gezielte .NET-Regressionstests sichern diese moderne Zustandsregel ab.
 
+## Validierung logischer Zeilengrenzen
+
+Die einzeilige wörtliche Suche und Ersetzung lehnt eingebettetes CR/LF vor jeder Änderung an Suchzustand, Text oder Undo ab. Direktaufrufe und semantische Dispatcher-Tests prüfen den typisierten Argumentfehler. Mehrzeilige Ersetzung bleibt außerhalb von V1, bis dafür ein eigener topologiesicherer Vertrag entworfen wurde.
+
 ## V1-Abschlusskriterium
 
 Die C#/.NET-Implementierung deckt die großen strukturellen FIRST-ED-Bereiche inzwischen ausführbar ab, einschließlich Absatz-Neuformatierung, mehrzeiliger Block-Bulk-Topologie, unabhängiger Block-Endpunkte und atomarer Multi-Dokument-Undo-/Navigationswiederherstellung. Der [Handbuch-Prozeduren-/Funktionsindex-Audit](HANDBUCH-PROZEDURENINDEX-AUDIT.md) erfasst inzwischen alle 123 gedruckten Einträge mit ersten Klassifikationen; die zugeordneten Routinen benötigen vor V1 noch einen abschließenden Testabdeckungs- und Host-Audit. MicroStar-spezifische Demonstrationen können als Samples statt als Core-Abhängigkeiten geliefert werden.

@@ -169,6 +169,7 @@ public sealed class EditorSearchService
     {
         ArgumentNullException.ThrowIfNull(replacement);
         ValidatePattern(pattern);
+        ValidateSingleLineReplacement(replacement);
 
         // Find can yield to the host before the replacement confirmation even
         // starts. Retain that initiating view, not the potentially different
@@ -222,6 +223,7 @@ public sealed class EditorSearchService
     {
         ValidatePattern(pattern);
         ArgumentNullException.ThrowIfNull(replacement);
+        ValidateSingleLineReplacement(replacement);
         options ??= new SearchOptions();
 
         var window = _session.CurrentWindow;
@@ -536,13 +538,44 @@ public sealed class EditorSearchService
         IReadOnlyList<EditorLineSnapshot> Lines,
         long SearchRevision);
 
+    /// <summary>
+    /// FIRST-ED literal search works on logical lines. Cross-line patterns
+    /// would require a separate multi-line search contract and position type.
+    /// Reject embedded physical line breaks rather than remembering a pattern
+    /// which can never be represented by a single-line match.
+    /// </summary>
     private static void ValidatePattern(string pattern)
     {
         if (string.IsNullOrEmpty(pattern))
         {
             throw new ArgumentException("Search pattern cannot be empty.", nameof(pattern));
         }
+
+        if (ContainsLineBreak(pattern))
+        {
+            throw new ArgumentException(
+                "Literal search does not support patterns spanning logical lines.", nameof(pattern));
+        }
     }
+
+    /// <summary>
+    /// The current replacement primitives replace a range *inside one line*.
+    /// If CR/LF were inserted directly into that line's text, the buffer,
+    /// viewport, file storage and marker topology would disagree about where
+    /// line boundaries lie. Reject before searching or creating Undo state.
+    /// Multi-line replacement can later use a dedicated structural API.
+    /// </summary>
+    private static void ValidateSingleLineReplacement(string replacement)
+    {
+        if (ContainsLineBreak(replacement))
+        {
+            throw new ArgumentException(
+                "Single-line replacement cannot contain CR or LF.", nameof(replacement));
+        }
+    }
+
+    private static bool ContainsLineBreak(string value) =>
+        value.Contains('\r') || value.Contains('\n');
 
     private static bool IsWholeWord(string text, int index, int length)
     {

@@ -49,6 +49,8 @@ Die portablen Fälle in `file-read-topology.json` verknüpfen `EditFileRead` und
 
 Acht weitere portable Such-/Ersetzungstests sichern die standardmäßig groß-/kleinschreibungsunabhängige Suche, Find Again ohne automatischen Umbruch, unabhängige verknüpfte Ansichten, Dokumentwechsel zwischen normalen Befehlen, sehr große virtuelle Spalten und Find Again nach einer Ersetzung ab. Die separaten asynchronen Host-Regressionstests des .NET-Kerns bleiben dafür zusätzlich notwendig.
 
+Vier neue portable Ablehnungsfälle sichern die einzeilige Such-/Ersetzungsgrenze ab. CR und LF in Mustern beziehungsweise Ersatztexten müssen ohne Veränderung von Cursor, Text oder Undo abgelehnt werden.
+
 ## Nächste Schritte und Abschlusskriterien
 
 Jeden offenen Eintrag anhand seiner eigenen Handbuchbeschreibung prüfen, die bereits vorhandenen Tests abgleichen und nur bei echten Verhaltenslücken unabhängigen Code samt Regressionstests ergänzen. Auch die als implementiert eingestuften Zuordnungen brauchen einen Randfall-/Testabgleich; künstliche Pascal-APIs sind ausdrücklich unerwünscht. Inventarliste, deutsche/englische Audit-Dokumente, Matrix und nötigenfalls sprachneutralen Vertrag/Conformance-Fälle synchron halten.

@@ -49,6 +49,8 @@ The portable `file-read-topology.json` fixtures now trace `EditFileRead` and `Ed
 
 Eight additional portable search/replace cases check the case-insensitive default, non-wrapping Find Again, isolated linked views, document changes between ordinary commands, very large virtual columns and subsequent Find Again after replacement. These augment, but do not replace, the separate .NET asynchronous-host interleaving tests.
 
+Four additional portable rejection cases protect the single-logical-line search/replace boundary: CR and LF in patterns/replacements must be rejected without text, cursor or Undo side effects.
+
 ## Next review and acceptance criteria
 
 For each *needs-review* row, examine its individual handbook description, check the existing architecture and tests, add focused regression coverage for genuine behavior gaps, then independently implement only those gaps. Revisit the conceptual *implemented* mappings and identify any missing tests without fabricating Pascal-shaped APIs. Keep the English and German audit, compatibility matrix, and any affected shared specification/conformance cases synchronized.

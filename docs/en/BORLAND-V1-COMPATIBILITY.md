@@ -195,6 +195,10 @@ Interruptible Find/Find Again now retain their initiating view and immutable doc
 
 The search history is separate from the snapshot Undo journal. Restoring a document discards its stale remembered match anchor but preserves the remembered search pattern and options. An unchanged prior match may still be skipped on ordinary repeats; a changed line cannot suppress a newly exposed occurrence. The same undo boundary invalidates pending asynchronous searches. Focused .NET regression cases verify these modern state-consistency rules, in addition to portable ordinary-command fixtures.
 
+## Logical-line search/replace validation
+
+Single-line literal Find/Replace rejects embedded CR/LF before modifying search state, document text or Undo. Direct service and semantic dispatcher tests distinguish the normal typed invalid-argument response from structural editing. Future multiline replacement remains outside V1 until a separate topology-safe contract is designed.
+
 ## V1 release gate
 
 The C#/.NET implementation now has executable coverage for the major FIRST-ED structural areas, including paragraph reformatting, whole-line block bulk topology, independent block endpoints and atomic multi-document undo/navigation restoration. The [handbook procedure/function index audit](HANDBOOK-PROCEDURE-INDEX-AUDIT.md) now records all 123 printed entries with first-pass classifications; its mapped behavior still requires a final regression-coverage and host-interface audit before calling V1 complete. MicroStar-specific demonstrations may ship as samples rather than core dependencies.
