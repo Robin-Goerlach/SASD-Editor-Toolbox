@@ -123,7 +123,9 @@ The handbook does not separately define whether markers or other non-block ancho
 - Literal forward search is required.
 - The compatibility search remembers the most recent non-empty pattern for a Find Again operation.
 - Historical EditFind with an explicitly empty input repeats the remembered pattern and options. This is distinct from a missing/null semantic-command argument, which is invalid. With no prior pattern, empty Find returns no match without document mutation.
-- Find Again resumes after the previous match when the cursor is still positioned on that match.
+- Find Again resumes after the previous match when the cursor is still positioned on that match **and its original logical line text still exists unchanged**. A stale coordinate after text editing does not authorize skipping a new occurrence at the same position.
+- Undo restores document contents and navigation/marker/block state, not the remembered search pattern or its options. It invalidates the last-match anchor for restored documents, so a subsequent Find Again starts at the current cursor (without blindly skipping a match left at the same coordinates). A document restoration also supersedes in-flight asynchronous search results.
+
 - FIRST-ED-compatible forward search does not wrap by default. Wrap-around remains an explicit option for hosts that want it.
 - Case-sensitive, case-insensitive and whole-word behavior are explicit options.
 - Portable case-insensitive literal examples guarantee ASCII case folding; locale-specific Unicode case folding is implementation policy until separately specified and cross-language verified.

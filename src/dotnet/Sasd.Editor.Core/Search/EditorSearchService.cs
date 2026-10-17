@@ -16,6 +16,9 @@ public sealed class EditorSearchService
     private string? _lastPattern;
     private SearchOptions _lastOptions = new();
     private TextPosition? _lastMatch;
+    // A remembered coordinate is not sufficient evidence that the same
+    // match still exists after editing or restoring a previous text snapshot.
+    private string? _lastMatchLineText;
     private Guid? _lastDocumentId;
     private long _searchRevision;
 
@@ -42,7 +45,7 @@ public sealed class EditorSearchService
         var window = _session.CurrentWindow;
         var start = window.Cursor;
         var match = FindFrom(start, pattern, options);
-        Remember(pattern, options, match, window.Document.DocumentId);
+        Remember(pattern, options, match, window.Document);
 
         if (match is not null)
         {
@@ -83,7 +86,7 @@ public sealed class EditorSearchService
         // document or perform another search while this scan is suspended.
         // Never apply an obsolete result to the newly selected window.
         EnsureContextUnchanged(context);
-        Remember(pattern, options, match, context.Document.DocumentId);
+        Remember(pattern, options, match, context.Document);
         if (match is not null)
         {
             context.Window.Cursor = match.Value;
@@ -106,15 +109,13 @@ public sealed class EditorSearchService
         var window = _session.CurrentWindow;
         var start = window.Cursor;
 
-        if (_lastDocumentId == window.Document.DocumentId
-            && _lastMatch.HasValue
-            && _lastMatch.Value == window.Cursor)
+        if (CanAdvancePastPreviousMatch(window.Document, window.Cursor))
         {
             start = AdvancePastMatch(window.Document, window.Cursor, _lastPattern.Length);
         }
 
         var match = FindFrom(start, _lastPattern, _lastOptions);
-        Remember(_lastPattern, _lastOptions, match, window.Document.DocumentId);
+        Remember(_lastPattern, _lastOptions, match, window.Document);
 
         if (match is not null)
         {
@@ -139,9 +140,7 @@ public sealed class EditorSearchService
         var pattern = _lastPattern;
         var options = _lastOptions;
         var start = context.Cursor;
-        if (_lastDocumentId == context.Document.DocumentId
-            && _lastMatch.HasValue
-            && _lastMatch.Value == context.Cursor)
+        if (CanAdvancePastPreviousMatch(context.Document, context.Cursor))
         {
             start = AdvancePastMatch(context.Document, context.Cursor, pattern.Length);
         }
@@ -152,7 +151,7 @@ public sealed class EditorSearchService
         // Repeated search must not overwrite a newer Find/Find Again request
         // that completed while this one was waiting at a host checkpoint.
         EnsureContextUnchanged(context);
-        Remember(pattern, options, match, context.Document.DocumentId);
+        Remember(pattern, options, match, context.Document);
         if (match is not null)
         {
             context.Window.Cursor = match.Value;
@@ -441,12 +440,59 @@ public sealed class EditorSearchService
         return null;
     }
 
-    private void Remember(string pattern, SearchOptions options, TextPosition? match, Guid documentId)
+    /// <summary>
+    /// A previous search hit may be skipped only if the exact logical line
+    /// that supplied it still exists unchanged at its old position. Keeping
+    /// just the numeric offset would lose the next match after an in-place
+    /// deletion, especially when replacing the match with an empty string.
+    /// </summary>
+    private bool CanAdvancePastPreviousMatch(EditorDocument document, TextPosition cursor)
+    {
+        if (_lastDocumentId != document.DocumentId
+            || !_lastMatch.HasValue
+            || _lastMatch.Value != cursor
+            || _lastMatchLineText is null
+            || cursor.Line < 0
+            || cursor.Line >= document.Buffer.LineCount)
+        {
+            return false;
+        }
+
+        // Only text, not user-color or block-presentation flags, determines
+        // whether the previous literal match remains a valid search anchor.
+        return string.Equals(
+            document.Buffer.GetLine(cursor.Line).Text,
+            _lastMatchLineText,
+            StringComparison.Ordinal);
+    }
+
+    private void Remember(string pattern, SearchOptions options, TextPosition? match, EditorDocument document)
     {
         _lastPattern = pattern;
         _lastOptions = options;
         _lastMatch = match;
-        _lastDocumentId = documentId;
+        _lastMatchLineText = match is null
+            ? null
+            : document.Buffer.GetLine(match.Value.Line).Text;
+        _lastDocumentId = document.DocumentId;
+        _searchRevision++;
+    }
+
+    /// <summary>
+    /// Undo restores a historical document snapshot, not the search-command
+    /// journal. Keep the user's last pattern/options but discard the old hit
+    /// coordinate whenever that stream is restored. Incrementing the revision
+    /// also prevents an in-flight async Find from overwriting restored state.
+    /// </summary>
+    internal void OnDocumentsRestored(IReadOnlySet<Guid> restoredDocumentIds)
+    {
+        if (_lastDocumentId is Guid documentId
+            && restoredDocumentIds.Contains(documentId))
+        {
+            _lastMatch = null;
+            _lastMatchLineText = null;
+        }
+
         _searchRevision++;
     }
 

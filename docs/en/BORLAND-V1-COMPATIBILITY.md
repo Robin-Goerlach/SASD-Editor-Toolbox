@@ -191,6 +191,10 @@ Portable case-insensitive literals use ASCII examples; locale-dependent Unicode 
 
 Interruptible Find/Find Again now retain their initiating view and immutable document snapshot across host checkpoints; stale searches cannot overwrite later editor navigation or the most recently completed search. Awaited replace confirmation is likewise guarded against stale matches and active-window changes. These modern defensive rules are regression-tested separately from historical search matching semantics.
 
+## Find Again / Undo interaction
+
+The search history is separate from the snapshot Undo journal. Restoring a document discards its stale remembered match anchor but preserves the remembered search pattern and options. An unchanged prior match may still be skipped on ordinary repeats; a changed line cannot suppress a newly exposed occurrence. The same undo boundary invalidates pending asynchronous searches. Focused .NET regression cases verify these modern state-consistency rules, in addition to portable ordinary-command fixtures.
+
 ## V1 release gate
 
 The C#/.NET implementation now has executable coverage for the major FIRST-ED structural areas, including paragraph reformatting, whole-line block bulk topology, independent block endpoints and atomic multi-document undo/navigation restoration. The [handbook procedure/function index audit](HANDBOOK-PROCEDURE-INDEX-AUDIT.md) now records all 123 printed entries with first-pass classifications; its mapped behavior still requires a final regression-coverage and host-interface audit before calling V1 complete. MicroStar-specific demonstrations may ship as samples rather than core dependencies.

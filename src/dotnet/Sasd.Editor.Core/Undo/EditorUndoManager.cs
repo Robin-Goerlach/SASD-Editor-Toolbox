@@ -268,6 +268,12 @@ public sealed class EditorUndoManager
         NormalizeMarkers(session);
         NormalizeBlockState(session);
         session.RefreshBlockFlags();
+
+        // Undo restores text/anchors, but must not rewind the independent
+        // remembered search pattern. Discard any coordinate tied to the
+        // restored document and invalidate asynchronous searches that started
+        // before this history operation.
+        session.Search.OnDocumentsRestored(restoredDocumentIds);
         return true;
     }
 
