@@ -41,7 +41,12 @@ public sealed class FileTextStorage(Encoding? encoding = null) : ITextStorage
         var versionAtWrite = document.Version;
         var snapshot = document.Buffer.Snapshot();
         var content = string.Join(document.NewLine, snapshot.Select(static line => line.Text));
-        await File.WriteAllTextAsync(target, content, _encoding, cancellationToken).ConfigureAwait(false);
+        // Publish only a fully encoded and written snapshot. An interrupted
+        // staging write leaves the old destination and document identity alone.
+        await StagedFileWriter.WriteAsync(
+            target,
+            (temporaryPath, token) => File.WriteAllTextAsync(temporaryPath, content, _encoding, token),
+            cancellationToken).ConfigureAwait(false);
         document.MarkSnapshotSaved(versionAtWrite, snapshot, target);
     }
 

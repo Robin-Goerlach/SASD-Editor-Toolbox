@@ -66,7 +66,7 @@ Compatibility Read/Write and modern Save now execute codec I/O through `EditorIn
 
 For Read File, decoded lines are not inserted until the codec operation has completed and a final interruption checkpoint succeeds. A Ctrl-U during the read therefore cancels the codec token and leaves the current document, cursor, dirty flag and undo stack untouched.
 
-Write/Save pass the same linked token to the codec. A cancelled external file write can still be partially visible at the filesystem/provider level; editor document state is updated only after successful completion. Save does not clear dirty state if the write is interrupted.
+Write/Save pass the same linked token to the codec. The built-in legacy codec now stages the complete file in the destination directory and publishes it only after a successful, non-cancelled staging write. Therefore cancellation or failure **before publication** leaves existing destination bytes intact. Custom external codecs may still expose partial files and must document their own persistence guarantees. Save does not clear dirty state if the write is interrupted.
 
 Semantic Find/Find Again use the interruptible search path. Scanning checkpoints once per logical line and only commits the cursor and remembered-search state after a successful scan. Direct synchronous service methods remain available for applications that deliberately want an in-process non-interruptible call.
 
@@ -109,3 +109,9 @@ The shared conformance runner now also accepts `find_next_with_options` to exerc
 ## Replacement confirmation displays actual text
 
 For an opt-in case-insensitive search, the literal input `alpha` may match the differently capitalized document text `Alpha`. `IEditorHooks.BeforeReplaceAsync` now receives `ReplaceCandidate.ExistingText = "Alpha"` rather than the user's search pattern. The displayed candidate is cut from the **same captured document snapshot** that must still match after the awaited confirmation. This keeps replace/skip/cancel decisions grounded in what would actually change on screen, with no new UI dependency in the core.
+
+## Staged file writes and cancellation
+
+Both built-in file writers now share an internal `StagedFileWriter`. The legacy writer encodes its complete 8-bit payload (including `0x8D` Wrapped boundaries) before staging; the modern UTF-8 provider serializes its captured snapshot using the document's newline convention. Each writes to a unique temporary file beside the target, checks cancellation after staging, then publishes with a same-directory overwrite rename. Failure or cancellation during staging preserves the previously saved bytes, and cleanup does not mask the original error. The final rename has no cancellable partial-publish window.
+
+This is a **modern best-effort replacement safety policy**, not a claim about 1985 DOS write behavior or guaranteed crash durability. Filesystem-specific rename atomicity, ACL/metadata preservation, multi-writer ordering and explicit flush/fsync are separate concerns. Custom `IEditorFileCodec` implementations may have different guarantees. Tests inject a controllable staging writer to prove cancellation and I/O failure leave the destination untouched without relying on timing.

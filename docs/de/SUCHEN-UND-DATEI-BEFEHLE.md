@@ -66,7 +66,7 @@ Kompatibles Read/Write sowie modernes Save führen Codec-I/O jetzt über `Editor
 
 Bei Read File werden dekodierte Zeilen erst eingefügt, nachdem der Codec erfolgreich beendet und ein abschließender Unterbrechungs-Checkpoint bestanden wurde. Ctrl-U während des Lesens bricht deshalb den Codec-Token ab und lässt aktuelles Dokument, Cursor, Dirty-Flag und Undo-Stack unverändert.
 
-Write/Save reichen denselben verknüpften Token an den Codec weiter. Ein abgebrochener externer Dateischreibvorgang kann auf Dateisystem-/Provider-Ebene trotzdem teilweise sichtbar sein; Editor-Dokumentzustand wird erst nach erfolgreichem Abschluss aktualisiert. Save löscht bei Unterbrechung den Dirty-Zustand nicht.
+Write/Save reichen denselben verknüpften Token an den Codec weiter. Der eingebaute historische Codec schreibt jetzt zuerst eine vollständige temporäre Datei im Zielverzeichnis und veröffentlicht sie erst nach erfolgreich abgeschlossenem, nicht abgebrochenem Schreiben. Abbruch oder Fehler **vor der Veröffentlichung** lassen die bisherigen Zieldatei-Bytes unverändert. Benutzerdefinierte externe Codecs können weiterhin teilweise Dateien schreiben und müssen ihre eigenen Garantien dokumentieren. Save löscht bei Unterbrechung den Dirty-Zustand nicht.
 
 Semantisches Find/Find Again verwendet den unterbrechbaren Suchpfad. Der Scan prüft einmal pro logischer Zeile und übernimmt Cursor sowie gemerkten Suchzustand erst nach erfolgreichem Abschluss. Direkte synchrone Service-Methoden bleiben für Anwendungen verfügbar, die bewusst einen nicht unterbrechbaren In-Process-Aufruf wünschen.
 
@@ -112,3 +112,9 @@ Der gemeinsame Conformance-Adapter kennt nun `find_next_with_options`, um diese 
 ## Ersetzungsbestätigung zeigt den tatsächlich gefundenen Text
 
 Bei einer Suche ohne Unterscheidung von Groß-/Kleinschreibung kann das Muster `alpha` im Dokument den Text `Alpha` finden. `IEditorHooks.BeforeReplaceAsync` erhält nun über `ReplaceCandidate.ExistingText` den **tatsächlich gefundenen Dokumenttext** (`Alpha`), nicht nur das eingegebene Suchmuster. Der Text stammt aus demselben Dokument-Snapshot, der nach der asynchronen Bestätigung nochmals geprüft wird. Damit beziehen sich Ersetzen, Überspringen und Abbrechen auf den tatsächlich sichtbaren Treffer, ohne eine UI-Abhängigkeit im Kern zu erzeugen.
+
+## Sicheres Schreiben über temporäre Dateien
+
+Beide eingebauten Dateischreiber verwenden jetzt intern `StagedFileWriter`. Der historische Codec erstellt zuerst den vollständigen 8-Bit-Datenstrom einschließlich der `0x8D`-Wrapped-Grenzen. Der moderne UTF-8-Speicher erzeugt den Inhalt aus dem gesicherten Dokument-Snapshot mit dessen Zeilenende-Konvention. Anschließend wird jeweils eine eindeutig benannte temporäre Datei **im Zielverzeichnis** vollständig geschrieben, auf Abbruch geprüft und per Überschreiben/Umbenennen veröffentlicht. Ein Fehler oder Abbruch während dieses ersten Schritts lässt die alte Zieldatei unverändert; Aufräumfehler verdecken nicht den ursprünglichen Schreibfehler.
+
+Diese Absicherung ist eine **moderne Best-Effort-Regel**, kein Nachweis für Absturzsicherheit oder ursprüngliches DOS-Verhalten. Garantien für atomare Umbenennung, Zugriffsrechte/Metadaten, konkurrierende Schreibaufträge und persistentes fsync hängen vom Dateisystem und späteren Architekturentscheidungen ab. Fremde `IEditorFileCodec`-Implementierungen dürfen eigene Schreibregeln haben. Deterministische Tests steuern Schreibabbrüche und -fehler direkt am temporären Dateischritt.

@@ -202,6 +202,10 @@ Die einzeilige wörtliche Suche und Ersetzung lehnt eingebettetes CR/LF vor jede
 
 Host-Hooks erhalten jetzt den tatsächlich gefundenen Text statt eines möglicherweise anders geschriebenen Suchmusters. Die Kandidatenzeichenfolge stammt aus dem vor der asynchronen Bestätigung gesicherten Dokument-Snapshot. Gezielt kommentierte Tests prüfen Bestätigen, Überspringen, Abbrechen, Nichtfund und Wortgrenzen.
 
+## Sicherheit bei eingebauten Dateischreibvorgängen
+
+Die .NET-UTF-8-Speicherung und der historische Byte-Codec schreiben jetzt erst eine temporäre Datei im Zielverzeichnis und ersetzen das Ziel nach erfolgreichem Schreiben und Abbruchprüfung. Deterministische Tests sichern den Erhalt vorhandener Bytes bei Schreibfehlern und Abbruch. Es handelt sich um eine dokumentierte moderne Host-Sicherheitsregel, nicht um eine Aussage zur Absturzfestigkeit oder zu historischen DOS-Mechanismen.
+
 ## V1-Abschlusskriterium
 
 Die C#/.NET-Implementierung deckt die großen strukturellen FIRST-ED-Bereiche inzwischen ausführbar ab, einschließlich Absatz-Neuformatierung, mehrzeiliger Block-Bulk-Topologie, unabhängiger Block-Endpunkte und atomarer Multi-Dokument-Undo-/Navigationswiederherstellung. Der [Handbuch-Prozeduren-/Funktionsindex-Audit](HANDBUCH-PROZEDURENINDEX-AUDIT.md) erfasst inzwischen alle 123 gedruckten Einträge mit ersten Klassifikationen; die zugeordneten Routinen benötigen vor V1 noch einen abschließenden Testabdeckungs- und Host-Audit. MicroStar-spezifische Demonstrationen können als Samples statt als Core-Abhängigkeiten geliefert werden.

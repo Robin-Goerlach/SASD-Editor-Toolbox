@@ -33,8 +33,14 @@ public sealed class FirstEdLegacyFileCodec : IEditorFileCodec
         ArgumentException.ThrowIfNullOrWhiteSpace(path);
         ArgumentNullException.ThrowIfNull(lines);
 
+        // Validate and encode the complete historical byte stream before
+        // staging. A failed conversion or cancelled write cannot truncate a
+        // previous valid file, including one containing Wrapped boundaries.
         var bytes = Encode(lines);
-        await File.WriteAllBytesAsync(Path.GetFullPath(path), bytes, cancellationToken).ConfigureAwait(false);
+        await StagedFileWriter.WriteAsync(
+            path,
+            (temporaryPath, token) => File.WriteAllBytesAsync(temporaryPath, bytes, token),
+            cancellationToken).ConfigureAwait(false);
     }
 
     private static IReadOnlyList<EditorLineSnapshot> Decode(ReadOnlySpan<byte> bytes)
