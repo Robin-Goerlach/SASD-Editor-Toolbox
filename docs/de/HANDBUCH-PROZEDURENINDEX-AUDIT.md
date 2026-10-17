@@ -55,6 +55,8 @@ Portable Befehlsfolgen prüfen jetzt Find Again nach Undo und leerer Ersetzung, 
 
 Sieben weitere portable Testfälle in `search-and-replace.json` prüfen das optionale Wrap-around des modernen Suchdienstes über `find_next_with_options`. Die historische FIRST-ED-Suche bleibt standardmäßig ohne Umbruch. Getestet werden Trefferstartgrenzen, ganze Wörter, die Suchreihenfolge über mehrere Zeilen und die für Find Again gespeicherten Optionen.
 
+Drei neue negative portable Fälle in `file-read-topology.json` weisen nach, dass ungültige dekodierte Zeilen (eingebettetes CR, LF oder 0x8D) den *gesamten* Import mit `file_io_failed` ablehnen, ohne Dokument oder Undo zu verändern. Sie ergänzen separate .NET-Tests für Byteformat und asynchrone Lesevorgänge, ersetzen diese jedoch nicht.
+
 ## Nächste Schritte und Abschlusskriterien
 
 Jeden offenen Eintrag anhand seiner eigenen Handbuchbeschreibung prüfen, die bereits vorhandenen Tests abgleichen und nur bei echten Verhaltenslücken unabhängigen Code samt Regressionstests ergänzen. Auch die als implementiert eingestuften Zuordnungen brauchen einen Randfall-/Testabgleich; künstliche Pascal-APIs sind ausdrücklich unerwünscht. Inventarliste, deutsche/englische Audit-Dokumente, Matrix und nötigenfalls sprachneutralen Vertrag/Conformance-Fälle synchron halten.

@@ -55,6 +55,8 @@ Portable command-sequence regression evidence now includes Find Again after Undo
 
 Seven additional portable fixtures in `search-and-replace.json` exercise the modern opt-in wrap-around search service via `find_next_with_options`. This remains separate from historical FIRST-ED's default non-wrapping search. Tests check match-start boundaries, whole-word filtering, preceding-line order and remembering options across Find Again.
 
+Three portable negative `file-read-topology.json` cases now prove that malformed decoded lines (embedded CR, LF or 0x8D) reject the *whole* insertion with typed `file_io_failed` and no document/Undo mutation. They complement separate .NET codec and asynchronous read consistency tests; they do not establish byte-level historical equivalence.
+
 ## Next review and acceptance criteria
 
 For each *needs-review* row, examine its individual handbook description, check the existing architecture and tests, add focused regression coverage for genuine behavior gaps, then independently implement only those gaps. Revisit the conceptual *implemented* mappings and identify any missing tests without fabricating Pascal-shaped APIs. Keep the English and German audit, compatibility matrix, and any affected shared specification/conformance cases synchronized.

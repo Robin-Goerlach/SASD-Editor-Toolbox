@@ -673,6 +673,264 @@
           "count": 0
         }
       }
+    },
+    {
+      "id": "files.read-rejects-decoded-cr-without-partial-insert",
+      "area": "file-read",
+      "initial": {
+        "documents": [
+          {
+            "id": "d",
+            "lines": [
+              {
+                "text": "before",
+                "flags": []
+              },
+              {
+                "text": "after",
+                "flags": []
+              }
+            ]
+          }
+        ],
+        "windows": [
+          {
+            "id": "w",
+            "documentId": "d",
+            "cursor": {
+              "line": 0,
+              "column": 3
+            },
+            "topLine": 0,
+            "leftColumn": 0
+          }
+        ],
+        "currentWindowId": "w",
+        "fileReadLines": [
+          {
+            "text": "first",
+            "flags": [
+              "wrapped"
+            ]
+          },
+          {
+            "text": "bad\rline",
+            "flags": []
+          }
+        ]
+      },
+      "operation": {
+        "id": "read_file",
+        "text": "fixture",
+        "commandSucceeded": false
+      },
+      "expect": {
+        "commandSucceeded": false,
+        "documents": {
+          "d": {
+            "lines": [
+              {
+                "text": "before",
+                "flags": []
+              },
+              {
+                "text": "after",
+                "flags": []
+              }
+            ],
+            "isDirty": false,
+            "version": 0
+          }
+        },
+        "windows": {
+          "w": {
+            "cursor": {
+              "line": 0,
+              "column": 3
+            }
+          }
+        },
+        "undo": {
+          "count": 0
+        },
+        "error": {
+          "id": "file_io_failed",
+          "code": "EDITOR_FILE_IO_FAILED",
+          "resourceKey": "Editor.Errors.File.IoFailed"
+        }
+      }
+    },
+    {
+      "id": "files.read-rejects-decoded-lf-without-partial-insert",
+      "area": "file-read",
+      "initial": {
+        "documents": [
+          {
+            "id": "d",
+            "lines": [
+              {
+                "text": "before",
+                "flags": []
+              },
+              {
+                "text": "after",
+                "flags": []
+              }
+            ]
+          }
+        ],
+        "windows": [
+          {
+            "id": "w",
+            "documentId": "d",
+            "cursor": {
+              "line": 0,
+              "column": 3
+            },
+            "topLine": 0,
+            "leftColumn": 0
+          }
+        ],
+        "currentWindowId": "w",
+        "fileReadLines": [
+          {
+            "text": "first",
+            "flags": [
+              "wrapped"
+            ]
+          },
+          {
+            "text": "bad\nline",
+            "flags": []
+          }
+        ]
+      },
+      "operation": {
+        "id": "read_file",
+        "text": "fixture",
+        "commandSucceeded": false
+      },
+      "expect": {
+        "commandSucceeded": false,
+        "documents": {
+          "d": {
+            "lines": [
+              {
+                "text": "before",
+                "flags": []
+              },
+              {
+                "text": "after",
+                "flags": []
+              }
+            ],
+            "isDirty": false,
+            "version": 0
+          }
+        },
+        "windows": {
+          "w": {
+            "cursor": {
+              "line": 0,
+              "column": 3
+            }
+          }
+        },
+        "undo": {
+          "count": 0
+        },
+        "error": {
+          "id": "file_io_failed",
+          "code": "EDITOR_FILE_IO_FAILED",
+          "resourceKey": "Editor.Errors.File.IoFailed"
+        }
+      }
+    },
+    {
+      "id": "files.read-rejects-decoded-high-bit-boundary-as-literal",
+      "area": "file-read",
+      "initial": {
+        "documents": [
+          {
+            "id": "d",
+            "lines": [
+              {
+                "text": "before",
+                "flags": []
+              },
+              {
+                "text": "after",
+                "flags": []
+              }
+            ]
+          }
+        ],
+        "windows": [
+          {
+            "id": "w",
+            "documentId": "d",
+            "cursor": {
+              "line": 0,
+              "column": 3
+            },
+            "topLine": 0,
+            "leftColumn": 0
+          }
+        ],
+        "currentWindowId": "w",
+        "fileReadLines": [
+          {
+            "text": "first",
+            "flags": [
+              "wrapped"
+            ]
+          },
+          {
+            "text": "badline",
+            "flags": []
+          }
+        ]
+      },
+      "operation": {
+        "id": "read_file",
+        "text": "fixture",
+        "commandSucceeded": false
+      },
+      "expect": {
+        "commandSucceeded": false,
+        "documents": {
+          "d": {
+            "lines": [
+              {
+                "text": "before",
+                "flags": []
+              },
+              {
+                "text": "after",
+                "flags": []
+              }
+            ],
+            "isDirty": false,
+            "version": 0
+          }
+        },
+        "windows": {
+          "w": {
+            "cursor": {
+              "line": 0,
+              "column": 3
+            }
+          }
+        },
+        "undo": {
+          "count": 0
+        },
+        "error": {
+          "id": "file_io_failed",
+          "code": "EDITOR_FILE_IO_FAILED",
+          "resourceKey": "Editor.Errors.File.IoFailed"
+        }
+      }
     }
   ]
 }

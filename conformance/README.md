@@ -57,3 +57,7 @@ The `search-and-replace.json` suite also covers Find Again after document Undo, 
 ## Portable search options (modern host service)
 
 The conceptual `find_next_with_options` operation calls the language's **ordinary reusable search service**, rather than changing the historical FIRST-ED command mapping. Its `searchOptions` object accepts optional `caseSensitive`, `wholeWord` and `wrapAround` booleans (omission means false). The returned match is observed through the current view's cursor; no disk, UI prompt or C# API naming is required. A following `find_again` still uses the remembered options. New V1 fixtures use this adapter to prove that a wrapped match is selected by its *starting position*, even if the matched text extends across the cursor.
+
+## Portable rejection of malformed decoded file lines
+
+Decoded compatibility files are not trusted simply because a codec returned successfully. Three `file-read-topology.json` cases provide a valid line followed by an invalid record containing embedded CR, LF or `0x8D` within its text. Adapters must reject the **entire** pending import through the stable `file_io_failed` error rather than insert the valid prefix: cursor, document version, dirty flag and Undo count remain unchanged. Raw byte encoding/decoding and filesystem staging are still tested in each language implementation.
