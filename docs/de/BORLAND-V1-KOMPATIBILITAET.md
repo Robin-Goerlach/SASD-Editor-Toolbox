@@ -210,6 +210,10 @@ Die .NET-UTF-8-Speicherung und der historische Byte-Codec schreiben jetzt erst e
 
 Der kompatible Lesedienst prüft den vollständigen dekodierten Zeilenbestand vor jeder Undo- oder Topologieänderung. Eingebettete Zeilentrenner, ungültige Codec-Einträge und unbekannte Attributbits führen zu einem typisierten Dateifehler ohne teilweisen Import. Bei umfangreichen Datenbeständen erfolgen kooperative Abbruchkontrollen. Der eingebaute historische Decoder liefert bereits gültige Zeilen; die neuen Prüfungen sichern insbesondere fremde Codec-Implementierungen ab.
 
+## Regressionstests für historische Byte-Zeilentrenner
+
+Zusätzliche .NET-Codec-Fälle prüfen High-Bit-CR am Dateiende und hintereinander, die defensive Variante 0x8D/LF, CR/LF-Grenzen, logische Leerzeilen, leere physische Dateien und Latin-1-Roundtrips. Damit wächst die Absicherung, ohne nicht belegte DOS-Eingabevarianten zur historischen Norm zu erklären.
+
 ## V1-Abschlusskriterium
 
 Die C#/.NET-Implementierung deckt die großen strukturellen FIRST-ED-Bereiche inzwischen ausführbar ab, einschließlich Absatz-Neuformatierung, mehrzeiliger Block-Bulk-Topologie, unabhängiger Block-Endpunkte und atomarer Multi-Dokument-Undo-/Navigationswiederherstellung. Der [Handbuch-Prozeduren-/Funktionsindex-Audit](HANDBUCH-PROZEDURENINDEX-AUDIT.md) erfasst inzwischen alle 123 gedruckten Einträge mit ersten Klassifikationen; die zugeordneten Routinen benötigen vor V1 noch einen abschließenden Testabdeckungs- und Host-Audit. MicroStar-spezifische Demonstrationen können als Samples statt als Core-Abhängigkeiten geliefert werden.
