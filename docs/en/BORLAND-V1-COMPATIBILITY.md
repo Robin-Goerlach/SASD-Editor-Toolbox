@@ -207,6 +207,10 @@ Host hooks now receive the actual selected document substring instead of an inpu
 
 The .NET modern UTF-8 storage provider and historical byte codec now stage output beside the destination and replace it only once staging and cancellation checks succeed. Deterministic tests inject staging failures and cancellation to protect the original file bytes. This is a documented modern host-safety policy; filesystem durability, metadata replacement semantics and custom codec behavior remain explicit limits rather than assumptions of 1985 compatibility.
 
+## Complete codec import validation
+
+The compatibility read service now copies and validates every decoded line before creating an Undo entry or altering document topology. Invalid embedded structural delimiters, null provider records and unsupported flag bits cause a typed file-I/O failure with no partial document import. Long validation runs include abort checkpoints. The built-in legacy decoder already returns valid lines; these guards apply at the extensibility boundary for custom codecs.
+
 ## V1 release gate
 
 The C#/.NET implementation now has executable coverage for the major FIRST-ED structural areas, including paragraph reformatting, whole-line block bulk topology, independent block endpoints and atomic multi-document undo/navigation restoration. The [handbook procedure/function index audit](HANDBOOK-PROCEDURE-INDEX-AUDIT.md) now records all 123 printed entries with first-pass classifications; its mapped behavior still requires a final regression-coverage and host-interface audit before calling V1 complete. MicroStar-specific demonstrations may ship as samples rather than core dependencies.

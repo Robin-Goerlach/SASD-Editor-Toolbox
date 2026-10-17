@@ -206,6 +206,10 @@ Host-Hooks erhalten jetzt den tatsächlich gefundenen Text statt eines mögliche
 
 Die .NET-UTF-8-Speicherung und der historische Byte-Codec schreiben jetzt erst eine temporäre Datei im Zielverzeichnis und ersetzen das Ziel nach erfolgreichem Schreiben und Abbruchprüfung. Deterministische Tests sichern den Erhalt vorhandener Bytes bei Schreibfehlern und Abbruch. Es handelt sich um eine dokumentierte moderne Host-Sicherheitsregel, nicht um eine Aussage zur Absturzfestigkeit oder zu historischen DOS-Mechanismen.
 
+## Vollständige Validierung von Codec-Importen
+
+Der kompatible Lesedienst prüft den vollständigen dekodierten Zeilenbestand vor jeder Undo- oder Topologieänderung. Eingebettete Zeilentrenner, ungültige Codec-Einträge und unbekannte Attributbits führen zu einem typisierten Dateifehler ohne teilweisen Import. Bei umfangreichen Datenbeständen erfolgen kooperative Abbruchkontrollen. Der eingebaute historische Decoder liefert bereits gültige Zeilen; die neuen Prüfungen sichern insbesondere fremde Codec-Implementierungen ab.
+
 ## V1-Abschlusskriterium
 
 Die C#/.NET-Implementierung deckt die großen strukturellen FIRST-ED-Bereiche inzwischen ausführbar ab, einschließlich Absatz-Neuformatierung, mehrzeiliger Block-Bulk-Topologie, unabhängiger Block-Endpunkte und atomarer Multi-Dokument-Undo-/Navigationswiederherstellung. Der [Handbuch-Prozeduren-/Funktionsindex-Audit](HANDBUCH-PROZEDURENINDEX-AUDIT.md) erfasst inzwischen alle 123 gedruckten Einträge mit ersten Klassifikationen; die zugeordneten Routinen benötigen vor V1 noch einen abschließenden Testabdeckungs- und Host-Audit. MicroStar-spezifische Demonstrationen können als Samples statt als Core-Abhängigkeiten geliefert werden.

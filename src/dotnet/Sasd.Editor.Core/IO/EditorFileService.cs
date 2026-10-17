@@ -52,9 +52,49 @@ public sealed class EditorFileService
                 token => _codec.ReadAsync(path, token),
                 cancellationToken)
             .ConfigureAwait(false);
-        if (lines.Count == 0)
+        if (lines is null)
+        {
+            throw new IOException("The file codec returned a null decoded-line collection.");
+        }
+
+        // Copy the provider's list before any further awaited checkpoints.
+        // A custom codec may expose a mutable collection; insertion must use
+        // precisely the lines that were validated, not a subsequently edited
+        // provider-side list.
+        var decodedLines = lines.ToArray();
+        if (decodedLines.Length == 0)
         {
             return 0;
+        }
+
+        // FIRST-ED line boundaries are metadata, not literal text. A custom
+        // IEditorFileCodec must not smuggle delimiters into a logical line or
+        // unrecognized flags into the buffer. Validate the *whole* payload
+        // before committing anything so one bad trailing line cannot cause
+        // a partial import or an orphaned Undo entry.
+        const EditorLineFlags allowedFlags =
+            EditorLineFlags.InBlock | EditorLineFlags.Wrapped | EditorLineFlags.UserColored;
+        for (var index = 0; index < decodedLines.Length; index++)
+        {
+            var line = decodedLines[index];
+            if (line is null
+                || line.Text is null
+                || line.Text.Contains('\r')
+                || line.Text.Contains('\n')
+                || line.Text.Contains('\u008D')
+                || (line.Flags & ~allowedFlags) != EditorLineFlags.None)
+            {
+                throw new IOException(
+                    "The file codec returned a malformed logical line or unsupported flags.");
+            }
+
+            // A large provider result may take time to validate. Give the host
+            // a bounded chance to process Ctrl-U before structural mutation;
+            // the previously captured destination is rechecked afterward.
+            if ((index & 127) == 127)
+            {
+                await _session.Interruption.CheckpointAsync(cancellationToken).ConfigureAwait(false);
+            }
         }
 
         // The entire compatibility file is decoded before editor mutation.
@@ -74,9 +114,9 @@ public sealed class EditorFileService
 
         var undo = _session.Undo.BeginTransaction(_session, window, "Read file");
 
-        for (var index = 0; index < lines.Count; index++)
+        for (var index = 0; index < decodedLines.Length; index++)
         {
-            var line = lines[index];
+            var line = decodedLines[index];
             var flags = line.Flags & ~EditorLineFlags.InBlock;
             document.Buffer.InsertLine(insertionLine + index, line.Text, flags);
         }
@@ -84,7 +124,7 @@ public sealed class EditorFileService
         // The historical editor's line descriptors made existing references stay
         // attached to their logical lines automatically. Our integer line model
         // needs an explicit EditRealign-like pass after structural insertion.
-        _session.Topology.LinesInserted(document, insertionLine, lines.Count);
+        _session.Topology.LinesInserted(document, insertionLine, decodedLines.Length);
 
         document.MarkChanged();
 
@@ -94,7 +134,7 @@ public sealed class EditorFileService
         // on the original source line without any special assignment.
         _session.RefreshBlockFlags();
         undo.Commit();
-        return lines.Count;
+        return decodedLines.Length;
     }
 
     /// <summary>
