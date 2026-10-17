@@ -1443,6 +1443,381 @@
           "resourceKey": "Editor.Errors.Command.InvalidArgument"
         }
       }
+    },
+    {
+      "id": "search.undo-restores-first-match-without-skipping",
+      "area": "search-and-replace",
+      "initial": {
+        "documents": [
+          {
+            "id": "d",
+            "lines": [
+              {
+                "text": "alpha alpha",
+                "flags": []
+              }
+            ]
+          }
+        ],
+        "windows": [
+          {
+            "id": "w",
+            "documentId": "d",
+            "cursor": {
+              "line": 0,
+              "column": 0
+            },
+            "topLine": 0,
+            "leftColumn": 0
+          }
+        ],
+        "currentWindowId": "w"
+      },
+      "operations": [
+        {
+          "id": "replace_next",
+          "text": "alpha",
+          "text2": "X"
+        },
+        {
+          "id": "undo"
+        },
+        {
+          "id": "find_again"
+        }
+      ],
+      "expect": {
+        "documents": {
+          "d": {
+            "lines": [
+              {
+                "text": "alpha alpha",
+                "flags": []
+              }
+            ],
+            "isDirty": false,
+            "version": 0
+          }
+        },
+        "windows": {
+          "w": {
+            "cursor": {
+              "line": 0,
+              "column": 0
+            }
+          }
+        },
+        "undo": {
+          "count": 0
+        }
+      }
+    },
+    {
+      "id": "search.empty-replacement-exposes-same-column-match",
+      "area": "search-and-replace",
+      "initial": {
+        "documents": [
+          {
+            "id": "d",
+            "lines": [
+              {
+                "text": "aa",
+                "flags": []
+              }
+            ]
+          }
+        ],
+        "windows": [
+          {
+            "id": "w",
+            "documentId": "d",
+            "cursor": {
+              "line": 0,
+              "column": 0
+            },
+            "topLine": 0,
+            "leftColumn": 0
+          }
+        ],
+        "currentWindowId": "w"
+      },
+      "operations": [
+        {
+          "id": "replace_next",
+          "text": "a",
+          "text2": ""
+        },
+        {
+          "id": "find_again"
+        }
+      ],
+      "expect": {
+        "documents": {
+          "d": {
+            "lines": [
+              {
+                "text": "a",
+                "flags": []
+              }
+            ],
+            "isDirty": true,
+            "version": 1
+          }
+        },
+        "windows": {
+          "w": {
+            "cursor": {
+              "line": 0,
+              "column": 0
+            }
+          }
+        },
+        "undo": {
+          "count": 1
+        }
+      }
+    },
+    {
+      "id": "search.undo-in-another-document-retains-previous-match",
+      "area": "search-and-replace",
+      "initial": {
+        "documents": [
+          {
+            "id": "a",
+            "lines": [
+              {
+                "text": "a a",
+                "flags": []
+              }
+            ]
+          },
+          {
+            "id": "b",
+            "lines": [
+              {
+                "text": "b",
+                "flags": []
+              }
+            ]
+          }
+        ],
+        "windows": [
+          {
+            "id": "w1",
+            "documentId": "a",
+            "cursor": {
+              "line": 0,
+              "column": 0
+            },
+            "topLine": 0,
+            "leftColumn": 0
+          },
+          {
+            "id": "w2",
+            "documentId": "b",
+            "cursor": {
+              "line": 0,
+              "column": 0
+            },
+            "topLine": 0,
+            "leftColumn": 0
+          }
+        ],
+        "currentWindowId": "w1"
+      },
+      "operations": [
+        {
+          "id": "find_next",
+          "text": "a"
+        },
+        {
+          "id": "select_window",
+          "windowId": "w2"
+        },
+        {
+          "id": "new_line"
+        },
+        {
+          "id": "undo"
+        },
+        {
+          "id": "select_window",
+          "windowId": "w1"
+        },
+        {
+          "id": "find_again"
+        }
+      ],
+      "expect": {
+        "documents": {
+          "a": {
+            "lines": [
+              {
+                "text": "a a",
+                "flags": []
+              }
+            ],
+            "isDirty": false,
+            "version": 0
+          },
+          "b": {
+            "lines": [
+              {
+                "text": "b",
+                "flags": []
+              }
+            ],
+            "isDirty": false,
+            "version": 0
+          }
+        },
+        "windows": {
+          "w1": {
+            "cursor": {
+              "line": 0,
+              "column": 2
+            }
+          },
+          "w2": {
+            "cursor": {
+              "line": 0,
+              "column": 0
+            }
+          }
+        },
+        "currentWindowId": "w1",
+        "undo": {
+          "count": 0
+        }
+      }
+    },
+    {
+      "id": "replace.block-highlights-and-linked-cursor-survive-literal-replacement",
+      "area": "search-and-replace",
+      "initial": {
+        "documents": [
+          {
+            "id": "d",
+            "lines": [
+              {
+                "text": "alpha",
+                "flags": []
+              },
+              {
+                "text": "middle",
+                "flags": []
+              },
+              {
+                "text": "alpha",
+                "flags": []
+              }
+            ]
+          }
+        ],
+        "windows": [
+          {
+            "id": "w1",
+            "documentId": "d",
+            "cursor": {
+              "line": 0,
+              "column": 0
+            },
+            "topLine": 0,
+            "leftColumn": 0
+          },
+          {
+            "id": "w2",
+            "documentId": "d",
+            "cursor": {
+              "line": 2,
+              "column": 0
+            },
+            "topLine": 0,
+            "leftColumn": 0
+          }
+        ],
+        "currentWindowId": "w1"
+      },
+      "operations": [
+        {
+          "id": "begin_block"
+        },
+        {
+          "id": "position_cursor",
+          "line": 2,
+          "column": 0
+        },
+        {
+          "id": "end_block"
+        },
+        {
+          "id": "position_cursor",
+          "line": 0,
+          "column": 0
+        },
+        {
+          "id": "replace_next",
+          "text": "alpha",
+          "text2": "X"
+        }
+      ],
+      "expect": {
+        "documents": {
+          "d": {
+            "lines": [
+              {
+                "text": "X",
+                "flags": [
+                  "in_block"
+                ]
+              },
+              {
+                "text": "middle",
+                "flags": [
+                  "in_block"
+                ]
+              },
+              {
+                "text": "alpha",
+                "flags": [
+                  "in_block"
+                ]
+              }
+            ],
+            "isDirty": true,
+            "version": 1
+          }
+        },
+        "windows": {
+          "w1": {
+            "cursor": {
+              "line": 0,
+              "column": 1
+            }
+          },
+          "w2": {
+            "cursor": {
+              "line": 2,
+              "column": 0
+            }
+          }
+        },
+        "blockState": {
+          "start": {
+            "documentId": "d",
+            "line": 0
+          },
+          "end": {
+            "documentId": "d",
+            "line": 2
+          },
+          "hidden": false,
+          "complete": true
+        },
+        "undo": {
+          "count": 1
+        }
+      }
     }
   ]
 }

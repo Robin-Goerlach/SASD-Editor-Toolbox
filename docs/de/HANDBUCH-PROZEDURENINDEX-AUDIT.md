@@ -51,6 +51,8 @@ Acht weitere portable Such-/Ersetzungstests sichern die standardmäßig groß-/k
 
 Vier neue portable Ablehnungsfälle sichern die einzeilige Such-/Ersetzungsgrenze ab. CR und LF in Mustern beziehungsweise Ersatztexten müssen ohne Veränderung von Cursor, Text oder Undo abgelehnt werden.
 
+Portable Befehlsfolgen prüfen jetzt Find Again nach Undo und leerer Ersetzung, Undo-Isolation zwischen Dokumenten sowie Ersetzung innerhalb markierter Blöcke mit verknüpften Fenstern. Diese gemeinsamen Tests beschreiben nur beobachtbares Verhalten; asynchrone Host-Zwischenfälle bleiben zusätzlich durch .NET-Tests abgesichert.
+
 ## Nächste Schritte und Abschlusskriterien
 
 Jeden offenen Eintrag anhand seiner eigenen Handbuchbeschreibung prüfen, die bereits vorhandenen Tests abgleichen und nur bei echten Verhaltenslücken unabhängigen Code samt Regressionstests ergänzen. Auch die als implementiert eingestuften Zuordnungen brauchen einen Randfall-/Testabgleich; künstliche Pascal-APIs sind ausdrücklich unerwünscht. Inventarliste, deutsche/englische Audit-Dokumente, Matrix und nötigenfalls sprachneutralen Vertrag/Conformance-Fälle synchron halten.

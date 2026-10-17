@@ -51,6 +51,8 @@ Eight additional portable search/replace cases check the case-insensitive defaul
 
 Four additional portable rejection cases protect the single-logical-line search/replace boundary: CR and LF in patterns/replacements must be rejected without text, cursor or Undo side effects.
 
+Portable command-sequence regression evidence now includes Find Again after Undo and empty replacements, unrelated-document Undo isolation and replacement inside visible blocks with linked views. The shared fixtures specify observable behavior, while the .NET-only tests cover asynchronous host interleavings.
+
 ## Next review and acceptance criteria
 
 For each *needs-review* row, examine its individual handbook description, check the existing architecture and tests, add focused regression coverage for genuine behavior gaps, then independently implement only those gaps. Revisit the conceptual *implemented* mappings and identify any missing tests without fabricating Pascal-shaped APIs. Keep the English and German audit, compatibility matrix, and any affected shared specification/conformance cases synchronized.
