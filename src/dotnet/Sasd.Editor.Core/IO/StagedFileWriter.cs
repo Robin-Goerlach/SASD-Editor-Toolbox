@@ -1,25 +1,39 @@
 namespace Sasd.Editor.IO;
 
 /// <summary>
-/// Writes a complete file beside its destination and publishes it only after
-/// the staging write succeeds. Used by both the modern UTF-8 storage provider
-/// and the byte-compatible FIRST-ED codec.
+/// Stages complete files beside their destinations and serializes publication
+/// for the same normalized target path within this editor process.
 /// </summary>
 /// <remarks>
-/// The staging file is placed in the same directory as the destination so
-/// replacing the destination uses a same-filesystem rename. On supported
-/// filesystems the rename is atomic; this is not a durability/fsync guarantee
-/// and does not try to preserve every platform-specific file attribute.
-/// A failed or cancelled staging write never opens or truncates the old target.
-/// The final rename itself is deliberately not cancellable: once publication
-/// begins, cancellation must not report failure after replacing the file.
+/// Without a per-target gate, an older slow write could publish *after* a
+/// newer write, leaving stale bytes on disk even though the newer Save was
+/// already acknowledged. Different target files remain independent.
+///
+/// The gate protects cooperating built-in .NET writers only: independent
+/// processes, custom codecs, symlinks/hardlinks and filesystem case aliases
+/// require coordination by the embedding host. Same-directory rename is
+/// best-effort atomic publication, not a crash-durability/fsync promise.
+/// File permissions and provider-specific metadata are not preserved here.
 /// </remarks>
 internal static class StagedFileWriter
 {
+    private sealed class TargetWriteGate
+    {
+        internal SemaphoreSlim Semaphore { get; } = new(1, 1);
+        internal int Reservations { get; set; }
+    }
+
+    // Retain an entry while any writer holds or awaits that target gate.
+    // Reference counting prevents an unbounded cache of paths for documents
+    // that the editor has long since closed.
+    private static readonly object GateSync = new();
+    private static readonly Dictionary<string, TargetWriteGate> ActiveTargets = new(
+        OperatingSystem.IsWindows() ? StringComparer.OrdinalIgnoreCase : StringComparer.Ordinal);
+
     /// <summary>
-    /// The writeStage callback writes only to the private temporary path.
-    /// Keeping it injectable permits deterministic cancellation/failure tests
-    /// without depending on real disk-write timing.
+    /// The injectable staging delegate receives only a private temporary path.
+    /// It enables deterministic failure/cancellation tests without filesystem
+    /// timing assumptions. No user-visible document state is updated here.
     /// </summary>
     internal static async ValueTask WriteAsync(
         string path,
@@ -31,40 +45,93 @@ internal static class StagedFileWriter
         cancellationToken.ThrowIfCancellationRequested();
 
         var destination = Path.GetFullPath(path);
-        var directory = Path.GetDirectoryName(destination)!;
-        var temporaryPath = Path.Combine(
-            directory,
-            $".{Path.GetFileName(destination)}.sasd-{Guid.NewGuid():N}.tmp");
+        var gate = ReserveTarget(destination);
+        var entered = false;
 
         try
         {
-            // The destination is untouched until the entire encoded payload
-            // has been staged and the last cancellation check has passed.
-            await writeStage(temporaryPath, cancellationToken).ConfigureAwait(false);
+            // Reserving synchronously before the first await ensures a later
+            // write to this path cannot begin staging before the active write
+            // finishes. A cancelled waiter never creates a staging file.
+            await gate.Semaphore.WaitAsync(cancellationToken).ConfigureAwait(false);
+            entered = true;
             cancellationToken.ThrowIfCancellationRequested();
 
-            // Same-directory replacement avoids an intermediate partially
-            // written destination. Only this commit point changes the target.
-            File.Move(temporaryPath, destination, overwrite: true);
+            var directory = Path.GetDirectoryName(destination)!;
+            var temporaryPath = Path.Combine(
+                directory,
+                $".{Path.GetFileName(destination)}.sasd-{Guid.NewGuid():N}.tmp");
+
+            try
+            {
+                // Until this stage is completely written, the old destination
+                // remains untouched. A cancellation just before publication
+                // likewise leaves the previous bytes in place.
+                await writeStage(temporaryPath, cancellationToken).ConfigureAwait(false);
+                cancellationToken.ThrowIfCancellationRequested();
+
+                // This final same-directory rename is intentionally not
+                // cancellable; after it succeeds, the new bytes are published.
+                File.Move(temporaryPath, destination, overwrite: true);
+            }
+            finally
+            {
+                // A partially written stage never becomes a visible target.
+                // Cleanup is best effort, without masking the real I/O error.
+                try
+                {
+                    if (File.Exists(temporaryPath))
+                    {
+                        File.Delete(temporaryPath);
+                    }
+                }
+                catch (IOException)
+                {
+                    // Preserve the original staging/publishing failure.
+                }
+                catch (UnauthorizedAccessException)
+                {
+                    // An inaccessible orphan must not hide the original error.
+                }
+            }
         }
         finally
         {
-            // If writing, cancellation, or rename fails, discard a staged
-            // fragment. Cleanup errors must not hide the original I/O failure.
-            try
+            if (entered)
             {
-                if (File.Exists(temporaryPath))
-                {
-                    File.Delete(temporaryPath);
-                }
+                gate.Semaphore.Release();
             }
-            catch (IOException)
+
+            ReleaseTarget(destination, gate);
+        }
+    }
+
+    private static TargetWriteGate ReserveTarget(string destination)
+    {
+        lock (GateSync)
+        {
+            if (!ActiveTargets.TryGetValue(destination, out var gate))
             {
-                // Best effort: callers still receive the original exception.
+                gate = new TargetWriteGate();
+                ActiveTargets.Add(destination, gate);
             }
-            catch (UnauthorizedAccessException)
+
+            gate.Reservations++;
+            return gate;
+        }
+    }
+
+    private static void ReleaseTarget(string destination, TargetWriteGate gate)
+    {
+        lock (GateSync)
+        {
+            gate.Reservations--;
+            if (gate.Reservations == 0)
             {
-                // Best effort: do not turn a completed rename into failure.
+                // All waiting/active users have exited; the next save can
+                // allocate a fresh gate without leaking one per edited path.
+                ActiveTargets.Remove(destination);
+                gate.Semaphore.Dispose();
             }
         }
     }
