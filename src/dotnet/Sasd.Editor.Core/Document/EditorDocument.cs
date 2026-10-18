@@ -9,6 +9,14 @@ namespace Sasd.Editor.Document;
 /// </summary>
 public sealed class EditorDocument
 {
+    // Save As may target multiple independent paths while I/O is pending.
+    // Distinct targets cannot share the staged writer's *path* gate; a
+    // monotonically increasing request ID prevents an older completion from
+    // stealing the newer successful save's document association.
+    private long _nextSaveRequestId;
+    private long _latestAcknowledgedSaveId;
+    private readonly object _saveAcknowledgementSync = new();
+
     public EditorDocument(ITextBuffer? buffer = null)
     {
         Buffer = buffer ?? new LinkedLineTextBuffer();
@@ -102,6 +110,41 @@ public sealed class EditorDocument
 
         IsDirty = false;
         return true;
+    }
+
+    /// <summary>
+    /// Reserves an ordering token before the first awaited write. Only saves
+    /// which actually succeed can advance the acknowledgement watermark.
+    /// A newer failed/cancelled request must not suppress an older successful
+    /// save, while a completed newer Save As must not be undone by a slow one.
+    /// </summary>
+    internal long BeginSaveRequest() => Interlocked.Increment(ref _nextSaveRequestId);
+
+    /// <summary>
+    /// Acknowledges an I/O-complete save if no *newer successful* save has
+    /// already published its document association. The same version, exact
+    /// line snapshot and optional newline checks still protect dirty state.
+    /// A superseded save still wrote its own target, but cannot rename or
+    /// mark this document clean after a later save to another path succeeded.
+    /// </summary>
+    internal bool AcknowledgeSaveRequest(
+        long requestId,
+        long snapshotVersion,
+        IReadOnlyList<EditorLineSnapshot> snapshotLines,
+        string? targetPath,
+        string? writtenNewLine = null)
+    {
+        lock (_saveAcknowledgementSync)
+        {
+            if (requestId <= _latestAcknowledgedSaveId)
+            {
+                return false;
+            }
+
+            _latestAcknowledgedSaveId = requestId;
+            return MarkSnapshotSaved(
+                snapshotVersion, snapshotLines, targetPath, writtenNewLine);
+        }
     }
 
     public void SetPersistenceMetadata(string? filePath, string? newLine = null)

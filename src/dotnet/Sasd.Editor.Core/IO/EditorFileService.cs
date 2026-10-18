@@ -174,6 +174,7 @@ public sealed class EditorFileService
         // window) while the codec awaits filesystem I/O.
         var versionAtWrite = document.Version;
         var snapshot = document.Buffer.Snapshot();
+        var saveRequestId = document.BeginSaveRequest();
         await _session.Interruption
             .RunInterruptibleAsync(
                 token => _codec.WriteAsync(target, snapshot, token),
@@ -182,7 +183,7 @@ public sealed class EditorFileService
 
         // The write itself succeeded. Mark the document clean only if no
         // newer text/metadata has replaced the persisted snapshot.
-        document.MarkSnapshotSaved(versionAtWrite, snapshot, target);
+        document.AcknowledgeSaveRequest(saveRequestId, versionAtWrite, snapshot, target);
         return true;
     }
 }

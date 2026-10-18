@@ -223,6 +223,10 @@ The built-in staged file writers now reserve a normalized target-path gate durin
 
 Modern UTF-8 writes now reject embedded CR/LF inside buffer lines and invalid configured newline styles before any staged write, preventing a lossy logical-line round trip. Save acknowledgement also checks the newline convention that was serialized, alongside text and version. These guards are modern storage constraints and do not impose FIRST-ED's reserved 0x8D byte on UTF-8 documents.
 
+## Save As completion order and document association
+
+The document assigns a save-order token before any awaited Save/Save As. Successful newer requests take precedence over slower older completions even when their target paths differ, preventing the older request from reverting a newer file association. Failed/cancelled newer requests do not suppress older successful saves. Direct Write File deliberately remains outside document-identity acknowledgements.
+
 ## V1 release gate
 
 The C#/.NET implementation now has executable coverage for the major FIRST-ED structural areas, including paragraph reformatting, whole-line block bulk topology, independent block endpoints and atomic multi-document undo/navigation restoration. The [handbook procedure/function index audit](HANDBOOK-PROCEDURE-INDEX-AUDIT.md) now records all 123 printed entries with first-pass classifications; its mapped behavior still requires a final regression-coverage and host-interface audit before calling V1 complete. MicroStar-specific demonstrations may ship as samples rather than core dependencies.

@@ -138,7 +138,8 @@ The handbook does not separately define whether markers or other non-block ancho
 ## 7. Undo and dirty state
 
 - Every ordinary text mutation marks the document dirty.
-- Successful persistence clears dirty state when the operation is semantically a save **and** the document still matches the version and line snapshot that was actually written. If editing continues while asynchronous I/O is in progress, the successful write may update file association but must not hide unsaved newer edits. Direct Write File leaves the identity/dirty state alone.
+- Successful persistence clears dirty state when the operation is semantically a save **and** the document still matches the version and line snapshot that was actually written.
+- Concurrent Save/Save As operations on one document receive request-order tokens. An older save that completes after a newer successful save must not roll back the document's associated path or dirty acknowledgement. Only successful saves advance the completion watermark, so a newer failed/cancelled request does not suppress an older successful save to another target. Distinct paths may publish independently; the per-target write gate applies only when normalized paths match. If editing continues while asynchronous I/O is in progress, the successful write may update file association but must not hide unsaved newer edits. Direct Write File leaves the identity/dirty state alone.
 - A direct compatibility Write File operation does not implicitly change document identity.
 - Undo is a replaceable service. Correctness is more important than storage efficiency in the first implementation.
 - The handbook's historical `EditUndo` is a line-stack operation rather than a general command journal. SASD's command-oriented snapshot undo is therefore a documented modernization boundary, not a claim of storage-level historical equivalence.

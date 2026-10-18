@@ -66,13 +66,15 @@ public sealed class FileTextStorage(Encoding? encoding = null) : ITextStorage
         }
 
         var content = string.Join(newLineAtWrite, snapshot.Select(static line => line.Text));
+        var saveRequestId = document.BeginSaveRequest();
         // Publish only a fully encoded and written snapshot. An interrupted
         // staging write leaves the old destination and document identity alone.
         await StagedFileWriter.WriteAsync(
             target,
             (temporaryPath, token) => File.WriteAllTextAsync(temporaryPath, content, _encoding, token),
             cancellationToken).ConfigureAwait(false);
-        document.MarkSnapshotSaved(versionAtWrite, snapshot, target, newLineAtWrite);
+        document.AcknowledgeSaveRequest(
+            saveRequestId, versionAtWrite, snapshot, target, newLineAtWrite);
     }
 
     private static string DetectNewLine(string text)
