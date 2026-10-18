@@ -8,6 +8,7 @@
     "conformance/v1/cases/block-topology-and-undo.json",
     "conformance/v1/cases/viewport-navigation.json",
     "conformance/v1/cases/search-and-replace.json",
-    "conformance/v1/cases/file-read-topology.json"
+    "conformance/v1/cases/file-read-topology.json",
+    "conformance/v1/cases/compatibility-primitives.json"
   ]
 }

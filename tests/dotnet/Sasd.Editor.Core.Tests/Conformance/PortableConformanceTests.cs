@@ -328,6 +328,21 @@ public sealed class PortableConformanceTests
         operation switch
         {
             "move_right_character" => EditorCommandId.CursorRight,
+            // Use the public semantic dispatcher, not implementation-private
+            // compatibility processors or DOS keyboard scan codes.
+            "beginning_of_line" => EditorCommandId.BeginningOfLine,
+            "end_of_line" => EditorCommandId.EndOfLine,
+            "beginning_or_end_of_line" => EditorCommandId.BeginningOrEndOfLine,
+            "goto_column" => EditorCommandId.GoToColumn,
+            "move_left_word" => EditorCommandId.WordLeft,
+            "move_right_word" => EditorCommandId.WordRight,
+            "toggle_insert" => EditorCommandId.ToggleInsert,
+            "toggle_word_wrap" => EditorCommandId.ToggleWordWrap,
+            "toggle_auto_indent" => EditorCommandId.ToggleAutoIndent,
+            "set_left_margin" => EditorCommandId.SetLeftMargin,
+            "set_right_margin" => EditorCommandId.SetRightMargin,
+            "change_case" => EditorCommandId.ChangeCase,
+            "delete_to_end_of_line" => EditorCommandId.DeleteToEndOfLine,
             // Search operations use the public semantic-command boundary.
             // In particular, text:"" for find_next has historical meaning;
             // it must not be converted to an omitted/null request argument.
@@ -580,6 +595,25 @@ public sealed class PortableConformanceTests
         if (expected.TryGetProperty("leftColumn", out var leftColumn))
         {
             Assert.Equal(leftColumn.GetInt32(), window.LeftColumn);
+        }
+
+        if (expected.TryGetProperty("options", out var options))
+        {
+            // Linked views have independent modes despite shared document text.
+            // A portable fixture asserts only fields explicitly present.
+            var actual = window.Options;
+            if (options.TryGetProperty("insertMode", out var insert))
+                Assert.Equal(insert.GetBoolean(), actual.InsertMode);
+            if (options.TryGetProperty("wordWrap", out var wrap))
+                Assert.Equal(wrap.GetBoolean(), actual.WordWrap);
+            if (options.TryGetProperty("autoIndent", out var indent))
+                Assert.Equal(indent.GetBoolean(), actual.AutoIndent);
+            if (options.TryGetProperty("leftMargin", out var left))
+                Assert.Equal(left.GetInt32(), actual.LeftMargin);
+            if (options.TryGetProperty("rightMargin", out var right))
+                Assert.Equal(right.GetInt32(), actual.RightMargin);
+            if (options.TryGetProperty("tabSize", out var tab))
+                Assert.Equal(tab.GetInt32(), actual.TabSize);
         }
     }
 
