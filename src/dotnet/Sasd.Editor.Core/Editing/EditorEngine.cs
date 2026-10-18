@@ -122,24 +122,54 @@ public sealed class EditorEngine
         window.Document.Buffer.ReplaceLine(window.Cursor.Line, line.Remove(window.Cursor.Column, end - window.Cursor.Column));
     });
 
-    public void DeleteToEndOfLine() => Mutate("Delete to end of line", () =>
+    public void DeleteToEndOfLine()
     {
         var window = Window;
         var line = window.Document.Buffer.GetLine(window.Cursor.Line).Text;
-        if (window.Cursor.Column < line.Length)
-            window.Document.Buffer.ReplaceLine(window.Cursor.Line, line[..window.Cursor.Column]);
-    });
 
-    public void ChangeCase() => Mutate("Change case", () =>
+        // A valid virtual cursor may be arbitrarily far beyond the stored
+        // text. Deleting zero characters is a navigation-safe no-op, not an
+        // edit: do not increment Version, set IsDirty or consume Undo history.
+        if (window.Cursor.Column >= line.Length)
+        {
+            return;
+        }
+
+        Mutate("Delete to end of line", () =>
+        {
+            window.Document.Buffer.ReplaceLine(window.Cursor.Line, line[..window.Cursor.Column]);
+        });
+    }
+
+    public void ChangeCase()
     {
         var window = Window;
         var line = window.Document.Buffer.GetLine(window.Cursor.Line).Text;
-        if (window.Cursor.Column >= line.Length) return;
-        var chars = line.ToCharArray();
-        var ch = chars[window.Cursor.Column];
-        chars[window.Cursor.Column] = char.IsUpper(ch) ? char.ToLowerInvariant(ch) : char.ToUpperInvariant(ch);
-        window.Document.Buffer.ReplaceLine(window.Cursor.Line, new string(chars));
-    });
+        if (window.Cursor.Column >= line.Length)
+        {
+            // In particular, the historical virtual-column rule must not
+            // create a phantom modification outside the physical line.
+            return;
+        }
+
+        var current = line[window.Cursor.Column];
+        var converted = char.IsUpper(current)
+            ? char.ToLowerInvariant(current)
+            : char.ToUpperInvariant(current);
+        if (current == converted)
+        {
+            // Punctuation, digits and other unchanged characters do not
+            // warrant a text transaction merely because the command ran.
+            return;
+        }
+
+        Mutate("Change case", () =>
+        {
+            var characters = line.ToCharArray();
+            characters[window.Cursor.Column] = converted;
+            window.Document.Buffer.ReplaceLine(window.Cursor.Line, new string(characters));
+        });
+    }
 
     public void CenterLine() => Mutate("Center line", () =>
     {
