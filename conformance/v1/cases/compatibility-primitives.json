@@ -1062,6 +1062,304 @@
           "count": 0
         }
       }
+    },
+    {
+      "id": "compat.tab-insert-mode-adds-spaces-and-undo",
+      "area": "compatibility-primitives",
+      "initial": {
+        "documents": [
+          {
+            "id": "d",
+            "lines": [
+              {
+                "text": "abc",
+                "flags": []
+              }
+            ]
+          }
+        ],
+        "windows": [
+          {
+            "id": "w",
+            "documentId": "d",
+            "cursor": {
+              "line": 0,
+              "column": 1
+            },
+            "topLine": 0,
+            "leftColumn": 0,
+            "options": {
+              "insertMode": true,
+              "tabSize": 4
+            }
+          }
+        ],
+        "currentWindowId": "w"
+      },
+      "operation": {
+        "id": "tab"
+      },
+      "expect": {
+        "documents": {
+          "d": {
+            "lines": [
+              {
+                "text": "a   bc",
+                "flags": []
+              }
+            ],
+            "isDirty": true,
+            "version": 1
+          }
+        },
+        "windows": {
+          "w": {
+            "cursor": {
+              "line": 0,
+              "column": 4
+            }
+          }
+        },
+        "undo": {
+          "count": 1
+        }
+      }
+    },
+    {
+      "id": "compat.tab-overtype-only-advances-cursor",
+      "area": "compatibility-primitives",
+      "initial": {
+        "documents": [
+          {
+            "id": "d",
+            "lines": [
+              {
+                "text": "abc",
+                "flags": []
+              }
+            ]
+          }
+        ],
+        "windows": [
+          {
+            "id": "w",
+            "documentId": "d",
+            "cursor": {
+              "line": 0,
+              "column": 1
+            },
+            "topLine": 0,
+            "leftColumn": 0,
+            "options": {
+              "insertMode": false,
+              "tabSize": 4
+            }
+          }
+        ],
+        "currentWindowId": "w"
+      },
+      "operation": {
+        "id": "tab"
+      },
+      "expect": {
+        "documents": {
+          "d": {
+            "lines": [
+              {
+                "text": "abc",
+                "flags": []
+              }
+            ],
+            "isDirty": false,
+            "version": 0
+          }
+        },
+        "windows": {
+          "w": {
+            "cursor": {
+              "line": 0,
+              "column": 4
+            }
+          }
+        },
+        "undo": {
+          "count": 0
+        }
+      }
+    },
+    {
+      "id": "compat.delete-left-in-virtual-space-does-not-dirty",
+      "area": "compatibility-primitives",
+      "initial": {
+        "documents": [
+          {
+            "id": "d",
+            "lines": [
+              {
+                "text": "abc",
+                "flags": []
+              }
+            ]
+          }
+        ],
+        "windows": [
+          {
+            "id": "w",
+            "documentId": "d",
+            "cursor": {
+              "line": 0,
+              "column": 6
+            },
+            "topLine": 0,
+            "leftColumn": 0
+          }
+        ],
+        "currentWindowId": "w"
+      },
+      "operation": {
+        "id": "delete_left_character"
+      },
+      "expect": {
+        "documents": {
+          "d": {
+            "lines": [
+              {
+                "text": "abc",
+                "flags": []
+              }
+            ],
+            "isDirty": false,
+            "version": 0
+          }
+        },
+        "windows": {
+          "w": {
+            "cursor": {
+              "line": 0,
+              "column": 5
+            }
+          }
+        },
+        "undo": {
+          "count": 0
+        }
+      }
+    },
+    {
+      "id": "compat.delete-right-character-removes-one-stored-character",
+      "area": "compatibility-primitives",
+      "initial": {
+        "documents": [
+          {
+            "id": "d",
+            "lines": [
+              {
+                "text": "abcd",
+                "flags": []
+              }
+            ]
+          }
+        ],
+        "windows": [
+          {
+            "id": "w",
+            "documentId": "d",
+            "cursor": {
+              "line": 0,
+              "column": 1
+            },
+            "topLine": 0,
+            "leftColumn": 0
+          }
+        ],
+        "currentWindowId": "w"
+      },
+      "operation": {
+        "id": "delete_right_character"
+      },
+      "expect": {
+        "documents": {
+          "d": {
+            "lines": [
+              {
+                "text": "acd",
+                "flags": []
+              }
+            ],
+            "isDirty": true,
+            "version": 1
+          }
+        },
+        "windows": {
+          "w": {
+            "cursor": {
+              "line": 0,
+              "column": 1
+            }
+          }
+        },
+        "undo": {
+          "count": 1
+        }
+      }
+    },
+    {
+      "id": "compat.delete-right-word-removes-punctuation-and-following-blanks",
+      "area": "compatibility-primitives",
+      "initial": {
+        "documents": [
+          {
+            "id": "d",
+            "lines": [
+              {
+                "text": "abc!!  def",
+                "flags": []
+              }
+            ]
+          }
+        ],
+        "windows": [
+          {
+            "id": "w",
+            "documentId": "d",
+            "cursor": {
+              "line": 0,
+              "column": 3
+            },
+            "topLine": 0,
+            "leftColumn": 0
+          }
+        ],
+        "currentWindowId": "w"
+      },
+      "operation": {
+        "id": "delete_right_word"
+      },
+      "expect": {
+        "documents": {
+          "d": {
+            "lines": [
+              {
+                "text": "abcdef",
+                "flags": []
+              }
+            ],
+            "isDirty": true,
+            "version": 1
+          }
+        },
+        "windows": {
+          "w": {
+            "cursor": {
+              "line": 0,
+              "column": 3
+            }
+          }
+        },
+        "undo": {
+          "count": 1
+        }
+      }
     }
   ]
 }

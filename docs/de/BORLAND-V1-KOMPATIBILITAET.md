@@ -234,6 +234,10 @@ Ein neuer protokollierender Codec-Adapter prüft den ausgewählten Dokument-Snap
 
 Die gemeinsamen Fälle decken historische Zeilen-/Wortbewegung, virtuelle Spalten, unabhängige Fensteroptionen, einbasierte Randeinstellungen und die Unterscheidung tatsächlicher beziehungsweise wirkungsloser Zeilenbearbeitung ab. `ChangeCase` und `DeleteToEndOfLine` erzeugen bei Leerlauf keine künstlichen Dirty- oder Undo-Einträge mehr; dies ist ausdrücklich eine moderne Konsistenzregel. Einzelne Handbuchroutinen besitzen jetzt ausführbare Belegverweise, ohne damit vollständige DOS-Gleichwertigkeit zu behaupten.
 
+## Portable Belege für Tab und Löschbefehle
+
+Fünf zusätzliche portable Fälle prüfen `EditTab`, `EditDeleteLeftChar`, `EditDeleteRightChar` und `EditDeleteRightWord`, einschließlich Einfügen, Cursorbewegung im virtuellen Bereich und wirklicher Undo-fähiger Löschungen. Nur diese konkret getesteten Eigenschaften werden im historischen Index verknüpft.
+
 ## V1-Abschlusskriterium
 
 Die C#/.NET-Implementierung deckt die großen strukturellen FIRST-ED-Bereiche inzwischen ausführbar ab, einschließlich Absatz-Neuformatierung, mehrzeiliger Block-Bulk-Topologie, unabhängiger Block-Endpunkte und atomarer Multi-Dokument-Undo-/Navigationswiederherstellung. Der [Handbuch-Prozeduren-/Funktionsindex-Audit](HANDBUCH-PROZEDURENINDEX-AUDIT.md) erfasst inzwischen alle 123 gedruckten Einträge mit ersten Klassifikationen; die zugeordneten Routinen benötigen vor V1 noch einen abschließenden Testabdeckungs- und Host-Audit. MicroStar-spezifische Demonstrationen können als Samples statt als Core-Abhängigkeiten geliefert werden.

@@ -343,6 +343,12 @@ public sealed class PortableConformanceTests
             "set_right_margin" => EditorCommandId.SetRightMargin,
             "change_case" => EditorCommandId.ChangeCase,
             "delete_to_end_of_line" => EditorCommandId.DeleteToEndOfLine,
+            // These remain distinct historical semantics even if a modern
+            // host binds them to different keys or menu actions.
+            "tab" => EditorCommandId.Tab,
+            "delete_left_character" => EditorCommandId.DeleteLeftCharacter,
+            "delete_right_character" => EditorCommandId.DeleteRightCharacter,
+            "delete_right_word" => EditorCommandId.DeleteRightWord,
             // Search operations use the public semantic-command boundary.
             // In particular, text:"" for find_next has historical meaning;
             // it must not be converted to an omitted/null request argument.

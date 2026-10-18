@@ -348,7 +348,10 @@
       "handbookPage": 161,
       "status": "implemented",
       "evidence": "docs/en/DELETION-COMPATIBILITY.md",
-      "note": "Character/word/line deletion and joining."
+      "note": "Character/word/line deletion and joining.",
+      "conformanceCases": [
+        "compat.delete-left-in-virtual-space-does-not-dirty"
+      ]
     },
     {
       "name": "EditDeleteLine",
@@ -365,14 +368,20 @@
       "handbookPage": 163,
       "status": "implemented",
       "evidence": "docs/en/DELETION-COMPATIBILITY.md",
-      "note": "Character/word/line deletion and joining."
+      "note": "Character/word/line deletion and joining.",
+      "conformanceCases": [
+        "compat.delete-right-character-removes-one-stored-character"
+      ]
     },
     {
       "name": "EditDeleteRightWord",
       "handbookPage": 164,
       "status": "implemented",
       "evidence": "docs/en/DELETION-COMPATIBILITY.md",
-      "note": "Character/word/line deletion and joining."
+      "note": "Character/word/line deletion and joining.",
+      "conformanceCases": [
+        "compat.delete-right-word-removes-punctuation-and-following-blanks"
+      ]
     },
     {
       "name": "EditDeleteTextRight",
@@ -820,7 +829,11 @@
       "handbookPage": 214,
       "status": "implemented",
       "evidence": "docs/en/KERNEL-COMPATIBILITY-AUDIT.md",
-      "note": "Compatibility navigation and tab rules."
+      "note": "Compatibility navigation and tab rules.",
+      "conformanceCases": [
+        "compat.tab-insert-mode-adds-spaces-and-undo",
+        "compat.tab-overtype-only-advances-cursor"
+      ]
     },
     {
       "name": "EditToggleAutoindent",
