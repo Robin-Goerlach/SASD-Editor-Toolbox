@@ -67,3 +67,9 @@ Decoded compatibility files are not trusted simply because a codec returned succ
 The `file-read-topology.json` suite now also includes `file-write` cases using `initial.fileWriteSink: true`. A deterministic codec captures each `write_file` or `save_file` invocation as a filename plus logical line snapshots (`expect.fileWrites`); no actual filesystem or byte encoding is involved. Expectations may also specify `associatedFileName` to check only the portable filename component instead of a language/OS-specific absolute path.
 
 Direct Write File must preserve document identity, dirty state and Undo and must write the selected document with line flags. A blank filename must not invoke the provider. Modern Save with an explicit path is a separately documented convenience: only that save acknowledges the persisted snapshot and updates document identity. Four of the five new cases link directly to historical `EditFileWrite`; modern Save is intentionally not presented as an additional 1985 requirement.
+
+## Portable FIRST-ED primitive-command audit
+
+The new `compatibility-primitives.json` fixture covers line beginning/end, one-based virtual-column targeting, three-class word motion, per-window insert/word-wrap/auto-indent modes, one-based margins, Change Case, and Delete To End Of Line. These execute public semantic commands rather than any C#-private compatibility APIs.
+
+Expected window projections can contain `options` with individual `insertMode`, `wordWrap`, `autoIndent`, `leftMargin`, `rightMargin` or `tabSize` fields. Only named fields are asserted, permitting independent C++ and Java option representations. Linked views sharing a document retain independent modes. No-op editing requests are handled without dirty/version/Undo changes, whereas actual edits retain Undo behavior.

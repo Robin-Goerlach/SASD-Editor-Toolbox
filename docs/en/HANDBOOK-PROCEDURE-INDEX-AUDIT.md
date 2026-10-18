@@ -35,7 +35,7 @@ The repository now reads every declared file in `conformance/v1/manifest.json`, 
 
 ## Machine-checked links to executable evidence
 
-The inventory may include an optional `conformanceCases` array on a historical routine. The repository contract validator verifies that each referenced case ID occurs in a file declared by the portable manifest, rejects duplicate or unknown IDs, and reports the number of rows with links. **Currently 32 of 123 rows** link to specific portable cases; the other rows retain conceptual/documentation evidence and still require individual regression review.
+The inventory may include an optional `conformanceCases` array on a historical routine. The repository contract validator verifies that each referenced case ID occurs in a file declared by the portable manifest, rejects duplicate or unknown IDs, and reports the number of rows with links. **Currently 46 of 123 rows** link to specific portable cases; the other rows retain conceptual/documentation evidence and still require individual regression review.
 
 These links represent **focused examples**, not exhaustive proof of historical behavior. The verifier deliberately does not fabricate conformance evidence for a procedure merely because its conceptual mapping is marked `implemented` or `modern-replacement`.
 
@@ -60,6 +60,8 @@ Three portable negative `file-read-topology.json` cases now prove that malformed
 Concurrent destination-write tests now explicitly check the in-process built-in staged writer's per-path serialization, cancellable waiters, cleanup after failures and independent writes to different destinations. This strengthens file persistence evidence; it does not turn the 32 linked historical routine rows into a blanket V1 certificate.
 
 Five new portable file-output cases exercise the public WriteFile/SaveFile semantic path via a recording logical-line codec, without filesystem timing or byte-format dependencies. Four cases now provide direct executable traceability for the previously unlinked historical `EditFileWrite` entry. There are now **33 of 123** historical routine rows linked to specific portable evidence; other mappings remain subject to the full behavioral audit.
+
+The new `compatibility-primitives.json` cases link 13 previously unlinked historical procedures to directly executable checks. Observable coverage includes linked-window option independence, virtual columns, one-based commands, historical word classes, Undo and modern nonmutating edit semantics. **46 of 123** index entries now carry explicit portable evidence links, not release-level equivalence certificates.
 
 ## Next review and acceptance criteria
 

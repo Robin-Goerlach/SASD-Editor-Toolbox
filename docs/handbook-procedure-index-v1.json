@@ -54,14 +54,21 @@
       "handbookPage": 124,
       "status": "implemented",
       "evidence": "docs/en/FIRST-ED-COMMAND-MAP.md",
-      "note": "Semantic FIRST-ED editing/navigation commands."
+      "note": "Semantic FIRST-ED editing/navigation commands.",
+      "conformanceCases": [
+        "compat.beginning-end-from-zero-finds-last-nonblank",
+        "compat.beginning-end-from-nonzero-goes-to-zero"
+      ]
     },
     {
       "name": "EditBeginningLine",
       "handbookPage": 125,
       "status": "implemented",
       "evidence": "docs/en/FIRST-ED-COMMAND-MAP.md",
-      "note": "Semantic FIRST-ED editing/navigation commands."
+      "note": "Semantic FIRST-ED editing/navigation commands.",
+      "conformanceCases": [
+        "compat.beginning-of-line-keeps-other-linked-cursor"
+      ]
     },
     {
       "name": "EditBlockBegin",
@@ -147,7 +154,13 @@
       "handbookPage": 135,
       "status": "implemented",
       "evidence": "docs/en/FIRST-ED-COMMAND-MAP.md",
-      "note": "Semantic FIRST-ED editing/navigation commands."
+      "note": "Semantic FIRST-ED editing/navigation commands.",
+      "conformanceCases": [
+        "compat.case-change-edits-one-letter",
+        "compat.case-change-digit-has-no-dirty-or-undo",
+        "compat.case-change-virtual-column-is-observational",
+        "compat.case-change-undo-restores-clean-document"
+      ]
     },
     {
       "name": "EditClsinp",
@@ -366,7 +379,11 @@
       "handbookPage": 165,
       "status": "implemented",
       "evidence": "docs/en/DELETION-COMPATIBILITY.md",
-      "note": "Character/word/line deletion and joining."
+      "note": "Character/word/line deletion and joining.",
+      "conformanceCases": [
+        "compat.delete-to-end-removes-tail-undoably",
+        "compat.delete-to-end-in-virtual-space-does-nothing"
+      ]
     },
     {
       "name": "EditDelline",
@@ -412,7 +429,10 @@
       "handbookPage": 170,
       "status": "implemented",
       "evidence": "docs/en/FIRST-ED-COMMAND-MAP.md",
-      "note": "Semantic FIRST-ED editing/navigation commands."
+      "note": "Semantic FIRST-ED editing/navigation commands.",
+      "conformanceCases": [
+        "compat.end-of-line-uses-last-nonblank"
+      ]
     },
     {
       "name": "EditErrormsg",
@@ -479,7 +499,10 @@
       "handbookPage": 177,
       "status": "implemented",
       "evidence": "docs/en/FIRST-ED-COMMAND-MAP.md",
-      "note": "Semantic FIRST-ED editing/navigation commands."
+      "note": "Semantic FIRST-ED editing/navigation commands.",
+      "conformanceCases": [
+        "compat.goto-column-preserves-large-virtual-column"
+      ]
     },
     {
       "name": "EditGotoLine",
@@ -571,7 +594,10 @@
       "handbookPage": 188,
       "status": "implemented",
       "evidence": "docs/en/KERNEL-COMPATIBILITY-AUDIT.md",
-      "note": "Compatibility navigation and tab rules."
+      "note": "Compatibility navigation and tab rules.",
+      "conformanceCases": [
+        "compat.word-left-stops-at-leading-indent-boundary"
+      ]
     },
     {
       "name": "EditLongLine",
@@ -695,7 +721,10 @@
       "handbookPage": 203,
       "status": "implemented",
       "evidence": "docs/en/KERNEL-COMPATIBILITY-AUDIT.md",
-      "note": "Compatibility navigation and tab rules."
+      "note": "Compatibility navigation and tab rules.",
+      "conformanceCases": [
+        "compat.word-right-punctuation-and-following-blanks"
+      ]
     },
     {
       "name": "EditSchedule",
@@ -730,7 +759,10 @@
       "handbookPage": 207,
       "status": "implemented",
       "evidence": "docs/en/FIRST-ED-COMMAND-MAP.md",
-      "note": "Semantic FIRST-ED editing/navigation commands."
+      "note": "Semantic FIRST-ED editing/navigation commands.",
+      "conformanceCases": [
+        "compat.margins-use-one-based-command-values"
+      ]
     },
     {
       "name": "EditSetMarker",
@@ -747,7 +779,10 @@
       "handbookPage": 209,
       "status": "implemented",
       "evidence": "docs/en/FIRST-ED-COMMAND-MAP.md",
-      "note": "Semantic FIRST-ED editing/navigation commands."
+      "note": "Semantic FIRST-ED editing/navigation commands.",
+      "conformanceCases": [
+        "compat.margins-use-one-based-command-values"
+      ]
     },
     {
       "name": "EditSetUndoLimit",
@@ -792,21 +827,30 @@
       "handbookPage": 215,
       "status": "implemented",
       "evidence": "docs/en/FIRST-ED-COMMAND-MAP.md",
-      "note": "Semantic FIRST-ED editing/navigation commands."
+      "note": "Semantic FIRST-ED editing/navigation commands.",
+      "conformanceCases": [
+        "compat.toggle-auto-indent-isolated-in-linked-view"
+      ]
     },
     {
       "name": "EditToggleInsert",
       "handbookPage": 216,
       "status": "implemented",
       "evidence": "docs/en/FIRST-ED-COMMAND-MAP.md",
-      "note": "Semantic FIRST-ED editing/navigation commands."
+      "note": "Semantic FIRST-ED editing/navigation commands.",
+      "conformanceCases": [
+        "compat.toggle-insert-isolated-in-linked-view"
+      ]
     },
     {
       "name": "EditToggleWordwrap",
       "handbookPage": 217,
       "status": "implemented",
       "evidence": "docs/en/FIRST-ED-COMMAND-MAP.md",
-      "note": "Semantic FIRST-ED editing/navigation commands."
+      "note": "Semantic FIRST-ED editing/navigation commands.",
+      "conformanceCases": [
+        "compat.toggle-word-wrap-isolated-in-linked-view"
+      ]
     },
     {
       "name": "EditTopBlock",
