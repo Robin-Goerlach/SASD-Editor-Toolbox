@@ -444,7 +444,13 @@
       "handbookPage": 174,
       "status": "implemented",
       "evidence": "docs/en/SEARCH-AND-FILE-COMMANDS.md",
-      "note": "Search, replace and compatible file read/write paths."
+      "note": "Search, replace and compatible file read/write paths.",
+      "conformanceCases": [
+        "files.write-direct-leaves-dirty-state-and-identity-untouched",
+        "files.write-direct-preserves-wrapped-and-colored-line-flags",
+        "files.write-direct-uses-selected-document-and-does-not-change-other-document",
+        "files.write-direct-rejects-blank-path-without-provider-call"
+      ]
     },
     {
       "name": "EditFind",

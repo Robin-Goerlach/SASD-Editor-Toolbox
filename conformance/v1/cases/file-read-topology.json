@@ -931,6 +931,414 @@
           "resourceKey": "Editor.Errors.File.IoFailed"
         }
       }
+    },
+    {
+      "id": "files.write-direct-leaves-dirty-state-and-identity-untouched",
+      "area": "file-write",
+      "initial": {
+        "documents": [
+          {
+            "id": "d",
+            "lines": [
+              {
+                "text": "alpha beta",
+                "flags": []
+              }
+            ]
+          }
+        ],
+        "windows": [
+          {
+            "id": "w",
+            "documentId": "d",
+            "cursor": {
+              "line": 0,
+              "column": 0
+            },
+            "topLine": 0,
+            "leftColumn": 0
+          }
+        ],
+        "currentWindowId": "w",
+        "fileWriteSink": true
+      },
+      "operations": [
+        {
+          "id": "replace_next",
+          "text": "alpha",
+          "text2": "X"
+        },
+        {
+          "id": "write_file",
+          "text": "export.txt"
+        }
+      ],
+      "expect": {
+        "documents": {
+          "d": {
+            "lines": [
+              {
+                "text": "X beta",
+                "flags": []
+              }
+            ],
+            "isDirty": true,
+            "version": 1,
+            "associatedFileName": null
+          }
+        },
+        "windows": {
+          "w": {
+            "cursor": {
+              "line": 0,
+              "column": 1
+            }
+          }
+        },
+        "undo": {
+          "count": 1
+        },
+        "fileWrites": [
+          {
+            "path": "export.txt",
+            "lines": [
+              {
+                "text": "X beta",
+                "flags": []
+              }
+            ]
+          }
+        ]
+      }
+    },
+    {
+      "id": "files.write-direct-preserves-wrapped-and-colored-line-flags",
+      "area": "file-write",
+      "initial": {
+        "documents": [
+          {
+            "id": "d",
+            "lines": [
+              {
+                "text": "soft",
+                "flags": [
+                  "wrapped"
+                ]
+              },
+              {
+                "text": "hard",
+                "flags": [
+                  "user_colored"
+                ]
+              }
+            ]
+          }
+        ],
+        "windows": [
+          {
+            "id": "w",
+            "documentId": "d",
+            "cursor": {
+              "line": 0,
+              "column": 2
+            },
+            "topLine": 0,
+            "leftColumn": 0
+          }
+        ],
+        "currentWindowId": "w",
+        "fileWriteSink": true
+      },
+      "operation": {
+        "id": "write_file",
+        "text": "copy.txt"
+      },
+      "expect": {
+        "documents": {
+          "d": {
+            "lines": [
+              {
+                "text": "soft",
+                "flags": [
+                  "wrapped"
+                ]
+              },
+              {
+                "text": "hard",
+                "flags": [
+                  "user_colored"
+                ]
+              }
+            ],
+            "isDirty": false,
+            "version": 0,
+            "associatedFileName": null
+          }
+        },
+        "windows": {
+          "w": {
+            "cursor": {
+              "line": 0,
+              "column": 2
+            }
+          }
+        },
+        "undo": {
+          "count": 0
+        },
+        "fileWrites": [
+          {
+            "path": "copy.txt",
+            "lines": [
+              {
+                "text": "soft",
+                "flags": [
+                  "wrapped"
+                ]
+              },
+              {
+                "text": "hard",
+                "flags": [
+                  "user_colored"
+                ]
+              }
+            ]
+          }
+        ]
+      }
+    },
+    {
+      "id": "files.write-direct-uses-selected-document-and-does-not-change-other-document",
+      "area": "file-write",
+      "initial": {
+        "documents": [
+          {
+            "id": "a",
+            "lines": [
+              {
+                "text": "one",
+                "flags": []
+              }
+            ]
+          },
+          {
+            "id": "b",
+            "lines": [
+              {
+                "text": "two",
+                "flags": []
+              }
+            ]
+          }
+        ],
+        "windows": [
+          {
+            "id": "wa",
+            "documentId": "a",
+            "cursor": {
+              "line": 0,
+              "column": 0
+            },
+            "topLine": 0,
+            "leftColumn": 0
+          },
+          {
+            "id": "wb",
+            "documentId": "b",
+            "cursor": {
+              "line": 0,
+              "column": 0
+            },
+            "topLine": 0,
+            "leftColumn": 0
+          }
+        ],
+        "currentWindowId": "wa",
+        "fileWriteSink": true
+      },
+      "operations": [
+        {
+          "id": "select_window",
+          "windowId": "wb"
+        },
+        {
+          "id": "write_file",
+          "text": "other.txt"
+        }
+      ],
+      "expect": {
+        "currentWindowId": "wb",
+        "documents": {
+          "a": {
+            "lines": [
+              {
+                "text": "one",
+                "flags": []
+              }
+            ],
+            "isDirty": false,
+            "version": 0,
+            "associatedFileName": null
+          },
+          "b": {
+            "lines": [
+              {
+                "text": "two",
+                "flags": []
+              }
+            ],
+            "isDirty": false,
+            "version": 0,
+            "associatedFileName": null
+          }
+        },
+        "undo": {
+          "count": 0
+        },
+        "fileWrites": [
+          {
+            "path": "other.txt",
+            "lines": [
+              {
+                "text": "two",
+                "flags": []
+              }
+            ]
+          }
+        ]
+      }
+    },
+    {
+      "id": "files.write-direct-rejects-blank-path-without-provider-call",
+      "area": "file-write",
+      "initial": {
+        "documents": [
+          {
+            "id": "d",
+            "lines": [
+              {
+                "text": "text",
+                "flags": []
+              }
+            ]
+          }
+        ],
+        "windows": [
+          {
+            "id": "w",
+            "documentId": "d",
+            "cursor": {
+              "line": 0,
+              "column": 0
+            },
+            "topLine": 0,
+            "leftColumn": 0
+          }
+        ],
+        "currentWindowId": "w",
+        "fileWriteSink": true
+      },
+      "operation": {
+        "id": "write_file",
+        "text": "",
+        "commandSucceeded": false
+      },
+      "expect": {
+        "commandSucceeded": false,
+        "documents": {
+          "d": {
+            "lines": [
+              {
+                "text": "text",
+                "flags": []
+              }
+            ],
+            "isDirty": false,
+            "version": 0,
+            "associatedFileName": null
+          }
+        },
+        "undo": {
+          "count": 0
+        },
+        "fileWrites": [],
+        "error": {
+          "id": "invalid_command_argument",
+          "code": "EDITOR_COMMAND_INVALID_ARGUMENT",
+          "resourceKey": "Editor.Errors.Command.InvalidArgument"
+        }
+      }
+    },
+    {
+      "id": "files.save-explicit-path-acknowledges-snapshot-where-write-direct-does-not",
+      "area": "file-write",
+      "initial": {
+        "documents": [
+          {
+            "id": "d",
+            "lines": [
+              {
+                "text": "alpha beta",
+                "flags": []
+              }
+            ]
+          }
+        ],
+        "windows": [
+          {
+            "id": "w",
+            "documentId": "d",
+            "cursor": {
+              "line": 0,
+              "column": 0
+            },
+            "topLine": 0,
+            "leftColumn": 0
+          }
+        ],
+        "currentWindowId": "w",
+        "fileWriteSink": true
+      },
+      "operations": [
+        {
+          "id": "replace_next",
+          "text": "alpha",
+          "text2": "X"
+        },
+        {
+          "id": "save_file",
+          "text": "saved.txt"
+        }
+      ],
+      "expect": {
+        "documents": {
+          "d": {
+            "lines": [
+              {
+                "text": "X beta",
+                "flags": []
+              }
+            ],
+            "isDirty": false,
+            "version": 1,
+            "associatedFileName": "saved.txt"
+          }
+        },
+        "undo": {
+          "count": 1
+        },
+        "fileWrites": [
+          {
+            "path": "saved.txt",
+            "lines": [
+              {
+                "text": "X beta",
+                "flags": []
+              }
+            ]
+          }
+        ]
+      }
     }
   ]
 }

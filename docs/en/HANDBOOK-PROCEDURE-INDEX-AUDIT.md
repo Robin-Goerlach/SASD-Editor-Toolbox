@@ -59,6 +59,8 @@ Three portable negative `file-read-topology.json` cases now prove that malformed
 
 Concurrent destination-write tests now explicitly check the in-process built-in staged writer's per-path serialization, cancellable waiters, cleanup after failures and independent writes to different destinations. This strengthens file persistence evidence; it does not turn the 32 linked historical routine rows into a blanket V1 certificate.
 
+Five new portable file-output cases exercise the public WriteFile/SaveFile semantic path via a recording logical-line codec, without filesystem timing or byte-format dependencies. Four cases now provide direct executable traceability for the previously unlinked historical `EditFileWrite` entry. There are now **33 of 123** historical routine rows linked to specific portable evidence; other mappings remain subject to the full behavioral audit.
+
 ## Next review and acceptance criteria
 
 For each *needs-review* row, examine its individual handbook description, check the existing architecture and tests, add focused regression coverage for genuine behavior gaps, then independently implement only those gaps. Revisit the conceptual *implemented* mappings and identify any missing tests without fabricating Pascal-shaped APIs. Keep the English and German audit, compatibility matrix, and any affected shared specification/conformance cases synchronized.

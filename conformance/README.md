@@ -61,3 +61,9 @@ The conceptual `find_next_with_options` operation calls the language's **ordinar
 ## Portable rejection of malformed decoded file lines
 
 Decoded compatibility files are not trusted simply because a codec returned successfully. Three `file-read-topology.json` cases provide a valid line followed by an invalid record containing embedded CR, LF or `0x8D` within its text. Adapters must reject the **entire** pending import through the stable `file_io_failed` error rather than insert the valid prefix: cursor, document version, dirty flag and Undo count remain unchanged. Raw byte encoding/decoding and filesystem staging are still tested in each language implementation.
+
+## Portable file write and Save As evidence
+
+The `file-read-topology.json` suite now also includes `file-write` cases using `initial.fileWriteSink: true`. A deterministic codec captures each `write_file` or `save_file` invocation as a filename plus logical line snapshots (`expect.fileWrites`); no actual filesystem or byte encoding is involved. Expectations may also specify `associatedFileName` to check only the portable filename component instead of a language/OS-specific absolute path.
+
+Direct Write File must preserve document identity, dirty state and Undo and must write the selected document with line flags. A blank filename must not invoke the provider. Modern Save with an explicit path is a separately documented convenience: only that save acknowledges the persisted snapshot and updates document identity. Four of the five new cases link directly to historical `EditFileWrite`; modern Save is intentionally not presented as an additional 1985 requirement.

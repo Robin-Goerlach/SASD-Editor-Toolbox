@@ -227,6 +227,10 @@ Modern UTF-8 writes now reject embedded CR/LF inside buffer lines and invalid co
 
 The document assigns a save-order token before any awaited Save/Save As. Successful newer requests take precedence over slower older completions even when their target paths differ, preventing the older request from reverting a newer file association. Failed/cancelled newer requests do not suppress older successful saves. Direct Write File deliberately remains outside document-identity acknowledgements.
 
+## Portable direct Write File evidence
+
+A new recording decoded-line codec adapter verifies the selected document snapshot, preserved Wrapped/UserColored flags, blank-path rejection and the historical direct Write File rule of not changing document identity/dirty/Undo state. The `EditFileWrite` inventory entry now links to four portable cases. Modern explicit Save is tested separately and must not be confused with the 1985 direct write operation.
+
 ## V1 release gate
 
 The C#/.NET implementation now has executable coverage for the major FIRST-ED structural areas, including paragraph reformatting, whole-line block bulk topology, independent block endpoints and atomic multi-document undo/navigation restoration. The [handbook procedure/function index audit](HANDBOOK-PROCEDURE-INDEX-AUDIT.md) now records all 123 printed entries with first-pass classifications; its mapped behavior still requires a final regression-coverage and host-interface audit before calling V1 complete. MicroStar-specific demonstrations may ship as samples rather than core dependencies.

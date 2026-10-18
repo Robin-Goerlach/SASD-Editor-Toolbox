@@ -91,15 +91,19 @@ public sealed class PortableConformanceTests
     {
         var hooks = new RecordingHooks();
 
-        // Portable file-read cases supply *decoded* lines, not a local
-        // filename. A deterministic codec translates those fixture lines
-        // into the same public ReadFile command used by real editor hosts.
-        // This tests file insertion without host filesystem dependencies
-        // or committing either language to the .NET byte codec.
-        IEditorFileCodec? fileCodec = initial.TryGetProperty("fileReadLines", out var decoded)
-            ? new FixtureReadCodec(decoded.EnumerateArray().Select(ParseLine).ToArray())
+        // Portable file fixtures use an in-memory codec: decoded input
+        // supports ReadFile and a recording sink supports WriteFile/SaveFile.
+        // No fixture creates a real file or depends on OS path separators.
+        var hasReadInput = initial.TryGetProperty("fileReadLines", out var decoded);
+        var hasWriteSink = initial.TryGetProperty("fileWriteSink", out var sink)
+            && sink.GetBoolean();
+        var fixtureCodec = hasReadInput || hasWriteSink
+            ? new FixtureFileCodec(
+                hasReadInput
+                    ? decoded.EnumerateArray().Select(ParseLine).ToArray()
+                    : Array.Empty<EditorLineSnapshot>())
             : null;
-        var session = new EditorSession(hooks, fileCodec);
+        var session = new EditorSession(hooks, fixtureCodec);
         var documents = new Dictionary<string, EditorDocument>(StringComparer.Ordinal);
         var windows = new Dictionary<string, EditorWindow>(StringComparer.Ordinal);
 
@@ -143,7 +147,7 @@ public sealed class PortableConformanceTests
         var currentWindowId = RequireString(initial, "currentWindowId");
         session.SetCurrentWindow(windows[currentWindowId].WindowId);
 
-        return new TestContext(session, documents, windows, hooks);
+        return new TestContext(session, documents, windows, hooks, fixtureCodec);
     }
 
     private static EditorWindowOptions ParseOptions(JsonElement portableWindow)
@@ -328,6 +332,8 @@ public sealed class PortableConformanceTests
             // In particular, text:"" for find_next has historical meaning;
             // it must not be converted to an omitted/null request argument.
             "read_file" => EditorCommandId.ReadFile,
+            "write_file" => EditorCommandId.WriteFile,
+            "save_file" => EditorCommandId.SaveFile,
             "find_next" => EditorCommandId.FindNext,
             "find_again" => EditorCommandId.FindAgain,
             "replace_next" => EditorCommandId.ReplaceNext,
@@ -421,6 +427,25 @@ public sealed class PortableConformanceTests
             AssertExpectedViewports(context, viewports);
         }
 
+        if (expected.TryGetProperty("fileWrites", out var expectedWrites))
+        {
+            // Portable output assertion compares captured logical snapshots,
+            // not historical byte encoding or OS-specific full paths.
+            var captured = Assert.IsType<FixtureFileCodec>(context.FileCodec).Writes;
+            Assert.Equal(expectedWrites.GetArrayLength(), captured.Count);
+            var index = 0;
+            foreach (var written in expectedWrites.EnumerateArray())
+            {
+                Assert.Equal(
+                    RequireString(written, "path"),
+                    Path.GetFileName(captured[index].Path));
+                var expectedLines = written.GetProperty("lines").EnumerateArray()
+                    .Select(ParseLine).ToArray();
+                Assert.Equal(expectedLines, captured[index].Lines);
+                index++;
+            }
+        }
+
         if (expected.TryGetProperty("error", out var error))
         {
             AssertExpectedError(context, error);
@@ -509,6 +534,12 @@ public sealed class PortableConformanceTests
             Assert.Equal(version.GetInt64(), document.Version);
         }
 
+        if (expected.TryGetProperty("associatedFileName", out var associatedFileName))
+        {
+            Assert.Equal(associatedFileName.GetString(),
+                document.FilePath is null ? null : Path.GetFileName(document.FilePath));
+        }
+
         if (!expected.TryGetProperty("lines", out var expectedLines))
         {
             return;
@@ -595,15 +626,21 @@ public sealed class PortableConformanceTests
         EditorSession Session,
         IReadOnlyDictionary<string, EditorDocument> Documents,
         IReadOnlyDictionary<string, EditorWindow> Windows,
-        RecordingHooks Hooks);
+        RecordingHooks Hooks,
+        FixtureFileCodec? FileCodec);
+
+    private sealed record WrittenFile(string Path, IReadOnlyList<EditorLineSnapshot> Lines);
 
     /// <summary>
-    /// A storage-free, deterministic decoded-line provider for portable
-    /// semantic ReadFile tests. Byte-level 0x8D/CRLF compatibility remains
-    /// covered by the separate legacy codec regressions.
+    /// The shared file fixture codec accepts decoded logical lines on Read,
+    /// and records writes as exact logical line snapshots without filesystem
+    /// I/O. Native C++/Java adapters can implement the same observable seam.
+    /// Historical 0x8D byte-level compatibility remains independently tested.
     /// </summary>
-    private sealed class FixtureReadCodec(IReadOnlyList<EditorLineSnapshot> lines) : IEditorFileCodec
+    private sealed class FixtureFileCodec(IReadOnlyList<EditorLineSnapshot> lines) : IEditorFileCodec
     {
+        public List<WrittenFile> Writes { get; } = [];
+
         public ValueTask<IReadOnlyList<EditorLineSnapshot>> ReadAsync(
             string path, CancellationToken cancellationToken = default)
         {
@@ -614,8 +651,12 @@ public sealed class PortableConformanceTests
         public ValueTask WriteAsync(
             string path,
             IReadOnlyList<EditorLineSnapshot> snapshots,
-            CancellationToken cancellationToken = default) =>
-            throw new NotSupportedException("Portable file-read fixtures do not write files.");
+            CancellationToken cancellationToken = default)
+        {
+            cancellationToken.ThrowIfCancellationRequested();
+            Writes.Add(new WrittenFile(path, snapshots.ToArray()));
+            return ValueTask.CompletedTask;
+        }
     }
 
     private sealed class RecordingHooks : IEditorHooks

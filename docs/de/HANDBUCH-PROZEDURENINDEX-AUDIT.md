@@ -59,6 +59,8 @@ Drei neue negative portable Fälle in `file-read-topology.json` weisen nach, das
 
 Neue Regressionstests für konkurrierende Dateiausgaben prüfen die pfadbezogene Serialisierung des eingebauten Staged-Writers innerhalb eines Prozesses, abbrechbare Wartende, Freigabe nach Fehlern und unabhängige Ausgaben an verschiedene Ziele. Das erweitert die Persistenz-Evidenz, ersetzt aber nicht den offenen Einzelnachweis für historische Routinen.
 
+Fünf neue portable Fälle zur Dateiausgabe testen WriteFile und SaveFile mit einem protokollierenden Codec für logische Zeilen, ohne von echten Dateien oder Bytes abzuhängen. Vier Fälle liefern erstmals ausdrücklich verknüpfte Tests für die historische Routine `EditFileWrite`. Damit besitzen jetzt **33 von 123** historischen Routinen direkte Verweise auf portable Testbelege; die übrigen Zuordnungen benötigen weiterhin den vollständigen Verhaltens-Audit.
+
 ## Nächste Schritte und Abschlusskriterien
 
 Jeden offenen Eintrag anhand seiner eigenen Handbuchbeschreibung prüfen, die bereits vorhandenen Tests abgleichen und nur bei echten Verhaltenslücken unabhängigen Code samt Regressionstests ergänzen. Auch die als implementiert eingestuften Zuordnungen brauchen einen Randfall-/Testabgleich; künstliche Pascal-APIs sind ausdrücklich unerwünscht. Inventarliste, deutsche/englische Audit-Dokumente, Matrix und nötigenfalls sprachneutralen Vertrag/Conformance-Fälle synchron halten.
