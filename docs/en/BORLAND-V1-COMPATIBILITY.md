@@ -215,6 +215,10 @@ The compatibility read service now copies and validates every decoded line befor
 
 The .NET codec now has separate byte-level cases for terminal and consecutive high-bit CR, defensive 0x8D/LF, ordinary CR/LF variants, blank logical lines, empty physical streams and Latin-1 byte round trips. These strengthen implementation confidence without claiming undocumented DOS input variants are historically normative.
 
+## Concurrent destination-write serialization
+
+The built-in staged file writers now reserve a normalized target-path gate during staging and publication. Same-path writes no longer overtake a prior in-progress write, while distinct paths remain independent. Cancellation while waiting and failure during a staged write release the gate without publishing a partial target. This is a modern in-process persistence policy, not a distributed locking or historical DOS guarantee.
+
 ## V1 release gate
 
 The C#/.NET implementation now has executable coverage for the major FIRST-ED structural areas, including paragraph reformatting, whole-line block bulk topology, independent block endpoints and atomic multi-document undo/navigation restoration. The [handbook procedure/function index audit](HANDBOOK-PROCEDURE-INDEX-AUDIT.md) now records all 123 printed entries with first-pass classifications; its mapped behavior still requires a final regression-coverage and host-interface audit before calling V1 complete. MicroStar-specific demonstrations may ship as samples rather than core dependencies.

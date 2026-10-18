@@ -57,6 +57,8 @@ Sieben weitere portable Testfälle in `search-and-replace.json` prüfen das opti
 
 Drei neue negative portable Fälle in `file-read-topology.json` weisen nach, dass ungültige dekodierte Zeilen (eingebettetes CR, LF oder 0x8D) den *gesamten* Import mit `file_io_failed` ablehnen, ohne Dokument oder Undo zu verändern. Sie ergänzen separate .NET-Tests für Byteformat und asynchrone Lesevorgänge, ersetzen diese jedoch nicht.
 
+Neue Regressionstests für konkurrierende Dateiausgaben prüfen die pfadbezogene Serialisierung des eingebauten Staged-Writers innerhalb eines Prozesses, abbrechbare Wartende, Freigabe nach Fehlern und unabhängige Ausgaben an verschiedene Ziele. Das erweitert die Persistenz-Evidenz, ersetzt aber nicht den offenen Einzelnachweis für historische Routinen.
+
 ## Nächste Schritte und Abschlusskriterien
 
 Jeden offenen Eintrag anhand seiner eigenen Handbuchbeschreibung prüfen, die bereits vorhandenen Tests abgleichen und nur bei echten Verhaltenslücken unabhängigen Code samt Regressionstests ergänzen. Auch die als implementiert eingestuften Zuordnungen brauchen einen Randfall-/Testabgleich; künstliche Pascal-APIs sind ausdrücklich unerwünscht. Inventarliste, deutsche/englische Audit-Dokumente, Matrix und nötigenfalls sprachneutralen Vertrag/Conformance-Fälle synchron halten.

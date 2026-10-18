@@ -128,3 +128,9 @@ Bei fehlerhaften Codec-Daten meldet der semantische Dispatcher den typisierten D
 ## Regressionstests für historische 0x8D-Zeilengrenzen
 
 Die Byteformat-Testreihe für .NET prüft jetzt ausdrücklich ein abschließendes `Wrapped`-Kennzeichen, die defensive Kombination `0x8D/LF`, aufeinanderfolgende weiche und harte Zeilentrenner mit absichtlich leeren Zeilen, einzelne CR-/LF-Grenzen neben CRLF, abschließende gewöhnliche Trennzeichen ohne künstliche zusätzliche Leerzeile, leere physische Dateien sowie Latin-1-Steuerzeichen und High-Bytes (außer dem reservierten `0x8D`). Diese Tests beschreiben die **dokumentierte Behandlung der Referenzimplementierung**, nicht eine pauschale Behauptung, jede defensive Eingabevariante sei im Handbuch von 1985 definiert.
+
+## Gleichzeitige Schreibvorgänge auf dieselbe Datei
+
+Der gemeinsame Dateischreiber reserviert jetzt **vor dem ersten asynchronen Warten** eine Sperre für den normalisierten Zielpfad. Schreiben zwei eingebaute UTF-8- bzw. historische Codec-Aufrufe auf dieselbe Datei, kann der zweite Vorgang erst nach Abschluss des ersten seinen temporären Inhalt schreiben und veröffentlichen. Dadurch kann ein älterer, langsamer eingebauter Schreibvorgang nicht mehr hinter einem bereits bestätigten neueren Schreibvorgang die alten Bytes veröffentlichen. Unterschiedliche Zieldateien bleiben parallel beschreibbar. Abgebrochene Wartende legen keine temporäre Datei an; Fehler geben die Sperre frei, nicht mehr benötigte Sperren werden verworfen.
+
+Das gilt innerhalb **eines Prozesses** für die eingebauten Dateischreiber. Fremde `IEditorFileCodec`-Implementierungen, weitere Prozesse, Symlink-/Hardlink-Aliase, plattformspezifische Groß-/Kleinschreibung und fremde Dateizugriffe sind nicht durch diese Sperre geschützt. Der Dirty-State wird unabhängig davon weiterhin anhand des tatsächlich gespeicherten Dokument-Snapshots bestätigt. Deterministische Tests sichern die Sperr- und Abbruchregeln ab.

@@ -125,3 +125,9 @@ If a decoder supplies a malformed line, a typed `FileIoFailed` is reported by th
 ## Legacy 0x8D boundary regression matrix
 
 The .NET byte-compatibility suite now explicitly tests a final `Wrapped` marker, a defensive `0x8D/LF` separator, consecutive soft/hard delimiters and intentional empty lines, standalone CR and LF alongside CRLF, a trailing ordinary separator without an invented extra line, an empty physical input, and Latin-1 control/high-byte round trips excluding reserved `0x8D`. These cases specify the **reference implementation's documented boundary handling**, not an assertion that every defensive input variant was explicitly described in the 1985 handbook.
+
+## Concurrent built-in writes to the same file
+
+The shared staged writer now reserves a **per-normalized-target gate before awaiting filesystem I/O**. If two built-in UTF-8/legacy writes target the same path, the second cannot stage and publish over the first until that earlier operation finishes. This prevents a slow older publication from overwriting bytes that a newer built-in write has already acknowledged. Different destinations can still write concurrently. A cancelled waiter never stages anything; failed operations release the gate, and unused path gates are discarded rather than retained forever.
+
+This is an in-process guarantee for cooperating built-in writers, not cross-process locking. External providers/custom `IEditorFileCodec` implementations, symlink and hardlink aliases, OS-dependent case sensitivity, and writes by other programs are not covered. The disk-snapshot/dirty acknowledgement rules remain separate from file publication ordering. Deterministic tests enforce these boundaries with controlled, asynchronous callbacks.

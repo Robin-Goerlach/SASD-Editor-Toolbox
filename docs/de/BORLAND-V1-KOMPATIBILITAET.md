@@ -214,6 +214,10 @@ Der kompatible Lesedienst prüft den vollständigen dekodierten Zeilenbestand vo
 
 Zusätzliche .NET-Codec-Fälle prüfen High-Bit-CR am Dateiende und hintereinander, die defensive Variante 0x8D/LF, CR/LF-Grenzen, logische Leerzeilen, leere physische Dateien und Latin-1-Roundtrips. Damit wächst die Absicherung, ohne nicht belegte DOS-Eingabevarianten zur historischen Norm zu erklären.
 
+## Serialisierung konkurrierender Dateiausgaben
+
+Die eingebauten Dateischreiber halten während Vorbereitung und Veröffentlichung eine Sperre für den normalisierten Zielpfad. Ein zweiter Schreibauftrag kann einen vorher begonnenen Auftrag für dieselbe Datei nicht überholen; unterschiedliche Ziele bleiben unabhängig. Abbruch während des Wartens und Fehler beim Staging geben die Sperre ohne teilweisen Import/Export frei. Dies ist eine moderne In-Process-Regel, keine systemweite Sperre oder historische DOS-Garantie.
+
 ## V1-Abschlusskriterium
 
 Die C#/.NET-Implementierung deckt die großen strukturellen FIRST-ED-Bereiche inzwischen ausführbar ab, einschließlich Absatz-Neuformatierung, mehrzeiliger Block-Bulk-Topologie, unabhängiger Block-Endpunkte und atomarer Multi-Dokument-Undo-/Navigationswiederherstellung. Der [Handbuch-Prozeduren-/Funktionsindex-Audit](HANDBUCH-PROZEDURENINDEX-AUDIT.md) erfasst inzwischen alle 123 gedruckten Einträge mit ersten Klassifikationen; die zugeordneten Routinen benötigen vor V1 noch einen abschließenden Testabdeckungs- und Host-Audit. MicroStar-spezifische Demonstrationen können als Samples statt als Core-Abhängigkeiten geliefert werden.
