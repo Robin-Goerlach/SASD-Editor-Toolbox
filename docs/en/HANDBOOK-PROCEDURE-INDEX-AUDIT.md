@@ -35,7 +35,7 @@ The repository now reads every declared file in `conformance/v1/manifest.json`, 
 
 ## Machine-checked links to executable evidence
 
-The inventory may include an optional `conformanceCases` array on a historical routine. The repository contract validator verifies that each referenced case ID occurs in a file declared by the portable manifest, rejects duplicate or unknown IDs, and reports the number of rows with links. **Currently 50 of 123 rows** link to specific portable cases; the other rows retain conceptual/documentation evidence and still require individual regression review.
+The inventory may include an optional `conformanceCases` array on a historical routine. The repository contract validator verifies that each referenced case ID occurs in a file declared by the portable manifest, rejects duplicate or unknown IDs, and reports the number of rows with links. **Currently 60 of 123 rows** link to specific portable cases; the other rows retain conceptual/documentation evidence and still require individual regression review.
 
 These links represent **focused examples**, not exhaustive proof of historical behavior. The verifier deliberately does not fabricate conformance evidence for a procedure merely because its conceptual mapping is marked `implemented` or `modern-replacement`.
 
@@ -64,6 +64,8 @@ Five new portable file-output cases exercise the public WriteFile/SaveFile seman
 The new `compatibility-primitives.json` cases link 13 previously unlinked historical procedures to directly executable checks. Observable coverage includes linked-window option independence, virtual columns, one-based commands, historical word classes, Undo and modern nonmutating edit semantics. **46 of 123** index entries now carry explicit portable evidence links, not release-level equivalence certificates.
 
 Five further shared cases now trace `EditTab`, `EditDeleteLeftChar`, `EditDeleteRightChar` and `EditDeleteRightWord` through their semantic commands. They distinguish insert versus overtype Tab behavior, virtual-space Backspace without a text mutation and deletion of punctuation/blank runs. The inventory now has **50 of 123** directly linked routines.
+
+The portable `windows-and-block-lifecycle.json` suite now provides direct executable coverage for all 10 previously unlinked historical window and block navigation/lifecycle routines. The handbook inventory therefore has **60 of 123** entries with explicit portable cases. Window/document association and host-neutral frame assertions supplement earlier .NET-only geometry and block tests; the remaining unlinked procedures still require review.
 
 ## Next review and acceptance criteria
 

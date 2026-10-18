@@ -24,6 +24,7 @@ This document defines behavior that every language implementation should preserv
 
 - Displayed windows have host-neutral vertical frames separate from document/view state.
 - A V1 compatibility frame height includes one status row and must be at least three rows total, leaving at least two text rows.
+- Portable workspace fixtures can assign a host row count before window commands and verify indexed top-row/height frames; row geometry remains host-neutral, not a terminal API contract.
 - Create Window receives a requested new-window height and a donor displayed-window number. It rejects a height below three rows or a split that would reduce the donor below three rows.
 - A successful Create Window takes the requested rows from the donor's lower displayed area, creates a blank new document/view directly after the donor in displayed-window order, and keeps total allocated rows unchanged.
 - If donor compression would leave its cursor below the donor's remaining visible text area, the cursor is moved to the donor's last displayed text line while preserving its column.

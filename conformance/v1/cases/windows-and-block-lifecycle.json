@@ -1,0 +1,1110 @@
+{
+  "formatVersion": 1,
+  "contractVersion": "v1",
+  "cases": [
+    {
+      "id": "windows.previous-from-first-wraps-to-last-view",
+      "area": "windows",
+      "initial": {
+        "documents": [
+          {
+            "id": "a",
+            "lines": [
+              {
+                "text": "a",
+                "flags": []
+              }
+            ]
+          },
+          {
+            "id": "b",
+            "lines": [
+              {
+                "text": "b",
+                "flags": []
+              }
+            ]
+          }
+        ],
+        "windows": [
+          {
+            "id": "wa",
+            "documentId": "a",
+            "cursor": {
+              "line": 0,
+              "column": 0
+            },
+            "topLine": 0,
+            "leftColumn": 0
+          },
+          {
+            "id": "wb",
+            "documentId": "b",
+            "cursor": {
+              "line": 0,
+              "column": 0
+            },
+            "topLine": 0,
+            "leftColumn": 0
+          }
+        ],
+        "currentWindowId": "wa"
+      },
+      "operation": {
+        "id": "previous_window"
+      },
+      "expect": {
+        "currentWindowId": "wb",
+        "windowCount": 2,
+        "documents": {
+          "a": {
+            "lines": [
+              {
+                "text": "a",
+                "flags": []
+              }
+            ],
+            "isDirty": false,
+            "version": 0
+          },
+          "b": {
+            "lines": [
+              {
+                "text": "b",
+                "flags": []
+              }
+            ],
+            "isDirty": false,
+            "version": 0
+          }
+        },
+        "undo": {
+          "count": 0
+        }
+      }
+    },
+    {
+      "id": "windows.next-from-last-wraps-to-first-view",
+      "area": "windows",
+      "initial": {
+        "documents": [
+          {
+            "id": "a",
+            "lines": [
+              {
+                "text": "a",
+                "flags": []
+              }
+            ]
+          },
+          {
+            "id": "b",
+            "lines": [
+              {
+                "text": "b",
+                "flags": []
+              }
+            ]
+          }
+        ],
+        "windows": [
+          {
+            "id": "wa",
+            "documentId": "a",
+            "cursor": {
+              "line": 0,
+              "column": 0
+            },
+            "topLine": 0,
+            "leftColumn": 0
+          },
+          {
+            "id": "wb",
+            "documentId": "b",
+            "cursor": {
+              "line": 0,
+              "column": 0
+            },
+            "topLine": 0,
+            "leftColumn": 0
+          }
+        ],
+        "currentWindowId": "wb"
+      },
+      "operation": {
+        "id": "next_window"
+      },
+      "expect": {
+        "currentWindowId": "wa",
+        "windowCount": 2,
+        "undo": {
+          "count": 0
+        }
+      }
+    },
+    {
+      "id": "windows.goto-one-based-modulo-window-number",
+      "area": "windows",
+      "initial": {
+        "documents": [
+          {
+            "id": "a",
+            "lines": [
+              {
+                "text": "a",
+                "flags": []
+              }
+            ]
+          },
+          {
+            "id": "b",
+            "lines": [
+              {
+                "text": "b",
+                "flags": []
+              }
+            ]
+          }
+        ],
+        "windows": [
+          {
+            "id": "wa",
+            "documentId": "a",
+            "cursor": {
+              "line": 0,
+              "column": 0
+            },
+            "topLine": 0,
+            "leftColumn": 0
+          },
+          {
+            "id": "wb",
+            "documentId": "b",
+            "cursor": {
+              "line": 0,
+              "column": 0
+            },
+            "topLine": 0,
+            "leftColumn": 0
+          }
+        ],
+        "currentWindowId": "wb"
+      },
+      "operation": {
+        "id": "goto_window",
+        "number": 3
+      },
+      "expect": {
+        "currentWindowId": "wa",
+        "windowCount": 2,
+        "undo": {
+          "count": 0
+        }
+      }
+    },
+    {
+      "id": "windows.link-replaces-last-destination-view-and-releases-history",
+      "area": "windows",
+      "initial": {
+        "documents": [
+          {
+            "id": "a",
+            "lines": [
+              {
+                "text": "old",
+                "flags": []
+              }
+            ]
+          },
+          {
+            "id": "b",
+            "lines": [
+              {
+                "text": "new",
+                "flags": []
+              }
+            ]
+          }
+        ],
+        "windows": [
+          {
+            "id": "wa",
+            "documentId": "a",
+            "cursor": {
+              "line": 0,
+              "column": 0
+            },
+            "topLine": 0,
+            "leftColumn": 0
+          },
+          {
+            "id": "wb",
+            "documentId": "b",
+            "cursor": {
+              "line": 0,
+              "column": 0
+            },
+            "topLine": 0,
+            "leftColumn": 0
+          }
+        ],
+        "currentWindowId": "wa"
+      },
+      "operations": [
+        {
+          "id": "change_case"
+        },
+        {
+          "id": "link_window",
+          "number": 1,
+          "number2": 2
+        },
+        {
+          "id": "undo",
+          "commandSucceeded": false
+        }
+      ],
+      "expect": {
+        "commandSucceeded": false,
+        "windowCount": 2,
+        "windows": {
+          "wa": {
+            "documentId": "b",
+            "sameDocumentAs": "wb"
+          }
+        },
+        "documents": {
+          "a": {
+            "lines": [
+              {
+                "text": "Old",
+                "flags": []
+              }
+            ],
+            "version": 1,
+            "isDirty": true
+          },
+          "b": {
+            "lines": [
+              {
+                "text": "new",
+                "flags": []
+              }
+            ],
+            "isDirty": false,
+            "version": 0
+          }
+        },
+        "undo": {
+          "count": 0
+        }
+      }
+    },
+    {
+      "id": "windows.link-keeps-history-when-old-stream-has-linked-view",
+      "area": "windows",
+      "initial": {
+        "documents": [
+          {
+            "id": "a",
+            "lines": [
+              {
+                "text": "old",
+                "flags": []
+              }
+            ]
+          },
+          {
+            "id": "b",
+            "lines": [
+              {
+                "text": "new",
+                "flags": []
+              }
+            ]
+          }
+        ],
+        "windows": [
+          {
+            "id": "wa",
+            "documentId": "a",
+            "cursor": {
+              "line": 0,
+              "column": 0
+            },
+            "topLine": 0,
+            "leftColumn": 0
+          },
+          {
+            "id": "sibling",
+            "documentId": "a",
+            "cursor": {
+              "line": 0,
+              "column": 0
+            },
+            "topLine": 0,
+            "leftColumn": 0
+          },
+          {
+            "id": "wb",
+            "documentId": "b",
+            "cursor": {
+              "line": 0,
+              "column": 0
+            },
+            "topLine": 0,
+            "leftColumn": 0
+          }
+        ],
+        "currentWindowId": "wa"
+      },
+      "operations": [
+        {
+          "id": "change_case"
+        },
+        {
+          "id": "link_window",
+          "number": 1,
+          "number2": 3
+        },
+        {
+          "id": "select_window",
+          "windowId": "sibling"
+        },
+        {
+          "id": "undo"
+        }
+      ],
+      "expect": {
+        "currentWindowId": "sibling",
+        "windowCount": 3,
+        "windows": {
+          "wa": {
+            "documentId": "b",
+            "sameDocumentAs": "wb"
+          },
+          "sibling": {
+            "documentId": "a"
+          }
+        },
+        "documents": {
+          "a": {
+            "lines": [
+              {
+                "text": "old",
+                "flags": []
+              }
+            ],
+            "isDirty": false,
+            "version": 0
+          },
+          "b": {
+            "lines": [
+              {
+                "text": "new",
+                "flags": []
+              }
+            ],
+            "isDirty": false,
+            "version": 0
+          }
+        },
+        "undo": {
+          "count": 0
+        }
+      }
+    },
+    {
+      "id": "windows.create-splits-donor-and-preserves-total-rows",
+      "area": "windows",
+      "initial": {
+        "documents": [
+          {
+            "id": "a",
+            "lines": [
+              {
+                "text": "text",
+                "flags": []
+              }
+            ]
+          }
+        ],
+        "windows": [
+          {
+            "id": "wa",
+            "documentId": "a",
+            "cursor": {
+              "line": 0,
+              "column": 0
+            },
+            "topLine": 0,
+            "leftColumn": 0
+          }
+        ],
+        "currentWindowId": "wa",
+        "layoutRows": 12
+      },
+      "operation": {
+        "id": "create_window",
+        "number": 4,
+        "number2": 1
+      },
+      "expect": {
+        "windowCount": 2,
+        "currentWindowIndex": 1,
+        "layoutFrames": [
+          {
+            "topRow": 0,
+            "height": 8
+          },
+          {
+            "topRow": 8,
+            "height": 4
+          }
+        ],
+        "windows": {
+          "wa": {
+            "documentId": "a"
+          }
+        },
+        "documents": {
+          "a": {
+            "lines": [
+              {
+                "text": "text",
+                "flags": []
+              }
+            ],
+            "isDirty": false,
+            "version": 0
+          }
+        },
+        "undo": {
+          "count": 0
+        }
+      }
+    },
+    {
+      "id": "windows.delete-first-returns-rows-to-following-window",
+      "area": "windows",
+      "initial": {
+        "documents": [
+          {
+            "id": "a",
+            "lines": [
+              {
+                "text": "left",
+                "flags": []
+              }
+            ]
+          },
+          {
+            "id": "b",
+            "lines": [
+              {
+                "text": "right",
+                "flags": []
+              }
+            ]
+          }
+        ],
+        "windows": [
+          {
+            "id": "wa",
+            "documentId": "a",
+            "cursor": {
+              "line": 0,
+              "column": 0
+            },
+            "topLine": 0,
+            "leftColumn": 0
+          },
+          {
+            "id": "wb",
+            "documentId": "b",
+            "cursor": {
+              "line": 0,
+              "column": 0
+            },
+            "topLine": 0,
+            "leftColumn": 0
+          }
+        ],
+        "currentWindowId": "wb",
+        "layoutRows": 18
+      },
+      "operation": {
+        "id": "delete_window",
+        "number": 1
+      },
+      "expect": {
+        "windowCount": 1,
+        "currentWindowId": "wb",
+        "layoutFrames": [
+          {
+            "topRow": 0,
+            "height": 18
+          }
+        ],
+        "documents": {
+          "b": {
+            "lines": [
+              {
+                "text": "right",
+                "flags": []
+              }
+            ],
+            "isDirty": false,
+            "version": 0
+          }
+        },
+        "undo": {
+          "count": 0
+        }
+      }
+    },
+    {
+      "id": "windows.delete-last-window-is-rejected-and-frame-survives",
+      "area": "windows",
+      "initial": {
+        "documents": [
+          {
+            "id": "a",
+            "lines": [
+              {
+                "text": "text",
+                "flags": []
+              }
+            ]
+          }
+        ],
+        "windows": [
+          {
+            "id": "wa",
+            "documentId": "a",
+            "cursor": {
+              "line": 0,
+              "column": 0
+            },
+            "topLine": 0,
+            "leftColumn": 0
+          }
+        ],
+        "currentWindowId": "wa",
+        "layoutRows": 12
+      },
+      "operation": {
+        "id": "delete_window",
+        "number": 1,
+        "commandSucceeded": false
+      },
+      "expect": {
+        "commandSucceeded": false,
+        "windowCount": 1,
+        "layoutFrames": [
+          {
+            "topRow": 0,
+            "height": 12
+          }
+        ],
+        "documents": {
+          "a": {
+            "lines": [
+              {
+                "text": "text",
+                "flags": []
+              }
+            ],
+            "isDirty": false,
+            "version": 0
+          }
+        },
+        "undo": {
+          "count": 0
+        }
+      }
+    },
+    {
+      "id": "windows.delete-linked-stream-text-detaches-every-view",
+      "area": "windows",
+      "initial": {
+        "documents": [
+          {
+            "id": "a",
+            "lines": [
+              {
+                "text": "shared",
+                "flags": []
+              }
+            ]
+          }
+        ],
+        "windows": [
+          {
+            "id": "wa",
+            "documentId": "a",
+            "cursor": {
+              "line": 0,
+              "column": 2
+            },
+            "topLine": 0,
+            "leftColumn": 0
+          },
+          {
+            "id": "wb",
+            "documentId": "a",
+            "cursor": {
+              "line": 0,
+              "column": 3
+            },
+            "topLine": 0,
+            "leftColumn": 0
+          }
+        ],
+        "currentWindowId": "wb"
+      },
+      "operations": [
+        {
+          "id": "change_case"
+        },
+        {
+          "id": "delete_window_text"
+        }
+      ],
+      "expect": {
+        "windowCount": 2,
+        "currentWindowId": "wb",
+        "windows": {
+          "wa": {
+            "documentLines": [
+              {
+                "text": "",
+                "flags": []
+              }
+            ],
+            "differentDocumentFrom": "wb",
+            "cursor": {
+              "line": 0,
+              "column": 0
+            }
+          },
+          "wb": {
+            "documentLines": [
+              {
+                "text": "",
+                "flags": []
+              }
+            ],
+            "cursor": {
+              "line": 0,
+              "column": 0
+            }
+          }
+        },
+        "undo": {
+          "count": 0
+        }
+      }
+    },
+    {
+      "id": "blocks.hide-removes-flags-but-preserves-block-boundaries",
+      "area": "blocks",
+      "initial": {
+        "documents": [
+          {
+            "id": "a",
+            "lines": [
+              {
+                "text": "one",
+                "flags": []
+              },
+              {
+                "text": "two",
+                "flags": []
+              },
+              {
+                "text": "three",
+                "flags": []
+              }
+            ]
+          }
+        ],
+        "windows": [
+          {
+            "id": "wa",
+            "documentId": "a",
+            "cursor": {
+              "line": 0,
+              "column": 0
+            },
+            "topLine": 0,
+            "leftColumn": 0
+          }
+        ],
+        "currentWindowId": "wa"
+      },
+      "operations": [
+        {
+          "id": "begin_block"
+        },
+        {
+          "id": "position_cursor",
+          "line": 1,
+          "column": 0
+        },
+        {
+          "id": "end_block"
+        },
+        {
+          "id": "hide_block"
+        }
+      ],
+      "expect": {
+        "documents": {
+          "a": {
+            "lines": [
+              {
+                "text": "one",
+                "flags": []
+              },
+              {
+                "text": "two",
+                "flags": []
+              },
+              {
+                "text": "three",
+                "flags": []
+              }
+            ],
+            "isDirty": false,
+            "version": 0
+          }
+        },
+        "blockState": {
+          "start": {
+            "documentId": "a",
+            "line": 0
+          },
+          "end": {
+            "documentId": "a",
+            "line": 1
+          },
+          "hidden": true,
+          "complete": true
+        },
+        "undo": {
+          "count": 0
+        }
+      }
+    },
+    {
+      "id": "blocks.unhide-restores-projected-in-block-annotations",
+      "area": "blocks",
+      "initial": {
+        "documents": [
+          {
+            "id": "a",
+            "lines": [
+              {
+                "text": "one",
+                "flags": []
+              },
+              {
+                "text": "two",
+                "flags": []
+              },
+              {
+                "text": "three",
+                "flags": []
+              }
+            ]
+          }
+        ],
+        "windows": [
+          {
+            "id": "wa",
+            "documentId": "a",
+            "cursor": {
+              "line": 0,
+              "column": 0
+            },
+            "topLine": 0,
+            "leftColumn": 0
+          }
+        ],
+        "currentWindowId": "wa"
+      },
+      "operations": [
+        {
+          "id": "begin_block"
+        },
+        {
+          "id": "position_cursor",
+          "line": 1,
+          "column": 0
+        },
+        {
+          "id": "end_block"
+        },
+        {
+          "id": "hide_block"
+        },
+        {
+          "id": "hide_block"
+        }
+      ],
+      "expect": {
+        "documents": {
+          "a": {
+            "lines": [
+              {
+                "text": "one",
+                "flags": [
+                  "in_block"
+                ]
+              },
+              {
+                "text": "two",
+                "flags": [
+                  "in_block"
+                ]
+              },
+              {
+                "text": "three",
+                "flags": []
+              }
+            ],
+            "isDirty": false,
+            "version": 0
+          }
+        },
+        "blockState": {
+          "start": {
+            "documentId": "a",
+            "line": 0
+          },
+          "end": {
+            "documentId": "a",
+            "line": 1
+          },
+          "hidden": false,
+          "complete": true
+        },
+        "undo": {
+          "count": 0
+        }
+      }
+    },
+    {
+      "id": "blocks.top-command-selects-block-view-and-keeps-column",
+      "area": "blocks",
+      "initial": {
+        "documents": [
+          {
+            "id": "a",
+            "lines": [
+              {
+                "text": "one",
+                "flags": []
+              },
+              {
+                "text": "two",
+                "flags": []
+              },
+              {
+                "text": "three",
+                "flags": []
+              }
+            ]
+          },
+          {
+            "id": "b",
+            "lines": [
+              {
+                "text": "other",
+                "flags": []
+              }
+            ]
+          }
+        ],
+        "windows": [
+          {
+            "id": "wa",
+            "documentId": "a",
+            "cursor": {
+              "line": 1,
+              "column": 7
+            },
+            "topLine": 0,
+            "leftColumn": 0
+          },
+          {
+            "id": "wb",
+            "documentId": "b",
+            "cursor": {
+              "line": 0,
+              "column": 0
+            },
+            "topLine": 0,
+            "leftColumn": 0
+          }
+        ],
+        "currentWindowId": "wa"
+      },
+      "operations": [
+        {
+          "id": "begin_block"
+        },
+        {
+          "id": "position_cursor",
+          "line": 2,
+          "column": 7
+        },
+        {
+          "id": "end_block"
+        },
+        {
+          "id": "select_window",
+          "windowId": "wb"
+        },
+        {
+          "id": "top_of_block"
+        }
+      ],
+      "expect": {
+        "currentWindowId": "wa",
+        "windows": {
+          "wa": {
+            "cursor": {
+              "line": 1,
+              "column": 7
+            }
+          }
+        },
+        "blockState": {
+          "start": {
+            "documentId": "a",
+            "line": 1
+          },
+          "end": {
+            "documentId": "a",
+            "line": 2
+          },
+          "hidden": false,
+          "complete": true
+        },
+        "undo": {
+          "count": 0
+        }
+      }
+    },
+    {
+      "id": "blocks.bottom-command-selects-source-and-keeps-column",
+      "area": "blocks",
+      "initial": {
+        "documents": [
+          {
+            "id": "a",
+            "lines": [
+              {
+                "text": "one",
+                "flags": []
+              },
+              {
+                "text": "two",
+                "flags": []
+              },
+              {
+                "text": "three",
+                "flags": []
+              }
+            ]
+          },
+          {
+            "id": "b",
+            "lines": [
+              {
+                "text": "other",
+                "flags": []
+              }
+            ]
+          }
+        ],
+        "windows": [
+          {
+            "id": "wa",
+            "documentId": "a",
+            "cursor": {
+              "line": 1,
+              "column": 7
+            },
+            "topLine": 0,
+            "leftColumn": 0
+          },
+          {
+            "id": "wb",
+            "documentId": "b",
+            "cursor": {
+              "line": 0,
+              "column": 0
+            },
+            "topLine": 0,
+            "leftColumn": 0
+          }
+        ],
+        "currentWindowId": "wa"
+      },
+      "operations": [
+        {
+          "id": "begin_block"
+        },
+        {
+          "id": "position_cursor",
+          "line": 2,
+          "column": 7
+        },
+        {
+          "id": "end_block"
+        },
+        {
+          "id": "position_cursor",
+          "line": 0,
+          "column": 7
+        },
+        {
+          "id": "select_window",
+          "windowId": "wb"
+        },
+        {
+          "id": "bottom_of_block"
+        }
+      ],
+      "expect": {
+        "currentWindowId": "wa",
+        "windows": {
+          "wa": {
+            "cursor": {
+              "line": 2,
+              "column": 7
+            }
+          }
+        },
+        "blockState": {
+          "start": {
+            "documentId": "a",
+            "line": 1
+          },
+          "end": {
+            "documentId": "a",
+            "line": 2
+          },
+          "hidden": false,
+          "complete": true
+        },
+        "undo": {
+          "count": 0
+        }
+      }
+    }
+  ]
+}

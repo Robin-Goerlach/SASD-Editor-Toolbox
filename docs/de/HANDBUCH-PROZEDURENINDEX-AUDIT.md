@@ -35,7 +35,7 @@ Die .NET-Tests laden inzwischen jede Datei aus `conformance/v1/manifest.json`, n
 
 ## Maschinengeprüfte Verweise auf ausführbare Belege
 
-Die Inventarliste unterstützt pro historischer Routine ein optionales Feld `conformanceCases`. Die Repository-Vertragsprüfung kontrolliert, ob jede referenzierte Fall-ID in einer durch das portable Manifest eingebundenen Datei vorkommt, weist doppelte oder unbekannte IDs zurück und meldet die Zahl verknüpfter Routinen. **Derzeit sind 50 von 123 Zeilen** mit konkreten portablen Fällen verknüpft. Für alle anderen bestehen zunächst nur konzeptionelle beziehungsweise dokumentierte Zuordnungen, deren Regressionstest-Abdeckung weiterhin einzeln geprüft werden muss.
+Die Inventarliste unterstützt pro historischer Routine ein optionales Feld `conformanceCases`. Die Repository-Vertragsprüfung kontrolliert, ob jede referenzierte Fall-ID in einer durch das portable Manifest eingebundenen Datei vorkommt, weist doppelte oder unbekannte IDs zurück und meldet die Zahl verknüpfter Routinen. **Derzeit sind 60 von 123 Zeilen** mit konkreten portablen Fällen verknüpft. Für alle anderen bestehen zunächst nur konzeptionelle beziehungsweise dokumentierte Zuordnungen, deren Regressionstest-Abdeckung weiterhin einzeln geprüft werden muss.
 
 Diese Verweise sind **gezielte Testbeispiele**, keine vollständigen historischen Verhaltensbeweise. Die Prüfung erzeugt bewusst keine erfundenen Tests für Einträge, die lediglich als `implemented` oder `modern-replacement` eingeordnet wurden.
 
@@ -64,6 +64,8 @@ Fünf neue portable Fälle zur Dateiausgabe testen WriteFile und SaveFile mit ei
 Die neue `compatibility-primitives.json`-Suite verknüpft 13 bisher unbelegte historische Prozeduren mit tatsächlich ausgeführten Tests. Sie umfasst unabhängige Optionen verknüpfter Fenster, virtuelle Spalten, einbasierte Befehle, historische Wortklassen, Undo und die moderne Behandlung wirkungsloser Textbefehle. **46 von 123** Indexeinträgen besitzen damit ausdrücklich portable Belege – keine vollständigen historischen Freigabezertifikate.
 
 Fünf weitere gemeinsame Fälle verknüpfen jetzt `EditTab`, `EditDeleteLeftChar`, `EditDeleteRightChar` und `EditDeleteRightWord` mit den semantischen Befehlen. Unterschieden werden Tab im Einfüge-/Überschreibmodus, Backspace im virtuellen Bereich ohne Textänderung sowie das Löschen von Interpunktions- und Leerzeichenläufen. Jetzt besitzen **50 von 123** Routinen direkte portable Verweise.
+
+Die Suite `windows-and-block-lifecycle.json` verknüpft jetzt alle 10 bislang nicht portabel belegten historischen Fenster- und Blocknavigations-/Lebenszyklusroutinen mit tatsächlich ausgeführten Fällen. Insgesamt besitzen **60 von 123** Einträgen direkte Testverweise. Die Fenster-/Dokumentzuordnung und hostneutrale Zeilenrahmen ergänzen bisherige .NET-spezifische Geometrie- und Blocktests; weitere nicht verknüpfte Routinen bleiben gesondert zu prüfen.
 
 ## Nächste Schritte und Abschlusskriterien
 

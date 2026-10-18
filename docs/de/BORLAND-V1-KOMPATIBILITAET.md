@@ -242,6 +242,10 @@ Fünf zusätzliche portable Fälle prüfen `EditTab`, `EditDeleteLeftChar`, `Edi
 
 Die Sitzung verwaltet jetzt das historische Neuverknüpfen von Fenstern und entfernt alte Marker-/Undo-Verweise, sobald die bisherige Textdatei ihre **letzte** Ansicht verliert. Dieselbe Regel gilt für direkt geschlossene Fenster. Sind weitere verknüpfte Ansichten vorhanden, bleiben Dokument und Verlauf erhalten; dokumentübergreifende Undo-Transaktionen mit einem verwaisten Dokument werden nur vollständig entfernt. Die historische Sonderregel beim Löschen eines Fensters, die einen betroffenen Block aufhebt, bleibt unverändert.
 
+## Ausführbare Belege für Fenster- und Blocklebenszyklus
+
+Neue portable Fälle prüfen historische Fensternavigation, Fenster erstellen/löschen/verknüpfen, destruktives Zurücksetzen eines Fenstertests, versteckte Blockdarstellung und Sprünge zu Blockanfang/-ende. Die Zeilengeometrie wird unabhängig von einer konkreten Oberfläche vorgegeben. Der historische Routinenindex verknüpft ausschließlich beobachtbare Testbelege; die moderne Bereinigung verwaister Undo-/Markerzustände bleibt separat gekennzeichnet.
+
 ## V1-Abschlusskriterium
 
 Die C#/.NET-Implementierung deckt die großen strukturellen FIRST-ED-Bereiche inzwischen ausführbar ab, einschließlich Absatz-Neuformatierung, mehrzeiliger Block-Bulk-Topologie, unabhängiger Block-Endpunkte und atomarer Multi-Dokument-Undo-/Navigationswiederherstellung. Der [Handbuch-Prozeduren-/Funktionsindex-Audit](HANDBUCH-PROZEDURENINDEX-AUDIT.md) erfasst inzwischen alle 123 gedruckten Einträge mit ersten Klassifikationen; die zugeordneten Routinen benötigen vor V1 noch einen abschließenden Testabdeckungs- und Host-Audit. MicroStar-spezifische Demonstrationen können als Samples statt als Core-Abhängigkeiten geliefert werden.

@@ -115,7 +115,11 @@
       "handbookPage": 130,
       "status": "implemented",
       "evidence": "docs/en/BLOCK-COMPATIBILITY.md",
-      "note": "Whole-line block operations and independent endpoints."
+      "note": "Whole-line block operations and independent endpoints.",
+      "conformanceCases": [
+        "blocks.hide-removes-flags-but-preserves-block-boundaries",
+        "blocks.unhide-restores-projected-in-block-annotations"
+      ]
     },
     {
       "name": "EditBlockMove",
@@ -133,7 +137,10 @@
       "handbookPage": 132,
       "status": "implemented",
       "evidence": "docs/en/BLOCK-COMPATIBILITY.md",
-      "note": "Whole-line block operations and independent endpoints."
+      "note": "Whole-line block operations and independent endpoints.",
+      "conformanceCases": [
+        "blocks.bottom-command-selects-source-and-keeps-column"
+      ]
     },
     {
       "name": "EditBreathe",
@@ -870,7 +877,10 @@
       "handbookPage": 218,
       "status": "implemented",
       "evidence": "docs/en/BLOCK-COMPATIBILITY.md",
-      "note": "Whole-line block operations and independent endpoints."
+      "note": "Whole-line block operations and independent endpoints.",
+      "conformanceCases": [
+        "blocks.top-command-selects-block-view-and-keeps-column"
+      ]
     },
     {
       "name": "EditUndo",
@@ -962,42 +972,62 @@
       "handbookPage": 229,
       "status": "implemented",
       "evidence": "docs/en/WINDOW-GEOMETRY.md",
-      "note": "Window lifecycle and linked document views."
+      "note": "Window lifecycle and linked document views.",
+      "conformanceCases": [
+        "windows.create-splits-donor-and-preserves-total-rows"
+      ]
     },
     {
       "name": "EditWindowDelete",
       "handbookPage": 230,
       "status": "implemented",
       "evidence": "docs/en/WINDOW-GEOMETRY.md",
-      "note": "Window lifecycle and linked document views."
+      "note": "Window lifecycle and linked document views.",
+      "conformanceCases": [
+        "windows.delete-first-returns-rows-to-following-window",
+        "windows.delete-last-window-is-rejected-and-frame-survives"
+      ]
     },
     {
       "name": "EditWindowDeleteText",
       "handbookPage": 231,
       "status": "implemented",
       "evidence": "docs/en/WINDOW-GEOMETRY.md",
-      "note": "Window lifecycle and linked document views."
+      "note": "Window lifecycle and linked document views.",
+      "conformanceCases": [
+        "windows.delete-linked-stream-text-detaches-every-view"
+      ]
     },
     {
       "name": "EditWindowDown",
       "handbookPage": 232,
       "status": "implemented",
       "evidence": "docs/en/WINDOW-GEOMETRY.md",
-      "note": "Window lifecycle and linked document views."
+      "note": "Window lifecycle and linked document views.",
+      "conformanceCases": [
+        "windows.next-from-last-wraps-to-first-view"
+      ]
     },
     {
       "name": "EditWindowGoto",
       "handbookPage": 233,
       "status": "implemented",
       "evidence": "docs/en/WINDOW-GEOMETRY.md",
-      "note": "Window lifecycle and linked document views."
+      "note": "Window lifecycle and linked document views.",
+      "conformanceCases": [
+        "windows.goto-one-based-modulo-window-number"
+      ]
     },
     {
       "name": "EditWindowLink",
       "handbookPage": 234,
       "status": "implemented",
       "evidence": "docs/en/WINDOW-GEOMETRY.md",
-      "note": "Window lifecycle and linked document views."
+      "note": "Window lifecycle and linked document views.",
+      "conformanceCases": [
+        "windows.link-replaces-last-destination-view-and-releases-history",
+        "windows.link-keeps-history-when-old-stream-has-linked-view"
+      ]
     },
     {
       "name": "EditWindowTopFile",
@@ -1014,7 +1044,10 @@
       "handbookPage": 236,
       "status": "implemented",
       "evidence": "docs/en/WINDOW-GEOMETRY.md",
-      "note": "Window lifecycle and linked document views."
+      "note": "Window lifecycle and linked document views.",
+      "conformanceCases": [
+        "windows.previous-from-first-wraps-to-last-view"
+      ]
     },
     {
       "name": "EditZapcmdnam",

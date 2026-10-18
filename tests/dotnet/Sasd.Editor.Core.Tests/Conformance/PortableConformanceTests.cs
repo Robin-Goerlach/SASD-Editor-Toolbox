@@ -147,6 +147,14 @@ public sealed class PortableConformanceTests
         var currentWindowId = RequireString(initial, "currentWindowId");
         session.SetCurrentWindow(windows[currentWindowId].WindowId);
 
+        // Physical rows are a host-provided layout constraint rather than an
+        // intrinsic property of editor text. Only cases exercising actual
+        // FIRST-ED window splits/deletions need to opt into a frame layout.
+        if (initial.TryGetProperty("layoutRows", out var layoutRows))
+        {
+            Assert.True(session.WindowLayout.Configure(layoutRows.GetInt32()));
+        }
+
         return new TestContext(session, documents, windows, hooks, fixtureCodec);
     }
 
@@ -349,6 +357,17 @@ public sealed class PortableConformanceTests
             "delete_left_character" => EditorCommandId.DeleteLeftCharacter,
             "delete_right_character" => EditorCommandId.DeleteRightCharacter,
             "delete_right_word" => EditorCommandId.DeleteRightWord,
+            // The semantic window/block operations remain UI-neutral.
+            "hide_block" => EditorCommandId.HideBlock,
+            "top_of_block" => EditorCommandId.TopOfBlock,
+            "bottom_of_block" => EditorCommandId.BottomOfBlock,
+            "create_window" => EditorCommandId.CreateWindow,
+            "delete_window" => EditorCommandId.DeleteWindow,
+            "delete_window_text" => EditorCommandId.DeleteWindowText,
+            "next_window" => EditorCommandId.NextWindow,
+            "previous_window" => EditorCommandId.PreviousWindow,
+            "goto_window" => EditorCommandId.GoToWindow,
+            "link_window" => EditorCommandId.LinkWindow,
             // Search operations use the public semantic-command boundary.
             // In particular, text:"" for find_next has historical meaning;
             // it must not be converted to an omitted/null request argument.
@@ -414,6 +433,7 @@ public sealed class PortableConformanceTests
             foreach (var portableWindow in windows.EnumerateObject())
             {
                 AssertExpectedWindow(
+                    context,
                     context.Windows[portableWindow.Name],
                     portableWindow.Value);
             }
@@ -422,6 +442,34 @@ public sealed class PortableConformanceTests
         if (expected.TryGetProperty("blockState", out var blockState))
         {
             AssertExpectedBlockState(context, blockState);
+        }
+
+        if (expected.TryGetProperty("windowCount", out var windowCount))
+        {
+            Assert.Equal(windowCount.GetInt32(), context.Session.Windows.Count);
+        }
+
+        if (expected.TryGetProperty("currentWindowIndex", out var windowIndex))
+        {
+            // Index is zero-based in portable fixtures, unlike FIRST-ED's
+            // user-facing one-based displayed-window command arguments.
+            Assert.Equal(windowIndex.GetInt32(), context.Session.Windows
+                .ToList().FindIndex(x => x.WindowId == context.Session.CurrentWindow.WindowId));
+        }
+
+        if (expected.TryGetProperty("layoutFrames", out var frames))
+        {
+            var actual = context.Session.WindowLayout.Frames;
+            Assert.Equal(frames.GetArrayLength(), actual.Count);
+            var index = 0;
+            foreach (var frame in frames.EnumerateArray())
+            {
+                if (frame.TryGetProperty("topRow", out var top))
+                    Assert.Equal(top.GetInt32(), actual[index].TopRow);
+                if (frame.TryGetProperty("height", out var height))
+                    Assert.Equal(height.GetInt32(), actual[index].Height);
+                index++;
+            }
         }
 
         if (expected.TryGetProperty("undo", out var undo))
@@ -582,7 +630,7 @@ public sealed class PortableConformanceTests
         }
     }
 
-    private static void AssertExpectedWindow(EditorWindow window, JsonElement expected)
+    private static void AssertExpectedWindow(TestContext context, EditorWindow window, JsonElement expected)
     {
         if (expected.TryGetProperty("cursor", out var cursor))
         {
@@ -601,6 +649,30 @@ public sealed class PortableConformanceTests
         if (expected.TryGetProperty("leftColumn", out var leftColumn))
         {
             Assert.Equal(leftColumn.GetInt32(), window.LeftColumn);
+        }
+
+        if (expected.TryGetProperty("documentId", out var documentId))
+        {
+            Assert.Same(context.Documents[RequireString(expected, "documentId")], window.Document);
+        }
+
+        if (expected.TryGetProperty("documentLines", out var viewLines))
+        {
+            var actualLines = window.Document.Buffer.Snapshot();
+            var expectedLines = viewLines.EnumerateArray().Select(ParseLine).ToArray();
+            Assert.Equal(expectedLines, actualLines);
+        }
+
+        if (expected.TryGetProperty("sameDocumentAs", out var linked))
+        {
+            var other = context.Windows[linked.GetString()!];
+            Assert.Same(other.Document, window.Document);
+        }
+
+        if (expected.TryGetProperty("differentDocumentFrom", out var separate))
+        {
+            var other = context.Windows[separate.GetString()!];
+            Assert.NotSame(other.Document, window.Document);
         }
 
         if (expected.TryGetProperty("options", out var options))
