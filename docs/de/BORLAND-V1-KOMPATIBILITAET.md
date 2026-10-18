@@ -244,7 +244,7 @@ Die Sitzung verwaltet jetzt das historische Neuverknüpfen von Fenstern und entf
 
 ## Ausführbare Belege für Fenster- und Blocklebenszyklus
 
-Neue portable Fälle prüfen historische Fensternavigation, Fenster erstellen/löschen/verknüpfen, destruktives Zurücksetzen eines Fenstertests, versteckte Blockdarstellung und Sprünge zu Blockanfang/-ende. Die Zeilengeometrie wird unabhängig von einer konkreten Oberfläche vorgegeben. Der historische Routinenindex verknüpft ausschließlich beobachtbare Testbelege; die moderne Bereinigung verwaister Undo-/Markerzustände bleibt separat gekennzeichnet.
+Neue portable Fälle prüfen historische Fensternavigation, Fenster erstellen/löschen/verknüpfen, destruktives Zurücksetzen eines Fenster-Textstroms, versteckte Blockdarstellung und Sprünge zu Blockanfang/-ende. Die Zeilengeometrie wird unabhängig von einer konkreten Oberfläche vorgegeben. Der historische Routinenindex verknüpft ausschließlich beobachtbare Testbelege; die moderne Bereinigung verwaister Undo-/Markerzustände bleibt separat gekennzeichnet.
 
 ## V1-Abschlusskriterium
 

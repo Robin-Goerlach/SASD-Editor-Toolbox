@@ -67,6 +67,8 @@ Five further shared cases now trace `EditTab`, `EditDeleteLeftChar`, `EditDelete
 
 The portable `windows-and-block-lifecycle.json` suite now provides direct executable coverage for all 10 previously unlinked historical window and block navigation/lifecycle routines. The handbook inventory therefore has **60 of 123** entries with explicit portable cases. Window/document association and host-neutral frame assertions supplement earlier .NET-only geometry and block tests; the remaining unlinked procedures still require review.
 
+Seven further negative and boundary cases verify window-linking rejection, one-based number validation, the three-row split minimum, freed-row ownership and last-view marker/block cleanup. These strengthen the already linked ten historical window/block routines without asserting new routine coverage.
+
 ## Next review and acceptance criteria
 
 For each *needs-review* row, examine its individual handbook description, check the existing architecture and tests, add focused regression coverage for genuine behavior gaps, then independently implement only those gaps. Revisit the conceptual *implemented* mappings and identify any missing tests without fabricating Pascal-shaped APIs. Keep the English and German audit, compatibility matrix, and any affected shared specification/conformance cases synchronized.

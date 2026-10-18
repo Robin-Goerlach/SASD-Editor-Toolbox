@@ -1105,6 +1105,561 @@
           "count": 0
         }
       }
+    },
+    {
+      "id": "windows.self-link-rejected-without-changing-linked-stream",
+      "area": "windows",
+      "initial": {
+        "documents": [
+          {
+            "id": "a",
+            "lines": [
+              {
+                "text": "alpha",
+                "flags": []
+              }
+            ]
+          },
+          {
+            "id": "b",
+            "lines": [
+              {
+                "text": "beta",
+                "flags": []
+              }
+            ]
+          }
+        ],
+        "windows": [
+          {
+            "id": "wa",
+            "documentId": "a",
+            "cursor": {
+              "line": 0,
+              "column": 0
+            },
+            "topLine": 0,
+            "leftColumn": 0
+          },
+          {
+            "id": "wb",
+            "documentId": "b",
+            "cursor": {
+              "line": 0,
+              "column": 0
+            },
+            "topLine": 0,
+            "leftColumn": 0
+          }
+        ],
+        "currentWindowId": "wa"
+      },
+      "operation": {
+        "id": "link_window",
+        "number": 1,
+        "number2": 1,
+        "commandSucceeded": false
+      },
+      "expect": {
+        "commandSucceeded": false,
+        "windowCount": 2,
+        "currentWindowId": "wa",
+        "windows": {
+          "wa": {
+            "documentId": "a"
+          },
+          "wb": {
+            "documentId": "b"
+          }
+        },
+        "documents": {
+          "a": {
+            "lines": [
+              {
+                "text": "alpha",
+                "flags": []
+              }
+            ],
+            "isDirty": false,
+            "version": 0
+          },
+          "b": {
+            "lines": [
+              {
+                "text": "beta",
+                "flags": []
+              }
+            ],
+            "isDirty": false,
+            "version": 0
+          }
+        },
+        "undo": {
+          "count": 0
+        }
+      }
+    },
+    {
+      "id": "windows.redundant-link-between-already-linked-views-rejected",
+      "area": "windows",
+      "initial": {
+        "documents": [
+          {
+            "id": "a",
+            "lines": [
+              {
+                "text": "alpha",
+                "flags": []
+              }
+            ]
+          }
+        ],
+        "windows": [
+          {
+            "id": "wa",
+            "documentId": "a",
+            "cursor": {
+              "line": 0,
+              "column": 0
+            },
+            "topLine": 0,
+            "leftColumn": 0
+          },
+          {
+            "id": "wb",
+            "documentId": "a",
+            "cursor": {
+              "line": 0,
+              "column": 0
+            },
+            "topLine": 0,
+            "leftColumn": 0
+          }
+        ],
+        "currentWindowId": "wa"
+      },
+      "operation": {
+        "id": "link_window",
+        "number": 1,
+        "number2": 2,
+        "commandSucceeded": false
+      },
+      "expect": {
+        "commandSucceeded": false,
+        "windowCount": 2,
+        "windows": {
+          "wa": {
+            "sameDocumentAs": "wb"
+          }
+        },
+        "documents": {
+          "a": {
+            "lines": [
+              {
+                "text": "alpha",
+                "flags": []
+              }
+            ],
+            "isDirty": false,
+            "version": 0
+          }
+        },
+        "undo": {
+          "count": 0
+        }
+      }
+    },
+    {
+      "id": "windows.invalid-zero-window-selection-does-not-change-current-view",
+      "area": "windows",
+      "initial": {
+        "documents": [
+          {
+            "id": "a",
+            "lines": [
+              {
+                "text": "alpha",
+                "flags": []
+              }
+            ]
+          },
+          {
+            "id": "b",
+            "lines": [
+              {
+                "text": "beta",
+                "flags": []
+              }
+            ]
+          }
+        ],
+        "windows": [
+          {
+            "id": "wa",
+            "documentId": "a",
+            "cursor": {
+              "line": 0,
+              "column": 0
+            },
+            "topLine": 0,
+            "leftColumn": 0
+          },
+          {
+            "id": "wb",
+            "documentId": "b",
+            "cursor": {
+              "line": 0,
+              "column": 0
+            },
+            "topLine": 0,
+            "leftColumn": 0
+          }
+        ],
+        "currentWindowId": "wb"
+      },
+      "operation": {
+        "id": "goto_window",
+        "number": 0,
+        "commandSucceeded": false
+      },
+      "expect": {
+        "commandSucceeded": false,
+        "currentWindowId": "wb",
+        "windowCount": 2,
+        "undo": {
+          "count": 0
+        }
+      }
+    },
+    {
+      "id": "windows.create-rejected-at-three-row-donor-minimum",
+      "area": "windows",
+      "initial": {
+        "documents": [
+          {
+            "id": "a",
+            "lines": [
+              {
+                "text": "alpha",
+                "flags": []
+              }
+            ]
+          }
+        ],
+        "windows": [
+          {
+            "id": "wa",
+            "documentId": "a",
+            "cursor": {
+              "line": 0,
+              "column": 0
+            },
+            "topLine": 0,
+            "leftColumn": 0
+          }
+        ],
+        "currentWindowId": "wa",
+        "layoutRows": 10
+      },
+      "operation": {
+        "id": "create_window",
+        "number": 8,
+        "number2": 1,
+        "commandSucceeded": false
+      },
+      "expect": {
+        "commandSucceeded": false,
+        "windowCount": 1,
+        "currentWindowId": "wa",
+        "layoutFrames": [
+          {
+            "topRow": 0,
+            "height": 10
+          }
+        ],
+        "documents": {
+          "a": {
+            "lines": [
+              {
+                "text": "alpha",
+                "flags": []
+              }
+            ],
+            "isDirty": false,
+            "version": 0
+          }
+        },
+        "undo": {
+          "count": 0
+        }
+      }
+    },
+    {
+      "id": "windows.delete-nonfirst-gives-rows-to-immediately-above-window",
+      "area": "windows",
+      "initial": {
+        "documents": [
+          {
+            "id": "a",
+            "lines": [
+              {
+                "text": "alpha",
+                "flags": []
+              }
+            ]
+          },
+          {
+            "id": "b",
+            "lines": [
+              {
+                "text": "beta",
+                "flags": []
+              }
+            ]
+          },
+          {
+            "id": "c",
+            "lines": [
+              {
+                "text": "gamma",
+                "flags": []
+              }
+            ]
+          }
+        ],
+        "windows": [
+          {
+            "id": "wa",
+            "documentId": "a",
+            "cursor": {
+              "line": 0,
+              "column": 0
+            },
+            "topLine": 0,
+            "leftColumn": 0
+          },
+          {
+            "id": "wb",
+            "documentId": "b",
+            "cursor": {
+              "line": 0,
+              "column": 0
+            },
+            "topLine": 0,
+            "leftColumn": 0
+          },
+          {
+            "id": "wc",
+            "documentId": "c",
+            "cursor": {
+              "line": 0,
+              "column": 0
+            },
+            "topLine": 0,
+            "leftColumn": 0
+          }
+        ],
+        "currentWindowId": "wc",
+        "layoutRows": 24
+      },
+      "operation": {
+        "id": "delete_window",
+        "number": 3
+      },
+      "expect": {
+        "windowCount": 2,
+        "currentWindowId": "wb",
+        "layoutFrames": [
+          {
+            "topRow": 0,
+            "height": 8
+          },
+          {
+            "topRow": 8,
+            "height": 16
+          }
+        ],
+        "documents": {
+          "a": {
+            "lines": [
+              {
+                "text": "alpha",
+                "flags": []
+              }
+            ],
+            "isDirty": false,
+            "version": 0
+          },
+          "b": {
+            "lines": [
+              {
+                "text": "beta",
+                "flags": []
+              }
+            ],
+            "isDirty": false,
+            "version": 0
+          }
+        },
+        "undo": {
+          "count": 0
+        }
+      }
+    },
+    {
+      "id": "windows.relink-orphan-invalidates-old-line-marker",
+      "area": "windows",
+      "initial": {
+        "documents": [
+          {
+            "id": "a",
+            "lines": [
+              {
+                "text": "alpha",
+                "flags": []
+              }
+            ]
+          },
+          {
+            "id": "b",
+            "lines": [
+              {
+                "text": "beta",
+                "flags": []
+              }
+            ]
+          }
+        ],
+        "windows": [
+          {
+            "id": "wa",
+            "documentId": "a",
+            "cursor": {
+              "line": 0,
+              "column": 0
+            },
+            "topLine": 0,
+            "leftColumn": 0
+          },
+          {
+            "id": "wb",
+            "documentId": "b",
+            "cursor": {
+              "line": 0,
+              "column": 0
+            },
+            "topLine": 0,
+            "leftColumn": 0
+          }
+        ],
+        "currentWindowId": "wa"
+      },
+      "operations": [
+        {
+          "id": "set_marker",
+          "number": 1
+        },
+        {
+          "id": "link_window",
+          "number": 1,
+          "number2": 2
+        },
+        {
+          "id": "jump_marker",
+          "number": 1,
+          "commandSucceeded": false
+        }
+      ],
+      "expect": {
+        "commandSucceeded": false,
+        "windowCount": 2,
+        "windows": {
+          "wa": {
+            "documentId": "b",
+            "sameDocumentAs": "wb"
+          }
+        },
+        "undo": {
+          "count": 0
+        }
+      }
+    },
+    {
+      "id": "windows.relink-orphan-clears-incomplete-block-endpoint",
+      "area": "windows",
+      "initial": {
+        "documents": [
+          {
+            "id": "a",
+            "lines": [
+              {
+                "text": "alpha",
+                "flags": []
+              }
+            ]
+          },
+          {
+            "id": "b",
+            "lines": [
+              {
+                "text": "beta",
+                "flags": []
+              }
+            ]
+          }
+        ],
+        "windows": [
+          {
+            "id": "wa",
+            "documentId": "a",
+            "cursor": {
+              "line": 0,
+              "column": 0
+            },
+            "topLine": 0,
+            "leftColumn": 0
+          },
+          {
+            "id": "wb",
+            "documentId": "b",
+            "cursor": {
+              "line": 0,
+              "column": 0
+            },
+            "topLine": 0,
+            "leftColumn": 0
+          }
+        ],
+        "currentWindowId": "wa"
+      },
+      "operations": [
+        {
+          "id": "begin_block"
+        },
+        {
+          "id": "link_window",
+          "number": 1,
+          "number2": 2
+        }
+      ],
+      "expect": {
+        "windowCount": 2,
+        "blockState": {
+          "start": null,
+          "end": null,
+          "hidden": true,
+          "complete": false
+        },
+        "windows": {
+          "wa": {
+            "documentId": "b",
+            "sameDocumentAs": "wb"
+          }
+        },
+        "undo": {
+          "count": 0
+        }
+      }
     }
   ]
 }

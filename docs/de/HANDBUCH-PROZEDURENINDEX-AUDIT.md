@@ -67,6 +67,8 @@ Fünf weitere gemeinsame Fälle verknüpfen jetzt `EditTab`, `EditDeleteLeftChar
 
 Die Suite `windows-and-block-lifecycle.json` verknüpft jetzt alle 10 bislang nicht portabel belegten historischen Fenster- und Blocknavigations-/Lebenszyklusroutinen mit tatsächlich ausgeführten Fällen. Insgesamt besitzen **60 von 123** Einträgen direkte Testverweise. Die Fenster-/Dokumentzuordnung und hostneutrale Zeilenrahmen ergänzen bisherige .NET-spezifische Geometrie- und Blocktests; weitere nicht verknüpfte Routinen bleiben gesondert zu prüfen.
 
+Sieben weitere negative und Grenzfälle prüfen abgelehnte Fensterverknüpfungen, die Einbasierung von Fensternummern, das Drei-Zeilen-Minimum beim Teilen, die Übernahme freigewordener Zeilen und die Bereinigung von Markern/Blockgrenzen beim letzten Dokumentfenster. Damit werden die zehn bereits verknüpften historischen Fenster-/Blockroutinen besser abgesichert; die Zahl der zugeordneten Routinen steigt dadurch nicht.
+
 ## Nächste Schritte und Abschlusskriterien
 
 Jeden offenen Eintrag anhand seiner eigenen Handbuchbeschreibung prüfen, die bereits vorhandenen Tests abgleichen und nur bei echten Verhaltenslücken unabhängigen Code samt Regressionstests ergänzen. Auch die als implementiert eingestuften Zuordnungen brauchen einen Randfall-/Testabgleich; künstliche Pascal-APIs sind ausdrücklich unerwünscht. Inventarliste, deutsche/englische Audit-Dokumente, Matrix und nötigenfalls sprachneutralen Vertrag/Conformance-Fälle synchron halten.
