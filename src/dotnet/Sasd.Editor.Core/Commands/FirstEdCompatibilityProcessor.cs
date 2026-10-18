@@ -302,8 +302,10 @@ internal static class FirstEdCompatibilityProcessor
             return false;
         }
 
-        destination.AttachDocument(source.Document);
-        destination.ClampCursor();
+        // The session owns reference lifetime, including cleanup of old
+        // markers and compound Undo only when the displaced text stream
+        // no longer has *any* displayed views.
+        session.AttachWindowDocument(destination, source.Document);
         return true;
     }
 

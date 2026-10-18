@@ -148,6 +148,13 @@ public sealed class EditorSession
 
         var wasCurrent = CurrentWindow?.WindowId == windowId;
         _windows.RemoveAt(index);
+
+        // Closing the last view of a stream makes its Undo and markers
+        // unreachable. Removing those stale references now prevents a future
+        // Undo from consuming a defunct transaction before reaching an edit
+        // that still belongs to a visible document. Linked sibling views
+        // retain the original stream and all its history.
+        ForgetUnreferencedDocument(target.Document.DocumentId);
         if (_windows.Count == 0)
         {
             CurrentWindow = null!;
@@ -158,6 +165,55 @@ public sealed class EditorSession
         }
 
         return true;
+    }
+
+    /// <summary>
+    /// Reattaches an existing view without leaving orphaned history behind.
+    /// This is the session-owned transition used by historical Link Window.
+    /// </summary>
+    internal void AttachWindowDocument(EditorWindow destination, EditorDocument document)
+    {
+        ArgumentNullException.ThrowIfNull(destination);
+        ArgumentNullException.ThrowIfNull(document);
+
+        if (!_windows.Any(window => window.WindowId == destination.WindowId))
+        {
+            throw new ArgumentException("The destination must belong to this session.", nameof(destination));
+        }
+
+        var previousDocumentId = destination.Document.DocumentId;
+        if (previousDocumentId == document.DocumentId)
+        {
+            return;
+        }
+
+        destination.AttachDocument(document);
+        destination.ClampCursor();
+
+        // Do not discard the prior stream until its *last* linked view stops
+        // displaying it. Discarding earlier would corrupt compound Undo and
+        // line markers still in use by other windows.
+        ForgetUnreferencedDocument(previousDocumentId);
+    }
+
+    /// <summary>
+    /// Drops navigation/history for a document with no surviving views.
+    /// Compound Undo entries are discarded atomically by the undo manager.
+    /// This modern lifecycle policy replaces dangling Pascal line pointers.
+    /// </summary>
+    private void ForgetUnreferencedDocument(Guid documentId)
+    {
+        if (_windows.Any(window => window.Document.DocumentId == documentId))
+        {
+            return;
+        }
+
+        Undo.DiscardDocument(documentId);
+        RemoveMarkersForDocument(documentId);
+        if (_blockState.ReferencesDocument(documentId))
+        {
+            ClearBlock();
+        }
     }
 
     public void SetCurrentWindow(Guid windowId)

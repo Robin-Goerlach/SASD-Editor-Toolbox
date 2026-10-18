@@ -239,6 +239,10 @@ The shared primitive-command cases cover historical line/word navigation, virtua
 
 Five additional portable tests cover `EditTab`, `EditDeleteLeftChar`, `EditDeleteRightChar` and `EditDeleteRightWord`, distinguishing insertion, cursor-only virtual-space behavior and real Undoable deletion. Only these concrete semantic behaviors are linked to the respective historic inventory entries.
 
+## Window relinking and unreachable-document history
+
+The session now owns compatibility window reattachment and cleans up stale marker/Undo references when the previously displayed text stream loses its **last** view. The same rule applies to directly closed views. Remaining linked views keep their document and history; cross-document Undo transactions involving an orphaned stream are discarded as whole units. Historical Delete Window still clears an active block according to its documented rule, even when another linked view survives.
+
 ## V1 release gate
 
 The C#/.NET implementation now has executable coverage for the major FIRST-ED structural areas, including paragraph reformatting, whole-line block bulk topology, independent block endpoints and atomic multi-document undo/navigation restoration. The [handbook procedure/function index audit](HANDBOOK-PROCEDURE-INDEX-AUDIT.md) now records all 123 printed entries with first-pass classifications; its mapped behavior still requires a final regression-coverage and host-interface audit before calling V1 complete. MicroStar-specific demonstrations may ship as samples rather than core dependencies.
