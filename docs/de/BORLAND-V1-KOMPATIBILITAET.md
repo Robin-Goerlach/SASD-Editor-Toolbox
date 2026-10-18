@@ -218,6 +218,10 @@ Zusätzliche .NET-Codec-Fälle prüfen High-Bit-CR am Dateiende und hintereinand
 
 Die eingebauten Dateischreiber halten während Vorbereitung und Veröffentlichung eine Sperre für den normalisierten Zielpfad. Ein zweiter Schreibauftrag kann einen vorher begonnenen Auftrag für dieselbe Datei nicht überholen; unterschiedliche Ziele bleiben unabhängig. Abbruch während des Wartens und Fehler beim Staging geben die Sperre ohne teilweisen Import/Export frei. Dies ist eine moderne In-Process-Regel, keine systemweite Sperre oder historische DOS-Garantie.
 
+## Sichere UTF-8-Dateispeicherung und Zeilentopologie
+
+Die moderne UTF-8-Speicherung lehnt eingebettetes CR/LF im Zeilentext und ungültige konfigurierte Zeilenenden vor dem Schreiben ab. So bleibt die logische Zeilentopologie beim Laden erhalten. Die Bestätigung eines Speicherstands berücksichtigt zusätzlich die tatsächlich verwendete Zeilenendekonvention. Diese moderne Regel macht das historische reservierte 0x8D-Byte nicht zur Einschränkung für Unicode-Dateien.
+
 ## V1-Abschlusskriterium
 
 Die C#/.NET-Implementierung deckt die großen strukturellen FIRST-ED-Bereiche inzwischen ausführbar ab, einschließlich Absatz-Neuformatierung, mehrzeiliger Block-Bulk-Topologie, unabhängiger Block-Endpunkte und atomarer Multi-Dokument-Undo-/Navigationswiederherstellung. Der [Handbuch-Prozeduren-/Funktionsindex-Audit](HANDBUCH-PROZEDURENINDEX-AUDIT.md) erfasst inzwischen alle 123 gedruckten Einträge mit ersten Klassifikationen; die zugeordneten Routinen benötigen vor V1 noch einen abschließenden Testabdeckungs- und Host-Audit. MicroStar-spezifische Demonstrationen können als Samples statt als Core-Abhängigkeiten geliefert werden.

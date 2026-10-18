@@ -70,6 +70,9 @@ public sealed class EditorDocument
     /// Version is checked for the fast common case; line snapshots are also
     /// compared because Undo or a custom buffer can restore a prior version
     /// without guaranteeing that its current content equals the saved bytes.
+    /// Modern UTF-8 storage also supplies the newline style used for its
+    /// serialization; changing that policy while writing means the saved
+    /// bytes are not the current document's preferred representation.
     /// A successful write may still establish the document's file association
     /// even if its contents have changed during I/O.
     /// </remarks>
@@ -77,7 +80,8 @@ public sealed class EditorDocument
     public bool MarkSnapshotSaved(
         long snapshotVersion,
         IReadOnlyList<EditorLineSnapshot> snapshotLines,
-        string? filePath = null)
+        string? filePath = null,
+        string? writtenNewLine = null)
     {
         ArgumentNullException.ThrowIfNull(snapshotLines);
 
@@ -87,6 +91,8 @@ public sealed class EditorDocument
         }
 
         if (Version != snapshotVersion
+            || (writtenNewLine is not null
+                && !string.Equals(NewLine, writtenNewLine, StringComparison.Ordinal))
             || !Buffer.Snapshot().SequenceEqual(snapshotLines))
         {
             // The persisted snapshot is not the current editor document.

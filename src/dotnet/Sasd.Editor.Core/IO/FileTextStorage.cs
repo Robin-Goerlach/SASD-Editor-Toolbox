@@ -40,14 +40,39 @@ public sealed class FileTextStorage(Encoding? encoding = null) : ITextStorage
         // never mark today's document clean.
         var versionAtWrite = document.Version;
         var snapshot = document.Buffer.Snapshot();
-        var content = string.Join(document.NewLine, snapshot.Select(static line => line.Text));
+        var newLineAtWrite = document.NewLine;
+
+        // The modern storage format may encode Unicode freely, but it still
+        // uses one logical line per buffer snapshot. CR/LF inside a line would
+        // become structural delimiters on the next LoadAsync and corrupt the
+        // line/marker topology. Verify all records *before* staging begins.
+        for (var index = 0; index < snapshot.Count; index++)
+        {
+            var line = snapshot[index];
+            if (line is null || line.Text is null
+                || line.Text.Contains('\r') || line.Text.Contains('\n'))
+            {
+                throw new InvalidDataException(
+                    "A logical line cannot contain CR or LF in modern UTF-8 storage.");
+            }
+        }
+
+        // SetPersistenceMetadata is public, so reject invalid configured
+        // separators rather than save a file that loads as one merged line.
+        if (newLineAtWrite is not ("\r\n" or "\n" or "\r"))
+        {
+            throw new InvalidDataException(
+                "The document newline style must be CRLF, LF or CR.");
+        }
+
+        var content = string.Join(newLineAtWrite, snapshot.Select(static line => line.Text));
         // Publish only a fully encoded and written snapshot. An interrupted
         // staging write leaves the old destination and document identity alone.
         await StagedFileWriter.WriteAsync(
             target,
             (temporaryPath, token) => File.WriteAllTextAsync(temporaryPath, content, _encoding, token),
             cancellationToken).ConfigureAwait(false);
-        document.MarkSnapshotSaved(versionAtWrite, snapshot, target);
+        document.MarkSnapshotSaved(versionAtWrite, snapshot, target, newLineAtWrite);
     }
 
     private static string DetectNewLine(string text)
