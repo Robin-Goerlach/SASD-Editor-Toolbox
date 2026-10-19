@@ -1,0 +1,1939 @@
+{
+  "formatVersion": 1,
+  "contractVersion": "v1",
+  "cases": [
+    {
+      "id": "host.replace-cancelled-second-prompt-cannot-delete",
+      "area": "host-prompts",
+      "initial": {
+        "documents": [
+          {
+            "id": "d",
+            "lines": [
+              {
+                "text": "alpha beta",
+                "flags": []
+              }
+            ]
+          }
+        ],
+        "windows": [
+          {
+            "id": "w",
+            "documentId": "d",
+            "cursor": {
+              "line": 0,
+              "column": 0
+            },
+            "topLine": 0,
+            "leftColumn": 0
+          }
+        ],
+        "currentWindowId": "w"
+      },
+      "operations": [
+        {
+          "id": "translate_firsted_key",
+          "character": "Q",
+          "control": true,
+          "expectAction": "prefix_pending",
+          "expectPrefixDisplay": "Ctrl-Q",
+          "expectPendingPrefix": "ctrl_q"
+        },
+        {
+          "id": "translate_firsted_key",
+          "character": "a",
+          "expectAction": "command",
+          "expectCommand": "replace_next",
+          "expectArgument": "find_replace",
+          "expectPendingPrefix": "none"
+        },
+        {
+          "id": "resolve_host_prompt",
+          "expectCancelled": true,
+          "firstResponse": "alpha",
+          "secondResponse": null
+        },
+        {
+          "id": "execute_resolved_prompt",
+          "commandSucceeded": false
+        }
+      ],
+      "expect": {
+        "commandSucceeded": false,
+        "documents": {
+          "d": {
+            "lines": [
+              {
+                "text": "alpha beta",
+                "flags": []
+              }
+            ],
+            "isDirty": false,
+            "version": 0
+          }
+        },
+        "undo": {
+          "count": 0
+        },
+        "windows": {
+          "w": {
+            "cursor": {
+              "line": 0,
+              "column": 0
+            }
+          }
+        }
+      }
+    },
+    {
+      "id": "host.replace-explicit-empty-second-prompt-deletes",
+      "area": "host-prompts",
+      "initial": {
+        "documents": [
+          {
+            "id": "d",
+            "lines": [
+              {
+                "text": "alpha beta",
+                "flags": []
+              }
+            ]
+          }
+        ],
+        "windows": [
+          {
+            "id": "w",
+            "documentId": "d",
+            "cursor": {
+              "line": 0,
+              "column": 0
+            },
+            "topLine": 0,
+            "leftColumn": 0
+          }
+        ],
+        "currentWindowId": "w"
+      },
+      "operations": [
+        {
+          "id": "translate_firsted_key",
+          "character": "Q",
+          "control": true,
+          "expectAction": "prefix_pending",
+          "expectPrefixDisplay": "Ctrl-Q",
+          "expectPendingPrefix": "ctrl_q"
+        },
+        {
+          "id": "translate_firsted_key",
+          "character": "a",
+          "expectAction": "command",
+          "expectCommand": "replace_next",
+          "expectArgument": "find_replace",
+          "expectPendingPrefix": "none"
+        },
+        {
+          "id": "resolve_host_prompt",
+          "expectCancelled": false,
+          "firstResponse": "alpha",
+          "secondResponse": "",
+          "expectRequest": {
+            "id": "replace_next",
+            "text": "alpha",
+            "text2": "",
+            "pageSize": 20
+          },
+          "pageSize": 20
+        },
+        {
+          "id": "execute_resolved_prompt"
+        }
+      ],
+      "expect": {
+        "documents": {
+          "d": {
+            "lines": [
+              {
+                "text": " beta",
+                "flags": []
+              }
+            ],
+            "isDirty": true,
+            "version": 1
+          }
+        },
+        "undo": {
+          "count": 1
+        },
+        "windows": {
+          "w": {
+            "cursor": {
+              "line": 0,
+              "column": 0
+            }
+          }
+        }
+      }
+    },
+    {
+      "id": "host.replace-nonempty-second-prompt-executes",
+      "area": "host-prompts",
+      "initial": {
+        "documents": [
+          {
+            "id": "d",
+            "lines": [
+              {
+                "text": "alpha beta",
+                "flags": []
+              }
+            ]
+          }
+        ],
+        "windows": [
+          {
+            "id": "w",
+            "documentId": "d",
+            "cursor": {
+              "line": 0,
+              "column": 0
+            },
+            "topLine": 0,
+            "leftColumn": 0
+          }
+        ],
+        "currentWindowId": "w"
+      },
+      "operations": [
+        {
+          "id": "translate_firsted_key",
+          "character": "Q",
+          "control": true,
+          "expectAction": "prefix_pending",
+          "expectPrefixDisplay": "Ctrl-Q",
+          "expectPendingPrefix": "ctrl_q"
+        },
+        {
+          "id": "translate_firsted_key",
+          "character": "a",
+          "expectAction": "command",
+          "expectCommand": "replace_next",
+          "expectArgument": "find_replace",
+          "expectPendingPrefix": "none"
+        },
+        {
+          "id": "resolve_host_prompt",
+          "expectCancelled": false,
+          "firstResponse": "alpha",
+          "secondResponse": "X",
+          "expectRequest": {
+            "id": "replace_next",
+            "text": "alpha",
+            "text2": "X"
+          }
+        },
+        {
+          "id": "execute_resolved_prompt"
+        }
+      ],
+      "expect": {
+        "documents": {
+          "d": {
+            "lines": [
+              {
+                "text": "X beta",
+                "flags": []
+              }
+            ],
+            "isDirty": true,
+            "version": 1
+          }
+        },
+        "undo": {
+          "count": 1
+        },
+        "windows": {
+          "w": {
+            "cursor": {
+              "line": 0,
+              "column": 1
+            }
+          }
+        }
+      }
+    },
+    {
+      "id": "host.replace-empty-pattern-never-asks-dispatcher-to-replace",
+      "area": "host-prompts",
+      "initial": {
+        "documents": [
+          {
+            "id": "d",
+            "lines": [
+              {
+                "text": "alpha beta",
+                "flags": []
+              }
+            ]
+          }
+        ],
+        "windows": [
+          {
+            "id": "w",
+            "documentId": "d",
+            "cursor": {
+              "line": 0,
+              "column": 0
+            },
+            "topLine": 0,
+            "leftColumn": 0
+          }
+        ],
+        "currentWindowId": "w"
+      },
+      "operations": [
+        {
+          "id": "translate_firsted_key",
+          "character": "Q",
+          "control": true,
+          "expectAction": "prefix_pending",
+          "expectPrefixDisplay": "Ctrl-Q",
+          "expectPendingPrefix": "ctrl_q"
+        },
+        {
+          "id": "translate_firsted_key",
+          "character": "a",
+          "expectAction": "command",
+          "expectCommand": "replace_next",
+          "expectArgument": "find_replace",
+          "expectPendingPrefix": "none"
+        },
+        {
+          "id": "resolve_host_prompt",
+          "expectCancelled": true,
+          "firstResponse": "",
+          "secondResponse": "X"
+        },
+        {
+          "id": "execute_resolved_prompt",
+          "commandSucceeded": false
+        }
+      ],
+      "expect": {
+        "commandSucceeded": false,
+        "documents": {
+          "d": {
+            "lines": [
+              {
+                "text": "alpha beta",
+                "flags": []
+              }
+            ],
+            "isDirty": false,
+            "version": 0
+          }
+        },
+        "undo": {
+          "count": 0
+        },
+        "windows": {
+          "w": {
+            "cursor": {
+              "line": 0,
+              "column": 0
+            }
+          }
+        }
+      }
+    },
+    {
+      "id": "host.find-cancelled-prompt-does-not-repeat",
+      "area": "host-prompts",
+      "initial": {
+        "documents": [
+          {
+            "id": "d",
+            "lines": [
+              {
+                "text": "alpha beta",
+                "flags": []
+              }
+            ]
+          }
+        ],
+        "windows": [
+          {
+            "id": "w",
+            "documentId": "d",
+            "cursor": {
+              "line": 0,
+              "column": 0
+            },
+            "topLine": 0,
+            "leftColumn": 0
+          }
+        ],
+        "currentWindowId": "w"
+      },
+      "operations": [
+        {
+          "id": "translate_firsted_key",
+          "character": "Q",
+          "control": true,
+          "expectAction": "prefix_pending",
+          "expectPrefixDisplay": "Ctrl-Q",
+          "expectPendingPrefix": "ctrl_q"
+        },
+        {
+          "id": "translate_firsted_key",
+          "character": "f",
+          "expectAction": "command",
+          "expectCommand": "find_next",
+          "expectArgument": "text",
+          "expectPendingPrefix": "none"
+        },
+        {
+          "id": "resolve_host_prompt",
+          "expectCancelled": true,
+          "firstResponse": null
+        },
+        {
+          "id": "execute_resolved_prompt",
+          "commandSucceeded": false
+        }
+      ],
+      "expect": {
+        "commandSucceeded": false,
+        "documents": {
+          "d": {
+            "lines": [
+              {
+                "text": "alpha beta",
+                "flags": []
+              }
+            ],
+            "isDirty": false,
+            "version": 0
+          }
+        },
+        "undo": {
+          "count": 0
+        },
+        "windows": {
+          "w": {
+            "cursor": {
+              "line": 0,
+              "column": 0
+            }
+          }
+        }
+      }
+    },
+    {
+      "id": "host.find-confirmed-empty-means-find-again",
+      "area": "host-prompts",
+      "initial": {
+        "documents": [
+          {
+            "id": "d",
+            "lines": [
+              {
+                "text": "alpha beta",
+                "flags": []
+              }
+            ]
+          }
+        ],
+        "windows": [
+          {
+            "id": "w",
+            "documentId": "d",
+            "cursor": {
+              "line": 0,
+              "column": 0
+            },
+            "topLine": 0,
+            "leftColumn": 0
+          }
+        ],
+        "currentWindowId": "w"
+      },
+      "operations": [
+        {
+          "id": "translate_firsted_key",
+          "character": "Q",
+          "control": true,
+          "expectAction": "prefix_pending",
+          "expectPrefixDisplay": "Ctrl-Q",
+          "expectPendingPrefix": "ctrl_q"
+        },
+        {
+          "id": "translate_firsted_key",
+          "character": "f",
+          "expectAction": "command",
+          "expectCommand": "find_next",
+          "expectArgument": "text",
+          "expectPendingPrefix": "none"
+        },
+        {
+          "id": "resolve_host_prompt",
+          "expectCancelled": false,
+          "firstResponse": "",
+          "expectRequest": {
+            "id": "find_again"
+          }
+        }
+      ],
+      "expect": {
+        "documents": {
+          "d": {
+            "lines": [
+              {
+                "text": "alpha beta",
+                "flags": []
+              }
+            ],
+            "isDirty": false,
+            "version": 0
+          }
+        },
+        "undo": {
+          "count": 0
+        },
+        "windows": {
+          "w": {
+            "cursor": {
+              "line": 0,
+              "column": 0
+            }
+          }
+        }
+      }
+    },
+    {
+      "id": "host.find-normal-pattern-reaches-search-service",
+      "area": "host-prompts",
+      "initial": {
+        "documents": [
+          {
+            "id": "d",
+            "lines": [
+              {
+                "text": "alpha beta",
+                "flags": []
+              }
+            ]
+          }
+        ],
+        "windows": [
+          {
+            "id": "w",
+            "documentId": "d",
+            "cursor": {
+              "line": 0,
+              "column": 0
+            },
+            "topLine": 0,
+            "leftColumn": 0
+          }
+        ],
+        "currentWindowId": "w"
+      },
+      "operations": [
+        {
+          "id": "translate_firsted_key",
+          "character": "Q",
+          "control": true,
+          "expectAction": "prefix_pending",
+          "expectPrefixDisplay": "Ctrl-Q",
+          "expectPendingPrefix": "ctrl_q"
+        },
+        {
+          "id": "translate_firsted_key",
+          "character": "f",
+          "expectAction": "command",
+          "expectCommand": "find_next",
+          "expectArgument": "text",
+          "expectPendingPrefix": "none"
+        },
+        {
+          "id": "resolve_host_prompt",
+          "expectCancelled": false,
+          "firstResponse": "beta",
+          "expectRequest": {
+            "id": "find_next",
+            "text": "beta"
+          }
+        },
+        {
+          "id": "execute_resolved_prompt"
+        }
+      ],
+      "expect": {
+        "documents": {
+          "d": {
+            "lines": [
+              {
+                "text": "alpha beta",
+                "flags": []
+              }
+            ],
+            "isDirty": false,
+            "version": 0
+          }
+        },
+        "undo": {
+          "count": 0
+        },
+        "windows": {
+          "w": {
+            "cursor": {
+              "line": 0,
+              "column": 6
+            }
+          }
+        }
+      }
+    },
+    {
+      "id": "host.goto-line-invalid-number-is-abandoned",
+      "area": "host-prompts",
+      "initial": {
+        "documents": [
+          {
+            "id": "d",
+            "lines": [
+              {
+                "text": "first",
+                "flags": []
+              },
+              {
+                "text": "second",
+                "flags": []
+              }
+            ]
+          }
+        ],
+        "windows": [
+          {
+            "id": "w",
+            "documentId": "d",
+            "cursor": {
+              "line": 0,
+              "column": 0
+            },
+            "topLine": 0,
+            "leftColumn": 0
+          }
+        ],
+        "currentWindowId": "w"
+      },
+      "operations": [
+        {
+          "id": "translate_firsted_key",
+          "character": "O",
+          "control": true,
+          "expectAction": "prefix_pending",
+          "expectPrefixDisplay": "Ctrl-O",
+          "expectPendingPrefix": "ctrl_o"
+        },
+        {
+          "id": "translate_firsted_key",
+          "character": "n",
+          "expectAction": "command",
+          "expectCommand": "go_to_line",
+          "expectArgument": "number",
+          "expectPendingPrefix": "none"
+        },
+        {
+          "id": "resolve_host_prompt",
+          "expectCancelled": true,
+          "firstResponse": "abc"
+        },
+        {
+          "id": "execute_resolved_prompt",
+          "commandSucceeded": false
+        }
+      ],
+      "expect": {
+        "commandSucceeded": false,
+        "documents": {
+          "d": {
+            "lines": [
+              {
+                "text": "first",
+                "flags": []
+              },
+              {
+                "text": "second",
+                "flags": []
+              }
+            ],
+            "isDirty": false,
+            "version": 0
+          }
+        },
+        "undo": {
+          "count": 0
+        },
+        "windows": {
+          "w": {
+            "cursor": {
+              "line": 0,
+              "column": 0
+            }
+          }
+        }
+      }
+    },
+    {
+      "id": "host.goto-line-valid-number-moves-cursor",
+      "area": "host-prompts",
+      "initial": {
+        "documents": [
+          {
+            "id": "d",
+            "lines": [
+              {
+                "text": "first",
+                "flags": []
+              },
+              {
+                "text": "second",
+                "flags": []
+              }
+            ]
+          }
+        ],
+        "windows": [
+          {
+            "id": "w",
+            "documentId": "d",
+            "cursor": {
+              "line": 0,
+              "column": 0
+            },
+            "topLine": 0,
+            "leftColumn": 0
+          }
+        ],
+        "currentWindowId": "w"
+      },
+      "operations": [
+        {
+          "id": "translate_firsted_key",
+          "character": "O",
+          "control": true,
+          "expectAction": "prefix_pending",
+          "expectPrefixDisplay": "Ctrl-O",
+          "expectPendingPrefix": "ctrl_o"
+        },
+        {
+          "id": "translate_firsted_key",
+          "character": "n",
+          "expectAction": "command",
+          "expectCommand": "go_to_line",
+          "expectArgument": "number",
+          "expectPendingPrefix": "none"
+        },
+        {
+          "id": "resolve_host_prompt",
+          "expectCancelled": false,
+          "firstResponse": "2",
+          "expectRequest": {
+            "id": "go_to_line",
+            "number": 2
+          }
+        },
+        {
+          "id": "execute_resolved_prompt"
+        }
+      ],
+      "expect": {
+        "documents": {
+          "d": {
+            "lines": [
+              {
+                "text": "first",
+                "flags": []
+              },
+              {
+                "text": "second",
+                "flags": []
+              }
+            ],
+            "isDirty": false,
+            "version": 0
+          }
+        },
+        "undo": {
+          "count": 0
+        },
+        "windows": {
+          "w": {
+            "cursor": {
+              "line": 1,
+              "column": 0
+            }
+          }
+        }
+      }
+    },
+    {
+      "id": "host.goto-column-number-is-one-based",
+      "area": "host-prompts",
+      "initial": {
+        "documents": [
+          {
+            "id": "d",
+            "lines": [
+              {
+                "text": "alpha beta",
+                "flags": []
+              }
+            ]
+          }
+        ],
+        "windows": [
+          {
+            "id": "w",
+            "documentId": "d",
+            "cursor": {
+              "line": 0,
+              "column": 0
+            },
+            "topLine": 0,
+            "leftColumn": 0
+          }
+        ],
+        "currentWindowId": "w"
+      },
+      "operations": [
+        {
+          "id": "translate_firsted_key",
+          "character": "O",
+          "control": true,
+          "expectAction": "prefix_pending",
+          "expectPrefixDisplay": "Ctrl-O",
+          "expectPendingPrefix": "ctrl_o"
+        },
+        {
+          "id": "translate_firsted_key",
+          "character": "i",
+          "expectAction": "command",
+          "expectCommand": "go_to_column",
+          "expectArgument": "number",
+          "expectPendingPrefix": "none"
+        },
+        {
+          "id": "resolve_host_prompt",
+          "expectCancelled": false,
+          "firstResponse": " 9 ",
+          "expectRequest": {
+            "id": "go_to_column",
+            "number": 9
+          }
+        },
+        {
+          "id": "execute_resolved_prompt"
+        }
+      ],
+      "expect": {
+        "documents": {
+          "d": {
+            "lines": [
+              {
+                "text": "alpha beta",
+                "flags": []
+              }
+            ],
+            "isDirty": false,
+            "version": 0
+          }
+        },
+        "undo": {
+          "count": 0
+        },
+        "windows": {
+          "w": {
+            "cursor": {
+              "line": 0,
+              "column": 8
+            }
+          }
+        }
+      }
+    },
+    {
+      "id": "host.invalid-range-passes-through-typed-command-validation",
+      "area": "host-prompts",
+      "initial": {
+        "documents": [
+          {
+            "id": "d",
+            "lines": [
+              {
+                "text": "alpha beta",
+                "flags": []
+              }
+            ]
+          }
+        ],
+        "windows": [
+          {
+            "id": "w",
+            "documentId": "d",
+            "cursor": {
+              "line": 0,
+              "column": 0
+            },
+            "topLine": 0,
+            "leftColumn": 0
+          }
+        ],
+        "currentWindowId": "w"
+      },
+      "operations": [
+        {
+          "id": "translate_firsted_key",
+          "character": "O",
+          "control": true,
+          "expectAction": "prefix_pending",
+          "expectPrefixDisplay": "Ctrl-O",
+          "expectPendingPrefix": "ctrl_o"
+        },
+        {
+          "id": "translate_firsted_key",
+          "character": "n",
+          "expectAction": "command",
+          "expectCommand": "go_to_line",
+          "expectArgument": "number",
+          "expectPendingPrefix": "none"
+        },
+        {
+          "id": "resolve_host_prompt",
+          "expectCancelled": false,
+          "firstResponse": "0",
+          "expectRequest": {
+            "id": "go_to_line",
+            "number": 0
+          }
+        },
+        {
+          "id": "execute_resolved_prompt",
+          "commandSucceeded": false
+        }
+      ],
+      "expect": {
+        "commandSucceeded": false,
+        "documents": {
+          "d": {
+            "lines": [
+              {
+                "text": "alpha beta",
+                "flags": []
+              }
+            ],
+            "isDirty": false,
+            "version": 0
+          }
+        },
+        "undo": {
+          "count": 0
+        },
+        "windows": {
+          "w": {
+            "cursor": {
+              "line": 0,
+              "column": 0
+            }
+          }
+        },
+        "error": {
+          "id": "invalid_command_argument",
+          "code": "EDITOR_COMMAND_INVALID_ARGUMENT",
+          "resourceKey": "Editor.Errors.Command.InvalidArgument"
+        }
+      }
+    },
+    {
+      "id": "host.link-window-second-number-cancelled-preserves-views",
+      "area": "host-prompts",
+      "initial": {
+        "documents": [
+          {
+            "id": "a",
+            "lines": [
+              {
+                "text": "first",
+                "flags": []
+              }
+            ]
+          },
+          {
+            "id": "b",
+            "lines": [
+              {
+                "text": "second",
+                "flags": []
+              }
+            ]
+          }
+        ],
+        "windows": [
+          {
+            "id": "wa",
+            "documentId": "a",
+            "cursor": {
+              "line": 0,
+              "column": 0
+            },
+            "topLine": 0,
+            "leftColumn": 0
+          },
+          {
+            "id": "wb",
+            "documentId": "b",
+            "cursor": {
+              "line": 0,
+              "column": 0
+            },
+            "topLine": 0,
+            "leftColumn": 0
+          }
+        ],
+        "currentWindowId": "wa"
+      },
+      "operations": [
+        {
+          "id": "translate_firsted_key",
+          "character": "O",
+          "control": true,
+          "expectAction": "prefix_pending",
+          "expectPrefixDisplay": "Ctrl-O",
+          "expectPendingPrefix": "ctrl_o"
+        },
+        {
+          "id": "translate_firsted_key",
+          "character": "j",
+          "expectAction": "command",
+          "expectCommand": "link_window",
+          "expectArgument": "two_numbers",
+          "expectPendingPrefix": "none"
+        },
+        {
+          "id": "resolve_host_prompt",
+          "expectCancelled": true,
+          "firstResponse": "1",
+          "secondResponse": null
+        },
+        {
+          "id": "execute_resolved_prompt",
+          "commandSucceeded": false
+        }
+      ],
+      "expect": {
+        "commandSucceeded": false,
+        "documents": {
+          "a": {
+            "lines": [
+              {
+                "text": "first",
+                "flags": []
+              }
+            ],
+            "isDirty": false,
+            "version": 0
+          },
+          "b": {
+            "lines": [
+              {
+                "text": "second",
+                "flags": []
+              }
+            ],
+            "isDirty": false,
+            "version": 0
+          }
+        },
+        "undo": {
+          "count": 0
+        },
+        "windows": {
+          "wa": {
+            "cursor": {
+              "line": 0,
+              "column": 0
+            }
+          }
+        },
+        "windowCount": 2
+      }
+    },
+    {
+      "id": "host.link-window-validated-two-values-reattach-view",
+      "area": "host-prompts",
+      "initial": {
+        "documents": [
+          {
+            "id": "a",
+            "lines": [
+              {
+                "text": "first",
+                "flags": []
+              }
+            ]
+          },
+          {
+            "id": "b",
+            "lines": [
+              {
+                "text": "second",
+                "flags": []
+              }
+            ]
+          }
+        ],
+        "windows": [
+          {
+            "id": "wa",
+            "documentId": "a",
+            "cursor": {
+              "line": 0,
+              "column": 0
+            },
+            "topLine": 0,
+            "leftColumn": 0
+          },
+          {
+            "id": "wb",
+            "documentId": "b",
+            "cursor": {
+              "line": 0,
+              "column": 0
+            },
+            "topLine": 0,
+            "leftColumn": 0
+          }
+        ],
+        "currentWindowId": "wa"
+      },
+      "operations": [
+        {
+          "id": "translate_firsted_key",
+          "character": "O",
+          "control": true,
+          "expectAction": "prefix_pending",
+          "expectPrefixDisplay": "Ctrl-O",
+          "expectPendingPrefix": "ctrl_o"
+        },
+        {
+          "id": "translate_firsted_key",
+          "character": "j",
+          "expectAction": "command",
+          "expectCommand": "link_window",
+          "expectArgument": "two_numbers",
+          "expectPendingPrefix": "none"
+        },
+        {
+          "id": "resolve_host_prompt",
+          "expectCancelled": false,
+          "firstResponse": "1",
+          "secondResponse": "2",
+          "expectRequest": {
+            "id": "link_window",
+            "number": 1,
+            "number2": 2
+          }
+        },
+        {
+          "id": "execute_resolved_prompt"
+        }
+      ],
+      "expect": {
+        "documents": {
+          "a": {
+            "lines": [
+              {
+                "text": "first",
+                "flags": []
+              }
+            ],
+            "isDirty": false,
+            "version": 0
+          },
+          "b": {
+            "lines": [
+              {
+                "text": "second",
+                "flags": []
+              }
+            ],
+            "isDirty": false,
+            "version": 0
+          }
+        },
+        "undo": {
+          "count": 0
+        },
+        "windows": {
+          "wa": {
+            "documentId": "b",
+            "sameDocumentAs": "wb"
+          }
+        },
+        "windowCount": 2
+      }
+    },
+    {
+      "id": "host.exit-unconfirmed-does-not-request-rundown",
+      "area": "host-prompts",
+      "initial": {
+        "documents": [
+          {
+            "id": "d",
+            "lines": [
+              {
+                "text": "alpha beta",
+                "flags": []
+              }
+            ]
+          }
+        ],
+        "windows": [
+          {
+            "id": "w",
+            "documentId": "d",
+            "cursor": {
+              "line": 0,
+              "column": 0
+            },
+            "topLine": 0,
+            "leftColumn": 0
+          }
+        ],
+        "currentWindowId": "w"
+      },
+      "operations": [
+        {
+          "id": "translate_firsted_key",
+          "character": "K",
+          "control": true,
+          "expectAction": "prefix_pending",
+          "expectPrefixDisplay": "Ctrl-K",
+          "expectPendingPrefix": "ctrl_k"
+        },
+        {
+          "id": "translate_firsted_key",
+          "character": "x",
+          "expectAction": "command",
+          "expectCommand": "exit",
+          "expectArgument": "confirmation",
+          "expectPendingPrefix": "none"
+        },
+        {
+          "id": "resolve_host_prompt",
+          "expectCancelled": true,
+          "firstResponse": "NO"
+        },
+        {
+          "id": "execute_resolved_prompt",
+          "commandSucceeded": false
+        }
+      ],
+      "expect": {
+        "commandSucceeded": false,
+        "documents": {
+          "d": {
+            "lines": [
+              {
+                "text": "alpha beta",
+                "flags": []
+              }
+            ],
+            "isDirty": false,
+            "version": 0
+          }
+        },
+        "undo": {
+          "count": 0
+        },
+        "windows": {
+          "w": {
+            "cursor": {
+              "line": 0,
+              "column": 0
+            }
+          }
+        },
+        "rundownRequested": false
+      }
+    },
+    {
+      "id": "host.exit-confirmed-requests-rundown",
+      "area": "host-prompts",
+      "initial": {
+        "documents": [
+          {
+            "id": "d",
+            "lines": [
+              {
+                "text": "alpha beta",
+                "flags": []
+              }
+            ]
+          }
+        ],
+        "windows": [
+          {
+            "id": "w",
+            "documentId": "d",
+            "cursor": {
+              "line": 0,
+              "column": 0
+            },
+            "topLine": 0,
+            "leftColumn": 0
+          }
+        ],
+        "currentWindowId": "w"
+      },
+      "operations": [
+        {
+          "id": "translate_firsted_key",
+          "character": "K",
+          "control": true,
+          "expectAction": "prefix_pending",
+          "expectPrefixDisplay": "Ctrl-K",
+          "expectPendingPrefix": "ctrl_k"
+        },
+        {
+          "id": "translate_firsted_key",
+          "character": "x",
+          "expectAction": "command",
+          "expectCommand": "exit",
+          "expectArgument": "confirmation",
+          "expectPendingPrefix": "none"
+        },
+        {
+          "id": "resolve_host_prompt",
+          "expectCancelled": false,
+          "firstResponse": " yes ",
+          "expectRequest": {
+            "id": "exit"
+          }
+        },
+        {
+          "id": "execute_resolved_prompt"
+        }
+      ],
+      "expect": {
+        "documents": {
+          "d": {
+            "lines": [
+              {
+                "text": "alpha beta",
+                "flags": []
+              }
+            ],
+            "isDirty": false,
+            "version": 0
+          }
+        },
+        "undo": {
+          "count": 0
+        },
+        "windows": {
+          "w": {
+            "cursor": {
+              "line": 0,
+              "column": 0
+            }
+          }
+        },
+        "rundownRequested": true
+      }
+    },
+    {
+      "id": "host.write-file-blank-path-never-reaches-provider",
+      "area": "host-prompts",
+      "initial": {
+        "documents": [
+          {
+            "id": "d",
+            "lines": [
+              {
+                "text": "alpha beta",
+                "flags": []
+              }
+            ]
+          }
+        ],
+        "windows": [
+          {
+            "id": "w",
+            "documentId": "d",
+            "cursor": {
+              "line": 0,
+              "column": 0
+            },
+            "topLine": 0,
+            "leftColumn": 0
+          }
+        ],
+        "currentWindowId": "w",
+        "fileWriteSink": true
+      },
+      "operations": [
+        {
+          "id": "translate_firsted_key",
+          "character": "K",
+          "control": true,
+          "expectAction": "prefix_pending",
+          "expectPrefixDisplay": "Ctrl-K",
+          "expectPendingPrefix": "ctrl_k"
+        },
+        {
+          "id": "translate_firsted_key",
+          "character": "w",
+          "expectAction": "command",
+          "expectCommand": "write_file",
+          "expectArgument": "file_path",
+          "expectPendingPrefix": "none"
+        },
+        {
+          "id": "resolve_host_prompt",
+          "expectCancelled": true,
+          "firstResponse": "  "
+        },
+        {
+          "id": "execute_resolved_prompt",
+          "commandSucceeded": false
+        }
+      ],
+      "expect": {
+        "commandSucceeded": false,
+        "documents": {
+          "d": {
+            "lines": [
+              {
+                "text": "alpha beta",
+                "flags": []
+              }
+            ],
+            "isDirty": false,
+            "version": 0
+          }
+        },
+        "undo": {
+          "count": 0
+        },
+        "windows": {
+          "w": {
+            "cursor": {
+              "line": 0,
+              "column": 0
+            }
+          }
+        },
+        "fileWrites": []
+      }
+    },
+    {
+      "id": "host.write-file-path-is-trimmed-before-provider",
+      "area": "host-prompts",
+      "initial": {
+        "documents": [
+          {
+            "id": "d",
+            "lines": [
+              {
+                "text": "alpha beta",
+                "flags": []
+              }
+            ]
+          }
+        ],
+        "windows": [
+          {
+            "id": "w",
+            "documentId": "d",
+            "cursor": {
+              "line": 0,
+              "column": 0
+            },
+            "topLine": 0,
+            "leftColumn": 0
+          }
+        ],
+        "currentWindowId": "w",
+        "fileWriteSink": true
+      },
+      "operations": [
+        {
+          "id": "translate_firsted_key",
+          "character": "K",
+          "control": true,
+          "expectAction": "prefix_pending",
+          "expectPrefixDisplay": "Ctrl-K",
+          "expectPendingPrefix": "ctrl_k"
+        },
+        {
+          "id": "translate_firsted_key",
+          "character": "w",
+          "expectAction": "command",
+          "expectCommand": "write_file",
+          "expectArgument": "file_path",
+          "expectPendingPrefix": "none"
+        },
+        {
+          "id": "resolve_host_prompt",
+          "expectCancelled": false,
+          "firstResponse": "  output.txt  ",
+          "expectRequest": {
+            "id": "write_file",
+            "text": "output.txt"
+          }
+        },
+        {
+          "id": "execute_resolved_prompt"
+        }
+      ],
+      "expect": {
+        "documents": {
+          "d": {
+            "lines": [
+              {
+                "text": "alpha beta",
+                "flags": []
+              }
+            ],
+            "isDirty": false,
+            "version": 0
+          }
+        },
+        "undo": {
+          "count": 0
+        },
+        "windows": {
+          "w": {
+            "cursor": {
+              "line": 0,
+              "column": 0
+            }
+          }
+        },
+        "fileWrites": [
+          {
+            "path": "output.txt",
+            "lines": [
+              {
+                "text": "alpha beta",
+                "flags": []
+              }
+            ]
+          }
+        ]
+      }
+    },
+    {
+      "id": "host.insert-character-prompt-cancelled",
+      "area": "host-prompts",
+      "initial": {
+        "documents": [
+          {
+            "id": "d",
+            "lines": [
+              {
+                "text": "alpha beta",
+                "flags": []
+              }
+            ]
+          }
+        ],
+        "windows": [
+          {
+            "id": "w",
+            "documentId": "d",
+            "cursor": {
+              "line": 0,
+              "column": 0
+            },
+            "topLine": 0,
+            "leftColumn": 0
+          }
+        ],
+        "currentWindowId": "w"
+      },
+      "operations": [
+        {
+          "id": "translate_firsted_key",
+          "character": "P",
+          "control": true,
+          "expectAction": "command",
+          "expectCommand": "insert_control_character",
+          "expectArgument": "character",
+          "expectPendingPrefix": "none"
+        },
+        {
+          "id": "resolve_host_prompt",
+          "expectCancelled": true,
+          "characterResponse": null
+        },
+        {
+          "id": "execute_resolved_prompt",
+          "commandSucceeded": false
+        }
+      ],
+      "expect": {
+        "commandSucceeded": false,
+        "documents": {
+          "d": {
+            "lines": [
+              {
+                "text": "alpha beta",
+                "flags": []
+              }
+            ],
+            "isDirty": false,
+            "version": 0
+          }
+        },
+        "undo": {
+          "count": 0
+        },
+        "windows": {
+          "w": {
+            "cursor": {
+              "line": 0,
+              "column": 0
+            }
+          }
+        }
+      }
+    },
+    {
+      "id": "host.insert-character-prompt-valid",
+      "area": "host-prompts",
+      "initial": {
+        "documents": [
+          {
+            "id": "d",
+            "lines": [
+              {
+                "text": "alpha beta",
+                "flags": []
+              }
+            ]
+          }
+        ],
+        "windows": [
+          {
+            "id": "w",
+            "documentId": "d",
+            "cursor": {
+              "line": 0,
+              "column": 0
+            },
+            "topLine": 0,
+            "leftColumn": 0
+          }
+        ],
+        "currentWindowId": "w"
+      },
+      "operations": [
+        {
+          "id": "translate_firsted_key",
+          "character": "P",
+          "control": true,
+          "expectAction": "command",
+          "expectCommand": "insert_control_character",
+          "expectArgument": "character",
+          "expectPendingPrefix": "none"
+        },
+        {
+          "id": "resolve_host_prompt",
+          "expectCancelled": false,
+          "expectRequest": {
+            "id": "insert_control_character",
+            "text": "!"
+          },
+          "characterResponse": "!"
+        },
+        {
+          "id": "execute_resolved_prompt"
+        }
+      ],
+      "expect": {
+        "documents": {
+          "d": {
+            "lines": [
+              {
+                "text": "!alpha beta",
+                "flags": []
+              }
+            ],
+            "isDirty": true,
+            "version": 1
+          }
+        },
+        "undo": {
+          "count": 1
+        },
+        "windows": {
+          "w": {
+            "cursor": {
+              "line": 0,
+              "column": 1
+            }
+          }
+        }
+      }
+    },
+    {
+      "id": "host.number-prompt-overflow-cancels-without-dispatch",
+      "area": "host-prompts",
+      "initial": {
+        "documents": [
+          {
+            "id": "d",
+            "lines": [
+              {
+                "text": "alpha beta",
+                "flags": []
+              }
+            ]
+          }
+        ],
+        "windows": [
+          {
+            "id": "w",
+            "documentId": "d",
+            "cursor": {
+              "line": 0,
+              "column": 0
+            },
+            "topLine": 0,
+            "leftColumn": 0
+          }
+        ],
+        "currentWindowId": "w"
+      },
+      "operations": [
+        {
+          "id": "translate_firsted_key",
+          "character": "O",
+          "control": true,
+          "expectAction": "prefix_pending",
+          "expectPrefixDisplay": "Ctrl-O",
+          "expectPendingPrefix": "ctrl_o"
+        },
+        {
+          "id": "translate_firsted_key",
+          "character": "n",
+          "expectAction": "command",
+          "expectCommand": "go_to_line",
+          "expectArgument": "number",
+          "expectPendingPrefix": "none"
+        },
+        {
+          "id": "resolve_host_prompt",
+          "expectCancelled": true,
+          "firstResponse": "999999999999999999999"
+        },
+        {
+          "id": "execute_resolved_prompt",
+          "commandSucceeded": false
+        }
+      ],
+      "expect": {
+        "commandSucceeded": false,
+        "documents": {
+          "d": {
+            "lines": [
+              {
+                "text": "alpha beta",
+                "flags": []
+              }
+            ],
+            "isDirty": false,
+            "version": 0
+          }
+        },
+        "undo": {
+          "count": 0
+        },
+        "windows": {
+          "w": {
+            "cursor": {
+              "line": 0,
+              "column": 0
+            }
+          }
+        }
+      }
+    },
+    {
+      "id": "host.number-prompt-null-cancels-without-dispatch",
+      "area": "host-prompts",
+      "initial": {
+        "documents": [
+          {
+            "id": "d",
+            "lines": [
+              {
+                "text": "alpha beta",
+                "flags": []
+              }
+            ]
+          }
+        ],
+        "windows": [
+          {
+            "id": "w",
+            "documentId": "d",
+            "cursor": {
+              "line": 0,
+              "column": 0
+            },
+            "topLine": 0,
+            "leftColumn": 0
+          }
+        ],
+        "currentWindowId": "w"
+      },
+      "operations": [
+        {
+          "id": "translate_firsted_key",
+          "character": "O",
+          "control": true,
+          "expectAction": "prefix_pending",
+          "expectPrefixDisplay": "Ctrl-O",
+          "expectPendingPrefix": "ctrl_o"
+        },
+        {
+          "id": "translate_firsted_key",
+          "character": "n",
+          "expectAction": "command",
+          "expectCommand": "go_to_line",
+          "expectArgument": "number",
+          "expectPendingPrefix": "none"
+        },
+        {
+          "id": "resolve_host_prompt",
+          "expectCancelled": true,
+          "firstResponse": null
+        },
+        {
+          "id": "execute_resolved_prompt",
+          "commandSucceeded": false
+        }
+      ],
+      "expect": {
+        "commandSucceeded": false,
+        "documents": {
+          "d": {
+            "lines": [
+              {
+                "text": "alpha beta",
+                "flags": []
+              }
+            ],
+            "isDirty": false,
+            "version": 0
+          }
+        },
+        "undo": {
+          "count": 0
+        },
+        "windows": {
+          "w": {
+            "cursor": {
+              "line": 0,
+              "column": 0
+            }
+          }
+        }
+      }
+    },
+    {
+      "id": "host.find-replacement-cancelled-after-valid-first-answer",
+      "area": "host-prompts",
+      "initial": {
+        "documents": [
+          {
+            "id": "d",
+            "lines": [
+              {
+                "text": "alpha beta",
+                "flags": []
+              }
+            ]
+          }
+        ],
+        "windows": [
+          {
+            "id": "w",
+            "documentId": "d",
+            "cursor": {
+              "line": 0,
+              "column": 0
+            },
+            "topLine": 0,
+            "leftColumn": 0
+          }
+        ],
+        "currentWindowId": "w"
+      },
+      "operations": [
+        {
+          "id": "translate_firsted_key",
+          "character": "Q",
+          "control": true,
+          "expectAction": "prefix_pending",
+          "expectPrefixDisplay": "Ctrl-Q",
+          "expectPendingPrefix": "ctrl_q"
+        },
+        {
+          "id": "translate_firsted_key",
+          "character": "a",
+          "expectAction": "command",
+          "expectCommand": "replace_next",
+          "expectArgument": "find_replace",
+          "expectPendingPrefix": "none"
+        },
+        {
+          "id": "resolve_host_prompt",
+          "expectCancelled": true,
+          "firstResponse": "alpha",
+          "secondResponse": null
+        }
+      ],
+      "expect": {
+        "documents": {
+          "d": {
+            "lines": [
+              {
+                "text": "alpha beta",
+                "flags": []
+              }
+            ],
+            "isDirty": false,
+            "version": 0
+          }
+        },
+        "undo": {
+          "count": 0
+        },
+        "windows": {
+          "w": {
+            "cursor": {
+              "line": 0,
+              "column": 0
+            }
+          }
+        }
+      }
+    }
+  ]
+}

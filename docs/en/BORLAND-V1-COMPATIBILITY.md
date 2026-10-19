@@ -263,6 +263,10 @@ Eight shared conformance cases now verify compress, left-margin shift, long-line
 
 Eight language-neutral typeahead cases now verify host FIFO vs. macro front insertion, queued macro Ctrl-U versus immediate physical Ctrl-U abort, CR/LF and ASCII control-key normalization, and full-buffer overflow clearing. Four historical routines (Pokechr, EditPushtbf, EditUserpush, EditAbort) now link to executable portable cases. Platform-specific key polling remains a host responsibility.
 
+## Host wrapper prompt-to-command acceptance
+
+Portable `host-prompt-resolution.json` cases now exercise the host-neutral interpretation of cancelled and submitted prompt replies through real Ctrl-K/O/Q bindings and semantic dispatch. The tests distinguish null Find from empty Find Again, cancelled replacement from intentional deletion, valid and invalid numbers, confirmation, and filepath/character prompts. Seven historically named interactive Cp wrappers receive explicit executable links for their observable prompt/command duties. Terminal presentation remains a host sample obligation.
+
 ## V1 release gate
 
 The C#/.NET implementation now has executable coverage for the major FIRST-ED structural areas, including paragraph reformatting, whole-line block bulk topology, independent block endpoints and atomic multi-document undo/navigation restoration. The [handbook procedure/function index audit](HANDBOOK-PROCEDURE-INDEX-AUDIT.md) now records all 123 printed entries with first-pass classifications; its mapped behavior still requires a final regression-coverage and host-interface audit before calling V1 complete. MicroStar-specific demonstrations may ship as samples rather than core dependencies.

@@ -229,7 +229,11 @@
       "handbookPage": 142,
       "status": "host-sample",
       "evidence": "docs/en/COMMAND-PROCESSOR-TRANSFER.md",
-      "note": "The historical interactive Cp wrapper maps to commands and host prompts."
+      "note": "The historical interactive Cp wrapper maps to commands and host prompts.",
+      "conformanceCases": [
+        "host.exit-unconfirmed-does-not-request-rundown",
+        "host.exit-confirmed-requests-rundown"
+      ]
     },
     {
       "name": "EditCpFileSave",
@@ -243,21 +247,34 @@
       "handbookPage": 144,
       "status": "host-sample",
       "evidence": "docs/en/COMMAND-PROCESSOR-TRANSFER.md",
-      "note": "The historical interactive Cp wrapper maps to commands and host prompts."
+      "note": "The historical interactive Cp wrapper maps to commands and host prompts.",
+      "conformanceCases": [
+        "host.find-cancelled-prompt-does-not-repeat",
+        "host.find-confirmed-empty-means-find-again",
+        "host.find-normal-pattern-reaches-search-service"
+      ]
     },
     {
       "name": "EditCpgotocl",
       "handbookPage": 145,
       "status": "host-sample",
       "evidence": "docs/en/COMMAND-PROCESSOR-TRANSFER.md",
-      "note": "The historical interactive Cp wrapper maps to commands and host prompts."
+      "note": "The historical interactive Cp wrapper maps to commands and host prompts.",
+      "conformanceCases": [
+        "host.goto-column-number-is-one-based"
+      ]
     },
     {
       "name": "EditCpgotoln",
       "handbookPage": 146,
       "status": "host-sample",
       "evidence": "docs/en/COMMAND-PROCESSOR-TRANSFER.md",
-      "note": "The historical interactive Cp wrapper maps to commands and host prompts."
+      "note": "The historical interactive Cp wrapper maps to commands and host prompts.",
+      "conformanceCases": [
+        "host.goto-line-invalid-number-is-abandoned",
+        "host.goto-line-valid-number-moves-cursor",
+        "host.invalid-range-passes-through-typed-command-validation"
+      ]
     },
     {
       "name": "EditCpgotowin",
@@ -278,14 +295,23 @@
       "handbookPage": 149,
       "status": "host-sample",
       "evidence": "docs/en/COMMAND-PROCESSOR-TRANSFER.md",
-      "note": "The historical interactive Cp wrapper maps to commands and host prompts."
+      "note": "The historical interactive Cp wrapper maps to commands and host prompts.",
+      "conformanceCases": [
+        "host.link-window-second-number-cancelled-preserves-views",
+        "host.link-window-validated-two-values-reattach-view"
+      ]
     },
     {
       "name": "EditCpReplace",
       "handbookPage": 150,
       "status": "host-sample",
       "evidence": "docs/en/COMMAND-PROCESSOR-TRANSFER.md",
-      "note": "The historical interactive Cp wrapper maps to commands and host prompts."
+      "note": "The historical interactive Cp wrapper maps to commands and host prompts.",
+      "conformanceCases": [
+        "host.replace-cancelled-second-prompt-cannot-delete",
+        "host.replace-explicit-empty-second-prompt-deletes",
+        "host.replace-nonempty-second-prompt-executes"
+      ]
     },
     {
       "name": "EditCprfw",
@@ -334,7 +360,11 @@
       "handbookPage": 157,
       "status": "host-sample",
       "evidence": "docs/en/COMMAND-PROCESSOR-TRANSFER.md",
-      "note": "The historical interactive Cp wrapper maps to commands and host prompts."
+      "note": "The historical interactive Cp wrapper maps to commands and host prompts.",
+      "conformanceCases": [
+        "host.write-file-blank-path-never-reaches-provider",
+        "host.write-file-path-is-trimmed-before-provider"
+      ]
     },
     {
       "name": "EditCvts2i",

@@ -13,6 +13,7 @@
     "conformance/v1/cases/windows-and-block-lifecycle.json",
     "conformance/v1/cases/reformat-compatibility.json",
     "conformance/v1/cases/typeahead-input.json",
-    "conformance/v1/cases/firsted-keymap.json"
+    "conformance/v1/cases/firsted-keymap.json",
+    "conformance/v1/cases/host-prompt-resolution.json"
   ]
 }

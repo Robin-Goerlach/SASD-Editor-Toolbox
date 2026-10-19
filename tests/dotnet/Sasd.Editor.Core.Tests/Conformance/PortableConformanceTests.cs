@@ -316,6 +316,58 @@ public sealed class PortableConformanceTests
 
                 return true;
             }
+            case "resolve_host_prompt":
+            {
+                // The key map merely declares required parameters. This
+                // adapter supplies the recorded host responses, including
+                // null cancellation, to the shared pure prompt resolver.
+                var binding = context.LastKeyAction?.Binding
+                    ?? throw new InvalidDataException("No pending host command binding.");
+                string? first = operation.TryGetProperty("firstResponse", out var a)
+                    ? a.GetString() : null;
+                string? second = operation.TryGetProperty("secondResponse", out var b)
+                    ? b.GetString() : null;
+                char? character = null;
+                if (operation.TryGetProperty("characterResponse", out var ch)
+                    && ch.ValueKind != JsonValueKind.Null)
+                {
+                    var value = ch.GetString()!;
+                    Assert.Single(value);
+                    character = value[0];
+                }
+
+                var request = EditorCommandPromptResolver.Resolve(
+                    binding,
+                    operation.TryGetProperty("pageSize", out var page) ? page.GetInt32() : null,
+                    first, second, character);
+                context.LastResolvedPrompt = request;
+                Assert.Equal(operation.GetProperty("expectCancelled").GetBoolean(),
+                    request is null);
+
+                if (operation.TryGetProperty("expectRequest", out var expected))
+                {
+                    Assert.NotNull(request);
+                    Assert.Equal(RequireString(expected, "id"),
+                        PortableEnumName(request.Id.ToString()));
+                    if (expected.TryGetProperty("text", out var expectedText))
+                        Assert.Equal(expectedText.GetString(), request.Text);
+                    if (expected.TryGetProperty("text2", out var expectedText2))
+                        Assert.Equal(expectedText2.GetString(), request.Text2);
+                    if (expected.TryGetProperty("number", out var expectedNumber))
+                        Assert.Equal(expectedNumber.GetInt32(), request.Number);
+                    if (expected.TryGetProperty("number2", out var expectedNumber2))
+                        Assert.Equal(expectedNumber2.GetInt32(), request.Number2);
+                    if (expected.TryGetProperty("pageSize", out var expectedPage))
+                        Assert.Equal(expectedPage.GetInt32(), request.PageSize);
+                }
+
+                return true;
+            }
+            case "execute_resolved_prompt":
+                // A cancelled host prompt must not even enter the dispatcher.
+                return context.LastResolvedPrompt is not null
+                    && await new EditorCommandDispatcher(context.Session)
+                        .ExecuteAsync(context.LastResolvedPrompt);
             case "execute_firsted_key":
             {
                 // The key map itself does not change text or collect prompts:
@@ -696,6 +748,11 @@ public sealed class PortableConformanceTests
             }
         }
 
+        if (expected.TryGetProperty("rundownRequested", out var rundown))
+        {
+            Assert.Equal(rundown.GetBoolean(), context.Session.RundownRequested);
+        }
+
         if (expected.TryGetProperty("firstEdKeymap", out var keymap))
         {
             if (keymap.TryGetProperty("pendingPrefix", out var pending))
@@ -986,6 +1043,7 @@ public sealed class PortableConformanceTests
         // its input sequence. No state is shared between parallel xUnit runs.
         public FirstEdKeyMap KeyMap { get; } = new();
         public EditorInputAction? LastKeyAction { get; set; }
+        public EditorCommandRequest? LastResolvedPrompt { get; set; }
     }
 
     private sealed record WrittenFile(string Path, IReadOnlyList<EditorLineSnapshot> Lines);
