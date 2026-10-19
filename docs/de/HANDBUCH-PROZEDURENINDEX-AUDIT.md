@@ -35,7 +35,7 @@ Die .NET-Tests laden inzwischen jede Datei aus `conformance/v1/manifest.json`, n
 
 ## Maschinengeprüfte Verweise auf ausführbare Belege
 
-Die Inventarliste unterstützt pro historischer Routine ein optionales Feld `conformanceCases`. Die Repository-Vertragsprüfung kontrolliert, ob jede referenzierte Fall-ID in einer durch das portable Manifest eingebundenen Datei vorkommt, weist doppelte oder unbekannte IDs zurück und meldet die Zahl verknüpfter Routinen. **Derzeit sind 81 von 123 Zeilen** mit konkreten portablen Fällen verknüpft. Für alle anderen bestehen zunächst nur konzeptionelle beziehungsweise dokumentierte Zuordnungen, deren Regressionstest-Abdeckung weiterhin einzeln geprüft werden muss.
+Die Inventarliste unterstützt pro historischer Routine ein optionales Feld `conformanceCases`. Die Repository-Vertragsprüfung kontrolliert, ob jede referenzierte Fall-ID in einer durch das portable Manifest eingebundenen Datei vorkommt, weist doppelte oder unbekannte IDs zurück und meldet die Zahl verknüpfter Routinen. **Derzeit sind 87 von 123 Zeilen** mit konkreten portablen Fällen verknüpft. Für alle anderen bestehen zunächst nur konzeptionelle beziehungsweise dokumentierte Zuordnungen, deren Regressionstest-Abdeckung weiterhin einzeln geprüft werden muss.
 
 Diese Verweise sind **gezielte Testbeispiele**, keine vollständigen historischen Verhaltensbeweise. Die Prüfung erzeugt bewusst keine erfundenen Tests für Einträge, die lediglich als `implemented` oder `modern-replacement` eingeordnet wurden.
 
@@ -76,6 +76,8 @@ Acht Typeahead-Fälle verknüpfen Pokechr, EditPushtbf, EditUserpush und EditAbo
 Die neuen Fälle in `firsted-keymap.json` verknüpfen fünf weitere historische Routinen für Ctrl-K/O/Q, Befehlsklassifikation sowie Text-/Befehlsverarbeitung mit ausführbaren Tests an der normalisierten Eingabegrenze. Damit besitzen **74 von 123** Indexeinträgen direkte portable Belege; konkrete Host-Dialoge bleiben von der wiederverwendbaren Editorbibliothek getrennt.
 
 22 neue portable Host-Prompt-Fälle prüfen die Abbruchgrenze zwischen FIRST-ED-Tastenbelegung, gelieferten Eingabewerten und ausgeführten Befehlen. Sieben interaktive historische Cp-Wrapper erhalten konkrete ausführbare Verweise auf ihre Teilaufgaben. Damit wächst die Host-Abdeckung vor V1, ohne eine vollständige Gleichwertigkeit der DOS-Terminaloberfläche zu behaupten. **81 von 123** Indexeinträge besitzen nun portable Testverknüpfungen.
+
+Zehn neue portable Fälle belegen jetzt sechs bisher noch nicht zugeordnete, bereits implementierte FIRST-ED-Kernelroutinen (Zentrieren, Linksbewegung, Zeilen verbinden, Steuerzeichen einfügen sowie Blockmarkierungen entfernen und wiederherstellen). Der Index besitzt jetzt für **87 von 123** Routinen konkrete Testverweise. Die übrigen Einträge erfordern eine gesonderte Funktions- oder Host-Abnahme und gelten nicht automatisch als fehlend.
 
 ## Nächste Schritte und Abschlusskriterien
 

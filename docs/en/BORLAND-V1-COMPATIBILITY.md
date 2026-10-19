@@ -267,6 +267,10 @@ Eight language-neutral typeahead cases now verify host FIFO vs. macro front inse
 
 Portable `host-prompt-resolution.json` cases now exercise the host-neutral interpretation of cancelled and submitted prompt replies through real Ctrl-K/O/Q bindings and semantic dispatch. The tests distinguish null Find from empty Find Again, cancelled replacement from intentional deletion, valid and invalid numbers, confirmation, and filepath/character prompts. Seven historically named interactive Cp wrappers receive explicit executable links for their observable prompt/command duties. Terminal presentation remains a host sample obligation.
 
+## Portable kernel routine audit
+
+Ten shared `kernel-routines.json` cases link six historically named kernel routines to directly executed behavior. These cover changed and unchanged Center Line commands, crossing a logical-line boundary to the previous nonblank end, Undoable joining, literal control-character insertion and independent block flag projection. The no-op centering fix is a modern state-consistency guarantee; no Pascal pointer ABI or historical video-memory API is required.
+
 ## V1 release gate
 
 The C#/.NET implementation now has executable coverage for the major FIRST-ED structural areas, including paragraph reformatting, whole-line block bulk topology, independent block endpoints and atomic multi-document undo/navigation restoration. The [handbook procedure/function index audit](HANDBOOK-PROCEDURE-INDEX-AUDIT.md) now records all 123 printed entries with first-pass classifications; its mapped behavior still requires a final regression-coverage and host-interface audit before calling V1 complete. MicroStar-specific demonstrations may ship as samples rather than core dependencies.

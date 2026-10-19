@@ -266,6 +266,10 @@ Acht sprachneutrale Eingabefälle prüfen Host-FIFO gegenüber vorn eingefügten
 
 Die portablen Fälle in `host-prompt-resolution.json` prüfen jetzt die UI-unabhängige Verarbeitung abgebrochener beziehungsweise bestätigter Dialogantworten über echte Ctrl-K/O/Q-Belegungen und den semantischen Dispatcher. Getestet werden null/leer bei Find, Abbruch versus bewusstes Löschen bei Replace, gültige/ungültige Zahlen, Bestätigung sowie Datei-/Zeichenabfragen. Sieben historische interaktive Cp-Wrapper erhalten ausführbare Verweise auf ihre beobachtbare Prompt-/Befehlsaufgabe. Die konkrete Terminaldarstellung bleibt Host-Angelegenheit.
 
+## Portabler Test historischer Kernelroutinen
+
+Zehn gemeinsame Fälle in `kernel-routines.json` verknüpfen sechs historische Kernroutinen mit tatsächlich ausgeführtem Verhalten: wirkliche und wirkungslose Zentrierung, Linksbewegung über Zeilengrenzen, Undo-fähiges Zeilenverbinden, Steuerzeichen-Einfügung sowie getrennte Blockflag-Projektion. Die Leerlaufbehandlung bei Zentrierung ist eine moderne Zustandskonsistenzregel; historische Pascal-Zeiger- oder Videoram-APIs werden nicht benötigt.
+
 ## V1-Abschlusskriterium
 
 Die C#/.NET-Implementierung deckt die großen strukturellen FIRST-ED-Bereiche inzwischen ausführbar ab, einschließlich Absatz-Neuformatierung, mehrzeiliger Block-Bulk-Topologie, unabhängiger Block-Endpunkte und atomarer Multi-Dokument-Undo-/Navigationswiederherstellung. Der [Handbuch-Prozeduren-/Funktionsindex-Audit](HANDBUCH-PROZEDURENINDEX-AUDIT.md) erfasst inzwischen alle 123 gedruckten Einträge mit ersten Klassifikationen; die zugeordneten Routinen benötigen vor V1 noch einen abschließenden Testabdeckungs- und Host-Audit. MicroStar-spezifische Demonstrationen können als Samples statt als Core-Abhängigkeiten geliefert werden.

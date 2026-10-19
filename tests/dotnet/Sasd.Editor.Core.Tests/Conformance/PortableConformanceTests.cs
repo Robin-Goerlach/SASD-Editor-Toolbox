@@ -499,6 +499,16 @@ public sealed class PortableConformanceTests
                 return await context.Session.Search.FindNextAsync(
                     RequireString(operation, "text"), options) is not null;
             }
+            case "clear_block_highlights":
+                // The historical EditOffblock presentation primitive clears
+                // projected flags but preserves the logical endpoint pair.
+                context.Session.ClearBlockHighlights();
+                return true;
+            case "mark_block_highlights":
+                // EditMarkblock recomputes projection from the current block
+                // definition. Neither operation changes text or Undo.
+                context.Session.MarkBlockHighlights();
+                return true;
             case "position_cursor":
             {
                 var window = context.Session.CurrentWindow;
@@ -609,6 +619,9 @@ public sealed class PortableConformanceTests
         operation switch
         {
             "move_right_character" => EditorCommandId.CursorRight,
+            "move_left_character" => EditorCommandId.CursorLeft,
+            "center_line" => EditorCommandId.CenterLine,
+            "insert_control_character" => EditorCommandId.InsertControlCharacter,
             // Use the public semantic dispatcher, not implementation-private
             // compatibility processors or DOS keyboard scan codes.
             "beginning_of_line" => EditorCommandId.BeginningOfLine,

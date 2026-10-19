@@ -158,7 +158,13 @@
       "handbookPage": 134,
       "status": "implemented",
       "evidence": "docs/en/FIRST-ED-COMMAND-MAP.md",
-      "note": "Semantic FIRST-ED editing/navigation commands."
+      "note": "Semantic FIRST-ED editing/navigation commands.",
+      "conformanceCases": [
+        "kernel.center-line-reformats-as-single-undo",
+        "kernel.center-line-noop-preserves-clean-state",
+        "kernel.center-line-repeated-command-does-not-consume-second-undo",
+        "kernel.center-line-nonzero-left-margin"
+      ]
     },
     {
       "name": "EditChangeCase",
@@ -599,7 +605,10 @@
       "handbookPage": 182,
       "status": "implemented",
       "evidence": "docs/en/FIRST-ED-COMMAND-MAP.md",
-      "note": "Normalized control-character insertion."
+      "note": "Normalized control-character insertion.",
+      "conformanceCases": [
+        "kernel.insert-control-character-writes-literal-control-into-line"
+      ]
     },
     {
       "name": "EditInsertLine",
@@ -616,7 +625,11 @@
       "handbookPage": 184,
       "status": "implemented",
       "evidence": "docs/en/DELETION-COMPATIBILITY.md",
-      "note": "Character/word/line deletion and joining."
+      "note": "Character/word/line deletion and joining.",
+      "conformanceCases": [
+        "kernel.join-next-line-at-last-nonblank",
+        "kernel.undo-join-restores-two-logical-lines"
+      ]
     },
     {
       "name": "EditJumpMarker",
@@ -646,7 +659,10 @@
       "handbookPage": 187,
       "status": "implemented",
       "evidence": "docs/en/KERNEL-COMPATIBILITY-AUDIT.md",
-      "note": "Compatibility navigation and tab rules."
+      "note": "Compatibility navigation and tab rules.",
+      "conformanceCases": [
+        "kernel.move-left-from-line-start-lands-after-previous-nonblank"
+      ]
     },
     {
       "name": "EditLeftWord",
@@ -674,7 +690,10 @@
       "handbookPage": 190,
       "status": "implemented",
       "evidence": "docs/en/BLOCK-COMPATIBILITY.md",
-      "note": "Whole-line block operations and independent endpoints."
+      "note": "Whole-line block operations and independent endpoints.",
+      "conformanceCases": [
+        "kernel.markblock-restores-projected-flags"
+      ]
     },
     {
       "name": "EditNewLine",
@@ -704,7 +723,11 @@
       "handbookPage": 193,
       "status": "implemented",
       "evidence": "docs/en/BLOCK-COMPATIBILITY.md",
-      "note": "Whole-line block operations and independent endpoints."
+      "note": "Whole-line block operations and independent endpoints.",
+      "conformanceCases": [
+        "kernel.offblock-clears-only-visual-flags",
+        "kernel.markblock-restores-projected-flags"
+      ]
     },
     {
       "name": "EditPrccmd",
