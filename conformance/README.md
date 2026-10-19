@@ -121,3 +121,7 @@ These fixtures expose observable ordering/cancellation responsibilities for the 
 ## Additional historical interactive Cp wrapper evidence
 
 The host-prompt suite now checks two-parameter window creation, window deletion, one-based window selection, marker setting/jumping, left/right margins, tab width and Undo limit. Both completed and cancelled prompts use actual FIRST-ED Ctrl-K/O/Q bindings and the ordinary command dispatcher. Layout assertions verify that cancelled window operations leave their frames intact; margin rejection tests check that invalid state-dependent values never change view settings. These fixtures link nine additional *observable wrapper responsibilities* from the 1985 handbook; they do not reproduce its console dialog rendering.
+
+## Tab safety at extreme virtual positions
+
+Four portable Tab boundary cases verify that Insert-mode requests with extreme tab widths or distant virtual-column gap fill reject the operation *before* any mutation or Undo; an unrepresentable next tab stop is rejected even in Overtype mode. By contrast, Overtype Tab can advance the cursor at a distant but representable virtual position without creating text. The conservative 4,096-space insertion budget is a documented modern safety rule, not a claimed historical DOS size limit. Ordinary Insert-mode and Overtype-mode Tab fixtures remain part of the same suite.

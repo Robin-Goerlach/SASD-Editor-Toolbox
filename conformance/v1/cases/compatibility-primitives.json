@@ -1360,6 +1360,260 @@
           "count": 1
         }
       }
+    },
+    {
+      "id": "compat.tab-insert-extreme-width-fails-before-allocating",
+      "area": "compatibility-primitives",
+      "initial": {
+        "documents": [
+          {
+            "id": "d",
+            "lines": [
+              {
+                "text": "abc",
+                "flags": []
+              }
+            ]
+          }
+        ],
+        "windows": [
+          {
+            "id": "w",
+            "documentId": "d",
+            "cursor": {
+              "line": 0,
+              "column": 0
+            },
+            "topLine": 0,
+            "leftColumn": 0,
+            "options": {
+              "insertMode": true,
+              "tabSize": 2147483647
+            }
+          }
+        ],
+        "currentWindowId": "w"
+      },
+      "operation": {
+        "id": "tab",
+        "commandSucceeded": false
+      },
+      "expect": {
+        "commandSucceeded": false,
+        "documents": {
+          "d": {
+            "lines": [
+              {
+                "text": "abc",
+                "flags": []
+              }
+            ],
+            "isDirty": false,
+            "version": 0
+          }
+        },
+        "windows": {
+          "w": {
+            "cursor": {
+              "line": 0,
+              "column": 0
+            }
+          }
+        },
+        "undo": {
+          "count": 0
+        }
+      }
+    },
+    {
+      "id": "compat.tab-insert-virtual-gap-fails-before-padding",
+      "area": "compatibility-primitives",
+      "initial": {
+        "documents": [
+          {
+            "id": "d",
+            "lines": [
+              {
+                "text": "abc",
+                "flags": []
+              }
+            ]
+          }
+        ],
+        "windows": [
+          {
+            "id": "w",
+            "documentId": "d",
+            "cursor": {
+              "line": 0,
+              "column": 50000
+            },
+            "topLine": 0,
+            "leftColumn": 0,
+            "options": {
+              "insertMode": true,
+              "tabSize": 4
+            }
+          }
+        ],
+        "currentWindowId": "w"
+      },
+      "operation": {
+        "id": "tab",
+        "commandSucceeded": false
+      },
+      "expect": {
+        "commandSucceeded": false,
+        "documents": {
+          "d": {
+            "lines": [
+              {
+                "text": "abc",
+                "flags": []
+              }
+            ],
+            "isDirty": false,
+            "version": 0
+          }
+        },
+        "windows": {
+          "w": {
+            "cursor": {
+              "line": 0,
+              "column": 50000
+            }
+          }
+        },
+        "undo": {
+          "count": 0
+        }
+      }
+    },
+    {
+      "id": "compat.tab-near-maximum-virtual-column-rejects-overflow",
+      "area": "compatibility-primitives",
+      "initial": {
+        "documents": [
+          {
+            "id": "d",
+            "lines": [
+              {
+                "text": "abc",
+                "flags": []
+              }
+            ]
+          }
+        ],
+        "windows": [
+          {
+            "id": "w",
+            "documentId": "d",
+            "cursor": {
+              "line": 0,
+              "column": 2147483645
+            },
+            "topLine": 0,
+            "leftColumn": 0,
+            "options": {
+              "insertMode": false,
+              "tabSize": 4
+            }
+          }
+        ],
+        "currentWindowId": "w"
+      },
+      "operation": {
+        "id": "tab",
+        "commandSucceeded": false
+      },
+      "expect": {
+        "commandSucceeded": false,
+        "documents": {
+          "d": {
+            "lines": [
+              {
+                "text": "abc",
+                "flags": []
+              }
+            ],
+            "isDirty": false,
+            "version": 0
+          }
+        },
+        "windows": {
+          "w": {
+            "cursor": {
+              "line": 0,
+              "column": 2147483645
+            }
+          }
+        },
+        "undo": {
+          "count": 0
+        }
+      }
+    },
+    {
+      "id": "compat.tab-overtype-distant-virtual-column-remains-cursor-only",
+      "area": "compatibility-primitives",
+      "initial": {
+        "documents": [
+          {
+            "id": "d",
+            "lines": [
+              {
+                "text": "abc",
+                "flags": []
+              }
+            ]
+          }
+        ],
+        "windows": [
+          {
+            "id": "w",
+            "documentId": "d",
+            "cursor": {
+              "line": 0,
+              "column": 100000
+            },
+            "topLine": 0,
+            "leftColumn": 0,
+            "options": {
+              "insertMode": false,
+              "tabSize": 4
+            }
+          }
+        ],
+        "currentWindowId": "w"
+      },
+      "operation": {
+        "id": "tab"
+      },
+      "expect": {
+        "documents": {
+          "d": {
+            "lines": [
+              {
+                "text": "abc",
+                "flags": []
+              }
+            ],
+            "isDirty": false,
+            "version": 0
+          }
+        },
+        "windows": {
+          "w": {
+            "cursor": {
+              "line": 0,
+              "column": 100004
+            }
+          }
+        },
+        "undo": {
+          "count": 0
+        }
+      }
     }
   ]
 }

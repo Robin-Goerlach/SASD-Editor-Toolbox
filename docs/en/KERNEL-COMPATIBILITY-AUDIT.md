@@ -89,3 +89,5 @@ The public `EditorEngine` is also usable without the FIRST-ED command dispatcher
 ## Tab insertion resource and virtual-column safety
 
 The direct `EditorEngine.Tab` and historical FIRST-ED Insert-mode Tab now share a bounded insertion path. An unrepresentable next tab column, more than **4,096 generated tab spaces**, or more than **4,096 missing spaces between physical text and the virtual cursor** causes a typed non-mutating failure before any Undo entry or allocation. This conservative modern resource bound protects against excessive work by the character-by-character insertion algorithm; it is not a 1985 tab-stop restriction. The historical Overtype Tab remains cursor-only and can advance from distant virtual columns without allocating padding, provided the result fits the cursor range.
+
+Four additional shared `compatibility-primitives.json` cases cover excessive tab width, excessive virtual gap fill, integer overflow at the next tab stop, and safe Overtype-only movement at a distant virtual column. They supplement direct-engine .NET regressions and preserve the existing historical Insert/Overtype Tab distinction.
