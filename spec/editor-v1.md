@@ -158,6 +158,7 @@ The handbook does not separately define whether markers or other non-block ancho
 - Host-specific keyboard events are normalized before compatibility mapping.
 - User input is translated to semantic commands outside the editing engine.
 - The FIRST-ED compatibility map is stateful because Ctrl-K, Ctrl-O and Ctrl-Q introduce a second keystroke.
+- A prefixed key sequence is consumed as one two-step input command: the first key creates a pending prefix (without editing), and the next recognized command character resolves a semantic action and clears the prefix. Unsupported second keys and Escape clear the pending prefix without executing an unrelated command. Without a prefix, printable text remains text and Escape retains Undo. The key map does not directly mutate documents, and host-supplied prompt values are required before constructing a semantic command request.
 - A key map never prompts the user directly. Instead it declares whether a command requires text, a number, two numbers, a character, a file path, find/replace values or confirmation.
 - Numbered prefix commands may carry their number directly in the binding.
 - A command-filter hook may rewrite a semantic command before dispatch.

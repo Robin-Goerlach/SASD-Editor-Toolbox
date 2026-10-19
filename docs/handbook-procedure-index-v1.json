@@ -603,7 +603,13 @@
       "handbookPage": 186,
       "status": "implemented",
       "evidence": "docs/en/FIRST-ED-COMMAND-MAP.md",
-      "note": "Typed keys and prefix command mapping."
+      "note": "Typed keys and prefix command mapping.",
+      "conformanceCases": [
+        "keys.ctrl-k-b-begin-block",
+        "keys.ctrl-k-digit-sets-fixed-marker",
+        "keys.ctrl-k-file-read-requests-host-file-path",
+        "keys.ctrl-k-exit-requires-host-confirmation"
+      ]
     },
     {
       "name": "EditLeftChar",
@@ -655,7 +661,13 @@
       "handbookPage": 192,
       "status": "implemented",
       "evidence": "docs/en/FIRST-ED-COMMAND-MAP.md",
-      "note": "Typed keys and prefix command mapping."
+      "note": "Typed keys and prefix command mapping.",
+      "conformanceCases": [
+        "keys.ctrl-o-digit-selects-one-based-view",
+        "keys.ctrl-o-link-requests-two-numbers",
+        "keys.ctrl-o-line-prompts-and-moves-to-one-based-line",
+        "keys.ctrl-o-word-wrap-toggles-view-mode"
+      ]
     },
     {
       "name": "EditOffblock",
@@ -669,14 +681,23 @@
       "handbookPage": 194,
       "status": "implemented",
       "evidence": "docs/en/COMMAND-PROCESSOR-TRANSFER.md",
-      "note": "Semantic command dispatch and text insertion."
+      "note": "Semantic command dispatch and text insertion.",
+      "conformanceCases": [
+        "keys.ctrl-o-word-wrap-toggles-view-mode",
+        "keys.ctrl-o-column-prompts-and-preserves-virtual-column",
+        "keys.special-backspace-routes-through-dispatcher"
+      ]
     },
     {
       "name": "EditPrctxt",
       "handbookPage": 195,
       "status": "implemented",
       "evidence": "docs/en/COMMAND-PROCESSOR-TRANSFER.md",
-      "note": "Semantic command dispatch and text insertion."
+      "note": "Semantic command dispatch and text insertion.",
+      "conformanceCases": [
+        "keys.plain-printable-key-inserts-text-through-dispatcher",
+        "keys.unknown-key-consumes-prefix-but-never-edits"
+      ]
     },
     {
       "name": "EditPushtbf",
@@ -694,7 +715,13 @@
       "handbookPage": 197,
       "status": "implemented",
       "evidence": "docs/en/FIRST-ED-COMMAND-MAP.md",
-      "note": "Typed keys and prefix command mapping."
+      "note": "Typed keys and prefix command mapping.",
+      "conformanceCases": [
+        "keys.ctrl-q-digit-jumps-to-fixed-marker",
+        "keys.ctrl-q-toggle-auto-indent",
+        "keys.ctrl-q-escape-cancels-prefix-without-undo",
+        "keys.ctrl-q-find-needs-text-value"
+      ]
     },
     {
       "name": "EditRealign",

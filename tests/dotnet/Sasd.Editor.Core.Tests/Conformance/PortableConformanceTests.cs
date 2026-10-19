@@ -265,6 +265,95 @@ public sealed class PortableConformanceTests
     {
         switch (RequireString(operation, "id"))
         {
+            case "translate_firsted_key":
+            {
+                // Drive the actual FIRST-ED key map, but describe key events
+                // using portable character/specialKey/modifier vocabulary.
+                // No terminal, browser, WinForms or DOS scan-code types leak
+                // into the cross-language test fixtures.
+                var key = ParsePortableKeyStroke(operation);
+                var action = context.KeyMap.Translate(key);
+                context.LastKeyAction = action;
+                Assert.Equal(
+                    RequireString(operation, "expectAction"),
+                    PortableEnumName(action.Kind.ToString()));
+
+                if (operation.TryGetProperty("expectCommand", out var command))
+                {
+                    Assert.NotNull(action.Binding);
+                    Assert.Equal(command.GetString(),
+                        PortableEnumName(action.Binding!.CommandId.ToString()));
+                }
+
+                if (operation.TryGetProperty("expectArgument", out var argument))
+                {
+                    Assert.NotNull(action.Binding);
+                    Assert.Equal(argument.GetString(),
+                        PortableEnumName(action.Binding!.ArgumentKind.ToString()));
+                }
+
+                if (operation.TryGetProperty("expectFixedNumber", out var fixedNumber))
+                {
+                    Assert.NotNull(action.Binding);
+                    Assert.Equal(fixedNumber.GetInt32(), action.Binding!.FixedNumber);
+                }
+
+                if (operation.TryGetProperty("expectText", out var insertedText))
+                {
+                    Assert.Equal(insertedText.GetString(), action.Text);
+                }
+
+                if (operation.TryGetProperty("expectPrefixDisplay", out var prefixDisplay))
+                {
+                    Assert.Equal(prefixDisplay.GetString(), action.PrefixDisplay);
+                }
+
+                if (operation.TryGetProperty("expectPendingPrefix", out var pending))
+                {
+                    Assert.Equal(pending.GetString(),
+                        PortableEnumName(context.KeyMap.PendingPrefix.ToString()));
+                }
+
+                return true;
+            }
+            case "execute_firsted_key":
+            {
+                // The key map itself does not change text or collect prompts:
+                // the host would supply these values, then dispatch the
+                // binding. These fixtures verify the complete public path
+                // without implementing any real user-facing dialog.
+                var action = context.LastKeyAction
+                    ?? throw new InvalidDataException("No key action has been translated.");
+                EditorCommandRequest request;
+                if (action.Kind == EditorInputActionKind.InsertText)
+                {
+                    request = new EditorCommandRequest(
+                        EditorCommandId.InsertText, Text: action.Text);
+                }
+                else if (action.Kind == EditorInputActionKind.Command)
+                {
+                    var binding = action.Binding
+                        ?? throw new InvalidDataException("Command action lacks a binding.");
+                    request = binding.CreateRequest(
+                        text: operation.TryGetProperty("text", out var text) ? text.GetString() : null,
+                        text2: operation.TryGetProperty("text2", out var text2) ? text2.GetString() : null,
+                        number: operation.TryGetProperty("number", out var number) ? number.GetInt32() : null,
+                        number2: operation.TryGetProperty("number2", out var number2) ? number2.GetInt32() : null,
+                        pageSize: operation.TryGetProperty("pageSize", out var pageSize) ? pageSize.GetInt32() : null);
+                }
+                else
+                {
+                    throw new InvalidDataException(
+                        "Only translated command or insert-text actions can execute.");
+                }
+
+                return await new EditorCommandDispatcher(context.Session)
+                    .ExecuteAsync(request);
+            }
+            case "reset_firsted_keymap":
+                context.KeyMap.Reset();
+                context.LastKeyAction = null;
+                return true;
             case "host_typeahead":
             case "push_typeahead":
             {
@@ -390,6 +479,66 @@ public sealed class PortableConformanceTests
                 return await new EditorCommandDispatcher(context.Session)
                     .ExecuteAsync(BuildRequest(operation));
         }
+    }
+
+    /// <summary>
+    /// Convert a portable key to the .NET normalized representation. The
+    /// fixture format deliberately avoids CLR enum identifiers and OS codes.
+    /// </summary>
+    private static EditorKeyStroke ParsePortableKeyStroke(JsonElement operation)
+    {
+        var modifiers = EditorKeyModifiers.None;
+        if (operation.TryGetProperty("control", out var control) && control.GetBoolean())
+            modifiers |= EditorKeyModifiers.Control;
+        if (operation.TryGetProperty("alt", out var alt) && alt.GetBoolean())
+            modifiers |= EditorKeyModifiers.Alt;
+        if (operation.TryGetProperty("shift", out var shift) && shift.GetBoolean())
+            modifiers |= EditorKeyModifiers.Shift;
+
+        if (operation.TryGetProperty("specialKey", out var specialKey))
+        {
+            var key = specialKey.GetString() switch
+            {
+                "enter" => EditorKey.Enter,
+                "escape" => EditorKey.Escape,
+                "backspace" => EditorKey.Backspace,
+                "delete" => EditorKey.Delete,
+                "tab" => EditorKey.Tab,
+                "arrow_left" => EditorKey.ArrowLeft,
+                "arrow_right" => EditorKey.ArrowRight,
+                "arrow_up" => EditorKey.ArrowUp,
+                "arrow_down" => EditorKey.ArrowDown,
+                "page_up" => EditorKey.PageUp,
+                "page_down" => EditorKey.PageDown,
+                "home" => EditorKey.Home,
+                "end" => EditorKey.End,
+                "f1" => EditorKey.F1,
+                _ => throw new InvalidDataException("Unsupported portable special key.")
+            };
+            return new EditorKeyStroke(key, modifiers: modifiers);
+        }
+
+        var character = RequireString(operation, "character");
+        Assert.Single(character);
+        return EditorKeyStroke.ForCharacter(character[0], modifiers);
+    }
+
+    /// <summary>
+    /// Deterministic snake_case projection for cross-language action and
+    /// binding labels, rather than serializing any .NET enum types.
+    /// </summary>
+    private static string PortableEnumName(string value)
+    {
+        var builder = new System.Text.StringBuilder();
+        for (var index = 0; index < value.Length; index++)
+        {
+            var ch = value[index];
+            if (char.IsUpper(ch) && index > 0
+                && (char.IsLower(value[index - 1]) || char.IsDigit(value[index - 1])))
+                builder.Append('_');
+            builder.Append(char.ToLowerInvariant(ch));
+        }
+        return builder.ToString();
     }
 
     private static EditorCommandRequest BuildRequest(JsonElement operation)
@@ -545,6 +694,13 @@ public sealed class PortableConformanceTests
                     Assert.Equal(height.GetInt32(), actual[index].Height);
                 index++;
             }
+        }
+
+        if (expected.TryGetProperty("firstEdKeymap", out var keymap))
+        {
+            if (keymap.TryGetProperty("pendingPrefix", out var pending))
+                Assert.Equal(pending.GetString(),
+                    PortableEnumName(context.KeyMap.PendingPrefix.ToString()));
         }
 
         if (expected.TryGetProperty("typeahead", out var typeahead))
@@ -824,7 +980,13 @@ public sealed class PortableConformanceTests
         IReadOnlyDictionary<string, EditorDocument> Documents,
         IReadOnlyDictionary<string, EditorWindow> Windows,
         RecordingHooks Hooks,
-        FixtureFileCodec? FileCodec);
+        FixtureFileCodec? FileCodec)
+    {
+        // A stateful map belongs to a *single* portable case and survives
+        // its input sequence. No state is shared between parallel xUnit runs.
+        public FirstEdKeyMap KeyMap { get; } = new();
+        public EditorInputAction? LastKeyAction { get; set; }
+    }
 
     private sealed record WrittenFile(string Path, IReadOnlyList<EditorLineSnapshot> Lines);
 

@@ -110,3 +110,7 @@ Die FIRST-ED-**Eingabezuordnung**, Prefix-Zustandsmaschine und zugehörigen sema
 ## Alt-modifizierte Tasten und Abbruch offener Präfixe
 
 Die UI-unabhängige Tastenzuordnung ignoriert Alt-modifizierte Eingaben **auch bei Sondertasten** wie Escape, Enter, Pfeiltasten oder Entf, damit mögliche Host-/Menükürzel nicht versehentlich den Editor verändern. Ein laufendes Ctrl-K/O/Q-Präfix verbraucht eine ungültige Zweittaste und kehrt in den neutralen Zustand zurück. Ein einfaches Escape während eines Präfixes verwirft nur das Präfix, während Escape ohne Präfix weiterhin Undo auslöst. Diese Regel ist eine moderne Host-Integrationsentscheidung und keine unbelegte historische DOS-Tastaturregel.
+
+## Portabler Test der Präfix- und Befehlsverarbeitung
+
+Die Fälle in `firsted-keymap.json` prüfen Ctrl-K/O/Q anhand normalisierter Tasten, feste einbasierte Ziffernbelegungen, Abfrage-Metadaten für Text/Datei/Zahl/zwei Zahlen/Bestätigung, abgebrochene oder unbekannte Zweittasten, die Ablehnung Alt-modifizierter Sondertasten, direkte Steuerzeichen, Texteingabe und die tatsächlich ausgeführte semantische Befehlsverarbeitung. Jeder Test besitzt eine eigene zustandsbehaftete Präfixmaschine; konkrete Dialoge oder Terminal-Abhängigkeiten kommen nicht vor. Die Fälle liefern ausführbare portable Belege für `EditK`, `EditO`, `EditQ`, `EditPrccmd` und `EditPrctxt`, ohne historische Pascal-Interna nachzubauen.

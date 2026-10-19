@@ -110,3 +110,7 @@ The FIRST-ED **input mapping contract**, prefix state machine and associated sem
 ## Alt-modified keys and prefix cancellation
 
 The reusable key map deliberately ignores an Alt-modified key, **including special keys** such as Escape, Enter, Arrow keys and Delete, instead of turning a possible host/menu accelerator into an editor mutation. A pending Ctrl-K/O/Q prefix consumes a rejected second key and returns to neutral; a plain Escape while the prefix is pending cancels that prefix, but Escape without a prefix retains its documented Undo binding. This is a modern host integration policy and not a historical DOS modifier claim.
+
+## Portable key-map and command-dispatch audit
+
+The `firsted-keymap.json` suite exercises Ctrl-K/O/Q prefixes directly on normalized key strokes, including one-based digit bindings, prompt metadata for text/file/numeric/two-number/confirmation requests, cancelled and unknown second keys, Alt-modified special-key rejection, direct control aliases, inserted text and actual semantic dispatcher results. A separate per-case state machine preserves a pending prefix until its next key; no UI code participates. These are executable portable evidence for `EditK`, `EditO`, `EditQ`, `EditPrccmd` and `EditPrctxt`, not historical implementation-language requirements.

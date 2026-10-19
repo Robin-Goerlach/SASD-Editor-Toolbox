@@ -1,0 +1,2106 @@
+{
+  "formatVersion": 1,
+  "contractVersion": "v1",
+  "cases": [
+    {
+      "id": "keys.ctrl-k-b-begin-block",
+      "area": "firsted-keymap",
+      "initial": {
+        "documents": [
+          {
+            "id": "d",
+            "lines": [
+              {
+                "text": "alpha beta",
+                "flags": []
+              }
+            ]
+          }
+        ],
+        "windows": [
+          {
+            "id": "w",
+            "documentId": "d",
+            "cursor": {
+              "line": 0,
+              "column": 0
+            },
+            "topLine": 0,
+            "leftColumn": 0
+          }
+        ],
+        "currentWindowId": "w"
+      },
+      "operations": [
+        {
+          "id": "translate_firsted_key",
+          "character": "K",
+          "control": true,
+          "expectAction": "prefix_pending",
+          "expectPrefixDisplay": "Ctrl-K",
+          "expectPendingPrefix": "ctrl_k"
+        },
+        {
+          "id": "translate_firsted_key",
+          "character": "b",
+          "expectAction": "command",
+          "expectCommand": "begin_block",
+          "expectArgument": "none",
+          "expectPendingPrefix": "none"
+        },
+        {
+          "id": "execute_firsted_key"
+        }
+      ],
+      "expect": {
+        "documents": {
+          "d": {
+            "lines": [
+              {
+                "text": "alpha beta",
+                "flags": []
+              }
+            ],
+            "isDirty": false,
+            "version": 0
+          }
+        },
+        "windows": {
+          "w": {
+            "cursor": {
+              "line": 0,
+              "column": 0
+            }
+          }
+        },
+        "firstEdKeymap": {
+          "pendingPrefix": "none"
+        },
+        "undo": {
+          "count": 0
+        },
+        "blockState": {
+          "start": {
+            "documentId": "d",
+            "line": 0
+          },
+          "end": null,
+          "hidden": false,
+          "complete": false
+        }
+      }
+    },
+    {
+      "id": "keys.ctrl-k-digit-sets-fixed-marker",
+      "area": "firsted-keymap",
+      "initial": {
+        "documents": [
+          {
+            "id": "d",
+            "lines": [
+              {
+                "text": "alpha beta",
+                "flags": []
+              }
+            ]
+          }
+        ],
+        "windows": [
+          {
+            "id": "w",
+            "documentId": "d",
+            "cursor": {
+              "line": 0,
+              "column": 0
+            },
+            "topLine": 0,
+            "leftColumn": 0
+          }
+        ],
+        "currentWindowId": "w"
+      },
+      "operations": [
+        {
+          "id": "translate_firsted_key",
+          "character": "K",
+          "control": true,
+          "expectAction": "prefix_pending",
+          "expectPrefixDisplay": "Ctrl-K",
+          "expectPendingPrefix": "ctrl_k"
+        },
+        {
+          "id": "translate_firsted_key",
+          "character": "3",
+          "expectAction": "command",
+          "expectCommand": "set_marker",
+          "expectArgument": "none",
+          "expectPendingPrefix": "none",
+          "expectFixedNumber": 3
+        },
+        {
+          "id": "execute_firsted_key"
+        }
+      ],
+      "expect": {
+        "documents": {
+          "d": {
+            "lines": [
+              {
+                "text": "alpha beta",
+                "flags": []
+              }
+            ],
+            "isDirty": false,
+            "version": 0
+          }
+        },
+        "windows": {
+          "w": {
+            "cursor": {
+              "line": 0,
+              "column": 0
+            }
+          }
+        },
+        "firstEdKeymap": {
+          "pendingPrefix": "none"
+        },
+        "undo": {
+          "count": 0
+        }
+      }
+    },
+    {
+      "id": "keys.ctrl-o-digit-selects-one-based-view",
+      "area": "firsted-keymap",
+      "initial": {
+        "documents": [
+          {
+            "id": "d",
+            "lines": [
+              {
+                "text": "alpha beta",
+                "flags": []
+              }
+            ]
+          }
+        ],
+        "windows": [
+          {
+            "id": "w",
+            "documentId": "d",
+            "cursor": {
+              "line": 0,
+              "column": 0
+            },
+            "topLine": 0,
+            "leftColumn": 0
+          }
+        ],
+        "currentWindowId": "w"
+      },
+      "operations": [
+        {
+          "id": "translate_firsted_key",
+          "character": "O",
+          "control": true,
+          "expectAction": "prefix_pending",
+          "expectPrefixDisplay": "Ctrl-O",
+          "expectPendingPrefix": "ctrl_o"
+        },
+        {
+          "id": "translate_firsted_key",
+          "character": "1",
+          "expectAction": "command",
+          "expectCommand": "go_to_window",
+          "expectArgument": "none",
+          "expectPendingPrefix": "none",
+          "expectFixedNumber": 1
+        },
+        {
+          "id": "execute_firsted_key"
+        }
+      ],
+      "expect": {
+        "documents": {
+          "d": {
+            "lines": [
+              {
+                "text": "alpha beta",
+                "flags": []
+              }
+            ],
+            "isDirty": false,
+            "version": 0
+          }
+        },
+        "windows": {
+          "w": {
+            "cursor": {
+              "line": 0,
+              "column": 0
+            }
+          }
+        },
+        "firstEdKeymap": {
+          "pendingPrefix": "none"
+        },
+        "undo": {
+          "count": 0
+        }
+      }
+    },
+    {
+      "id": "keys.ctrl-q-digit-jumps-to-fixed-marker",
+      "area": "firsted-keymap",
+      "initial": {
+        "documents": [
+          {
+            "id": "d",
+            "lines": [
+              {
+                "text": "alpha beta",
+                "flags": []
+              }
+            ]
+          }
+        ],
+        "windows": [
+          {
+            "id": "w",
+            "documentId": "d",
+            "cursor": {
+              "line": 0,
+              "column": 0
+            },
+            "topLine": 0,
+            "leftColumn": 0
+          }
+        ],
+        "currentWindowId": "w"
+      },
+      "operations": [
+        {
+          "id": "translate_firsted_key",
+          "character": "K",
+          "control": true,
+          "expectAction": "prefix_pending",
+          "expectPrefixDisplay": "Ctrl-K",
+          "expectPendingPrefix": "ctrl_k"
+        },
+        {
+          "id": "translate_firsted_key",
+          "character": "4",
+          "expectAction": "command",
+          "expectCommand": "set_marker",
+          "expectArgument": "none",
+          "expectPendingPrefix": "none",
+          "expectFixedNumber": 4
+        },
+        {
+          "id": "execute_firsted_key"
+        },
+        {
+          "id": "translate_firsted_key",
+          "character": "Q",
+          "control": true,
+          "expectAction": "prefix_pending",
+          "expectPrefixDisplay": "Ctrl-Q",
+          "expectPendingPrefix": "ctrl_q"
+        },
+        {
+          "id": "translate_firsted_key",
+          "character": "4",
+          "expectAction": "command",
+          "expectCommand": "jump_marker",
+          "expectArgument": "none",
+          "expectPendingPrefix": "none",
+          "expectFixedNumber": 4
+        },
+        {
+          "id": "execute_firsted_key"
+        }
+      ],
+      "expect": {
+        "documents": {
+          "d": {
+            "lines": [
+              {
+                "text": "alpha beta",
+                "flags": []
+              }
+            ],
+            "isDirty": false,
+            "version": 0
+          }
+        },
+        "windows": {
+          "w": {
+            "cursor": {
+              "line": 0,
+              "column": 0
+            }
+          }
+        },
+        "firstEdKeymap": {
+          "pendingPrefix": "none"
+        },
+        "undo": {
+          "count": 0
+        }
+      }
+    },
+    {
+      "id": "keys.ctrl-k-file-read-requests-host-file-path",
+      "area": "firsted-keymap",
+      "initial": {
+        "documents": [
+          {
+            "id": "d",
+            "lines": [
+              {
+                "text": "alpha beta",
+                "flags": []
+              }
+            ]
+          }
+        ],
+        "windows": [
+          {
+            "id": "w",
+            "documentId": "d",
+            "cursor": {
+              "line": 0,
+              "column": 0
+            },
+            "topLine": 0,
+            "leftColumn": 0
+          }
+        ],
+        "currentWindowId": "w"
+      },
+      "operations": [
+        {
+          "id": "translate_firsted_key",
+          "character": "K",
+          "control": true,
+          "expectAction": "prefix_pending",
+          "expectPrefixDisplay": "Ctrl-K",
+          "expectPendingPrefix": "ctrl_k"
+        },
+        {
+          "id": "translate_firsted_key",
+          "character": "r",
+          "expectAction": "command",
+          "expectCommand": "read_file",
+          "expectArgument": "file_path",
+          "expectPendingPrefix": "none"
+        }
+      ],
+      "expect": {
+        "documents": {
+          "d": {
+            "lines": [
+              {
+                "text": "alpha beta",
+                "flags": []
+              }
+            ],
+            "isDirty": false,
+            "version": 0
+          }
+        },
+        "windows": {
+          "w": {
+            "cursor": {
+              "line": 0,
+              "column": 0
+            }
+          }
+        },
+        "firstEdKeymap": {
+          "pendingPrefix": "none"
+        },
+        "undo": {
+          "count": 0
+        }
+      }
+    },
+    {
+      "id": "keys.ctrl-k-file-write-requests-host-file-path",
+      "area": "firsted-keymap",
+      "initial": {
+        "documents": [
+          {
+            "id": "d",
+            "lines": [
+              {
+                "text": "alpha beta",
+                "flags": []
+              }
+            ]
+          }
+        ],
+        "windows": [
+          {
+            "id": "w",
+            "documentId": "d",
+            "cursor": {
+              "line": 0,
+              "column": 0
+            },
+            "topLine": 0,
+            "leftColumn": 0
+          }
+        ],
+        "currentWindowId": "w"
+      },
+      "operations": [
+        {
+          "id": "translate_firsted_key",
+          "character": "K",
+          "control": true,
+          "expectAction": "prefix_pending",
+          "expectPrefixDisplay": "Ctrl-K",
+          "expectPendingPrefix": "ctrl_k"
+        },
+        {
+          "id": "translate_firsted_key",
+          "character": "w",
+          "expectAction": "command",
+          "expectCommand": "write_file",
+          "expectArgument": "file_path",
+          "expectPendingPrefix": "none"
+        }
+      ],
+      "expect": {
+        "documents": {
+          "d": {
+            "lines": [
+              {
+                "text": "alpha beta",
+                "flags": []
+              }
+            ],
+            "isDirty": false,
+            "version": 0
+          }
+        },
+        "windows": {
+          "w": {
+            "cursor": {
+              "line": 0,
+              "column": 0
+            }
+          }
+        },
+        "firstEdKeymap": {
+          "pendingPrefix": "none"
+        },
+        "undo": {
+          "count": 0
+        }
+      }
+    },
+    {
+      "id": "keys.ctrl-k-exit-requires-host-confirmation",
+      "area": "firsted-keymap",
+      "initial": {
+        "documents": [
+          {
+            "id": "d",
+            "lines": [
+              {
+                "text": "alpha beta",
+                "flags": []
+              }
+            ]
+          }
+        ],
+        "windows": [
+          {
+            "id": "w",
+            "documentId": "d",
+            "cursor": {
+              "line": 0,
+              "column": 0
+            },
+            "topLine": 0,
+            "leftColumn": 0
+          }
+        ],
+        "currentWindowId": "w"
+      },
+      "operations": [
+        {
+          "id": "translate_firsted_key",
+          "character": "K",
+          "control": true,
+          "expectAction": "prefix_pending",
+          "expectPrefixDisplay": "Ctrl-K",
+          "expectPendingPrefix": "ctrl_k"
+        },
+        {
+          "id": "translate_firsted_key",
+          "character": "x",
+          "expectAction": "command",
+          "expectCommand": "exit",
+          "expectArgument": "confirmation",
+          "expectPendingPrefix": "none"
+        }
+      ],
+      "expect": {
+        "documents": {
+          "d": {
+            "lines": [
+              {
+                "text": "alpha beta",
+                "flags": []
+              }
+            ],
+            "isDirty": false,
+            "version": 0
+          }
+        },
+        "windows": {
+          "w": {
+            "cursor": {
+              "line": 0,
+              "column": 0
+            }
+          }
+        },
+        "firstEdKeymap": {
+          "pendingPrefix": "none"
+        },
+        "undo": {
+          "count": 0
+        }
+      }
+    },
+    {
+      "id": "keys.ctrl-o-link-requests-two-numbers",
+      "area": "firsted-keymap",
+      "initial": {
+        "documents": [
+          {
+            "id": "d",
+            "lines": [
+              {
+                "text": "alpha beta",
+                "flags": []
+              }
+            ]
+          }
+        ],
+        "windows": [
+          {
+            "id": "w",
+            "documentId": "d",
+            "cursor": {
+              "line": 0,
+              "column": 0
+            },
+            "topLine": 0,
+            "leftColumn": 0
+          }
+        ],
+        "currentWindowId": "w"
+      },
+      "operations": [
+        {
+          "id": "translate_firsted_key",
+          "character": "O",
+          "control": true,
+          "expectAction": "prefix_pending",
+          "expectPrefixDisplay": "Ctrl-O",
+          "expectPendingPrefix": "ctrl_o"
+        },
+        {
+          "id": "translate_firsted_key",
+          "character": "j",
+          "expectAction": "command",
+          "expectCommand": "link_window",
+          "expectArgument": "two_numbers",
+          "expectPendingPrefix": "none"
+        }
+      ],
+      "expect": {
+        "documents": {
+          "d": {
+            "lines": [
+              {
+                "text": "alpha beta",
+                "flags": []
+              }
+            ],
+            "isDirty": false,
+            "version": 0
+          }
+        },
+        "windows": {
+          "w": {
+            "cursor": {
+              "line": 0,
+              "column": 0
+            }
+          }
+        },
+        "firstEdKeymap": {
+          "pendingPrefix": "none"
+        },
+        "undo": {
+          "count": 0
+        }
+      }
+    },
+    {
+      "id": "keys.ctrl-o-create-window-requests-two-numbers",
+      "area": "firsted-keymap",
+      "initial": {
+        "documents": [
+          {
+            "id": "d",
+            "lines": [
+              {
+                "text": "alpha beta",
+                "flags": []
+              }
+            ]
+          }
+        ],
+        "windows": [
+          {
+            "id": "w",
+            "documentId": "d",
+            "cursor": {
+              "line": 0,
+              "column": 0
+            },
+            "topLine": 0,
+            "leftColumn": 0
+          }
+        ],
+        "currentWindowId": "w"
+      },
+      "operations": [
+        {
+          "id": "translate_firsted_key",
+          "character": "O",
+          "control": true,
+          "expectAction": "prefix_pending",
+          "expectPrefixDisplay": "Ctrl-O",
+          "expectPendingPrefix": "ctrl_o"
+        },
+        {
+          "id": "translate_firsted_key",
+          "character": "o",
+          "expectAction": "command",
+          "expectCommand": "create_window",
+          "expectArgument": "two_numbers",
+          "expectPendingPrefix": "none"
+        }
+      ],
+      "expect": {
+        "documents": {
+          "d": {
+            "lines": [
+              {
+                "text": "alpha beta",
+                "flags": []
+              }
+            ],
+            "isDirty": false,
+            "version": 0
+          }
+        },
+        "windows": {
+          "w": {
+            "cursor": {
+              "line": 0,
+              "column": 0
+            }
+          }
+        },
+        "firstEdKeymap": {
+          "pendingPrefix": "none"
+        },
+        "undo": {
+          "count": 0
+        }
+      }
+    },
+    {
+      "id": "keys.ctrl-o-line-prompts-and-moves-to-one-based-line",
+      "area": "firsted-keymap",
+      "initial": {
+        "documents": [
+          {
+            "id": "d",
+            "lines": [
+              {
+                "text": "alpha beta",
+                "flags": []
+              }
+            ]
+          }
+        ],
+        "windows": [
+          {
+            "id": "w",
+            "documentId": "d",
+            "cursor": {
+              "line": 0,
+              "column": 0
+            },
+            "topLine": 0,
+            "leftColumn": 0
+          }
+        ],
+        "currentWindowId": "w"
+      },
+      "operations": [
+        {
+          "id": "translate_firsted_key",
+          "character": "O",
+          "control": true,
+          "expectAction": "prefix_pending",
+          "expectPrefixDisplay": "Ctrl-O",
+          "expectPendingPrefix": "ctrl_o"
+        },
+        {
+          "id": "translate_firsted_key",
+          "character": "n",
+          "expectAction": "command",
+          "expectCommand": "go_to_line",
+          "expectArgument": "number",
+          "expectPendingPrefix": "none"
+        },
+        {
+          "id": "execute_firsted_key",
+          "number": 1
+        }
+      ],
+      "expect": {
+        "documents": {
+          "d": {
+            "lines": [
+              {
+                "text": "alpha beta",
+                "flags": []
+              }
+            ],
+            "isDirty": false,
+            "version": 0
+          }
+        },
+        "windows": {
+          "w": {
+            "cursor": {
+              "line": 0,
+              "column": 0
+            }
+          }
+        },
+        "firstEdKeymap": {
+          "pendingPrefix": "none"
+        },
+        "undo": {
+          "count": 0
+        }
+      }
+    },
+    {
+      "id": "keys.ctrl-o-column-prompts-and-preserves-virtual-column",
+      "area": "firsted-keymap",
+      "initial": {
+        "documents": [
+          {
+            "id": "d",
+            "lines": [
+              {
+                "text": "alpha beta",
+                "flags": []
+              }
+            ]
+          }
+        ],
+        "windows": [
+          {
+            "id": "w",
+            "documentId": "d",
+            "cursor": {
+              "line": 0,
+              "column": 0
+            },
+            "topLine": 0,
+            "leftColumn": 0
+          }
+        ],
+        "currentWindowId": "w"
+      },
+      "operations": [
+        {
+          "id": "translate_firsted_key",
+          "character": "O",
+          "control": true,
+          "expectAction": "prefix_pending",
+          "expectPrefixDisplay": "Ctrl-O",
+          "expectPendingPrefix": "ctrl_o"
+        },
+        {
+          "id": "translate_firsted_key",
+          "character": "i",
+          "expectAction": "command",
+          "expectCommand": "go_to_column",
+          "expectArgument": "number",
+          "expectPendingPrefix": "none"
+        },
+        {
+          "id": "execute_firsted_key",
+          "number": 42
+        }
+      ],
+      "expect": {
+        "documents": {
+          "d": {
+            "lines": [
+              {
+                "text": "alpha beta",
+                "flags": []
+              }
+            ],
+            "isDirty": false,
+            "version": 0
+          }
+        },
+        "windows": {
+          "w": {
+            "cursor": {
+              "line": 0,
+              "column": 41
+            }
+          }
+        },
+        "firstEdKeymap": {
+          "pendingPrefix": "none"
+        },
+        "undo": {
+          "count": 0
+        }
+      }
+    },
+    {
+      "id": "keys.ctrl-o-word-wrap-toggles-view-mode",
+      "area": "firsted-keymap",
+      "initial": {
+        "documents": [
+          {
+            "id": "d",
+            "lines": [
+              {
+                "text": "alpha beta",
+                "flags": []
+              }
+            ]
+          }
+        ],
+        "windows": [
+          {
+            "id": "w",
+            "documentId": "d",
+            "cursor": {
+              "line": 0,
+              "column": 0
+            },
+            "topLine": 0,
+            "leftColumn": 0
+          }
+        ],
+        "currentWindowId": "w"
+      },
+      "operations": [
+        {
+          "id": "translate_firsted_key",
+          "character": "O",
+          "control": true,
+          "expectAction": "prefix_pending",
+          "expectPrefixDisplay": "Ctrl-O",
+          "expectPendingPrefix": "ctrl_o"
+        },
+        {
+          "id": "translate_firsted_key",
+          "character": "w",
+          "expectAction": "command",
+          "expectCommand": "toggle_word_wrap",
+          "expectArgument": "none",
+          "expectPendingPrefix": "none"
+        },
+        {
+          "id": "execute_firsted_key"
+        }
+      ],
+      "expect": {
+        "documents": {
+          "d": {
+            "lines": [
+              {
+                "text": "alpha beta",
+                "flags": []
+              }
+            ],
+            "isDirty": false,
+            "version": 0
+          }
+        },
+        "windows": {
+          "w": {
+            "cursor": {
+              "line": 0,
+              "column": 0
+            },
+            "options": {
+              "wordWrap": true
+            }
+          }
+        },
+        "firstEdKeymap": {
+          "pendingPrefix": "none"
+        },
+        "undo": {
+          "count": 0
+        }
+      }
+    },
+    {
+      "id": "keys.ctrl-q-toggle-auto-indent",
+      "area": "firsted-keymap",
+      "initial": {
+        "documents": [
+          {
+            "id": "d",
+            "lines": [
+              {
+                "text": "alpha beta",
+                "flags": []
+              }
+            ]
+          }
+        ],
+        "windows": [
+          {
+            "id": "w",
+            "documentId": "d",
+            "cursor": {
+              "line": 0,
+              "column": 0
+            },
+            "topLine": 0,
+            "leftColumn": 0
+          }
+        ],
+        "currentWindowId": "w"
+      },
+      "operations": [
+        {
+          "id": "translate_firsted_key",
+          "character": "Q",
+          "control": true,
+          "expectAction": "prefix_pending",
+          "expectPrefixDisplay": "Ctrl-Q",
+          "expectPendingPrefix": "ctrl_q"
+        },
+        {
+          "id": "translate_firsted_key",
+          "character": "i",
+          "expectAction": "command",
+          "expectCommand": "toggle_auto_indent",
+          "expectArgument": "none",
+          "expectPendingPrefix": "none"
+        },
+        {
+          "id": "execute_firsted_key"
+        }
+      ],
+      "expect": {
+        "documents": {
+          "d": {
+            "lines": [
+              {
+                "text": "alpha beta",
+                "flags": []
+              }
+            ],
+            "isDirty": false,
+            "version": 0
+          }
+        },
+        "windows": {
+          "w": {
+            "cursor": {
+              "line": 0,
+              "column": 0
+            },
+            "options": {
+              "autoIndent": true
+            }
+          }
+        },
+        "firstEdKeymap": {
+          "pendingPrefix": "none"
+        },
+        "undo": {
+          "count": 0
+        }
+      }
+    },
+    {
+      "id": "keys.ctrl-q-find-needs-text-value",
+      "area": "firsted-keymap",
+      "initial": {
+        "documents": [
+          {
+            "id": "d",
+            "lines": [
+              {
+                "text": "alpha beta",
+                "flags": []
+              }
+            ]
+          }
+        ],
+        "windows": [
+          {
+            "id": "w",
+            "documentId": "d",
+            "cursor": {
+              "line": 0,
+              "column": 0
+            },
+            "topLine": 0,
+            "leftColumn": 0
+          }
+        ],
+        "currentWindowId": "w"
+      },
+      "operations": [
+        {
+          "id": "translate_firsted_key",
+          "character": "Q",
+          "control": true,
+          "expectAction": "prefix_pending",
+          "expectPrefixDisplay": "Ctrl-Q",
+          "expectPendingPrefix": "ctrl_q"
+        },
+        {
+          "id": "translate_firsted_key",
+          "character": "f",
+          "expectAction": "command",
+          "expectCommand": "find_next",
+          "expectArgument": "text",
+          "expectPendingPrefix": "none"
+        }
+      ],
+      "expect": {
+        "documents": {
+          "d": {
+            "lines": [
+              {
+                "text": "alpha beta",
+                "flags": []
+              }
+            ],
+            "isDirty": false,
+            "version": 0
+          }
+        },
+        "windows": {
+          "w": {
+            "cursor": {
+              "line": 0,
+              "column": 0
+            }
+          }
+        },
+        "firstEdKeymap": {
+          "pendingPrefix": "none"
+        },
+        "undo": {
+          "count": 0
+        }
+      }
+    },
+    {
+      "id": "keys.ctrl-q-replace-needs-find-and-replace",
+      "area": "firsted-keymap",
+      "initial": {
+        "documents": [
+          {
+            "id": "d",
+            "lines": [
+              {
+                "text": "alpha beta",
+                "flags": []
+              }
+            ]
+          }
+        ],
+        "windows": [
+          {
+            "id": "w",
+            "documentId": "d",
+            "cursor": {
+              "line": 0,
+              "column": 0
+            },
+            "topLine": 0,
+            "leftColumn": 0
+          }
+        ],
+        "currentWindowId": "w"
+      },
+      "operations": [
+        {
+          "id": "translate_firsted_key",
+          "character": "Q",
+          "control": true,
+          "expectAction": "prefix_pending",
+          "expectPrefixDisplay": "Ctrl-Q",
+          "expectPendingPrefix": "ctrl_q"
+        },
+        {
+          "id": "translate_firsted_key",
+          "character": "a",
+          "expectAction": "command",
+          "expectCommand": "replace_next",
+          "expectArgument": "find_replace",
+          "expectPendingPrefix": "none"
+        }
+      ],
+      "expect": {
+        "documents": {
+          "d": {
+            "lines": [
+              {
+                "text": "alpha beta",
+                "flags": []
+              }
+            ],
+            "isDirty": false,
+            "version": 0
+          }
+        },
+        "windows": {
+          "w": {
+            "cursor": {
+              "line": 0,
+              "column": 0
+            }
+          }
+        },
+        "firstEdKeymap": {
+          "pendingPrefix": "none"
+        },
+        "undo": {
+          "count": 0
+        }
+      }
+    },
+    {
+      "id": "keys.ctrl-q-escape-cancels-prefix-without-undo",
+      "area": "firsted-keymap",
+      "initial": {
+        "documents": [
+          {
+            "id": "d",
+            "lines": [
+              {
+                "text": "alpha beta",
+                "flags": []
+              }
+            ]
+          }
+        ],
+        "windows": [
+          {
+            "id": "w",
+            "documentId": "d",
+            "cursor": {
+              "line": 0,
+              "column": 0
+            },
+            "topLine": 0,
+            "leftColumn": 0
+          }
+        ],
+        "currentWindowId": "w"
+      },
+      "operations": [
+        {
+          "id": "translate_firsted_key",
+          "character": "Q",
+          "control": true,
+          "expectAction": "prefix_pending",
+          "expectPrefixDisplay": "Ctrl-Q",
+          "expectPendingPrefix": "ctrl_q"
+        },
+        {
+          "id": "translate_firsted_key",
+          "specialKey": "escape",
+          "expectAction": "ignored",
+          "expectPendingPrefix": "none"
+        },
+        {
+          "id": "translate_firsted_key",
+          "character": "Z",
+          "expectAction": "insert_text",
+          "expectText": "Z",
+          "expectPendingPrefix": "none"
+        },
+        {
+          "id": "execute_firsted_key"
+        }
+      ],
+      "expect": {
+        "documents": {
+          "d": {
+            "lines": [
+              {
+                "text": "Zalpha beta",
+                "flags": []
+              }
+            ],
+            "isDirty": true,
+            "version": 1
+          }
+        },
+        "windows": {
+          "w": {
+            "cursor": {
+              "line": 0,
+              "column": 1
+            }
+          }
+        },
+        "firstEdKeymap": {
+          "pendingPrefix": "none"
+        },
+        "undo": {
+          "count": 1
+        }
+      }
+    },
+    {
+      "id": "keys.escape-unprefixed-still-means-undo",
+      "area": "firsted-keymap",
+      "initial": {
+        "documents": [
+          {
+            "id": "d",
+            "lines": [
+              {
+                "text": "alpha beta",
+                "flags": []
+              }
+            ]
+          }
+        ],
+        "windows": [
+          {
+            "id": "w",
+            "documentId": "d",
+            "cursor": {
+              "line": 0,
+              "column": 0
+            },
+            "topLine": 0,
+            "leftColumn": 0
+          }
+        ],
+        "currentWindowId": "w"
+      },
+      "operations": [
+        {
+          "id": "translate_firsted_key",
+          "specialKey": "escape",
+          "expectAction": "command",
+          "expectCommand": "undo",
+          "expectArgument": "none",
+          "expectPendingPrefix": "none"
+        }
+      ],
+      "expect": {
+        "documents": {
+          "d": {
+            "lines": [
+              {
+                "text": "alpha beta",
+                "flags": []
+              }
+            ],
+            "isDirty": false,
+            "version": 0
+          }
+        },
+        "windows": {
+          "w": {
+            "cursor": {
+              "line": 0,
+              "column": 0
+            }
+          }
+        },
+        "firstEdKeymap": {
+          "pendingPrefix": "none"
+        },
+        "undo": {
+          "count": 0
+        }
+      }
+    },
+    {
+      "id": "keys.unknown-key-consumes-prefix-but-never-edits",
+      "area": "firsted-keymap",
+      "initial": {
+        "documents": [
+          {
+            "id": "d",
+            "lines": [
+              {
+                "text": "alpha beta",
+                "flags": []
+              }
+            ]
+          }
+        ],
+        "windows": [
+          {
+            "id": "w",
+            "documentId": "d",
+            "cursor": {
+              "line": 0,
+              "column": 0
+            },
+            "topLine": 0,
+            "leftColumn": 0
+          }
+        ],
+        "currentWindowId": "w"
+      },
+      "operations": [
+        {
+          "id": "translate_firsted_key",
+          "character": "K",
+          "control": true,
+          "expectAction": "prefix_pending",
+          "expectPrefixDisplay": "Ctrl-K",
+          "expectPendingPrefix": "ctrl_k"
+        },
+        {
+          "id": "translate_firsted_key",
+          "character": "?",
+          "expectAction": "ignored",
+          "expectPendingPrefix": "none"
+        },
+        {
+          "id": "translate_firsted_key",
+          "character": "x",
+          "expectAction": "insert_text",
+          "expectText": "x",
+          "expectPendingPrefix": "none"
+        },
+        {
+          "id": "execute_firsted_key"
+        }
+      ],
+      "expect": {
+        "documents": {
+          "d": {
+            "lines": [
+              {
+                "text": "xalpha beta",
+                "flags": []
+              }
+            ],
+            "isDirty": true,
+            "version": 1
+          }
+        },
+        "windows": {
+          "w": {
+            "cursor": {
+              "line": 0,
+              "column": 1
+            }
+          }
+        },
+        "firstEdKeymap": {
+          "pendingPrefix": "none"
+        },
+        "undo": {
+          "count": 1
+        }
+      }
+    },
+    {
+      "id": "keys.alt-escape-must-not-undo",
+      "area": "firsted-keymap",
+      "initial": {
+        "documents": [
+          {
+            "id": "d",
+            "lines": [
+              {
+                "text": "alpha beta",
+                "flags": []
+              }
+            ]
+          }
+        ],
+        "windows": [
+          {
+            "id": "w",
+            "documentId": "d",
+            "cursor": {
+              "line": 0,
+              "column": 0
+            },
+            "topLine": 0,
+            "leftColumn": 0
+          }
+        ],
+        "currentWindowId": "w"
+      },
+      "operations": [
+        {
+          "id": "translate_firsted_key",
+          "specialKey": "escape",
+          "alt": true,
+          "expectAction": "ignored",
+          "expectPendingPrefix": "none"
+        }
+      ],
+      "expect": {
+        "documents": {
+          "d": {
+            "lines": [
+              {
+                "text": "alpha beta",
+                "flags": []
+              }
+            ],
+            "isDirty": false,
+            "version": 0
+          }
+        },
+        "windows": {
+          "w": {
+            "cursor": {
+              "line": 0,
+              "column": 0
+            }
+          }
+        },
+        "firstEdKeymap": {
+          "pendingPrefix": "none"
+        },
+        "undo": {
+          "count": 0
+        }
+      }
+    },
+    {
+      "id": "keys.alt-enter-must-not-create-line",
+      "area": "firsted-keymap",
+      "initial": {
+        "documents": [
+          {
+            "id": "d",
+            "lines": [
+              {
+                "text": "alpha beta",
+                "flags": []
+              }
+            ]
+          }
+        ],
+        "windows": [
+          {
+            "id": "w",
+            "documentId": "d",
+            "cursor": {
+              "line": 0,
+              "column": 0
+            },
+            "topLine": 0,
+            "leftColumn": 0
+          }
+        ],
+        "currentWindowId": "w"
+      },
+      "operations": [
+        {
+          "id": "translate_firsted_key",
+          "specialKey": "enter",
+          "alt": true,
+          "expectAction": "ignored",
+          "expectPendingPrefix": "none"
+        }
+      ],
+      "expect": {
+        "documents": {
+          "d": {
+            "lines": [
+              {
+                "text": "alpha beta",
+                "flags": []
+              }
+            ],
+            "isDirty": false,
+            "version": 0
+          }
+        },
+        "windows": {
+          "w": {
+            "cursor": {
+              "line": 0,
+              "column": 0
+            }
+          }
+        },
+        "firstEdKeymap": {
+          "pendingPrefix": "none"
+        },
+        "undo": {
+          "count": 0
+        }
+      }
+    },
+    {
+      "id": "keys.alt-navigation-must-not-change-cursor",
+      "area": "firsted-keymap",
+      "initial": {
+        "documents": [
+          {
+            "id": "d",
+            "lines": [
+              {
+                "text": "alpha beta",
+                "flags": []
+              }
+            ]
+          }
+        ],
+        "windows": [
+          {
+            "id": "w",
+            "documentId": "d",
+            "cursor": {
+              "line": 0,
+              "column": 5
+            },
+            "topLine": 0,
+            "leftColumn": 0
+          }
+        ],
+        "currentWindowId": "w"
+      },
+      "operations": [
+        {
+          "id": "translate_firsted_key",
+          "specialKey": "arrow_right",
+          "alt": true,
+          "expectAction": "ignored",
+          "expectPendingPrefix": "none"
+        }
+      ],
+      "expect": {
+        "documents": {
+          "d": {
+            "lines": [
+              {
+                "text": "alpha beta",
+                "flags": []
+              }
+            ],
+            "isDirty": false,
+            "version": 0
+          }
+        },
+        "windows": {
+          "w": {
+            "cursor": {
+              "line": 0,
+              "column": 5
+            }
+          }
+        },
+        "firstEdKeymap": {
+          "pendingPrefix": "none"
+        },
+        "undo": {
+          "count": 0
+        }
+      }
+    },
+    {
+      "id": "keys.alt-second-key-cancels-pending-prefix",
+      "area": "firsted-keymap",
+      "initial": {
+        "documents": [
+          {
+            "id": "d",
+            "lines": [
+              {
+                "text": "alpha beta",
+                "flags": []
+              }
+            ]
+          }
+        ],
+        "windows": [
+          {
+            "id": "w",
+            "documentId": "d",
+            "cursor": {
+              "line": 0,
+              "column": 0
+            },
+            "topLine": 0,
+            "leftColumn": 0
+          }
+        ],
+        "currentWindowId": "w"
+      },
+      "operations": [
+        {
+          "id": "translate_firsted_key",
+          "character": "O",
+          "control": true,
+          "expectAction": "prefix_pending",
+          "expectPrefixDisplay": "Ctrl-O",
+          "expectPendingPrefix": "ctrl_o"
+        },
+        {
+          "id": "translate_firsted_key",
+          "character": "w",
+          "alt": true,
+          "expectAction": "ignored",
+          "expectPendingPrefix": "none"
+        },
+        {
+          "id": "translate_firsted_key",
+          "character": "a",
+          "expectAction": "insert_text",
+          "expectText": "a",
+          "expectPendingPrefix": "none"
+        },
+        {
+          "id": "execute_firsted_key"
+        }
+      ],
+      "expect": {
+        "documents": {
+          "d": {
+            "lines": [
+              {
+                "text": "aalpha beta",
+                "flags": []
+              }
+            ],
+            "isDirty": true,
+            "version": 1
+          }
+        },
+        "windows": {
+          "w": {
+            "cursor": {
+              "line": 0,
+              "column": 1
+            }
+          }
+        },
+        "firstEdKeymap": {
+          "pendingPrefix": "none"
+        },
+        "undo": {
+          "count": 1
+        }
+      }
+    },
+    {
+      "id": "keys.prefixed-control-second-letter-is-supported",
+      "area": "firsted-keymap",
+      "initial": {
+        "documents": [
+          {
+            "id": "d",
+            "lines": [
+              {
+                "text": "alpha beta",
+                "flags": []
+              }
+            ]
+          }
+        ],
+        "windows": [
+          {
+            "id": "w",
+            "documentId": "d",
+            "cursor": {
+              "line": 0,
+              "column": 0
+            },
+            "topLine": 0,
+            "leftColumn": 0
+          }
+        ],
+        "currentWindowId": "w"
+      },
+      "operations": [
+        {
+          "id": "translate_firsted_key",
+          "character": "K",
+          "control": true,
+          "expectAction": "prefix_pending",
+          "expectPrefixDisplay": "Ctrl-K",
+          "expectPendingPrefix": "ctrl_k"
+        },
+        {
+          "id": "translate_firsted_key",
+          "character": "c",
+          "control": true,
+          "expectAction": "command",
+          "expectCommand": "copy_block",
+          "expectArgument": "none",
+          "expectPendingPrefix": "none"
+        }
+      ],
+      "expect": {
+        "documents": {
+          "d": {
+            "lines": [
+              {
+                "text": "alpha beta",
+                "flags": []
+              }
+            ],
+            "isDirty": false,
+            "version": 0
+          }
+        },
+        "windows": {
+          "w": {
+            "cursor": {
+              "line": 0,
+              "column": 0
+            }
+          }
+        },
+        "firstEdKeymap": {
+          "pendingPrefix": "none"
+        },
+        "undo": {
+          "count": 0
+        }
+      }
+    },
+    {
+      "id": "keys.primary-control-v-toggles-insert-mode",
+      "area": "firsted-keymap",
+      "initial": {
+        "documents": [
+          {
+            "id": "d",
+            "lines": [
+              {
+                "text": "alpha beta",
+                "flags": []
+              }
+            ]
+          }
+        ],
+        "windows": [
+          {
+            "id": "w",
+            "documentId": "d",
+            "cursor": {
+              "line": 0,
+              "column": 0
+            },
+            "topLine": 0,
+            "leftColumn": 0
+          }
+        ],
+        "currentWindowId": "w"
+      },
+      "operations": [
+        {
+          "id": "translate_firsted_key",
+          "character": "V",
+          "control": true,
+          "expectAction": "command",
+          "expectCommand": "toggle_insert",
+          "expectArgument": "none",
+          "expectPendingPrefix": "none"
+        },
+        {
+          "id": "execute_firsted_key"
+        }
+      ],
+      "expect": {
+        "documents": {
+          "d": {
+            "lines": [
+              {
+                "text": "alpha beta",
+                "flags": []
+              }
+            ],
+            "isDirty": false,
+            "version": 0
+          }
+        },
+        "windows": {
+          "w": {
+            "cursor": {
+              "line": 0,
+              "column": 0
+            },
+            "options": {
+              "insertMode": false
+            }
+          }
+        },
+        "firstEdKeymap": {
+          "pendingPrefix": "none"
+        },
+        "undo": {
+          "count": 0
+        }
+      }
+    },
+    {
+      "id": "keys.special-backspace-routes-through-dispatcher",
+      "area": "firsted-keymap",
+      "initial": {
+        "documents": [
+          {
+            "id": "d",
+            "lines": [
+              {
+                "text": "abc",
+                "flags": []
+              }
+            ]
+          }
+        ],
+        "windows": [
+          {
+            "id": "w",
+            "documentId": "d",
+            "cursor": {
+              "line": 0,
+              "column": 2
+            },
+            "topLine": 0,
+            "leftColumn": 0
+          }
+        ],
+        "currentWindowId": "w"
+      },
+      "operations": [
+        {
+          "id": "translate_firsted_key",
+          "specialKey": "backspace",
+          "expectAction": "command",
+          "expectCommand": "delete_left_character",
+          "expectArgument": "none",
+          "expectPendingPrefix": "none"
+        },
+        {
+          "id": "execute_firsted_key"
+        }
+      ],
+      "expect": {
+        "documents": {
+          "d": {
+            "lines": [
+              {
+                "text": "ac",
+                "flags": []
+              }
+            ],
+            "isDirty": true,
+            "version": 1
+          }
+        },
+        "windows": {
+          "w": {
+            "cursor": {
+              "line": 0,
+              "column": 1
+            }
+          }
+        },
+        "firstEdKeymap": {
+          "pendingPrefix": "none"
+        },
+        "undo": {
+          "count": 1
+        }
+      }
+    },
+    {
+      "id": "keys.plain-printable-key-inserts-text-through-dispatcher",
+      "area": "firsted-keymap",
+      "initial": {
+        "documents": [
+          {
+            "id": "d",
+            "lines": [
+              {
+                "text": "alpha beta",
+                "flags": []
+              }
+            ]
+          }
+        ],
+        "windows": [
+          {
+            "id": "w",
+            "documentId": "d",
+            "cursor": {
+              "line": 0,
+              "column": 0
+            },
+            "topLine": 0,
+            "leftColumn": 0
+          }
+        ],
+        "currentWindowId": "w"
+      },
+      "operations": [
+        {
+          "id": "translate_firsted_key",
+          "character": "z",
+          "expectAction": "insert_text",
+          "expectText": "z",
+          "expectPendingPrefix": "none"
+        },
+        {
+          "id": "execute_firsted_key"
+        }
+      ],
+      "expect": {
+        "documents": {
+          "d": {
+            "lines": [
+              {
+                "text": "zalpha beta",
+                "flags": []
+              }
+            ],
+            "isDirty": true,
+            "version": 1
+          }
+        },
+        "windows": {
+          "w": {
+            "cursor": {
+              "line": 0,
+              "column": 1
+            }
+          }
+        },
+        "firstEdKeymap": {
+          "pendingPrefix": "none"
+        },
+        "undo": {
+          "count": 1
+        }
+      }
+    },
+    {
+      "id": "keys.reset-cancels-prefix-and-accepts-ordinary-text",
+      "area": "firsted-keymap",
+      "initial": {
+        "documents": [
+          {
+            "id": "d",
+            "lines": [
+              {
+                "text": "alpha beta",
+                "flags": []
+              }
+            ]
+          }
+        ],
+        "windows": [
+          {
+            "id": "w",
+            "documentId": "d",
+            "cursor": {
+              "line": 0,
+              "column": 0
+            },
+            "topLine": 0,
+            "leftColumn": 0
+          }
+        ],
+        "currentWindowId": "w"
+      },
+      "operations": [
+        {
+          "id": "translate_firsted_key",
+          "character": "Q",
+          "control": true,
+          "expectAction": "prefix_pending",
+          "expectPrefixDisplay": "Ctrl-Q",
+          "expectPendingPrefix": "ctrl_q"
+        },
+        {
+          "id": "reset_firsted_keymap"
+        },
+        {
+          "id": "translate_firsted_key",
+          "character": "x",
+          "expectAction": "insert_text",
+          "expectText": "x",
+          "expectPendingPrefix": "none"
+        },
+        {
+          "id": "execute_firsted_key"
+        }
+      ],
+      "expect": {
+        "documents": {
+          "d": {
+            "lines": [
+              {
+                "text": "xalpha beta",
+                "flags": []
+              }
+            ],
+            "isDirty": true,
+            "version": 1
+          }
+        },
+        "windows": {
+          "w": {
+            "cursor": {
+              "line": 0,
+              "column": 1
+            }
+          }
+        },
+        "firstEdKeymap": {
+          "pendingPrefix": "none"
+        },
+        "undo": {
+          "count": 1
+        }
+      }
+    }
+  ]
+}
