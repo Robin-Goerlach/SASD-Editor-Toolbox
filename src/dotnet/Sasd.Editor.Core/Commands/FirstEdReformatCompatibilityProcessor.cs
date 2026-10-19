@@ -107,7 +107,7 @@ internal static class FirstEdReformatCompatibilityProcessor
         // words flow, but does not prescribe a new cursor location. Preserving
         // the initiating logical line/column is therefore the documented modern
         // host-neutral policy. Virtual columns remain valid by design.
-        window.Cursor = originalCursor;
+        window.Cursor = initialCursor;
         session.RefreshBlockFlags();
         undo.Commit();
         return true;
