@@ -106,3 +106,7 @@ Der historische Create-Window-Befehl fragt sowohl nach einer Größe als auch na
 ## Stand der Übertragung
 
 Die FIRST-ED-**Eingabezuordnung**, Prefix-Zustandsmaschine und zugehörigen semantischen Befehlspfade werden inzwischen durch Regressionstests abgesichert, auch für Datei-, Fenster- und Suchbefehle mit Host-Abfragen. Der interaktive Terminalhost besitzt die Dialoge; `EditorCommandDispatcher` und Dienste bleiben UI-unabhängig. Neue portable Conformance-Fälle werden über das gemeinsame Manifest entdeckt und nicht aus der .NET-Tastenbelegung abgeleitet.
+
+## Alt-modifizierte Tasten und Abbruch offener Präfixe
+
+Die UI-unabhängige Tastenzuordnung ignoriert Alt-modifizierte Eingaben **auch bei Sondertasten** wie Escape, Enter, Pfeiltasten oder Entf, damit mögliche Host-/Menükürzel nicht versehentlich den Editor verändern. Ein laufendes Ctrl-K/O/Q-Präfix verbraucht eine ungültige Zweittaste und kehrt in den neutralen Zustand zurück. Ein einfaches Escape während eines Präfixes verwirft nur das Präfix, während Escape ohne Präfix weiterhin Undo auslöst. Diese Regel ist eine moderne Host-Integrationsentscheidung und keine unbelegte historische DOS-Tastaturregel.

@@ -36,6 +36,15 @@ public sealed class FirstEdKeyMap
             return TranslatePrefixed(keyStroke);
         }
 
+        // An Alt-modified navigation/editing key may be a host/menu
+        // accelerator. It must not silently become an ordinary FIRST-ED
+        // command (for example Alt+Escape must not Undo). This is an explicit
+        // modern host-safety policy, not a claim about DOS keyboard modifiers.
+        if (keyStroke.HasModifier(EditorKeyModifiers.Alt))
+        {
+            return EditorInputAction.Ignored;
+        }
+
         var special = TranslateSpecialKey(keyStroke);
         if (special is not null)
         {

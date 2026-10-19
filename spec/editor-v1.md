@@ -169,6 +169,7 @@ The handbook does not separately define whether markers or other non-block ancho
 - Stateful constraints, such as a left margin not exceeding the current right margin or a donor window retaining its three-row minimum, are validated by the service that owns that state after the request envelope has passed boundary validation.
 - The engine itself must remain callable directly by application code.
 - Hosts may add modern aliases (for example arrow keys) without removing the historical command sequences.
+- As a modern host-safety policy, Alt-modified normalized keys are not mapped to FIRST-ED commands, including special navigation/editing keys; hosts may reserve these combinations for application or operating-system accelerators. When a prefix is already pending, an unsupported modified second key consumes the pending prefix without executing any command. Plain Escape while waiting for a prefix cancels the prefix rather than triggering Undo. This is not asserted as a DOS scan-code compatibility rule.
 - V1 provides an editor-owned bounded typeahead abstraction with a default capacity of 500 logical input units.
 - Physical/host input appends at the back in FIFO order. Macro/user-pushed input can be inserted at the front, including a sequence whose subsequent read order matches the caller's sequence order.
 - Typeahead overflow clears pending typeahead instead of keeping an ambiguous partial command sequence.

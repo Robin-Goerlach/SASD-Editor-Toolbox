@@ -106,3 +106,7 @@ The historical create-window command asks for both a size and a source window. S
 ## Current transfer status
 
 The FIRST-ED **input mapping contract**, prefix state machine and associated semantic command paths now have regression coverage, including prompt-driven file, window and search commands. The interactive terminal host owns prompts; `EditorCommandDispatcher` and services remain UI-independent. New portable conformance cases are discovered from the shared manifest, not inferred from the .NET key mapping.
+
+## Alt-modified keys and prefix cancellation
+
+The reusable key map deliberately ignores an Alt-modified key, **including special keys** such as Escape, Enter, Arrow keys and Delete, instead of turning a possible host/menu accelerator into an editor mutation. A pending Ctrl-K/O/Q prefix consumes a rejected second key and returns to neutral; a plain Escape while the prefix is pending cancels that prefix, but Escape without a prefix retains its documented Undo binding. This is a modern host integration policy and not a historical DOS modifier claim.
