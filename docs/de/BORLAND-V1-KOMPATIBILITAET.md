@@ -254,6 +254,10 @@ Die Neuformatierung speichert Dokument/Fenster, Cursor, Ränder, Blockzustand, V
 
 Der moderne Scheduler startet nach einer Rundown-Anforderung keine weiteren Hintergrund-Teilaufgaben, auch wenn sie aus dem Idle-Hook oder einer vorherigen Teilaufgabe stammt. Im selben Zyklus entfernte Aufgaben werden übersprungen; neu registrierte Aufgaben kommen frühestens im nächsten Idle-Zyklus zum Zug. Externe Abbrüche werden vor Idle-/Teilaufgaben geprüft. Deterministische .NET-Tests sichern diese modernen Lebenszyklusgrenzen ohne parallele Editor-Threads ab.
 
+## Portable Belege für die Absatz-Neuformatierung
+
+Acht gemeinsame Fälle prüfen das Verdichten, Einrücken, Umbrechen, Zusammenziehen, harte Absatzgrenzen, überlange Wörter, Leerlauf und Undo über den semantischen Reformat-Befehl. Fünf historische Routinen aus dieser Funktionsfamilie erhalten direkte Verweise auf beobachtbare Tests. Asynchrone Host-Zwischenfälle werden weiterhin separat in .NET geprüft.
+
 ## V1-Abschlusskriterium
 
 Die C#/.NET-Implementierung deckt die großen strukturellen FIRST-ED-Bereiche inzwischen ausführbar ab, einschließlich Absatz-Neuformatierung, mehrzeiliger Block-Bulk-Topologie, unabhängiger Block-Endpunkte und atomarer Multi-Dokument-Undo-/Navigationswiederherstellung. Der [Handbuch-Prozeduren-/Funktionsindex-Audit](HANDBUCH-PROZEDURENINDEX-AUDIT.md) erfasst inzwischen alle 123 gedruckten Einträge mit ersten Klassifikationen; die zugeordneten Routinen benötigen vor V1 noch einen abschließenden Testabdeckungs- und Host-Audit. MicroStar-spezifische Demonstrationen können als Samples statt als Core-Abhängigkeiten geliefert werden.

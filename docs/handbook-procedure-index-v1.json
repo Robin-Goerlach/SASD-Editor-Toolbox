@@ -201,7 +201,10 @@
       "handbookPage": 139,
       "status": "implemented",
       "evidence": "docs/en/REFORMAT-COMPATIBILITY.md",
-      "note": "Paragraph planning/reflow replaces historical helper code."
+      "note": "Paragraph planning/reflow replaces historical helper code.",
+      "conformanceCases": [
+        "reformat.compress-repeated-blank-runs"
+      ]
     },
     {
       "name": "EditCpcrewin",
@@ -620,7 +623,11 @@
       "handbookPage": 189,
       "status": "implemented",
       "evidence": "docs/en/REFORMAT-COMPATIBILITY.md",
-      "note": "Paragraph planning/reflow replaces historical helper code."
+      "note": "Paragraph planning/reflow replaces historical helper code.",
+      "conformanceCases": [
+        "reformat.long-line-creates-wrapped-continuation",
+        "reformat.word-too-long-rejected-before-undo-or-mutation"
+      ]
     },
     {
       "name": "EditMarkblock",
@@ -709,7 +716,12 @@
       "handbookPage": 200,
       "status": "implemented",
       "evidence": "docs/en/REFORMAT-COMPATIBILITY.md",
-      "note": "Paragraph planning/reflow replaces historical helper code."
+      "note": "Paragraph planning/reflow replaces historical helper code.",
+      "conformanceCases": [
+        "reformat.respects-hard-boundary-and-does-not-touch-next-paragraph",
+        "reformat.already-normalized-paragraph-is-ordinary-noop",
+        "reformat.undo-restores-original-soft-boundaries"
+      ]
     },
     {
       "name": "EditReplace",
@@ -815,14 +827,20 @@
       "handbookPage": 211,
       "status": "implemented",
       "evidence": "docs/en/REFORMAT-COMPATIBILITY.md",
-      "note": "Paragraph planning/reflow replaces historical helper code."
+      "note": "Paragraph planning/reflow replaces historical helper code.",
+      "conformanceCases": [
+        "reformat.shift-words-to-nonzero-left-margin"
+      ]
     },
     {
       "name": "EditShortLine",
       "handbookPage": 212,
       "status": "implemented",
       "evidence": "docs/en/REFORMAT-COMPATIBILITY.md",
-      "note": "Paragraph planning/reflow replaces historical helper code."
+      "note": "Paragraph planning/reflow replaces historical helper code.",
+      "conformanceCases": [
+        "reformat.short-line-pulls-words-from-soft-continuation"
+      ]
     },
     {
       "name": "EditSystem",

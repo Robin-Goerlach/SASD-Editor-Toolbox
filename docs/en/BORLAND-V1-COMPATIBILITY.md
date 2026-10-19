@@ -255,6 +255,10 @@ Reformat now captures the initiating document/view, margins, cursor, block state
 
 The modern scheduler stops starting background slices as soon as rundown is requested, even when requested in an idle callback or an earlier background slice. Unregistered tasks are skipped in the same cycle and new tasks are deferred until a later idle cycle. External cancellation is observed before idle/slice invocation. Deterministic .NET regressions verify these modern lifecycle boundaries without introducing threaded background execution.
 
+## Portable paragraph-reflow evidence
+
+Eight shared conformance cases now verify compress, left-margin shift, long-line wrap, short-line pull-up, hard-boundary stop, too-wide-word rejection, no-op and Undo through the semantic Reformat command. Five historical reformat-family routine entries link to these actual observable tests. Async host interleaving remains covered separately by deterministic .NET tests.
+
 ## V1 release gate
 
 The C#/.NET implementation now has executable coverage for the major FIRST-ED structural areas, including paragraph reformatting, whole-line block bulk topology, independent block endpoints and atomic multi-document undo/navigation restoration. The [handbook procedure/function index audit](HANDBOOK-PROCEDURE-INDEX-AUDIT.md) now records all 123 printed entries with first-pass classifications; its mapped behavior still requires a final regression-coverage and host-interface audit before calling V1 complete. MicroStar-specific demonstrations may ship as samples rather than core dependencies.

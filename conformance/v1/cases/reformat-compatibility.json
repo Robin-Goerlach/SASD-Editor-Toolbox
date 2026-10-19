@@ -1,0 +1,541 @@
+{
+  "formatVersion": 1,
+  "contractVersion": "v1",
+  "cases": [
+    {
+      "id": "reformat.compress-repeated-blank-runs",
+      "area": "reformat",
+      "initial": {
+        "documents": [
+          {
+            "id": "d",
+            "lines": [
+              {
+                "text": "one    two",
+                "flags": []
+              }
+            ]
+          }
+        ],
+        "windows": [
+          {
+            "id": "w",
+            "documentId": "d",
+            "cursor": {
+              "line": 0,
+              "column": 0
+            },
+            "topLine": 0,
+            "leftColumn": 0,
+            "options": {
+              "rightMargin": 20
+            }
+          }
+        ],
+        "currentWindowId": "w"
+      },
+      "operation": {
+        "id": "reformat_paragraph"
+      },
+      "expect": {
+        "documents": {
+          "d": {
+            "lines": [
+              {
+                "text": "one two",
+                "flags": []
+              }
+            ],
+            "isDirty": true,
+            "version": 1
+          }
+        },
+        "windows": {
+          "w": {
+            "cursor": {
+              "line": 0,
+              "column": 0
+            }
+          }
+        },
+        "undo": {
+          "count": 1
+        }
+      }
+    },
+    {
+      "id": "reformat.shift-words-to-nonzero-left-margin",
+      "area": "reformat",
+      "initial": {
+        "documents": [
+          {
+            "id": "d",
+            "lines": [
+              {
+                "text": "one two",
+                "flags": []
+              }
+            ]
+          }
+        ],
+        "windows": [
+          {
+            "id": "w",
+            "documentId": "d",
+            "cursor": {
+              "line": 0,
+              "column": 0
+            },
+            "topLine": 0,
+            "leftColumn": 0,
+            "options": {
+              "leftMargin": 2,
+              "rightMargin": 12
+            }
+          }
+        ],
+        "currentWindowId": "w"
+      },
+      "operation": {
+        "id": "reformat_paragraph"
+      },
+      "expect": {
+        "documents": {
+          "d": {
+            "lines": [
+              {
+                "text": "  one two",
+                "flags": []
+              }
+            ],
+            "isDirty": true,
+            "version": 1
+          }
+        },
+        "windows": {
+          "w": {
+            "cursor": {
+              "line": 0,
+              "column": 0
+            }
+          }
+        },
+        "undo": {
+          "count": 1
+        }
+      }
+    },
+    {
+      "id": "reformat.long-line-creates-wrapped-continuation",
+      "area": "reformat",
+      "initial": {
+        "documents": [
+          {
+            "id": "d",
+            "lines": [
+              {
+                "text": "one two three",
+                "flags": []
+              }
+            ]
+          }
+        ],
+        "windows": [
+          {
+            "id": "w",
+            "documentId": "d",
+            "cursor": {
+              "line": 0,
+              "column": 0
+            },
+            "topLine": 0,
+            "leftColumn": 0,
+            "options": {
+              "rightMargin": 7
+            }
+          }
+        ],
+        "currentWindowId": "w"
+      },
+      "operation": {
+        "id": "reformat_paragraph"
+      },
+      "expect": {
+        "documents": {
+          "d": {
+            "lines": [
+              {
+                "text": "one two",
+                "flags": [
+                  "wrapped"
+                ]
+              },
+              {
+                "text": "three",
+                "flags": []
+              }
+            ],
+            "isDirty": true,
+            "version": 1
+          }
+        },
+        "windows": {
+          "w": {
+            "cursor": {
+              "line": 0,
+              "column": 0
+            }
+          }
+        },
+        "undo": {
+          "count": 1
+        }
+      }
+    },
+    {
+      "id": "reformat.short-line-pulls-words-from-soft-continuation",
+      "area": "reformat",
+      "initial": {
+        "documents": [
+          {
+            "id": "d",
+            "lines": [
+              {
+                "text": "one two",
+                "flags": [
+                  "wrapped"
+                ]
+              },
+              {
+                "text": "three",
+                "flags": []
+              }
+            ]
+          }
+        ],
+        "windows": [
+          {
+            "id": "w",
+            "documentId": "d",
+            "cursor": {
+              "line": 0,
+              "column": 0
+            },
+            "topLine": 0,
+            "leftColumn": 0,
+            "options": {
+              "rightMargin": 20
+            }
+          }
+        ],
+        "currentWindowId": "w"
+      },
+      "operation": {
+        "id": "reformat_paragraph"
+      },
+      "expect": {
+        "documents": {
+          "d": {
+            "lines": [
+              {
+                "text": "one two three",
+                "flags": []
+              }
+            ],
+            "isDirty": true,
+            "version": 1
+          }
+        },
+        "windows": {
+          "w": {
+            "cursor": {
+              "line": 0,
+              "column": 0
+            }
+          }
+        },
+        "undo": {
+          "count": 1
+        }
+      }
+    },
+    {
+      "id": "reformat.respects-hard-boundary-and-does-not-touch-next-paragraph",
+      "area": "reformat",
+      "initial": {
+        "documents": [
+          {
+            "id": "d",
+            "lines": [
+              {
+                "text": "one   two",
+                "flags": []
+              },
+              {
+                "text": "do   not touch",
+                "flags": []
+              }
+            ]
+          }
+        ],
+        "windows": [
+          {
+            "id": "w",
+            "documentId": "d",
+            "cursor": {
+              "line": 0,
+              "column": 0
+            },
+            "topLine": 0,
+            "leftColumn": 0,
+            "options": {
+              "rightMargin": 20
+            }
+          }
+        ],
+        "currentWindowId": "w"
+      },
+      "operation": {
+        "id": "reformat_paragraph"
+      },
+      "expect": {
+        "documents": {
+          "d": {
+            "lines": [
+              {
+                "text": "one two",
+                "flags": []
+              },
+              {
+                "text": "do   not touch",
+                "flags": []
+              }
+            ],
+            "isDirty": true,
+            "version": 1
+          }
+        },
+        "windows": {
+          "w": {
+            "cursor": {
+              "line": 0,
+              "column": 0
+            }
+          }
+        },
+        "undo": {
+          "count": 1
+        }
+      }
+    },
+    {
+      "id": "reformat.word-too-long-rejected-before-undo-or-mutation",
+      "area": "reformat",
+      "initial": {
+        "documents": [
+          {
+            "id": "d",
+            "lines": [
+              {
+                "text": "abcdef",
+                "flags": []
+              }
+            ]
+          }
+        ],
+        "windows": [
+          {
+            "id": "w",
+            "documentId": "d",
+            "cursor": {
+              "line": 0,
+              "column": 3
+            },
+            "topLine": 0,
+            "leftColumn": 0,
+            "options": {
+              "leftMargin": 2,
+              "rightMargin": 5
+            }
+          }
+        ],
+        "currentWindowId": "w"
+      },
+      "operation": {
+        "id": "reformat_paragraph",
+        "commandSucceeded": false
+      },
+      "expect": {
+        "commandSucceeded": false,
+        "documents": {
+          "d": {
+            "lines": [
+              {
+                "text": "abcdef",
+                "flags": []
+              }
+            ],
+            "isDirty": false,
+            "version": 0
+          }
+        },
+        "windows": {
+          "w": {
+            "cursor": {
+              "line": 0,
+              "column": 3
+            }
+          }
+        },
+        "undo": {
+          "count": 0
+        },
+        "error": {
+          "id": "operation_failed"
+        }
+      }
+    },
+    {
+      "id": "reformat.already-normalized-paragraph-is-ordinary-noop",
+      "area": "reformat",
+      "initial": {
+        "documents": [
+          {
+            "id": "d",
+            "lines": [
+              {
+                "text": "one two",
+                "flags": []
+              }
+            ]
+          }
+        ],
+        "windows": [
+          {
+            "id": "w",
+            "documentId": "d",
+            "cursor": {
+              "line": 0,
+              "column": 0
+            },
+            "topLine": 0,
+            "leftColumn": 0,
+            "options": {
+              "rightMargin": 20
+            }
+          }
+        ],
+        "currentWindowId": "w"
+      },
+      "operation": {
+        "id": "reformat_paragraph",
+        "commandSucceeded": false
+      },
+      "expect": {
+        "commandSucceeded": false,
+        "documents": {
+          "d": {
+            "lines": [
+              {
+                "text": "one two",
+                "flags": []
+              }
+            ],
+            "isDirty": false,
+            "version": 0
+          }
+        },
+        "windows": {
+          "w": {
+            "cursor": {
+              "line": 0,
+              "column": 0
+            }
+          }
+        },
+        "undo": {
+          "count": 0
+        }
+      }
+    },
+    {
+      "id": "reformat.undo-restores-original-soft-boundaries",
+      "area": "reformat",
+      "initial": {
+        "documents": [
+          {
+            "id": "d",
+            "lines": [
+              {
+                "text": "one  two",
+                "flags": [
+                  "wrapped"
+                ]
+              },
+              {
+                "text": "three",
+                "flags": []
+              }
+            ]
+          }
+        ],
+        "windows": [
+          {
+            "id": "w",
+            "documentId": "d",
+            "cursor": {
+              "line": 0,
+              "column": 4
+            },
+            "topLine": 0,
+            "leftColumn": 0,
+            "options": {
+              "rightMargin": 20,
+              "wordWrap": false
+            }
+          }
+        ],
+        "currentWindowId": "w"
+      },
+      "operations": [
+        {
+          "id": "reformat_paragraph"
+        },
+        {
+          "id": "undo"
+        }
+      ],
+      "expect": {
+        "documents": {
+          "d": {
+            "lines": [
+              {
+                "text": "one  two",
+                "flags": [
+                  "wrapped"
+                ]
+              },
+              {
+                "text": "three",
+                "flags": []
+              }
+            ],
+            "isDirty": false,
+            "version": 0
+          }
+        },
+        "windows": {
+          "w": {
+            "cursor": {
+              "line": 0,
+              "column": 4
+            }
+          }
+        },
+        "undo": {
+          "count": 0
+        }
+      }
+    }
+  ]
+}

@@ -77,3 +77,7 @@ Unmittelbar vor Undo-Capture und Dokumentmutation erfolgt ein letzter Checkpoint
 ### Zustandskonsistenz bei asynchroner Neuformatierung
 
 Die Neuformatierung plant ihren Absatz jetzt anhand eines vollständigen Snapshots, der **vor** dem ersten kooperativen Eingabeprüfpunkt festgehalten wird. Unmittelbar vor der Textänderung (auch vor einem geplanten Leerlauf) werden die ursprüngliche Fenster-/Dokumentzuordnung, Cursorposition, Ränder, Blockdefinition, Dokumentversion und der gesamte Zeilenbestand erneut verglichen. Ein reiner Wechsel des aktiven Fensters ist unschädlich: Eine gültige Neuformatierung verändert weiterhin nur das ursprüngliche Dokument. Ein veralteter Plan wird mit einem typisierten Operationsfehler abgelehnt; zwischenzeitliche Änderungen und Navigation bleiben bestehen und es entsteht kein zusätzlicher Reformat-Undo-Eintrag. Diese Regel ist eine moderne Sicherheitseigenschaft asynchroner Hosts und keine Behauptung über die DOS-Implementierung von 1985.
+
+## Portable Abnahmetests für Absatz-Neuformatierung
+
+Acht Fälle in `reformat-compatibility.json` liefern jetzt sprachunabhängige, ausführbare Belege für die sichtbaren Aufgaben von `EditCompressLine`, `EditShiftLine`, `EditLongLine`, `EditShortLine` und `EditReformat`. Geprüft werden Ausdehnen und Zusammenziehen weich umgebrochener Absätze, Stoppen an harten Zeilengrenzen, atomare Ablehnung zu langer Wörter, die moderne Leerlaufregel und Undo in einem Schritt. Die Fälle verlangen **keine** historischen Pascal-Hilfs-APIs und keine Nachbildung der damaligen Zeigermechanik.

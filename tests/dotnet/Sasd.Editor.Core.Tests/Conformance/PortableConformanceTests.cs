@@ -357,6 +357,9 @@ public sealed class PortableConformanceTests
             "delete_left_character" => EditorCommandId.DeleteLeftCharacter,
             "delete_right_character" => EditorCommandId.DeleteRightCharacter,
             "delete_right_word" => EditorCommandId.DeleteRightWord,
+            // Cross-language reflow is a semantic command, not a public
+            // copy of the Pascal compression/splicing helper functions.
+            "reformat_paragraph" => EditorCommandId.ReformatParagraph,
             // The semantic window/block operations remain UI-neutral.
             "hide_block" => EditorCommandId.HideBlock,
             "top_of_block" => EditorCommandId.TopOfBlock,

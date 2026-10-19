@@ -77,3 +77,7 @@ One final checkpoint occurs immediately before undo capture and document mutatio
 ### Async reformat state-consistency rule
 
 A paragraph reformat plan is now based on a full source snapshot captured **before** the first cooperative input checkpoint. Immediately before mutation (including a planned no-op), the initiating window must still be attached to the same document with the same cursor and margins; the block definition, document version and complete buffer snapshot must still match. Concurrent host focus changes to another window alone are harmless: a successful plan still changes only its originating document. Any stale plan is rejected with a typed operation failure, preserving intervening edits and navigation and adding no reformat Undo item. This is a modern asynchronous host-safety policy, not a claim about 1985 single-threaded DOS internals.
+
+## Portable reformat acceptance cases
+
+Eight `reformat-compatibility.json` cases are now normative, language-independent evidence for the publicly observable paragraph-reflow responsibilities associated with `EditCompressLine`, `EditShiftLine`, `EditLongLine`, `EditShortLine` and `EditReformat`. The fixtures test both expansion and contraction of soft-Wrapped paragraphs, the hard-boundary stop, atomic width failure, modern no-op policy and single-command Undo. They do **not** require other language lanes to expose historical helper APIs or reproduce Pascal pointer mechanics.
