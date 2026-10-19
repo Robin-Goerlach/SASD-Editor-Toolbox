@@ -1,0 +1,698 @@
+{
+  "formatVersion": 1,
+  "contractVersion": "v1",
+  "cases": [
+    {
+      "id": "lifecycle.input-first-never-starts-background",
+      "area": "cooperative-lifecycle",
+      "initial": {
+        "documents": [
+          {
+            "id": "d",
+            "lines": [
+              {
+                "text": "example",
+                "flags": []
+              }
+            ]
+          }
+        ],
+        "windows": [
+          {
+            "id": "w",
+            "documentId": "d",
+            "cursor": {
+              "line": 0,
+              "column": 0
+            },
+            "topLine": 0,
+            "leftColumn": 0
+          }
+        ],
+        "currentWindowId": "w"
+      },
+      "operations": [
+        {
+          "id": "register_background_task",
+          "name": "task"
+        },
+        {
+          "id": "run_scheduler_cycle",
+          "inputProcessed": true,
+          "expectResult": "input_processed"
+        }
+      ],
+      "expect": {
+        "documents": {
+          "d": {
+            "lines": [
+              {
+                "text": "example",
+                "flags": []
+              }
+            ],
+            "isDirty": false,
+            "version": 0
+          }
+        },
+        "scheduler": {
+          "taskTrace": [],
+          "inputCalls": 1,
+          "idleCalls": 0,
+          "pollCalls": 0,
+          "userAborts": 0
+        },
+        "rundownRequested": false,
+        "undo": {
+          "count": 0
+        }
+      }
+    },
+    {
+      "id": "lifecycle.idle-runs-one-background-slice",
+      "area": "cooperative-lifecycle",
+      "initial": {
+        "documents": [
+          {
+            "id": "d",
+            "lines": [
+              {
+                "text": "example",
+                "flags": []
+              }
+            ]
+          }
+        ],
+        "windows": [
+          {
+            "id": "w",
+            "documentId": "d",
+            "cursor": {
+              "line": 0,
+              "column": 0
+            },
+            "topLine": 0,
+            "leftColumn": 0
+          }
+        ],
+        "currentWindowId": "w"
+      },
+      "operations": [
+        {
+          "id": "register_background_task",
+          "name": "task"
+        },
+        {
+          "id": "run_scheduler_cycle",
+          "inputProcessed": false,
+          "expectResult": "background_processed"
+        }
+      ],
+      "expect": {
+        "documents": {
+          "d": {
+            "lines": [
+              {
+                "text": "example",
+                "flags": []
+              }
+            ],
+            "isDirty": false,
+            "version": 0
+          }
+        },
+        "scheduler": {
+          "taskTrace": [
+            "task"
+          ],
+          "inputCalls": 1,
+          "idleCalls": 1,
+          "pollCalls": 0,
+          "userAborts": 0
+        },
+        "rundownRequested": false,
+        "undo": {
+          "count": 0
+        }
+      }
+    },
+    {
+      "id": "lifecycle.repeated-idle-cycles-preserve-task-order",
+      "area": "cooperative-lifecycle",
+      "initial": {
+        "documents": [
+          {
+            "id": "d",
+            "lines": [
+              {
+                "text": "example",
+                "flags": []
+              }
+            ]
+          }
+        ],
+        "windows": [
+          {
+            "id": "w",
+            "documentId": "d",
+            "cursor": {
+              "line": 0,
+              "column": 0
+            },
+            "topLine": 0,
+            "leftColumn": 0
+          }
+        ],
+        "currentWindowId": "w"
+      },
+      "operations": [
+        {
+          "id": "register_background_task",
+          "name": "a"
+        },
+        {
+          "id": "register_background_task",
+          "name": "b"
+        },
+        {
+          "id": "run_scheduler_cycle",
+          "inputProcessed": false,
+          "expectResult": "background_processed"
+        },
+        {
+          "id": "run_scheduler_cycle",
+          "inputProcessed": false,
+          "expectResult": "background_processed"
+        }
+      ],
+      "expect": {
+        "documents": {
+          "d": {
+            "lines": [
+              {
+                "text": "example",
+                "flags": []
+              }
+            ],
+            "isDirty": false,
+            "version": 0
+          }
+        },
+        "scheduler": {
+          "taskTrace": [
+            "a",
+            "b",
+            "a",
+            "b"
+          ],
+          "inputCalls": 2,
+          "idleCalls": 2,
+          "pollCalls": 0,
+          "userAborts": 0
+        },
+        "rundownRequested": false,
+        "undo": {
+          "count": 0
+        }
+      }
+    },
+    {
+      "id": "lifecycle.input-pump-rundown-skips-idle",
+      "area": "cooperative-lifecycle",
+      "initial": {
+        "documents": [
+          {
+            "id": "d",
+            "lines": [
+              {
+                "text": "example",
+                "flags": []
+              }
+            ]
+          }
+        ],
+        "windows": [
+          {
+            "id": "w",
+            "documentId": "d",
+            "cursor": {
+              "line": 0,
+              "column": 0
+            },
+            "topLine": 0,
+            "leftColumn": 0
+          }
+        ],
+        "currentWindowId": "w"
+      },
+      "operations": [
+        {
+          "id": "register_background_task",
+          "name": "task"
+        },
+        {
+          "id": "run_scheduler_cycle",
+          "inputProcessed": false,
+          "expectResult": "background_processed",
+          "requestRundown": true
+        }
+      ],
+      "expect": {
+        "documents": {
+          "d": {
+            "lines": [
+              {
+                "text": "example",
+                "flags": []
+              }
+            ],
+            "isDirty": false,
+            "version": 0
+          }
+        },
+        "scheduler": {
+          "taskTrace": [],
+          "inputCalls": 1,
+          "idleCalls": 0,
+          "pollCalls": 0,
+          "userAborts": 0
+        },
+        "rundownRequested": true,
+        "undo": {
+          "count": 0
+        }
+      }
+    },
+    {
+      "id": "lifecycle.task-rundown-prevents-subsequent-slices",
+      "area": "cooperative-lifecycle",
+      "initial": {
+        "documents": [
+          {
+            "id": "d",
+            "lines": [
+              {
+                "text": "example",
+                "flags": []
+              }
+            ]
+          }
+        ],
+        "windows": [
+          {
+            "id": "w",
+            "documentId": "d",
+            "cursor": {
+              "line": 0,
+              "column": 0
+            },
+            "topLine": 0,
+            "leftColumn": 0
+          }
+        ],
+        "currentWindowId": "w"
+      },
+      "operations": [
+        {
+          "id": "register_background_task",
+          "name": "exit",
+          "requestRundown": true
+        },
+        {
+          "id": "register_background_task",
+          "name": "should-not-run"
+        },
+        {
+          "id": "run_scheduler_cycle",
+          "inputProcessed": false,
+          "expectResult": "background_processed"
+        }
+      ],
+      "expect": {
+        "documents": {
+          "d": {
+            "lines": [
+              {
+                "text": "example",
+                "flags": []
+              }
+            ],
+            "isDirty": false,
+            "version": 0
+          }
+        },
+        "scheduler": {
+          "taskTrace": [
+            "exit"
+          ],
+          "inputCalls": 1,
+          "idleCalls": 1,
+          "pollCalls": 0,
+          "userAborts": 0
+        },
+        "rundownRequested": true,
+        "undo": {
+          "count": 0
+        }
+      }
+    },
+    {
+      "id": "lifecycle.system-loop-respects-exit-request-from-input",
+      "area": "cooperative-lifecycle",
+      "initial": {
+        "documents": [
+          {
+            "id": "d",
+            "lines": [
+              {
+                "text": "example",
+                "flags": []
+              }
+            ]
+          }
+        ],
+        "windows": [
+          {
+            "id": "w",
+            "documentId": "d",
+            "cursor": {
+              "line": 0,
+              "column": 0
+            },
+            "topLine": 0,
+            "leftColumn": 0
+          }
+        ],
+        "currentWindowId": "w"
+      },
+      "operations": [
+        {
+          "id": "register_background_task",
+          "name": "task"
+        },
+        {
+          "id": "run_system_loop",
+          "exitOnInputCall": 1,
+          "inputProcessed": true
+        }
+      ],
+      "expect": {
+        "documents": {
+          "d": {
+            "lines": [
+              {
+                "text": "example",
+                "flags": []
+              }
+            ],
+            "isDirty": false,
+            "version": 0
+          }
+        },
+        "scheduler": {
+          "taskTrace": [],
+          "inputCalls": 1,
+          "idleCalls": 0,
+          "pollCalls": 0,
+          "userAborts": 0
+        },
+        "rundownRequested": true,
+        "undo": {
+          "count": 0
+        }
+      }
+    },
+    {
+      "id": "lifecycle.system-loop-repeats-idle-until-exit",
+      "area": "cooperative-lifecycle",
+      "initial": {
+        "documents": [
+          {
+            "id": "d",
+            "lines": [
+              {
+                "text": "example",
+                "flags": []
+              }
+            ]
+          }
+        ],
+        "windows": [
+          {
+            "id": "w",
+            "documentId": "d",
+            "cursor": {
+              "line": 0,
+              "column": 0
+            },
+            "topLine": 0,
+            "leftColumn": 0
+          }
+        ],
+        "currentWindowId": "w"
+      },
+      "operations": [
+        {
+          "id": "register_background_task",
+          "name": "task"
+        },
+        {
+          "id": "run_system_loop",
+          "exitOnInputCall": 3,
+          "inputProcessed": false
+        }
+      ],
+      "expect": {
+        "documents": {
+          "d": {
+            "lines": [
+              {
+                "text": "example",
+                "flags": []
+              }
+            ],
+            "isDirty": false,
+            "version": 0
+          }
+        },
+        "scheduler": {
+          "taskTrace": [
+            "task",
+            "task"
+          ],
+          "inputCalls": 3,
+          "idleCalls": 2,
+          "pollCalls": 0,
+          "userAborts": 0
+        },
+        "rundownRequested": true,
+        "undo": {
+          "count": 0
+        }
+      }
+    },
+    {
+      "id": "lifecycle.semantic-exit-command-sets-rundown",
+      "area": "cooperative-lifecycle",
+      "initial": {
+        "documents": [
+          {
+            "id": "d",
+            "lines": [
+              {
+                "text": "example",
+                "flags": []
+              }
+            ]
+          }
+        ],
+        "windows": [
+          {
+            "id": "w",
+            "documentId": "d",
+            "cursor": {
+              "line": 0,
+              "column": 0
+            },
+            "topLine": 0,
+            "leftColumn": 0
+          }
+        ],
+        "currentWindowId": "w"
+      },
+      "operations": [
+        {
+          "id": "exit"
+        }
+      ],
+      "expect": {
+        "documents": {
+          "d": {
+            "lines": [
+              {
+                "text": "example",
+                "flags": []
+              }
+            ],
+            "isDirty": false,
+            "version": 0
+          }
+        },
+        "scheduler": {
+          "taskTrace": [],
+          "inputCalls": 0,
+          "idleCalls": 0,
+          "pollCalls": 0,
+          "userAborts": 0
+        },
+        "rundownRequested": true,
+        "undo": {
+          "count": 0
+        }
+      }
+    },
+    {
+      "id": "lifecycle.breathe-preserves-normal-queued-input",
+      "area": "cooperative-lifecycle",
+      "initial": {
+        "documents": [
+          {
+            "id": "d",
+            "lines": [
+              {
+                "text": "example",
+                "flags": []
+              }
+            ]
+          }
+        ],
+        "windows": [
+          {
+            "id": "w",
+            "documentId": "d",
+            "cursor": {
+              "line": 0,
+              "column": 0
+            },
+            "topLine": 0,
+            "leftColumn": 0
+          }
+        ],
+        "currentWindowId": "w"
+      },
+      "operations": [
+        {
+          "id": "host_typeahead",
+          "character": "x",
+          "expectResult": "queued"
+        },
+        {
+          "id": "breathe_checkpoint",
+          "expectAborted": false
+        },
+        {
+          "id": "read_typeahead",
+          "expectKind": "character",
+          "expectCharacter": "x"
+        }
+      ],
+      "expect": {
+        "documents": {
+          "d": {
+            "lines": [
+              {
+                "text": "example",
+                "flags": []
+              }
+            ],
+            "isDirty": false,
+            "version": 0
+          }
+        },
+        "scheduler": {
+          "taskTrace": [],
+          "inputCalls": 0,
+          "idleCalls": 0,
+          "pollCalls": 1,
+          "userAborts": 0
+        },
+        "rundownRequested": false,
+        "undo": {
+          "count": 0
+        }
+      }
+    },
+    {
+      "id": "lifecycle.physical-abort-consumed-only-once",
+      "area": "cooperative-lifecycle",
+      "initial": {
+        "documents": [
+          {
+            "id": "d",
+            "lines": [
+              {
+                "text": "example",
+                "flags": []
+              }
+            ]
+          }
+        ],
+        "windows": [
+          {
+            "id": "w",
+            "documentId": "d",
+            "cursor": {
+              "line": 0,
+              "column": 0
+            },
+            "topLine": 0,
+            "leftColumn": 0
+          }
+        ],
+        "currentWindowId": "w"
+      },
+      "operations": [
+        {
+          "id": "enqueue_physical_abort"
+        },
+        {
+          "id": "breathe_checkpoint",
+          "expectAborted": true
+        },
+        {
+          "id": "breathe_checkpoint",
+          "expectAborted": false
+        },
+        {
+          "id": "consume_typeahead_abort",
+          "expectAbort": false
+        }
+      ],
+      "expect": {
+        "documents": {
+          "d": {
+            "lines": [
+              {
+                "text": "example",
+                "flags": []
+              }
+            ],
+            "isDirty": false,
+            "version": 0
+          }
+        },
+        "scheduler": {
+          "taskTrace": [],
+          "inputCalls": 0,
+          "idleCalls": 0,
+          "pollCalls": 2,
+          "userAborts": 1
+        },
+        "rundownRequested": false,
+        "undo": {
+          "count": 0
+        }
+      }
+    }
+  ]
+}

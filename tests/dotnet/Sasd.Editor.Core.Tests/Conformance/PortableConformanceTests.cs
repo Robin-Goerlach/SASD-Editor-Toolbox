@@ -8,6 +8,7 @@ using Sasd.Editor.Input;
 using Sasd.Editor.Model;
 using Sasd.Editor.Rendering;
 using Sasd.Editor.Search;
+using Sasd.Editor.Scheduling;
 using Sasd.Editor.Windows;
 using Xunit;
 
@@ -499,6 +500,65 @@ public sealed class PortableConformanceTests
                 return await context.Session.Search.FindNextAsync(
                     RequireString(operation, "text"), options) is not null;
             }
+            case "register_background_task":
+            {
+                // Test-only cooperative task registration; a native port
+                // records the same slice order without sharing CLR APIs.
+                context.Session.Scheduler.Add(new FixtureBackgroundTask(
+                    context, RequireString(operation, "name"),
+                    operation.TryGetProperty("requestRundown", out var rundown)
+                        && rundown.GetBoolean()));
+                return true;
+            }
+            case "run_scheduler_cycle":
+            {
+                var pump = new FixtureInputPump(
+                    context,
+                    operation.TryGetProperty("inputProcessed", out var processed)
+                        && processed.GetBoolean(),
+                    operation.TryGetProperty("requestRundown", out var exit)
+                        && exit.GetBoolean());
+                var result = await context.Session.Scheduler.RunCycleAsync(pump);
+                Assert.Equal(RequireString(operation, "expectResult"),
+                    PortableEnumName(result.ToString()));
+                return true;
+            }
+            case "run_system_loop":
+            {
+                // Ensure the fixture cannot spin forever: the synthetic
+                // input pump requests shutdown on a bounded positive cycle.
+                var exitOnCall = operation.GetProperty("exitOnInputCall").GetInt32();
+                if (exitOnCall < 1 || exitOnCall > 10)
+                    throw new InvalidDataException("Exit cycle must be between 1 and 10.");
+                await context.Session.SystemLoop.RunAsync(new FixtureInputPump(
+                    context,
+                    operation.TryGetProperty("inputProcessed", out var processed)
+                        && processed.GetBoolean(),
+                    requestRundown: false, exitOnCall));
+                return true;
+            }
+            case "enqueue_physical_abort":
+            {
+                Assert.Equal(EditorTypeaheadWriteResult.Aborted,
+                    context.Session.Typeahead.EnqueueFromHost(EditorKeyStroke.Control('U')));
+                return true;
+            }
+            case "breathe_checkpoint":
+            {
+                var aborted = false;
+                try
+                {
+                    await context.Session.Interruption.CheckpointAsync();
+                }
+                catch (EditorOperationAbortedException)
+                {
+                    aborted = true;
+                    context.UserAbortCount++;
+                }
+
+                Assert.Equal(operation.GetProperty("expectAborted").GetBoolean(), aborted);
+                return true;
+            }
             case "clear_block_highlights":
                 // The historical EditOffblock presentation primitive clears
                 // projected flags but preserves the logical endpoint pair.
@@ -622,6 +682,7 @@ public sealed class PortableConformanceTests
             "move_left_character" => EditorCommandId.CursorLeft,
             "center_line" => EditorCommandId.CenterLine,
             "insert_control_character" => EditorCommandId.InsertControlCharacter,
+            "exit" => EditorCommandId.Exit,
             // Use the public semantic dispatcher, not implementation-private
             // compatibility processors or DOS keyboard scan codes.
             "beginning_of_line" => EditorCommandId.BeginningOfLine,
@@ -758,6 +819,24 @@ public sealed class PortableConformanceTests
                 if (frame.TryGetProperty("height", out var height))
                     Assert.Equal(height.GetInt32(), actual[index].Height);
                 index++;
+            }
+        }
+
+        if (expected.TryGetProperty("scheduler", out var scheduler))
+        {
+            if (scheduler.TryGetProperty("inputCalls", out var input))
+                Assert.Equal(input.GetInt32(), context.InputCalls);
+            if (scheduler.TryGetProperty("idleCalls", out var idle))
+                Assert.Equal(idle.GetInt32(), context.Hooks.IdleCalls);
+            if (scheduler.TryGetProperty("pollCalls", out var polls))
+                Assert.Equal(polls.GetInt32(), context.Hooks.PollCalls);
+            if (scheduler.TryGetProperty("userAborts", out var aborts))
+                Assert.Equal(aborts.GetInt32(), context.UserAbortCount);
+            if (scheduler.TryGetProperty("taskTrace", out var taskTrace))
+            {
+                var names = taskTrace.EnumerateArray()
+                    .Select(value => value.GetString()!).ToArray();
+                Assert.Equal(names, context.TaskTrace);
             }
         }
 
@@ -1057,6 +1136,44 @@ public sealed class PortableConformanceTests
         public FirstEdKeyMap KeyMap { get; } = new();
         public EditorInputAction? LastKeyAction { get; set; }
         public EditorCommandRequest? LastResolvedPrompt { get; set; }
+        public int InputCalls { get; set; }
+        public int UserAbortCount { get; set; }
+        public List<string> TaskTrace { get; } = [];
+    }
+
+    /// <summary>
+    /// Records a bounded slice, optionally requesting shutdown. The portable
+    /// fixture defines ordering; C++/Java adapters may use native callbacks.
+    /// </summary>
+    private sealed class FixtureBackgroundTask(
+        TestContext context, string name, bool requestRundown) : IEditorBackgroundTask
+    {
+        public ValueTask ExecuteSliceAsync(
+            EditorSession session, CancellationToken cancellationToken)
+        {
+            cancellationToken.ThrowIfCancellationRequested();
+            context.TaskTrace.Add(name);
+            if (requestRundown)
+                session.RequestRundown();
+            return ValueTask.CompletedTask;
+        }
+    }
+
+    private sealed class FixtureInputPump(
+        TestContext context,
+        bool processed,
+        bool requestRundown,
+        int? exitOnInputCall = null) : IEditorInputPump
+    {
+        public ValueTask<bool> TryProcessInputAsync(
+            EditorSession session, CancellationToken cancellationToken = default)
+        {
+            cancellationToken.ThrowIfCancellationRequested();
+            context.InputCalls++;
+            if (requestRundown || context.InputCalls == exitOnInputCall)
+                session.RequestRundown();
+            return ValueTask.FromResult(processed);
+        }
     }
 
     private sealed record WrittenFile(string Path, IReadOnlyList<EditorLineSnapshot> Lines);
@@ -1092,6 +1209,24 @@ public sealed class PortableConformanceTests
     private sealed class RecordingHooks : IEditorHooks
     {
         public List<EditorError> Errors { get; } = [];
+        public int IdleCalls { get; private set; }
+        public int PollCalls { get; private set; }
+
+        public ValueTask OnIdleAsync(
+            EditorSession session, CancellationToken cancellationToken)
+        {
+            cancellationToken.ThrowIfCancellationRequested();
+            IdleCalls++;
+            return ValueTask.CompletedTask;
+        }
+
+        public ValueTask PollInputDuringOperationAsync(
+            EditorSession session, CancellationToken cancellationToken)
+        {
+            cancellationToken.ThrowIfCancellationRequested();
+            PollCalls++;
+            return ValueTask.CompletedTask;
+        }
 
         public ValueTask OnErrorAsync(
             EditorSession session,

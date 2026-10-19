@@ -270,6 +270,10 @@ Die portablen Fälle in `host-prompt-resolution.json` prüfen jetzt die UI-unabh
 
 Zehn gemeinsame Fälle in `kernel-routines.json` verknüpfen sechs historische Kernroutinen mit tatsächlich ausgeführtem Verhalten: wirkliche und wirkungslose Zentrierung, Linksbewegung über Zeilengrenzen, Undo-fähiges Zeilenverbinden, Steuerzeichen-Einfügung sowie getrennte Blockflag-Projektion. Die Leerlaufbehandlung bei Zentrierung ist eine moderne Zustandskonsistenzregel; historische Pascal-Zeiger- oder Videoram-APIs werden nicht benötigt.
 
+## Portable System-Lebenszyklus-Tests
+
+Zehn hostunabhängige Szenarien in `cooperative-lifecycle.json` prüfen die Eingabepriorität des Schedulers, wiederholbare begrenzte Hintergrundaufgaben, Rundown/Exit, die UI-neutrale Systemschleife und den einmaligen physischen Ctrl-U-Abbruch am Unterbrechungspunkt. Fünf weitere historische Scheduler-/Lebenszyklusroutinen besitzen damit konkrete portable Belege, ohne plattformspezifisches Input-Polling im Editor-Kern einzuführen.
+
 ## V1-Abschlusskriterium
 
 Die C#/.NET-Implementierung deckt die großen strukturellen FIRST-ED-Bereiche inzwischen ausführbar ab, einschließlich Absatz-Neuformatierung, mehrzeiliger Block-Bulk-Topologie, unabhängiger Block-Endpunkte und atomarer Multi-Dokument-Undo-/Navigationswiederherstellung. Der [Handbuch-Prozeduren-/Funktionsindex-Audit](HANDBUCH-PROZEDURENINDEX-AUDIT.md) erfasst inzwischen alle 123 gedruckten Einträge mit ersten Klassifikationen; die zugeordneten Routinen benötigen vor V1 noch einen abschließenden Testabdeckungs- und Host-Audit. MicroStar-spezifische Demonstrationen können als Samples statt als Core-Abhängigkeiten geliefert werden.

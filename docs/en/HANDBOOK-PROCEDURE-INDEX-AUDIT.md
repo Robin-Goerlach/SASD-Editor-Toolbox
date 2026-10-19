@@ -35,7 +35,7 @@ The repository now reads every declared file in `conformance/v1/manifest.json`, 
 
 ## Machine-checked links to executable evidence
 
-The inventory may include an optional `conformanceCases` array on a historical routine. The repository contract validator verifies that each referenced case ID occurs in a file declared by the portable manifest, rejects duplicate or unknown IDs, and reports the number of rows with links. **Currently 87 of 123 rows** link to specific portable cases; the other rows retain conceptual/documentation evidence and still require individual regression review.
+The inventory may include an optional `conformanceCases` array on a historical routine. The repository contract validator verifies that each referenced case ID occurs in a file declared by the portable manifest, rejects duplicate or unknown IDs, and reports the number of rows with links. **Currently 92 of 123 rows** link to specific portable cases; the other rows retain conceptual/documentation evidence and still require individual regression review.
 
 These links represent **focused examples**, not exhaustive proof of historical behavior. The verifier deliberately does not fabricate conformance evidence for a procedure merely because its conceptual mapping is marked `implemented` or `modern-replacement`.
 
@@ -78,6 +78,8 @@ The new `firsted-keymap.json` fixtures link five additional historical routines 
 Twenty-two new portable host-prompt cases directly test the cancellation boundary between FIRST-ED bindings, user-supplied values and dispatched commands. Seven interactive historical Cp wrapper responsibilities now have specific executable mappings. This strengthens the host-facing V1 gate but does not certify 1985 terminal UI fidelity. **81 of 123** entries now have portable test links.
 
 Ten new portable cases now provide explicit executable evidence for six previously unlinked, already-implemented FIRST-ED kernel routines (Center Line, character-left, line joining, literal control insertion, block flag clearing and reconstruction). The inventory now links **87 of 123** routines. The remaining routines still require separate functionality or host-boundary review, rather than automatically being treated as missing features.
+
+Ten new portable cooperative lifecycle cases now link the remaining five already-implemented scheduler/interrupt/system/exit routines to executable evidence. The fixture checks input precedence, bounded idle slices, orderly shutdown and one-shot physical Ctrl-U interruption. With the kernel cases, **92 of 123** handbook entries have portable case links. Historical DOS scheduling internals remain excluded.
 
 ## Next review and acceptance criteria
 

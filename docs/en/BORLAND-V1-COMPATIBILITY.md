@@ -271,6 +271,10 @@ Portable `host-prompt-resolution.json` cases now exercise the host-neutral inter
 
 Ten shared `kernel-routines.json` cases link six historically named kernel routines to directly executed behavior. These cover changed and unchanged Center Line commands, crossing a logical-line boundary to the previous nonblank end, Undoable joining, literal control-character insertion and independent block flag projection. The no-op centering fix is a modern state-consistency guarantee; no Pascal pointer ABI or historical video-memory API is required.
 
+## Cooperative system lifecycle conformance
+
+Ten host-neutral scenarios in `cooperative-lifecycle.json` verify input-first scheduler priorities, repeatable bounded background slices, prompt rundown/Exit, the host-neutral system loop and the single-use physical Ctrl-U interruption checkpoint. Five additional historical scheduler/lifecycle routines now have direct portable case references, without leaking platform-specific input polling into the reusable core.
+
 ## V1 release gate
 
 The C#/.NET implementation now has executable coverage for the major FIRST-ED structural areas, including paragraph reformatting, whole-line block bulk topology, independent block endpoints and atomic multi-document undo/navigation restoration. The [handbook procedure/function index audit](HANDBOOK-PROCEDURE-INDEX-AUDIT.md) now records all 123 printed entries with first-pass classifications; its mapped behavior still requires a final regression-coverage and host-interface audit before calling V1 complete. MicroStar-specific demonstrations may ship as samples rather than core dependencies.

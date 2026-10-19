@@ -15,6 +15,7 @@
     "conformance/v1/cases/typeahead-input.json",
     "conformance/v1/cases/firsted-keymap.json",
     "conformance/v1/cases/host-prompt-resolution.json",
-    "conformance/v1/cases/kernel-routines.json"
+    "conformance/v1/cases/kernel-routines.json",
+    "conformance/v1/cases/cooperative-lifecycle.json"
   ]
 }

@@ -51,7 +51,11 @@
       "handbookPage": 123,
       "status": "implemented",
       "evidence": "docs/en/LIFECYCLE-AND-SCROLLING.md",
-      "note": "Cooperative scheduler and lifecycle behavior."
+      "note": "Cooperative scheduler and lifecycle behavior.",
+      "conformanceCases": [
+        "lifecycle.idle-runs-one-background-slice",
+        "lifecycle.task-rundown-prevents-subsequent-slices"
+      ]
     },
     {
       "name": "EditBeginningEndLine",
@@ -151,7 +155,11 @@
       "handbookPage": 133,
       "status": "implemented",
       "evidence": "docs/en/INTERRUPTIBILITY.md",
-      "note": "Input interruption and cooperative checkpoint behavior."
+      "note": "Input interruption and cooperative checkpoint behavior.",
+      "conformanceCases": [
+        "lifecycle.breathe-preserves-normal-queued-input",
+        "lifecycle.physical-abort-consumed-only-once"
+      ]
     },
     {
       "name": "EditCenterLine",
@@ -505,7 +513,11 @@
       "handbookPage": 172,
       "status": "implemented",
       "evidence": "docs/en/LIFECYCLE-AND-SCROLLING.md",
-      "note": "Cooperative scheduler and lifecycle behavior."
+      "note": "Cooperative scheduler and lifecycle behavior.",
+      "conformanceCases": [
+        "lifecycle.semantic-exit-command-sets-rundown",
+        "lifecycle.input-pump-rundown-skips-idle"
+      ]
     },
     {
       "name": "EditFileRead",
@@ -847,7 +859,11 @@
       "handbookPage": 204,
       "status": "implemented",
       "evidence": "docs/en/LIFECYCLE-AND-SCROLLING.md",
-      "note": "Cooperative scheduler and lifecycle behavior."
+      "note": "Cooperative scheduler and lifecycle behavior.",
+      "conformanceCases": [
+        "lifecycle.input-first-never-starts-background",
+        "lifecycle.repeated-idle-cycles-preserve-task-order"
+      ]
     },
     {
       "name": "EditScrollDown",
@@ -935,7 +951,11 @@
       "handbookPage": 213,
       "status": "implemented",
       "evidence": "docs/en/LIFECYCLE-AND-SCROLLING.md",
-      "note": "Cooperative scheduler and lifecycle behavior."
+      "note": "Cooperative scheduler and lifecycle behavior.",
+      "conformanceCases": [
+        "lifecycle.system-loop-respects-exit-request-from-input",
+        "lifecycle.system-loop-repeats-idle-until-exit"
+      ]
     },
     {
       "name": "EditTab",
