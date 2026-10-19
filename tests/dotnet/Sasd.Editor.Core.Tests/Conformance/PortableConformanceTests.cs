@@ -4,6 +4,7 @@ using Sasd.Editor.Document;
 using Sasd.Editor.Editing;
 using Sasd.Editor.Hooks;
 using Sasd.Editor.IO;
+using Sasd.Editor.Input;
 using Sasd.Editor.Model;
 using Sasd.Editor.Rendering;
 using Sasd.Editor.Search;
@@ -264,6 +265,77 @@ public sealed class PortableConformanceTests
     {
         switch (RequireString(operation, "id"))
         {
+            case "host_typeahead":
+            case "push_typeahead":
+            {
+                // The origin of a normalized keystroke matters: physical
+                // Ctrl-U aborts immediately; macro Ctrl-U is queued normally.
+                // Keep this below the language-neutral buffer adapter rather
+                // than synthesizing terminal/DOS scan codes.
+                var symbol = RequireString(operation, "character");
+                Assert.Single(symbol);
+                var key = operation.TryGetProperty("control", out var control)
+                    && control.GetBoolean()
+                    ? EditorKeyStroke.Control(symbol[0])
+                    : EditorKeyStroke.ForCharacter(symbol[0]);
+                var result = RequireString(operation, "id") == "host_typeahead"
+                    ? context.Session.Typeahead.EnqueueFromHost(key)
+                    : context.Session.Typeahead.PushNext(key);
+                if (operation.TryGetProperty("expectResult", out var expectedResult))
+                {
+                    Assert.Equal(expectedResult.GetString(), result.ToString().ToLowerInvariant());
+                }
+
+                return true;
+            }
+            case "push_typeahead_text":
+            {
+                var result = context.Session.Typeahead.PushText(
+                    RequireString(operation, "text"));
+                if (operation.TryGetProperty("expectResult", out var expectedResult))
+                {
+                    Assert.Equal(expectedResult.GetString(), result.ToString().ToLowerInvariant());
+                }
+
+                return true;
+            }
+            case "read_typeahead":
+            {
+                var available = context.Session.Typeahead.TryRead(out var key);
+                if (operation.TryGetProperty("expectAvailable", out var expectedAvailable))
+                {
+                    Assert.Equal(expectedAvailable.GetBoolean(), available);
+                }
+                else
+                {
+                    Assert.True(available);
+                }
+
+                if (available)
+                {
+                    // Enum names are converted to lowercase conceptual
+                    // categories, independent of any host physical key codes.
+                    if (operation.TryGetProperty("expectKind", out var expectedKind))
+                        Assert.Equal(expectedKind.GetString(), key.Key.ToString().ToLowerInvariant());
+                    if (operation.TryGetProperty("expectCharacter", out var expectedCharacter))
+                        Assert.Equal(expectedCharacter.GetString(), key.Character.ToString());
+                    if (operation.TryGetProperty("expectControl", out var expectedControl))
+                    {
+                        var symbol = expectedControl.GetString()!;
+                        Assert.Single(symbol);
+                        Assert.True(key.IsControlLetter(symbol[0]));
+                    }
+                }
+
+                return true;
+            }
+            case "consume_typeahead_abort":
+            {
+                var consumed = context.Session.Typeahead.ConsumeAbortRequest();
+                Assert.Equal(
+                    operation.GetProperty("expectAbort").GetBoolean(), consumed);
+                return true;
+            }
             case "select_window":
                 // Fixture view selection must not manufacture an editor key.
                 context.Session.SetCurrentWindow(
@@ -473,6 +545,16 @@ public sealed class PortableConformanceTests
                     Assert.Equal(height.GetInt32(), actual[index].Height);
                 index++;
             }
+        }
+
+        if (expected.TryGetProperty("typeahead", out var typeahead))
+        {
+            // A portable projection of the queue's size and immediate Ctrl-U
+            // state. Sequence order is checked by read_typeahead operations.
+            if (typeahead.TryGetProperty("count", out var count))
+                Assert.Equal(count.GetInt32(), context.Session.Typeahead.Count);
+            if (typeahead.TryGetProperty("abortRequested", out var abort))
+                Assert.Equal(abort.GetBoolean(), context.Session.Typeahead.AbortRequested);
         }
 
         if (expected.TryGetProperty("undo", out var undo))

@@ -81,3 +81,7 @@ Die semantische Operation `DeleteWindowText` steht Hosts, Menüs, Skripten und s
 ## Tests
 
 Die Regressionstests prüfen unter anderem FIFO-Hosteingabe, Front-Priorität, Sequenzreihenfolge, Control-Zeichen in Makros, unmittelbares Ctrl-U vom Host, bewusst nicht sofort abgebrochenes Makro-Ctrl-U, Overflow-Clearing sowie das destruktive und nicht rückgängig machbare Löschen inklusive verknüpfter Fenster, Block-/Marker-Bereinigung und unveränderter unabhängiger Dokumente.
+
+## Portable Typeahead-Belege
+
+Acht Fälle in `typeahead-input.json` prüfen die normalisierte Queue physischer Eingaben und vorn eingefügte Makros ohne DOS-Scancodes oder Terminal-API. Gesichert werden FIFO, Makro-Vorrang, CR/LF-Normalisierung, unmittelbares *physisches* Ctrl-U gegenüber gepuffertem Makro-Ctrl-U, ASCII-Steuerzeichen in Präfixen und das vollständige Leeren des Puffers bei Überlauf. Die gemeinsamen Fälle liefern ausführbare Verweise für `Pokechr`, `EditPushtbf`, `EditUserpush` und `EditAbort`; Unterbrechungspunkte laufender Operationen sind separat getestet.

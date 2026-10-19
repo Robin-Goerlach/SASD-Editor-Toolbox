@@ -11,6 +11,7 @@
     "conformance/v1/cases/file-read-topology.json",
     "conformance/v1/cases/compatibility-primitives.json",
     "conformance/v1/cases/windows-and-block-lifecycle.json",
-    "conformance/v1/cases/reformat-compatibility.json"
+    "conformance/v1/cases/reformat-compatibility.json",
+    "conformance/v1/cases/typeahead-input.json"
   ]
 }

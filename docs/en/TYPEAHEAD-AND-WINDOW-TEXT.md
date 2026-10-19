@@ -92,3 +92,7 @@ The regression suite covers:
 - destructive, non-undoable window-text deletion;
 - linked-view detachment;
 - block/marker cleanup and preservation of unrelated documents.
+
+## Portable typeahead evidence
+
+Eight `typeahead-input.json` cases now exercise the normalized physical-input queue and front-inserted macros independently of DOS scan codes or any terminal API. Tests check FIFO order, macro priority, CR/LF normalization, immediate *physical* Ctrl-U abort versus queued macro Ctrl-U, ASCII control-prefix normalization and capacity overflow that clears the whole queue. The shared cases provide executable traces for `Pokechr`, `EditPushtbf`, `EditUserpush` and `EditAbort`; interruptible operation checkpoints remain a separately tested concern.

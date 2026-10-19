@@ -35,7 +35,7 @@ The repository now reads every declared file in `conformance/v1/manifest.json`, 
 
 ## Machine-checked links to executable evidence
 
-The inventory may include an optional `conformanceCases` array on a historical routine. The repository contract validator verifies that each referenced case ID occurs in a file declared by the portable manifest, rejects duplicate or unknown IDs, and reports the number of rows with links. **Currently 65 of 123 rows** link to specific portable cases; the other rows retain conceptual/documentation evidence and still require individual regression review.
+The inventory may include an optional `conformanceCases` array on a historical routine. The repository contract validator verifies that each referenced case ID occurs in a file declared by the portable manifest, rejects duplicate or unknown IDs, and reports the number of rows with links. **Currently 69 of 123 rows** link to specific portable cases; the other rows retain conceptual/documentation evidence and still require individual regression review.
 
 These links represent **focused examples**, not exhaustive proof of historical behavior. The verifier deliberately does not fabricate conformance evidence for a procedure merely because its conceptual mapping is marked `implemented` or `modern-replacement`.
 
@@ -70,6 +70,8 @@ The portable `windows-and-block-lifecycle.json` suite now provides direct execut
 Seven further negative and boundary cases verify window-linking rejection, one-based number validation, the three-row split minimum, freed-row ownership and last-view marker/block cleanup. These strengthen the already linked ten historical window/block routines without asserting new routine coverage.
 
 Eight portable reformat cases have been linked to the five historical `EditCompressLine`, `EditShiftLine`, `EditLongLine`, `EditShortLine` and `EditReformat` responsibilities. The inventory now contains **65 of 123** explicit portable test links. These verify observable behavior, not one-to-one historical helper implementation details.
+
+Eight typeahead fixtures now link Pokechr, EditPushtbf, EditUserpush and EditAbort to direct portable input/abort tests. Host-originated Ctrl-U is deliberately not interchangeable with macro input; normalized keys remain separate from physical platform scan codes. The historical inventory now has **69 of 123** entries linked to actual portable tests.
 
 ## Next review and acceptance criteria
 

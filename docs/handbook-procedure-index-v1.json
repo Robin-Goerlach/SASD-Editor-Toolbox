@@ -19,7 +19,11 @@
       "handbookPage": 119,
       "status": "implemented",
       "evidence": "docs/en/INTERRUPTIBILITY.md",
-      "note": "Input interruption and cooperative checkpoint behavior."
+      "note": "Input interruption and cooperative checkpoint behavior.",
+      "conformanceCases": [
+        "input.physical-control-u-aborts-and-flushes-pending-queue",
+        "input.pushed-control-u-does-not-use-host-abort-path"
+      ]
     },
     {
       "name": "EditAppchar",
@@ -679,7 +683,11 @@
       "handbookPage": 196,
       "status": "implemented",
       "evidence": "docs/en/TYPEAHEAD-AND-WINDOW-TEXT.md",
-      "note": "Bounded logical typeahead and front/host insertion."
+      "note": "Bounded logical typeahead and front/host insertion.",
+      "conformanceCases": [
+        "input.physical-fifo-and-front-macro-priority",
+        "input.pushed-control-u-does-not-use-host-abort-path"
+      ]
     },
     {
       "name": "EditQ",
@@ -973,7 +981,12 @@
       "handbookPage": 227,
       "status": "implemented",
       "evidence": "docs/en/TYPEAHEAD-AND-WINDOW-TEXT.md",
-      "note": "Bounded logical typeahead and front/host insertion."
+      "note": "Bounded logical typeahead and front/host insertion.",
+      "conformanceCases": [
+        "input.macro-text-precedes-physical-keystrokes-in-natural-order",
+        "input.pushed-control-k-from-ascii-macro-normalization",
+        "input.overflowing-macro-preflight-keeps-no-prefix"
+      ]
     },
     {
       "name": "EditWindowBottomFile",
@@ -1093,7 +1106,12 @@
       "handbookPage": 240,
       "status": "implemented",
       "evidence": "docs/en/TYPEAHEAD-AND-WINDOW-TEXT.md",
-      "note": "Bounded logical typeahead and front/host insertion."
+      "note": "Bounded logical typeahead and front/host insertion.",
+      "conformanceCases": [
+        "input.physical-fifo-and-front-macro-priority",
+        "input.physical-control-u-aborts-and-flushes-pending-queue",
+        "input.full-typeahead-overflow-discards-all-pending-input"
+      ]
     }
   ]
 }

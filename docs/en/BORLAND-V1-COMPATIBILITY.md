@@ -259,6 +259,10 @@ The modern scheduler stops starting background slices as soon as rundown is requ
 
 Eight shared conformance cases now verify compress, left-margin shift, long-line wrap, short-line pull-up, hard-boundary stop, too-wide-word rejection, no-op and Undo through the semantic Reformat command. Five historical reformat-family routine entries link to these actual observable tests. Async host interleaving remains covered separately by deterministic .NET tests.
 
+## Portable typeahead/abort traces
+
+Eight language-neutral typeahead cases now verify host FIFO vs. macro front insertion, queued macro Ctrl-U versus immediate physical Ctrl-U abort, CR/LF and ASCII control-key normalization, and full-buffer overflow clearing. Four historical routines (Pokechr, EditPushtbf, EditUserpush, EditAbort) now link to executable portable cases. Platform-specific key polling remains a host responsibility.
+
 ## V1 release gate
 
 The C#/.NET implementation now has executable coverage for the major FIRST-ED structural areas, including paragraph reformatting, whole-line block bulk topology, independent block endpoints and atomic multi-document undo/navigation restoration. The [handbook procedure/function index audit](HANDBOOK-PROCEDURE-INDEX-AUDIT.md) now records all 123 printed entries with first-pass classifications; its mapped behavior still requires a final regression-coverage and host-interface audit before calling V1 complete. MicroStar-specific demonstrations may ship as samples rather than core dependencies.

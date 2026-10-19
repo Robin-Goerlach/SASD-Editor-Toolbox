@@ -35,7 +35,7 @@ Die .NET-Tests laden inzwischen jede Datei aus `conformance/v1/manifest.json`, n
 
 ## Maschinengeprüfte Verweise auf ausführbare Belege
 
-Die Inventarliste unterstützt pro historischer Routine ein optionales Feld `conformanceCases`. Die Repository-Vertragsprüfung kontrolliert, ob jede referenzierte Fall-ID in einer durch das portable Manifest eingebundenen Datei vorkommt, weist doppelte oder unbekannte IDs zurück und meldet die Zahl verknüpfter Routinen. **Derzeit sind 65 von 123 Zeilen** mit konkreten portablen Fällen verknüpft. Für alle anderen bestehen zunächst nur konzeptionelle beziehungsweise dokumentierte Zuordnungen, deren Regressionstest-Abdeckung weiterhin einzeln geprüft werden muss.
+Die Inventarliste unterstützt pro historischer Routine ein optionales Feld `conformanceCases`. Die Repository-Vertragsprüfung kontrolliert, ob jede referenzierte Fall-ID in einer durch das portable Manifest eingebundenen Datei vorkommt, weist doppelte oder unbekannte IDs zurück und meldet die Zahl verknüpfter Routinen. **Derzeit sind 69 von 123 Zeilen** mit konkreten portablen Fällen verknüpft. Für alle anderen bestehen zunächst nur konzeptionelle beziehungsweise dokumentierte Zuordnungen, deren Regressionstest-Abdeckung weiterhin einzeln geprüft werden muss.
 
 Diese Verweise sind **gezielte Testbeispiele**, keine vollständigen historischen Verhaltensbeweise. Die Prüfung erzeugt bewusst keine erfundenen Tests für Einträge, die lediglich als `implemented` oder `modern-replacement` eingeordnet wurden.
 
@@ -70,6 +70,8 @@ Die Suite `windows-and-block-lifecycle.json` verknüpft jetzt alle 10 bislang ni
 Sieben weitere negative und Grenzfälle prüfen abgelehnte Fensterverknüpfungen, die Einbasierung von Fensternummern, das Drei-Zeilen-Minimum beim Teilen, die Übernahme freigewordener Zeilen und die Bereinigung von Markern/Blockgrenzen beim letzten Dokumentfenster. Damit werden die zehn bereits verknüpften historischen Fenster-/Blockroutinen besser abgesichert; die Zahl der zugeordneten Routinen steigt dadurch nicht.
 
 Acht portable Reformat-Fälle wurden mit den fünf historischen Aufgaben von `EditCompressLine`, `EditShiftLine`, `EditLongLine`, `EditShortLine` und `EditReformat` verknüpft. Damit besitzen **65 von 123** Einträgen direkte portable Testbelege. Geprüft wird beobachtbares Verhalten, nicht die identische historische Implementierung interner Hilfsroutinen.
+
+Acht Typeahead-Fälle verknüpfen Pokechr, EditPushtbf, EditUserpush und EditAbort mit konkreten portablen Eingabe-/Abbruchtests. Vom Host stammendes Ctrl-U ist bewusst nicht mit Makroeingaben identisch; normalisierte Tasten bleiben von plattformspezifischen Scancodes getrennt. Der historische Index besitzt jetzt **69 von 123** Einträgen mit direkten portablen Testbelegen.
 
 ## Nächste Schritte und Abschlusskriterien
 

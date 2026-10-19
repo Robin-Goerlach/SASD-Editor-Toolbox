@@ -1,0 +1,591 @@
+{
+  "formatVersion": 1,
+  "contractVersion": "v1",
+  "cases": [
+    {
+      "id": "input.physical-fifo-and-front-macro-priority",
+      "area": "typeahead",
+      "initial": {
+        "documents": [
+          {
+            "id": "d",
+            "lines": [
+              {
+                "text": "ready",
+                "flags": []
+              }
+            ]
+          }
+        ],
+        "windows": [
+          {
+            "id": "w",
+            "documentId": "d",
+            "cursor": {
+              "line": 0,
+              "column": 0
+            },
+            "topLine": 0,
+            "leftColumn": 0
+          }
+        ],
+        "currentWindowId": "w"
+      },
+      "operations": [
+        {
+          "id": "host_typeahead",
+          "character": "A",
+          "expectResult": "queued"
+        },
+        {
+          "id": "host_typeahead",
+          "character": "B"
+        },
+        {
+          "id": "push_typeahead",
+          "character": "X"
+        },
+        {
+          "id": "read_typeahead",
+          "expectKind": "character",
+          "expectCharacter": "X"
+        },
+        {
+          "id": "read_typeahead",
+          "expectKind": "character",
+          "expectCharacter": "A"
+        },
+        {
+          "id": "read_typeahead",
+          "expectKind": "character",
+          "expectCharacter": "B"
+        },
+        {
+          "id": "read_typeahead",
+          "expectAvailable": false
+        }
+      ],
+      "expect": {
+        "documents": {
+          "d": {
+            "lines": [
+              {
+                "text": "ready",
+                "flags": []
+              }
+            ],
+            "isDirty": false,
+            "version": 0
+          }
+        },
+        "typeahead": {
+          "count": 0,
+          "abortRequested": false
+        },
+        "undo": {
+          "count": 0
+        }
+      }
+    },
+    {
+      "id": "input.macro-text-precedes-physical-keystrokes-in-natural-order",
+      "area": "typeahead",
+      "initial": {
+        "documents": [
+          {
+            "id": "d",
+            "lines": [
+              {
+                "text": "ready",
+                "flags": []
+              }
+            ]
+          }
+        ],
+        "windows": [
+          {
+            "id": "w",
+            "documentId": "d",
+            "cursor": {
+              "line": 0,
+              "column": 0
+            },
+            "topLine": 0,
+            "leftColumn": 0
+          }
+        ],
+        "currentWindowId": "w"
+      },
+      "operations": [
+        {
+          "id": "host_typeahead",
+          "character": "Z"
+        },
+        {
+          "id": "push_typeahead_text",
+          "text": "a\nb",
+          "expectResult": "queued"
+        },
+        {
+          "id": "read_typeahead",
+          "expectKind": "character",
+          "expectCharacter": "a"
+        },
+        {
+          "id": "read_typeahead",
+          "expectKind": "enter"
+        },
+        {
+          "id": "read_typeahead",
+          "expectKind": "character",
+          "expectCharacter": "b"
+        },
+        {
+          "id": "read_typeahead",
+          "expectKind": "character",
+          "expectCharacter": "Z"
+        }
+      ],
+      "expect": {
+        "documents": {
+          "d": {
+            "lines": [
+              {
+                "text": "ready",
+                "flags": []
+              }
+            ],
+            "isDirty": false,
+            "version": 0
+          }
+        },
+        "typeahead": {
+          "count": 0,
+          "abortRequested": false
+        },
+        "undo": {
+          "count": 0
+        }
+      }
+    },
+    {
+      "id": "input.physical-control-u-aborts-and-flushes-pending-queue",
+      "area": "typeahead",
+      "initial": {
+        "documents": [
+          {
+            "id": "d",
+            "lines": [
+              {
+                "text": "ready",
+                "flags": []
+              }
+            ]
+          }
+        ],
+        "windows": [
+          {
+            "id": "w",
+            "documentId": "d",
+            "cursor": {
+              "line": 0,
+              "column": 0
+            },
+            "topLine": 0,
+            "leftColumn": 0
+          }
+        ],
+        "currentWindowId": "w"
+      },
+      "operations": [
+        {
+          "id": "host_typeahead",
+          "character": "A"
+        },
+        {
+          "id": "host_typeahead",
+          "character": "U",
+          "control": true,
+          "expectResult": "aborted"
+        },
+        {
+          "id": "read_typeahead",
+          "expectAvailable": false
+        },
+        {
+          "id": "consume_typeahead_abort",
+          "expectAbort": true
+        },
+        {
+          "id": "consume_typeahead_abort",
+          "expectAbort": false
+        }
+      ],
+      "expect": {
+        "documents": {
+          "d": {
+            "lines": [
+              {
+                "text": "ready",
+                "flags": []
+              }
+            ],
+            "isDirty": false,
+            "version": 0
+          }
+        },
+        "typeahead": {
+          "count": 0,
+          "abortRequested": false
+        },
+        "undo": {
+          "count": 0
+        }
+      }
+    },
+    {
+      "id": "input.pushed-control-u-does-not-use-host-abort-path",
+      "area": "typeahead",
+      "initial": {
+        "documents": [
+          {
+            "id": "d",
+            "lines": [
+              {
+                "text": "ready",
+                "flags": []
+              }
+            ]
+          }
+        ],
+        "windows": [
+          {
+            "id": "w",
+            "documentId": "d",
+            "cursor": {
+              "line": 0,
+              "column": 0
+            },
+            "topLine": 0,
+            "leftColumn": 0
+          }
+        ],
+        "currentWindowId": "w"
+      },
+      "operations": [
+        {
+          "id": "host_typeahead",
+          "character": "A"
+        },
+        {
+          "id": "push_typeahead",
+          "character": "U",
+          "control": true,
+          "expectResult": "queued"
+        },
+        {
+          "id": "read_typeahead",
+          "expectKind": "character",
+          "expectControl": "U"
+        },
+        {
+          "id": "read_typeahead",
+          "expectKind": "character",
+          "expectCharacter": "A"
+        },
+        {
+          "id": "consume_typeahead_abort",
+          "expectAbort": false
+        }
+      ],
+      "expect": {
+        "documents": {
+          "d": {
+            "lines": [
+              {
+                "text": "ready",
+                "flags": []
+              }
+            ],
+            "isDirty": false,
+            "version": 0
+          }
+        },
+        "typeahead": {
+          "count": 0,
+          "abortRequested": false
+        },
+        "undo": {
+          "count": 0
+        }
+      }
+    },
+    {
+      "id": "input.pushed-control-k-from-ascii-macro-normalization",
+      "area": "typeahead",
+      "initial": {
+        "documents": [
+          {
+            "id": "d",
+            "lines": [
+              {
+                "text": "ready",
+                "flags": []
+              }
+            ]
+          }
+        ],
+        "windows": [
+          {
+            "id": "w",
+            "documentId": "d",
+            "cursor": {
+              "line": 0,
+              "column": 0
+            },
+            "topLine": 0,
+            "leftColumn": 0
+          }
+        ],
+        "currentWindowId": "w"
+      },
+      "operations": [
+        {
+          "id": "push_typeahead_text",
+          "text": "\u000bB"
+        },
+        {
+          "id": "read_typeahead",
+          "expectKind": "character",
+          "expectControl": "K"
+        },
+        {
+          "id": "read_typeahead",
+          "expectKind": "character",
+          "expectCharacter": "B"
+        }
+      ],
+      "expect": {
+        "documents": {
+          "d": {
+            "lines": [
+              {
+                "text": "ready",
+                "flags": []
+              }
+            ],
+            "isDirty": false,
+            "version": 0
+          }
+        },
+        "typeahead": {
+          "count": 0,
+          "abortRequested": false
+        },
+        "undo": {
+          "count": 0
+        }
+      }
+    },
+    {
+      "id": "input.full-typeahead-overflow-discards-all-pending-input",
+      "area": "typeahead",
+      "initial": {
+        "documents": [
+          {
+            "id": "d",
+            "lines": [
+              {
+                "text": "ready",
+                "flags": []
+              }
+            ]
+          }
+        ],
+        "windows": [
+          {
+            "id": "w",
+            "documentId": "d",
+            "cursor": {
+              "line": 0,
+              "column": 0
+            },
+            "topLine": 0,
+            "leftColumn": 0
+          }
+        ],
+        "currentWindowId": "w"
+      },
+      "operations": [
+        {
+          "id": "push_typeahead_text",
+          "text": "xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx",
+          "expectResult": "queued"
+        },
+        {
+          "id": "host_typeahead",
+          "character": "Y",
+          "expectResult": "overflow"
+        },
+        {
+          "id": "read_typeahead",
+          "expectAvailable": false
+        }
+      ],
+      "expect": {
+        "documents": {
+          "d": {
+            "lines": [
+              {
+                "text": "ready",
+                "flags": []
+              }
+            ],
+            "isDirty": false,
+            "version": 0
+          }
+        },
+        "typeahead": {
+          "count": 0,
+          "abortRequested": false
+        },
+        "undo": {
+          "count": 0
+        }
+      }
+    },
+    {
+      "id": "input.overflowing-macro-preflight-keeps-no-prefix",
+      "area": "typeahead",
+      "initial": {
+        "documents": [
+          {
+            "id": "d",
+            "lines": [
+              {
+                "text": "ready",
+                "flags": []
+              }
+            ]
+          }
+        ],
+        "windows": [
+          {
+            "id": "w",
+            "documentId": "d",
+            "cursor": {
+              "line": 0,
+              "column": 0
+            },
+            "topLine": 0,
+            "leftColumn": 0
+          }
+        ],
+        "currentWindowId": "w"
+      },
+      "operations": [
+        {
+          "id": "host_typeahead",
+          "character": "A"
+        },
+        {
+          "id": "push_typeahead_text",
+          "text": "xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx",
+          "expectResult": "overflow"
+        },
+        {
+          "id": "read_typeahead",
+          "expectAvailable": false
+        }
+      ],
+      "expect": {
+        "documents": {
+          "d": {
+            "lines": [
+              {
+                "text": "ready",
+                "flags": []
+              }
+            ],
+            "isDirty": false,
+            "version": 0
+          }
+        },
+        "typeahead": {
+          "count": 0,
+          "abortRequested": false
+        },
+        "undo": {
+          "count": 0
+        }
+      }
+    },
+    {
+      "id": "input.empty-macro-is-ignored-without-clearing-host-input",
+      "area": "typeahead",
+      "initial": {
+        "documents": [
+          {
+            "id": "d",
+            "lines": [
+              {
+                "text": "ready",
+                "flags": []
+              }
+            ]
+          }
+        ],
+        "windows": [
+          {
+            "id": "w",
+            "documentId": "d",
+            "cursor": {
+              "line": 0,
+              "column": 0
+            },
+            "topLine": 0,
+            "leftColumn": 0
+          }
+        ],
+        "currentWindowId": "w"
+      },
+      "operations": [
+        {
+          "id": "host_typeahead",
+          "character": "A"
+        },
+        {
+          "id": "push_typeahead_text",
+          "text": "",
+          "expectResult": "ignored"
+        },
+        {
+          "id": "read_typeahead",
+          "expectKind": "character",
+          "expectCharacter": "A"
+        }
+      ],
+      "expect": {
+        "documents": {
+          "d": {
+            "lines": [
+              {
+                "text": "ready",
+                "flags": []
+              }
+            ],
+            "isDirty": false,
+            "version": 0
+          }
+        },
+        "typeahead": {
+          "count": 0,
+          "abortRequested": false
+        },
+        "undo": {
+          "count": 0
+        }
+      }
+    }
+  ]
+}
