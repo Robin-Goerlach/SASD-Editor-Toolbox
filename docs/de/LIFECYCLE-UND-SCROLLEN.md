@@ -67,3 +67,7 @@ Ist nur eine Textzeile sichtbar, ergibt `visibleRows - 1` den Wert null. Page Up
 ### Beenden und dynamische Registrierung von Hintergrundaufgaben
 
 Der moderne kooperative Scheduler prüft Abbruch und `RundownRequested` vor der Idle-Phase, nach dem Idle-Hook und vor jeder Hintergrund-Teilaufgabe. Fordert ein Hook oder eine Aufgabe das Beenden des Editors an, entfallen die weiteren Teilaufgaben dieses Zyklus. Eine Momentaufnahme der Registrierung erlaubt das Hinzufügen oder Entfernen während der Ausführung; vor jedem Aufruf wird zusätzlich geprüft, ob die Aufgabe **noch registriert** ist. Eine inzwischen entfernte Aufgabe läuft deshalb nicht mehr, eine neu hinzugefügte frühestens im nächsten Idle-Zyklus. Die Eingabeverarbeitung bleibt vorrangig; jede Hintergrundaufgabe muss weiterhin kurz und kooperativ sein.
+
+## Direkte Seitennavigation bei sehr großen Seitenhöhen
+
+Ein moderner Host kann `EditorEngine.MovePageDown` beziehungsweise `MovePageUp` mit einer Seitenhöhe bis `int.MaxValue` aufrufen. Die Zielzeile wird deshalb vor dem Eingrenzen mit breiten Ganzzahlen berechnet. Ein riesiger positiver PageDown darf vom Dokumentinneren nicht durch einen Überlauf in der ersten Zeile landen. Tests prüfen beide Bewegungsrichtungen, die unabhängigen Cursor verknüpfter Ansichten sowie ausbleibende Text-/Undo-Änderungen. Die historischen semantischen Viewport-Regeln bleiben separat getestet.

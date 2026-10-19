@@ -469,7 +469,12 @@ public sealed class EditorEngine
     private void MoveVertical(int delta)
     {
         var window = Window;
-        var targetLine = Math.Clamp(window.Cursor.Line + delta, 0, window.Document.Buffer.LineCount - 1);
+        // A direct host may supply int.MaxValue rows for PageDown. Adding
+        // that page displacement to an existing line index as int would
+        // wrap negative and jump to the *top* instead of the bottom.
+        // Clamp the wide sum before narrowing back to the indexed line.
+        var targetLine = (int)Math.Clamp(
+            (long)window.Cursor.Line + delta, 0L, window.Document.Buffer.LineCount - 1L);
         var targetColumn = Math.Min(window.Cursor.Column, window.Document.Buffer.GetLine(targetLine).Text.Length);
         window.Cursor = new TextPosition(targetLine, targetColumn);
     }

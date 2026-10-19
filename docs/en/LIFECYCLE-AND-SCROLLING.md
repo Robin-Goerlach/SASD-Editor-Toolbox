@@ -67,3 +67,7 @@ When only one text row is visible, `visibleRows - 1` is zero. Page Up and Page D
 ### Rundown and dynamic background task registration
 
 The modern cooperative scheduler now checks cancellation and `RundownRequested` before idle and after the host idle callback, and again before each registered background slice. If a callback asks the editor to exit, later slices in that cycle are skipped. A registration snapshot allows callbacks to add/remove tasks safely; each pending task is checked against the *live* registry immediately before execution, so removing it during an earlier slice prevents its execution. Tasks registered during an active cycle begin no sooner than the next idle cycle. These checks preserve input-first priority and are host-independent; an individual background task must still return promptly and honor cancellation.
+
+## Direct engine navigation with huge page sizes
+
+The direct `EditorEngine.MovePageDown`/ `MovePageUp` API may be called by a modern host with a page size as large as `int.MaxValue`. Vertical destination calculations now use wide arithmetic before clamping, so a huge positive PageDown cannot wrap to the first line when invoked from a nonzero index. Tests verify both directions, linked-view cursor independence and no text/Undo mutation. This supplements the separately tested FIRST-ED semantic viewport rules.
