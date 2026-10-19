@@ -114,3 +114,7 @@ Die UI-unabhängige Tastenzuordnung ignoriert Alt-modifizierte Eingaben **auch b
 ## Portabler Test der Präfix- und Befehlsverarbeitung
 
 Die Fälle in `firsted-keymap.json` prüfen Ctrl-K/O/Q anhand normalisierter Tasten, feste einbasierte Ziffernbelegungen, Abfrage-Metadaten für Text/Datei/Zahl/zwei Zahlen/Bestätigung, abgebrochene oder unbekannte Zweittasten, die Ablehnung Alt-modifizierter Sondertasten, direkte Steuerzeichen, Texteingabe und die tatsächlich ausgeführte semantische Befehlsverarbeitung. Jeder Test besitzt eine eigene zustandsbehaftete Präfixmaschine; konkrete Dialoge oder Terminal-Abhängigkeiten kommen nicht vor. Die Fälle liefern ausführbare portable Belege für `EditK`, `EditO`, `EditQ`, `EditPrccmd` und `EditPrctxt`, ohne historische Pascal-Interna nachzubauen.
+
+## Dialogabbruch ist kein leerer Ersatztext
+
+Der UI-neutrale `EditorCommandPromptResolver` wandelt bereits erfasste Host-Antworten in semantische Anforderungen um. Eine null-Antwort bricht ab; eine ausdrücklich leere Find-Eingabe bedeutet Find Again, und nur ein ausdrücklich leerer Ersatztext bedeutet Löschen. Beim Abbruch des *zweiten* Ersetzen-Dialogs darf deshalb kein Löschbefehl entstehen. Zahlen-, Datei-, Zeichen- und Bestätigungsabfragen teilen dieselbe zustandsneutrale Abbruchgrenze. Der Terminal-Host fragt weiterhin die Werte ab, überlässt ihre Interpretation jedoch dem Kern.

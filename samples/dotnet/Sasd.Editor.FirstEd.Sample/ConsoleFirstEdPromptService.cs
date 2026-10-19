@@ -15,7 +15,7 @@ internal sealed class ConsoleFirstEdPromptService(ConsoleFirstEdRenderer rendere
 
         return binding.ArgumentKind switch
         {
-            EditorCommandArgumentKind.None => binding.CreateRequest(pageSize: visibleRows),
+            EditorCommandArgumentKind.None => EditorCommandPromptResolver.Resolve(binding, visibleRows),
             EditorCommandArgumentKind.Number => ResolveNumber(binding, visibleRows),
             EditorCommandArgumentKind.TwoNumbers => ResolveTwoNumbers(binding, visibleRows),
             EditorCommandArgumentKind.Text => ResolveText(binding, visibleRows),
@@ -30,9 +30,8 @@ internal sealed class ConsoleFirstEdPromptService(ConsoleFirstEdRenderer rendere
     private EditorCommandRequest? ResolveNumber(EditorCommandBinding binding, int visibleRows)
     {
         var raw = renderer.ReadPrompt(NumberPrompt(binding.CommandId));
-        return int.TryParse(raw, out var value)
-            ? binding.CreateRequest(number: value, pageSize: visibleRows)
-            : null;
+        return EditorCommandPromptResolver.Resolve(
+            binding, visibleRows, firstResponse: raw);
     }
 
     private EditorCommandRequest? ResolveTwoNumbers(EditorCommandBinding binding, int visibleRows)
@@ -44,13 +43,15 @@ internal sealed class ConsoleFirstEdPromptService(ConsoleFirstEdRenderer rendere
             _ => ("First number: ", "Second number: ")
         };
 
-        if (!int.TryParse(renderer.ReadPrompt(prompts.Item1), out var first) ||
-            !int.TryParse(renderer.ReadPrompt(prompts.Item2), out var second))
-        {
+        var first = renderer.ReadPrompt(prompts.Item1);
+        // No second prompt after invalid/cancelled first input.
+        if (!int.TryParse(first, System.Globalization.NumberStyles.Integer,
+            System.Globalization.CultureInfo.InvariantCulture, out _))
             return null;
-        }
 
-        return binding.CreateRequest(number: first, number2: second, pageSize: visibleRows);
+        var second = renderer.ReadPrompt(prompts.Item2);
+        return EditorCommandPromptResolver.Resolve(
+            binding, visibleRows, firstResponse: first, secondResponse: second);
     }
 
     private EditorCommandRequest? ResolveText(EditorCommandBinding binding, int visibleRows)
@@ -59,14 +60,9 @@ internal sealed class ConsoleFirstEdPromptService(ConsoleFirstEdRenderer rendere
             ? "Find (empty = find again): "
             : "Text: ");
 
-        if (binding.CommandId == EditorCommandId.FindNext && string.IsNullOrEmpty(text))
-        {
-            return new EditorCommandRequest(EditorCommandId.FindAgain, PageSize: visibleRows);
-        }
-
-        return string.IsNullOrEmpty(text)
-            ? null
-            : binding.CreateRequest(text: text, pageSize: visibleRows);
+        // A cancelled (null) Find is not an explicitly empty Find Again.
+        return EditorCommandPromptResolver.Resolve(
+            binding, visibleRows, firstResponse: text);
     }
 
     private EditorCommandRequest? ResolveFindReplace(EditorCommandBinding binding, int visibleRows)
@@ -77,27 +73,26 @@ internal sealed class ConsoleFirstEdPromptService(ConsoleFirstEdRenderer rendere
             return null;
         }
 
-        // Empty replacement is valid and means deletion of the matched text.
-        // Keep pattern and replacement separate at the semantic boundary so the
-        // command contract remains portable to C++, Java and later languages.
-        var replacement = renderer.ReadPrompt("Replace with: ") ?? string.Empty;
-        return binding.CreateRequest(text: find, text2: replacement, pageSize: visibleRows);
+        // Null means cancel; the explicitly empty string means deletion.
+        // Coalescing null to "" here previously made an abandoned prompt
+        // unintentionally destructive.
+        var replacement = renderer.ReadPrompt("Replace with: ");
+        return EditorCommandPromptResolver.Resolve(
+            binding, visibleRows, firstResponse: find, secondResponse: replacement);
     }
 
     private EditorCommandRequest? ResolveCharacter(EditorCommandBinding binding, int visibleRows)
     {
         var value = renderer.ReadCharacterPrompt("Character to insert: ");
-        return value.HasValue
-            ? binding.CreateRequest(text: value.Value.ToString(), pageSize: visibleRows)
-            : null;
+        return EditorCommandPromptResolver.Resolve(
+            binding, visibleRows, characterResponse: value);
     }
 
     private EditorCommandRequest? ResolveFilePath(EditorCommandBinding binding, int visibleRows)
     {
         var path = renderer.ReadPrompt("File path: ");
-        return string.IsNullOrWhiteSpace(path)
-            ? null
-            : binding.CreateRequest(text: path.Trim(), pageSize: visibleRows);
+        return EditorCommandPromptResolver.Resolve(
+            binding, visibleRows, firstResponse: path);
     }
 
     private EditorCommandRequest? ResolveConfirmation(EditorCommandBinding binding, int visibleRows)
@@ -106,9 +101,8 @@ internal sealed class ConsoleFirstEdPromptService(ConsoleFirstEdRenderer rendere
             ? "Exit editor? Type YES to confirm: "
             : "Confirm? Type YES: ");
 
-        return string.Equals(answer?.Trim(), "YES", StringComparison.OrdinalIgnoreCase)
-            ? binding.CreateRequest(pageSize: visibleRows)
-            : null;
+        return EditorCommandPromptResolver.Resolve(
+            binding, visibleRows, firstResponse: answer);
     }
 
     private static string NumberPrompt(EditorCommandId commandId) => commandId switch

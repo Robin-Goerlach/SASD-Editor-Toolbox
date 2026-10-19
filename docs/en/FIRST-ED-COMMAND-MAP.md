@@ -114,3 +114,7 @@ The reusable key map deliberately ignores an Alt-modified key, **including speci
 ## Portable key-map and command-dispatch audit
 
 The `firsted-keymap.json` suite exercises Ctrl-K/O/Q prefixes directly on normalized key strokes, including one-based digit bindings, prompt metadata for text/file/numeric/two-number/confirmation requests, cancelled and unknown second keys, Alt-modified special-key rejection, direct control aliases, inserted text and actual semantic dispatcher results. A separate per-case state machine preserves a pending prefix until its next key; no UI code participates. These are executable portable evidence for `EditK`, `EditO`, `EditQ`, `EditPrccmd` and `EditPrctxt`, not historical implementation-language requirements.
+
+## Prompt cancellation is not an empty replacement
+
+The UI-neutral `EditorCommandPromptResolver` converts already-collected host responses into semantic requests. A null answer cancels; explicitly empty Find means Find Again and explicitly empty Replace means deletion. A cancelled *second* replacement prompt therefore never becomes a delete command. Numeric, file, character and confirmation prompts share the same non-mutating cancellation boundary. The console host delegates response interpretation to the core, but still owns asking questions.
