@@ -22,7 +22,10 @@ public sealed class EditorEngine
     public void InsertText(string text)
     {
         ArgumentNullException.ThrowIfNull(text);
-        if (text.Length == 0)
+        // CR is intentionally ignored by this direct insert API. A
+        // CR-only payload therefore changes no physical character or cursor
+        // and must not create a phantom Undo/dirty transaction.
+        if (text.AsSpan().IndexOfAnyExcept('\r') < 0)
         {
             return;
         }
@@ -47,9 +50,20 @@ public sealed class EditorEngine
         InsertText(new string(' ', spaces));
     }
 
-    public void DeleteRightCharacter() => Mutate("Delete right character", () =>
+    public void DeleteRightCharacter()
     {
         var window = Window;
+        var lastLine = window.Document.Buffer.LineCount - 1;
+        var lineText = window.Document.Buffer.GetLine(window.Cursor.Line).Text;
+        if (window.Cursor.Column >= lineText.Length && window.Cursor.Line == lastLine)
+        {
+            // No stored character and no following logical line to join.
+            // A virtual column here is not a deletion transaction.
+            return;
+        }
+
+        Mutate("Delete right character", () =>
+        {
         var line = window.Document.Buffer.GetLine(window.Cursor.Line).Text;
         if (window.Cursor.Column < line.Length)
         {
@@ -65,11 +79,26 @@ public sealed class EditorEngine
             window.Document.Buffer.RemoveLine(nextLineIndex);
             _session.Topology.LinesDeleted(window.Document, nextLineIndex, 1);
         }
-    });
+        });
+    }
 
     public void DeleteLeftCharacter()
     {
-        if (Window.Cursor.Column == 0 && Window.Cursor.Line == 0) return;
+        var window = Window;
+        if (window.Cursor.Column == 0 && window.Cursor.Line == 0)
+            return;
+
+        if (window.Cursor.Column > 0
+            && window.Cursor.Column - 1 >= window.Document.Buffer.GetLine(window.Cursor.Line).Text.Length)
+        {
+            // FIRST-ED permits cursors beyond physical EOL. Backspace
+            // through this virtual area moves the view cursor only, while
+            // keeping linked windows, text and Undo untouched. Without this
+            // check string.Remove would throw after opening a transaction.
+            window.Cursor = window.Cursor with { Column = window.Cursor.Column - 1 };
+            return;
+        }
+
         Mutate("Delete left character", () =>
         {
             var window = Window;
@@ -106,9 +135,19 @@ public sealed class EditorEngine
         window.Cursor = new TextPosition(Math.Min(lineIndex, window.Document.Buffer.LineCount - 1), 0);
     });
 
-    public void DeleteRightWord() => Mutate("Delete right word", () =>
+    public void DeleteRightWord()
     {
         var window = Window;
+        var atPhysicalEnd = window.Cursor.Column
+            >= window.Document.Buffer.GetLine(window.Cursor.Line).Text.Length;
+        if (atPhysicalEnd && window.Cursor.Line == window.Document.Buffer.LineCount - 1)
+        {
+            // Nothing remains in this stream for a direct word deletion.
+            return;
+        }
+
+        Mutate("Delete right word", () =>
+        {
         var line = window.Document.Buffer.GetLine(window.Cursor.Line).Text;
         if (window.Cursor.Column >= line.Length)
         {
@@ -120,7 +159,8 @@ public sealed class EditorEngine
         while (end < line.Length && char.IsWhiteSpace(line[end])) end++;
         while (end < line.Length && !char.IsWhiteSpace(line[end])) end++;
         window.Document.Buffer.ReplaceLine(window.Cursor.Line, line.Remove(window.Cursor.Column, end - window.Cursor.Column));
-    });
+        });
+    }
 
     public void DeleteToEndOfLine()
     {
