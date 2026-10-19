@@ -84,3 +84,8 @@ Centering also compares the required line with the existing buffer before alloca
 ## Direct editor engine: virtual-space/no-op editing guards
 
 The public `EditorEngine` is also usable without the FIRST-ED command dispatcher. Its direct entrypoints now avoid creating dirty/version/Undo transactions for CR-only text insertion and right-character/right-word deletion where no physical character or following line remains. Direct Backspace through virtual space decrements only the initiating view's cursor; it no longer attempts an invalid substring removal after an Undo transaction has begun. These modern safety rules mirror the already-tested command boundaries without replacing the historical command processors.
+
+
+## Tab insertion resource and virtual-column safety
+
+The direct `EditorEngine.Tab` and historical FIRST-ED Insert-mode Tab now share a bounded insertion path. An unrepresentable next tab column, more than **4,096 generated tab spaces**, or more than **4,096 missing spaces between physical text and the virtual cursor** causes a typed non-mutating failure before any Undo entry or allocation. This conservative modern resource bound protects against excessive work by the character-by-character insertion algorithm; it is not a 1985 tab-stop restriction. The historical Overtype Tab remains cursor-only and can advance from distant virtual columns without allocating padding, provided the result fits the cursor range.

@@ -49,6 +49,7 @@ V1 includes character/word/line movement, page movement, beginning/end/top/botto
 - Word-left treats leading blanks as a boundary: from within or immediately after leading indentation it moves to column zero. From column zero it enters the preceding line immediately after that line's last non-blank. Otherwise it moves to the beginning of the preceding same-line word/class run.
 - Target languages may use Unicode-aware letter/digit and whitespace classification as a documented extension; ASCII input must preserve the three historical classes.
 - Tab advances to the next configured tab stop. In Insert mode the padding is inserted into the document; in Overtype mode only the cursor moves.
+- As a modern resource-safety rule, inserting a tab is rejected without text/dirty/Undo mutation if the next virtual column exceeds the integer cursor range, if one tab would synthesize over 4,096 spaces, or if inserting at a cursor beyond physical text would require over 4,096 spaces of gap fill. Overtype-mode FIRST-ED Tab only moves the cursor, remains permitted at a distant virtual column if its next stop is representable, and never allocates padding.
 - Ordinary text insertion preserves the existing outgoing `Wrapped` boundary unless the insertion itself triggers a new automatic word wrap.
 - Automatic word wrapping marks the upper line's outgoing boundary as `Wrapped`. If the original line already had a downstream soft boundary, that boundary follows the newly inserted lower fragment.
 

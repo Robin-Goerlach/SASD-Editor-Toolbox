@@ -84,3 +84,8 @@ Die Zentrierung vergleicht den gewünschten Text jetzt bereits **vor** der Anlag
 ## Direkte EditorEngine-API: virtuelle Spalten und wirkungslose Befehle
 
 Die öffentliche `EditorEngine` ist auch ohne FIRST-ED-Dispatcher verwendbar. Direkte Eingaben mit ausschließlich CR sowie Zeichen-/Wortlöschungen hinter dem physischen Ende der letzten Zeile erzeugen jetzt keine künstlichen Dirty-/Versions-/Undo-Transaktionen. Backspace im virtuellen Bereich bewegt nur den Cursor des aufrufenden Fensters nach links und löst keine ungültige Zeichenentfernung nach Beginn einer Undo-Transaktion mehr aus. Diese modernen Sicherheitsgrenzen ergänzen die bereits geprüften historischen Kommando-Prozessoren und ersetzen sie nicht.
+
+
+## Ressourcenschutz beim Tabulator und virtuelle Spalten
+
+Die direkte Methode `EditorEngine.Tab` und der historische Tab im Einfügemodus nutzen jetzt denselben begrenzten Einfügepfad. Eine nicht darstellbare nächste Spalte, mehr als **4.096 automatisch einzufügende Tab-Leerzeichen** oder mehr als **4.096 fehlende Leerzeichen zwischen physischem Zeilenende und virtuellem Cursor** führen vor jeder Undo-Transaktion beziehungsweise Textänderung zu einem typisierten Fehler. Diese vorsichtige moderne Grenze schützt den zeichenweisen Einfügealgorithmus; sie ist keine historische Beschränkung von 1985. Der historische Tab im Überschreibmodus bleibt eine reine Cursorbewegung und darf auch entfernte virtuelle Spalten erreichen, solange die Zielspalte darstellbar ist.

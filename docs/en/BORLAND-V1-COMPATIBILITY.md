@@ -279,6 +279,10 @@ Ten host-neutral scenarios in `cooperative-lifecycle.json` verify input-first sc
 
 Twelve new portable host-prompt sequences cover Create/Delete/Go To Window, Set/Jump Marker, left/right margin, tab width and Undo-limit prompts, including cancellation and state-based rejection. Nine additional historical `EditCp...` wrappers link to those directly executed semantic boundaries. The tests require no Pascal-shaped prompt API or terminal renderer in the shared core.
 
+## Large virtual tab stops
+
+Direct and FIRST-ED Insert-mode Tab now reject unsafe generated padding and virtual-column overflow before changing text or Undo. The numeric budget is a documented modern implementation guard, not an imposed historical tab-width limit. FIRST-ED Overtype Tab keeps its cursor-only semantics at large virtual positions.
+
 ## V1 release gate
 
 The C#/.NET implementation now has executable coverage for the major FIRST-ED structural areas, including paragraph reformatting, whole-line block bulk topology, independent block endpoints and atomic multi-document undo/navigation restoration. The [handbook procedure/function index audit](HANDBOOK-PROCEDURE-INDEX-AUDIT.md) now records all 123 printed entries with first-pass classifications; its mapped behavior still requires a final regression-coverage and host-interface audit before calling V1 complete. MicroStar-specific demonstrations may ship as samples rather than core dependencies.

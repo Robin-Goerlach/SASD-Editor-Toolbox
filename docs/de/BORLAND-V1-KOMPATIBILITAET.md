@@ -278,6 +278,10 @@ Zehn hostunabhängige Szenarien in `cooperative-lifecycle.json` prüfen die Eing
 
 Zwölf neue Host-Prompt-Sequenzen prüfen Fenster erstellen/löschen/auswählen, Marker setzen/anspringen, linke/rechte Ränder, Tabulatorbreite und Undo-Limit, einschließlich Abbruch und zustandsabhängiger Ablehnung. Neun zusätzliche historische `EditCp...`-Wrapper werden dadurch ausdrücklich mit ausgeführten Tests verknüpft. Der gemeinsame Kern benötigt dafür weder historische Pascal-Dialog-APIs noch einen Terminal-Renderer.
 
+## Große virtuelle Tabulatorpositionen
+
+Der direkte Editor-Tab und der FIRST-ED-Tab im Einfügemodus lehnen übermäßige automatisch generierte Leerzeichen sowie virtuelle Spaltenüberläufe vor Text- oder Undo-Änderungen ab. Diese Grenze ist eine dokumentierte moderne Schutzregel, keine historische Tabulatorbreite. Der FIRST-ED-Tab im Überschreibmodus bleibt auch bei entfernten virtuellen Positionen eine reine Cursorbewegung.
+
 ## V1-Abschlusskriterium
 
 Die C#/.NET-Implementierung deckt die großen strukturellen FIRST-ED-Bereiche inzwischen ausführbar ab, einschließlich Absatz-Neuformatierung, mehrzeiliger Block-Bulk-Topologie, unabhängiger Block-Endpunkte und atomarer Multi-Dokument-Undo-/Navigationswiederherstellung. Der [Handbuch-Prozeduren-/Funktionsindex-Audit](HANDBUCH-PROZEDURENINDEX-AUDIT.md) erfasst inzwischen alle 123 gedruckten Einträge mit ersten Klassifikationen; die zugeordneten Routinen benötigen vor V1 noch einen abschließenden Testabdeckungs- und Host-Audit. MicroStar-spezifische Demonstrationen können als Samples statt als Core-Abhängigkeiten geliefert werden.

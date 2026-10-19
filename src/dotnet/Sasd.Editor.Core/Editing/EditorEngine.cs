@@ -44,9 +44,40 @@ public sealed class EditorEngine
     public void InsertControlCharacter(char value) => InsertText(value.ToString());
     public void InsertNewLine() => Mutate("Insert line", InsertNewLineCore);
 
+    /// <summary>
+    /// Inserts enough blanks to reach the next configured tab stop.
+    /// The historical command wrapper separately handles its Overtype-only
+    /// cursor movement; this direct engine API keeps its insert/overwrite
+    /// semantics but enforces the same virtual-column safety bounds.
+    /// </summary>
     public void Tab()
     {
-        var spaces = Window.Options.TabSize - (Window.Cursor.Column % Window.Options.TabSize);
+        var window = Window;
+        var column = window.Cursor.Column;
+        var tabSize = window.Options.TabSize;
+        var spaces = tabSize - column % tabSize;
+
+        // A cursor at the maximum virtual column may not have room for
+        // another tab stop. Guard the *resulting* cursor before opening Undo.
+        if (column > int.MaxValue - spaces)
+        {
+            throw new ArgumentOutOfRangeException(nameof(window.Cursor),
+                "The next tab stop exceeds the supported virtual column range.");
+        }
+
+        // InsertText processes the inserted blanks one at a time to preserve
+        // ordinary wrapping/overwrite semantics. Reject extreme tab widths
+        // or huge gaps from the physical end before allocating/iterating over
+        // millions of spaces. This is a modern resource-safety policy.
+        const int maximumGeneratedTabSpaces = 4096;
+        var physicalLength = window.Document.Buffer.GetLine(window.Cursor.Line).Text.Length;
+        if (spaces > maximumGeneratedTabSpaces
+            || (long)column - physicalLength > maximumGeneratedTabSpaces)
+        {
+            throw new ArgumentOutOfRangeException(nameof(window.Options.TabSize),
+                "Automatic tab insertion exceeds the safe padding budget.");
+        }
+
         InsertText(new string(' ', spaces));
     }
 

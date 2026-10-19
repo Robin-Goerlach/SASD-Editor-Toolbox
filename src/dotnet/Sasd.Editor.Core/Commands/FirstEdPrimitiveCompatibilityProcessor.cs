@@ -437,10 +437,16 @@ internal static class FirstEdPrimitiveCompatibilityProcessor
 
         if (window.Options.InsertMode)
         {
-            session.Engine.InsertText(new string(' ', spaces));
+            // Use the shared engine's bounded tab insertion instead of
+            // allocating a potentially enormous string for a malformed host
+            // tab width or a distant virtual column. The dispatcher reports
+            // a typed failure if that modern safety budget is exceeded.
+            session.Engine.Tab();
         }
         else
         {
+            // Historical Overtype Tab is only a cursor move: it must still
+            // support large virtual columns without creating padding text.
             window.Cursor = window.Cursor with { Column = column + spaces };
         }
 
