@@ -85,7 +85,7 @@
             "line": 0
           },
           "end": null,
-          "hidden": false,
+          "hidden": true,
           "complete": false
         }
       }
