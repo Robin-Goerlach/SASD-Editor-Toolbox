@@ -75,3 +75,6 @@ Zeilentopologie, Reformatierung, Befehlsgrenzen sowie das typisierte Fehler-/Res
 
 Der verbleibende V1-Audit nutzt das [vollständige historische Prozedureninventar](HANDBUCH-PROZEDURENINDEX-AUDIT.md). `EditDestxtdes` bleibt eine Speicherfreigaberoutine, keine nachzubauende C#-Pointer-API.
 
+## Zeile zentrieren: Wiederholungsbefehle und virtuelle Ränder
+
+`EditorEngine.CenterLine` berechnet die Einrückung nun mit breiten Ganzzahlen, um Überläufe bei großen virtuellen Randwerten zu vermeiden. Eine bereits zentrierte Zeile verändert weder Dokumentversion und Dirty-State noch die Undo-Historie, selbst wenn der aktive Cursor vom virtuellen Bereich ans physische Zeilenende zurückkehrt. Cursor verknüpfter Ansichten bleiben unabhängig. Wirkliche Textänderungen bleiben ein einzelner Undo-fähiger Vorgang; eine physisch nicht darstellbare Ergebnislänge wird vorab abgelehnt. Dies ist eine moderne Leerlauf- und Größen-Sicherheitsregel.

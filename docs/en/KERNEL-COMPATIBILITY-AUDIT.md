@@ -75,3 +75,6 @@ The later line-topology, reformat, command-boundary validation and typed error/r
 
 The remaining V1 review follows the [full handbook procedure/function inventory](HANDBOOK-PROCEDURE-INDEX-AUDIT.md). `EditDestxtdes` is a memory-release primitive, not a C# pointer API to recreate.
 
+## Center Line: repeat commands and virtual margins
+
+`EditorEngine.CenterLine` now computes padding using wide integer arithmetic to avoid signed overflow on large virtual margin values. An already centered physical line leaves Version, dirty state and Undo unchanged, even when the active cursor is returned from virtual space to the physical line end. Other linked windows keep their cursor state. Real centering remains one undoable mutation; an unrepresentable resulting physical line is rejected before any edit. This is a modern no-op and size-safety policy.

@@ -171,15 +171,46 @@ public sealed class EditorEngine
         });
     }
 
-    public void CenterLine() => Mutate("Center line", () =>
+    public void CenterLine()
     {
         var window = Window;
-        var content = window.Document.Buffer.GetLine(window.Cursor.Line).Text.Trim();
-        var width = Math.Max(0, window.Options.RightMargin - window.Options.LeftMargin + 1);
-        var leftPadding = Math.Max(window.Options.LeftMargin, window.Options.LeftMargin + (width - content.Length) / 2);
-        window.Document.Buffer.ReplaceLine(window.Cursor.Line, new string(' ', leftPadding) + content);
-        window.Cursor = window.Cursor with { Column = Math.Min(window.Cursor.Column, leftPadding + content.Length) };
-    });
+        var lineIndex = window.Cursor.Line;
+        var originalText = window.Document.Buffer.GetLine(lineIndex).Text;
+        var content = originalText.Trim();
+
+        // Calculate the inclusive margin width using wide arithmetic:
+        // valid virtual margins can be much larger than a physical line,
+        // and int addition/subtraction would otherwise wrap here.
+        var leftMargin = window.Options.LeftMargin;
+        var width = (long)window.Options.RightMargin - leftMargin + 1;
+        var padding = (long)leftMargin + Math.Max(0L, (width - content.Length) / 2);
+
+        // Reject unrepresentable physical line lengths before allocating
+        // memory or starting an Undo transaction.
+        if (padding > int.MaxValue - (long)content.Length)
+        {
+            throw new ArgumentOutOfRangeException(
+                nameof(window.Options.RightMargin),
+                "The centered line exceeds the indexed line capacity.");
+        }
+
+        var newColumn = Math.Min(window.Cursor.Column, (int)padding + content.Length);
+        var centered = new string(' ', (int)padding) + content;
+
+        if (string.Equals(originalText, centered, StringComparison.Ordinal))
+        {
+            // Repositioning from virtual space is not a text edit: keep
+            // document version, dirty state and Undo history unchanged.
+            window.Cursor = window.Cursor with { Column = newColumn };
+            return;
+        }
+
+        Mutate("Center line", () =>
+        {
+            window.Document.Buffer.ReplaceLine(lineIndex, centered);
+            window.Cursor = window.Cursor with { Column = newColumn };
+        });
+    }
 
     /// <summary>
     /// General-purpose paragraph formatter for direct engine consumers. FIRST-ED
