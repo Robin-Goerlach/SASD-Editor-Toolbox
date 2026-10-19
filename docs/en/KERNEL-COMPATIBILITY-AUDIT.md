@@ -78,3 +78,5 @@ The remaining V1 review follows the [full handbook procedure/function inventory]
 ## Center Line: repeat commands and virtual margins
 
 `EditorEngine.CenterLine` now computes padding using wide integer arithmetic to avoid signed overflow on large virtual margin values. An already centered physical line leaves Version, dirty state and Undo unchanged, even when the active cursor is returned from virtual space to the physical line end. Other linked windows keep their cursor state. Real centering remains one undoable mutation; an unrepresentable resulting physical line is rejected before any edit. This is a modern no-op and size-safety policy.
+
+Centering also compares the required line with the existing buffer before allocating a duplicate. A modern resource-safety guard rejects attempts to generate more than **1,000,000 leading spaces** from huge virtual margins, before beginning Undo or mutating data. This limit applies to automatic padding generation only, not to the ability to keep or inspect an existing longer line. It prevents a valid but extreme one-based margin request from causing a large accidental allocation.

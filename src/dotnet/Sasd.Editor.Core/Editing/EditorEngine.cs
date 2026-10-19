@@ -194,17 +194,32 @@ public sealed class EditorEngine
                 "The centered line exceeds the indexed line capacity.");
         }
 
-        var newColumn = Math.Min(window.Cursor.Column, (int)padding + content.Length);
-        var centered = new string(' ', (int)padding) + content;
-
-        if (string.Equals(originalText, centered, StringComparison.Ordinal))
+        var physicalLength = (int)padding + content.Length;
+        var newColumn = Math.Min(window.Cursor.Column, physicalLength);
+        var alreadyCentered = originalText.Length == physicalLength
+            && originalText.AsSpan(0, (int)padding).IndexOfAnyExcept(' ') < 0
+            && originalText.AsSpan((int)padding).SequenceEqual(content);
+        if (alreadyCentered)
         {
-            // Repositioning from virtual space is not a text edit: keep
-            // document version, dirty state and Undo history unchanged.
+            // Check the existing text without allocating a duplicate string.
+            // Even a very long, pre-existing centered line can be a no-op.
             window.Cursor = window.Cursor with { Column = newColumn };
             return;
         }
 
+        // A very large but technically representable virtual right margin
+        // must not force the editor to allocate gigabytes of blank padding.
+        // This modern safety limit applies only to *newly generated* spaces,
+        // not to reading or preserving existing long text lines.
+        const int maximumGeneratedCenterPadding = 1_000_000;
+        if (padding > maximumGeneratedCenterPadding)
+        {
+            throw new ArgumentOutOfRangeException(
+                nameof(window.Options.RightMargin),
+                "Automatic centering cannot generate more than one million leading spaces.");
+        }
+
+        var centered = new string(' ', (int)padding) + content;
         Mutate("Center line", () =>
         {
             window.Document.Buffer.ReplaceLine(lineIndex, centered);

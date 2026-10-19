@@ -84,6 +84,24 @@ public sealed class CenterLineCompatibilityTests
     }
 
     [Fact]
+    public async Task HugeRepresentableRightMarginDoesNotAllocateGigabytes()
+    {
+        var session = new EditorSession();
+        var view = session.CreateDocument("word");
+        view.Options.RightMargin = int.MaxValue; // Huge, but mathematically valid.
+
+        // A caller may configure an extreme virtual margin, but the command
+        // must reject pathological new padding before allocating memory.
+        Assert.False(await new EditorCommandDispatcher(session)
+            .ExecuteAsync(new(EditorCommandId.CenterLine)));
+
+        Assert.Equal("word", view.Document.Buffer.GetLine(0).Text);
+        Assert.False(view.Document.IsDirty);
+        Assert.Equal(0, view.Document.Version);
+        Assert.Equal(0, session.Undo.Count);
+    }
+
+    [Fact]
     public async Task UnrepresentablePhysicalLengthIsRejectedBeforeUndo()
     {
         var session = new EditorSession();
