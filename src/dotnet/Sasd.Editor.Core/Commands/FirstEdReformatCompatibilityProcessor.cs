@@ -35,10 +35,22 @@ internal static class FirstEdReformatCompatibilityProcessor
         ArgumentNullException.ThrowIfNull(session);
         var window = RequireWindow(session);
         var document = window.Document;
-        var startLine = window.Cursor.Line;
+        // Capture the entire source buffer and the initiating view *before*
+        // yielding to any host input callback. During a long reformat plan,
+        // a linked window can edit text or the initiating host can navigate,
+        // change margins or reattach this view. Reading the live buffer at
+        // each checkpoint would mix different document revisions.
+        var initialCursor = window.Cursor;
+        var startLine = initialCursor.Line;
+        var initialVersion = document.Version;
+        var initialLines = document.Buffer.Snapshot();
+        var leftMargin = window.Options.LeftMargin;
+        var rightMargin = window.Options.RightMargin;
+        var initialBlockState = session.BlockState;
+
         var sourceLines = await ReadParagraphAsync(
             session,
-            document,
+            initialLines,
             startLine,
             cancellationToken).ConfigureAwait(false);
         var words = await CompressLinesAsync(
@@ -51,8 +63,6 @@ internal static class FirstEdReformatCompatibilityProcessor
             return false;
         }
 
-        var leftMargin = window.Options.LeftMargin;
-        var rightMargin = window.Options.RightMargin;
         var contentWidth = checked(rightMargin - leftMargin + 1);
 
         var tooLong = words.FirstOrDefault(word => word.Length > contentWidth);
@@ -73,18 +83,22 @@ internal static class FirstEdReformatCompatibilityProcessor
             cancellationToken).ConfigureAwait(false);
         var plannedLines = BuildPlannedLines(sourceLines, formattedText);
 
+        // Even a no-op plan must not silently succeed after an intervening
+        // edit or a view change. Always complete the final cancellation poll
+        // and the same consistency check before returning or committing.
+        await session.Interruption.CheckpointAsync(cancellationToken).ConfigureAwait(false);
+        EnsureUnchangedSource(
+            session, window, document, initialCursor, initialVersion,
+            initialLines, leftMargin, rightMargin, initialBlockState);
+
         if (Equivalent(sourceLines, plannedLines))
         {
             return false;
         }
 
-        // All interruption checkpoints are deliberately completed before this
-        // commit phase. Once mutation starts, the small in-memory plan is applied
-        // atomically from the editor user's perspective instead of allowing Ctrl-U
-        // to leave a half-reformatted paragraph behind.
-        await session.Interruption.CheckpointAsync(cancellationToken).ConfigureAwait(false);
-
-        var originalCursor = window.Cursor;
+        // From this point onward the structural in-memory update is applied
+        // without further async yields. The original cursor is restored only
+        // because we have just proved that this view has not navigated.
         var undo = session.Undo.BeginTransaction(session, window, "Reformat paragraph");
         ApplyPlan(session, document, startLine, sourceLines.Count, plannedLines);
         document.MarkChanged();
@@ -105,17 +119,17 @@ internal static class FirstEdReformatCompatibilityProcessor
     /// </summary>
     private static async ValueTask<IReadOnlyList<EditorLineSnapshot>> ReadParagraphAsync(
         EditorSession session,
-        EditorDocument document,
+        IReadOnlyList<EditorLineSnapshot> sourceSnapshot,
         int startLine,
         CancellationToken cancellationToken)
     {
         var lines = new List<EditorLineSnapshot>();
         var lineIndex = startLine;
 
-        while (lineIndex < document.Buffer.LineCount)
+        while (lineIndex < sourceSnapshot.Count)
         {
             await session.Interruption.CheckpointAsync(cancellationToken).ConfigureAwait(false);
-            var line = document.Buffer.GetLine(lineIndex);
+            var line = sourceSnapshot[lineIndex];
             lines.Add(line);
 
             if (!line.Flags.HasFlag(EditorLineFlags.Wrapped))
@@ -290,6 +304,39 @@ internal static class FirstEdReformatCompatibilityProcessor
             }
 
             session.Topology.LinesDeleted(document, firstDeletedLine, deletedCount);
+        }
+    }
+
+    /// <summary>
+    /// Treat the computed paragraph as an optimistic edit transaction. A host
+    /// can switch focus during the awaited checkpoints (which is harmless),
+    /// but may not reattach/move the initiating view, change its margins or
+    /// block definition, or edit any line of the source document meanwhile.
+    /// Version alone is insufficient because public buffer adapters can edit
+    /// directly without calling MarkChanged; compare exact line snapshots too.
+    /// </summary>
+    private static void EnsureUnchangedSource(
+        EditorSession session,
+        EditorWindow window,
+        EditorDocument document,
+        TextPosition initialCursor,
+        long initialVersion,
+        IReadOnlyList<EditorLineSnapshot> initialLines,
+        int leftMargin,
+        int rightMargin,
+        EditorBlockState initialBlockState)
+    {
+        if (!session.Windows.Any(candidate => candidate.WindowId == window.WindowId)
+            || !ReferenceEquals(window.Document, document)
+            || window.Cursor != initialCursor
+            || window.Options.LeftMargin != leftMargin
+            || window.Options.RightMargin != rightMargin
+            || session.BlockState != initialBlockState
+            || document.Version != initialVersion
+            || !document.Buffer.Snapshot().SequenceEqual(initialLines))
+        {
+            throw new InvalidOperationException(
+                "The paragraph or initiating editor view changed during reformat planning.");
         }
     }
 

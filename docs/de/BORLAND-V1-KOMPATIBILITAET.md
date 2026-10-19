@@ -246,6 +246,10 @@ Die Sitzung verwaltet jetzt das historische Neuverknüpfen von Fenstern und entf
 
 Neue portable Fälle prüfen historische Fensternavigation, Fenster erstellen/löschen/verknüpfen, destruktives Zurücksetzen eines Fenster-Textstroms, versteckte Blockdarstellung und Sprünge zu Blockanfang/-ende. Die Zeilengeometrie wird unabhängig von einer konkreten Oberfläche vorgegeben. Der historische Routinenindex verknüpft ausschließlich beobachtbare Testbelege; die moderne Bereinigung verwaister Undo-/Markerzustände bleibt separat gekennzeichnet.
 
+## Konsistenz der Neuformatierung bei Host-Eingabeprüfpunkten
+
+Die Neuformatierung speichert Dokument/Fenster, Cursor, Ränder, Blockzustand, Version und vollständigen Zeilen-Snapshot vor dem ersten Await. Vor dem Commit werden veraltete Pläne nach Änderungen verknüpfter Fenster, direkten Pufferänderungen, Cursor-/Randänderungen oder Neuverknüpfung abgelehnt. Ein bloßer Wechsel des aktiven Fensters verändert das Ziel nicht. Deterministische .NET-Tests steuern diese Zwischenfälle über Eingabe-Hooks.
+
 ## V1-Abschlusskriterium
 
 Die C#/.NET-Implementierung deckt die großen strukturellen FIRST-ED-Bereiche inzwischen ausführbar ab, einschließlich Absatz-Neuformatierung, mehrzeiliger Block-Bulk-Topologie, unabhängiger Block-Endpunkte und atomarer Multi-Dokument-Undo-/Navigationswiederherstellung. Der [Handbuch-Prozeduren-/Funktionsindex-Audit](HANDBUCH-PROZEDURENINDEX-AUDIT.md) erfasst inzwischen alle 123 gedruckten Einträge mit ersten Klassifikationen; die zugeordneten Routinen benötigen vor V1 noch einen abschließenden Testabdeckungs- und Host-Audit. MicroStar-spezifische Demonstrationen können als Samples statt als Core-Abhängigkeiten geliefert werden.

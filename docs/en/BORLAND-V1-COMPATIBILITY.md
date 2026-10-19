@@ -247,6 +247,10 @@ The session now owns compatibility window reattachment and cleans up stale marke
 
 Portable window/frame and block lifecycle cases now exercise historical view navigation, Create/Delete/Link Window, destructive Delete Window Text, hidden block projection and top/bottom block navigation. The host supplies total row geometry without any UI-specific runtime. Only test-observable semantics are linked to routine names; modern last-view history cleanup is documented separately from historical pointer mechanics.
 
+## Reformat planning consistency across host callbacks
+
+Reformat now captures the initiating document/view, margins, cursor, block state, version and complete logical-line snapshot before any await. A final guarded commit rejects stale plans after linked-view edits, direct buffer mutations, cursor/margin changes or view reattachment. Switching the active view alone does not redirect the destination. Focused .NET tests use deterministic input-checkpoint callbacks to verify all branches.
+
 ## V1 release gate
 
 The C#/.NET implementation now has executable coverage for the major FIRST-ED structural areas, including paragraph reformatting, whole-line block bulk topology, independent block endpoints and atomic multi-document undo/navigation restoration. The [handbook procedure/function index audit](HANDBOOK-PROCEDURE-INDEX-AUDIT.md) now records all 123 printed entries with first-pass classifications; its mapped behavior still requires a final regression-coverage and host-interface audit before calling V1 complete. MicroStar-specific demonstrations may ship as samples rather than core dependencies.

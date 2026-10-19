@@ -73,3 +73,7 @@ The paragraph-reformat family is now behaviorally represented, but V1 still need
 Reformatting now uses `EditorInterruptionService.CheckpointAsync` while reading the Wrapped paragraph, compressing words and building the new line plan. Those phases are side-effect free.
 
 One final checkpoint occurs immediately before undo capture and document mutation. After that point the already prepared in-memory plan is committed without further Ctrl-U checks. This is intentional: cancelling between individual line replacements/insertions/deletions would leave a partially reformatted paragraph and inconsistent topology. External cancellation and Ctrl-U therefore remain responsive during the potentially long planning work while the short commit remains atomic from the editor user's perspective.
+
+### Async reformat state-consistency rule
+
+A paragraph reformat plan is now based on a full source snapshot captured **before** the first cooperative input checkpoint. Immediately before mutation (including a planned no-op), the initiating window must still be attached to the same document with the same cursor and margins; the block definition, document version and complete buffer snapshot must still match. Concurrent host focus changes to another window alone are harmless: a successful plan still changes only its originating document. Any stale plan is rejected with a typed operation failure, preserving intervening edits and navigation and adding no reformat Undo item. This is a modern asynchronous host-safety policy, not a claim about 1985 single-threaded DOS internals.
