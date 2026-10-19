@@ -29,7 +29,9 @@ public sealed class DirectEngineMutationSafetyTests
     }
 
     [Theory]
-    [InlineData(3)]
+    // Column 3 is the physical EOL of "abc": Backspace there *deletes*
+    // 'c'. Virtual whitespace begins at the next (zero-based) column.
+    [InlineData(4)]
     [InlineData(40)]
     [InlineData(int.MaxValue)]
     public void DirectBackspaceThroughVirtualSpaceDoesNotModifySharedText(int column)
