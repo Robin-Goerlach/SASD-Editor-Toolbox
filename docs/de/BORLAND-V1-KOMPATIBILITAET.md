@@ -274,6 +274,10 @@ Zehn gemeinsame Fälle in `kernel-routines.json` verknüpfen sechs historische K
 
 Zehn hostunabhängige Szenarien in `cooperative-lifecycle.json` prüfen die Eingabepriorität des Schedulers, wiederholbare begrenzte Hintergrundaufgaben, Rundown/Exit, die UI-neutrale Systemschleife und den einmaligen physischen Ctrl-U-Abbruch am Unterbrechungspunkt. Fünf weitere historische Scheduler-/Lebenszyklusroutinen besitzen damit konkrete portable Belege, ohne plattformspezifisches Input-Polling im Editor-Kern einzuführen.
 
+## Erweiterte portable Host-Wrapper-Abnahme
+
+Zwölf neue Host-Prompt-Sequenzen prüfen Fenster erstellen/löschen/auswählen, Marker setzen/anspringen, linke/rechte Ränder, Tabulatorbreite und Undo-Limit, einschließlich Abbruch und zustandsabhängiger Ablehnung. Neun zusätzliche historische `EditCp...`-Wrapper werden dadurch ausdrücklich mit ausgeführten Tests verknüpft. Der gemeinsame Kern benötigt dafür weder historische Pascal-Dialog-APIs noch einen Terminal-Renderer.
+
 ## V1-Abschlusskriterium
 
 Die C#/.NET-Implementierung deckt die großen strukturellen FIRST-ED-Bereiche inzwischen ausführbar ab, einschließlich Absatz-Neuformatierung, mehrzeiliger Block-Bulk-Topologie, unabhängiger Block-Endpunkte und atomarer Multi-Dokument-Undo-/Navigationswiederherstellung. Der [Handbuch-Prozeduren-/Funktionsindex-Audit](HANDBUCH-PROZEDURENINDEX-AUDIT.md) erfasst inzwischen alle 123 gedruckten Einträge mit ersten Klassifikationen; die zugeordneten Routinen benötigen vor V1 noch einen abschließenden Testabdeckungs- und Host-Audit. MicroStar-spezifische Demonstrationen können als Samples statt als Core-Abhängigkeiten geliefert werden.

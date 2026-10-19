@@ -35,7 +35,7 @@ Die .NET-Tests laden inzwischen jede Datei aus `conformance/v1/manifest.json`, n
 
 ## Maschinengeprüfte Verweise auf ausführbare Belege
 
-Die Inventarliste unterstützt pro historischer Routine ein optionales Feld `conformanceCases`. Die Repository-Vertragsprüfung kontrolliert, ob jede referenzierte Fall-ID in einer durch das portable Manifest eingebundenen Datei vorkommt, weist doppelte oder unbekannte IDs zurück und meldet die Zahl verknüpfter Routinen. **Derzeit sind 92 von 123 Zeilen** mit konkreten portablen Fällen verknüpft. Für alle anderen bestehen zunächst nur konzeptionelle beziehungsweise dokumentierte Zuordnungen, deren Regressionstest-Abdeckung weiterhin einzeln geprüft werden muss.
+Die Inventarliste unterstützt pro historischer Routine ein optionales Feld `conformanceCases`. Die Repository-Vertragsprüfung kontrolliert, ob jede referenzierte Fall-ID in einer durch das portable Manifest eingebundenen Datei vorkommt, weist doppelte oder unbekannte IDs zurück und meldet die Zahl verknüpfter Routinen. **Derzeit sind 101 von 123 Zeilen** mit konkreten portablen Fällen verknüpft. Für alle anderen bestehen zunächst nur konzeptionelle beziehungsweise dokumentierte Zuordnungen, deren Regressionstest-Abdeckung weiterhin einzeln geprüft werden muss.
 
 Diese Verweise sind **gezielte Testbeispiele**, keine vollständigen historischen Verhaltensbeweise. Die Prüfung erzeugt bewusst keine erfundenen Tests für Einträge, die lediglich als `implemented` oder `modern-replacement` eingeordnet wurden.
 
@@ -80,6 +80,8 @@ Die neuen Fälle in `firsted-keymap.json` verknüpfen fünf weitere historische 
 Zehn neue portable Fälle belegen jetzt sechs bisher noch nicht zugeordnete, bereits implementierte FIRST-ED-Kernelroutinen (Zentrieren, Linksbewegung, Zeilen verbinden, Steuerzeichen einfügen sowie Blockmarkierungen entfernen und wiederherstellen). Der Index besitzt jetzt für **87 von 123** Routinen konkrete Testverweise. Die übrigen Einträge erfordern eine gesonderte Funktions- oder Host-Abnahme und gelten nicht automatisch als fehlend.
 
 Zehn weitere portable Fälle zum kooperativen Lebenszyklus verknüpfen die fünf bisher unbelegten, bereits implementierten Scheduler-/Unterbrechungs-/System-/Exit-Routinen mit tatsächlichen Tests. Geprüft werden Vorrang der Eingabe, begrenzte Idle-Abschnitte, geregeltes Beenden und das einmalige Verbrauchen eines physischen Ctrl-U-Abbruchs. Zusammen mit den Kernel-Fällen besitzen nun **92 von 123** Handbucheinträgen direkte portable Verweise. Historische DOS-Scheduler-Interna bleiben ausgeklammert.
+
+Zwölf weitere hostneutrale Cp-Wrapper-Fälle verknüpfen neun bislang unbelegte historische interaktive Prozeduren für Fenster, Marker, Ränder, Tabulatoren und Undo-Grenzen. Geprüft werden bestätigte beziehungsweise abgebrochene Dialoge sowie ungültige zustandsabhängige Werte über echte Ctrl-K/O/Q-Befehle. Damit besitzen **101 von 123** historische Routinen direkte portable Testbelege, jedoch keine pauschale Zertifizierung der DOS-Oberfläche.
 
 ## Nächste Schritte und Abschlusskriterien
 

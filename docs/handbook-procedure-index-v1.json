@@ -229,14 +229,22 @@
       "handbookPage": 140,
       "status": "host-sample",
       "evidence": "docs/en/COMMAND-PROCESSOR-TRANSFER.md",
-      "note": "The historical interactive Cp wrapper maps to commands and host prompts."
+      "note": "The historical interactive Cp wrapper maps to commands and host prompts.",
+      "conformanceCases": [
+        "host.create-window-with-two-host-parameters",
+        "host.create-window-cancelled-second-value"
+      ]
     },
     {
       "name": "EditCpdelwin",
       "handbookPage": 141,
       "status": "host-sample",
       "evidence": "docs/en/COMMAND-PROCESSOR-TRANSFER.md",
-      "note": "The historical interactive Cp wrapper maps to commands and host prompts."
+      "note": "The historical interactive Cp wrapper maps to commands and host prompts.",
+      "conformanceCases": [
+        "host.delete-window-numbered-prompt",
+        "host.delete-window-cancelled-prompt"
+      ]
     },
     {
       "name": "EditCpexit",
@@ -295,14 +303,20 @@
       "handbookPage": 147,
       "status": "host-sample",
       "evidence": "docs/en/COMMAND-PROCESSOR-TRANSFER.md",
-      "note": "The historical interactive Cp wrapper maps to commands and host prompts."
+      "note": "The historical interactive Cp wrapper maps to commands and host prompts.",
+      "conformanceCases": [
+        "host.goto-window-numbered-prompt"
+      ]
     },
     {
       "name": "EditCpjmpmrk",
       "handbookPage": 148,
       "status": "host-sample",
       "evidence": "docs/en/COMMAND-PROCESSOR-TRANSFER.md",
-      "note": "The historical interactive Cp wrapper maps to commands and host prompts."
+      "note": "The historical interactive Cp wrapper maps to commands and host prompts.",
+      "conformanceCases": [
+        "host.jump-marker-from-numbered-prompt"
+      ]
     },
     {
       "name": "EditCplnkwin",
@@ -339,35 +353,50 @@
       "handbookPage": 152,
       "status": "host-sample",
       "evidence": "docs/en/COMMAND-PROCESSOR-TRANSFER.md",
-      "note": "The historical interactive Cp wrapper maps to commands and host prompts."
+      "note": "The historical interactive Cp wrapper maps to commands and host prompts.",
+      "conformanceCases": [
+        "host.set-left-margin-from-one-based-number"
+      ]
     },
     {
       "name": "EditCpsetmrk",
       "handbookPage": 153,
       "status": "host-sample",
       "evidence": "docs/en/COMMAND-PROCESSOR-TRANSFER.md",
-      "note": "The historical interactive Cp wrapper maps to commands and host prompts."
+      "note": "The historical interactive Cp wrapper maps to commands and host prompts.",
+      "conformanceCases": [
+        "host.set-marker-from-numbered-prompt"
+      ]
     },
     {
       "name": "EditCpsetrm",
       "handbookPage": 154,
       "status": "host-sample",
       "evidence": "docs/en/COMMAND-PROCESSOR-TRANSFER.md",
-      "note": "The historical interactive Cp wrapper maps to commands and host prompts."
+      "note": "The historical interactive Cp wrapper maps to commands and host prompts.",
+      "conformanceCases": [
+        "host.set-right-margin-from-one-based-number"
+      ]
     },
     {
       "name": "EditCptabdef",
       "handbookPage": 155,
       "status": "host-sample",
       "evidence": "docs/en/COMMAND-PROCESSOR-TRANSFER.md",
-      "note": "The historical interactive Cp wrapper maps to commands and host prompts."
+      "note": "The historical interactive Cp wrapper maps to commands and host prompts.",
+      "conformanceCases": [
+        "host.set-tab-width-from-numbered-prompt"
+      ]
     },
     {
       "name": "EditCpundlim",
       "handbookPage": 156,
       "status": "host-sample",
       "evidence": "docs/en/COMMAND-PROCESSOR-TRANSFER.md",
-      "note": "The historical interactive Cp wrapper maps to commands and host prompts."
+      "note": "The historical interactive Cp wrapper maps to commands and host prompts.",
+      "conformanceCases": [
+        "host.set-undo-limit-from-numbered-prompt"
+      ]
     },
     {
       "name": "EditCpwfw",
