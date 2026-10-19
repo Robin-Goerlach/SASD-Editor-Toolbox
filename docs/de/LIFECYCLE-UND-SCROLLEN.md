@@ -63,3 +63,7 @@ Die FIRST-ED-Kompatibilitätsschicht berechnet die letzte sichtbare Zeile und Pa
 ## Einzeilige Page-Bewegung und portable Tests
 
 Ist nur eine Textzeile sichtbar, ergibt `visibleRows - 1` den Wert null. Page Up und Page Down verändern daher Cursor und oberste Zeile nicht; der Dispatcher kann den gültigen Befehl dennoch als verarbeitet melden. `conformance/v1/cases/viewport-navigation.json` prüft das gemeinsam mit regulären und extrem großen Viewport-Höhen sowie dem unabhängigen Zustand verknüpfter Fenster.
+
+### Beenden und dynamische Registrierung von Hintergrundaufgaben
+
+Der moderne kooperative Scheduler prüft Abbruch und `RundownRequested` vor der Idle-Phase, nach dem Idle-Hook und vor jeder Hintergrund-Teilaufgabe. Fordert ein Hook oder eine Aufgabe das Beenden des Editors an, entfallen die weiteren Teilaufgaben dieses Zyklus. Eine Momentaufnahme der Registrierung erlaubt das Hinzufügen oder Entfernen während der Ausführung; vor jedem Aufruf wird zusätzlich geprüft, ob die Aufgabe **noch registriert** ist. Eine inzwischen entfernte Aufgabe läuft deshalb nicht mehr, eine neu hinzugefügte frühestens im nächsten Idle-Zyklus. Die Eingabeverarbeitung bleibt vorrangig; jede Hintergrundaufgabe muss weiterhin kurz und kooperativ sein.

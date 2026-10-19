@@ -250,6 +250,10 @@ Neue portable Fälle prüfen historische Fensternavigation, Fenster erstellen/l�
 
 Die Neuformatierung speichert Dokument/Fenster, Cursor, Ränder, Blockzustand, Version und vollständigen Zeilen-Snapshot vor dem ersten Await. Vor dem Commit werden veraltete Pläne nach Änderungen verknüpfter Fenster, direkten Pufferänderungen, Cursor-/Randänderungen oder Neuverknüpfung abgelehnt. Ein bloßer Wechsel des aktiven Fensters verändert das Ziel nicht. Deterministische .NET-Tests steuern diese Zwischenfälle über Eingabe-Hooks.
 
+## Kooperative Scheduler- und Rundown-Regeln
+
+Der moderne Scheduler startet nach einer Rundown-Anforderung keine weiteren Hintergrund-Teilaufgaben, auch wenn sie aus dem Idle-Hook oder einer vorherigen Teilaufgabe stammt. Im selben Zyklus entfernte Aufgaben werden übersprungen; neu registrierte Aufgaben kommen frühestens im nächsten Idle-Zyklus zum Zug. Externe Abbrüche werden vor Idle-/Teilaufgaben geprüft. Deterministische .NET-Tests sichern diese modernen Lebenszyklusgrenzen ohne parallele Editor-Threads ab.
+
 ## V1-Abschlusskriterium
 
 Die C#/.NET-Implementierung deckt die großen strukturellen FIRST-ED-Bereiche inzwischen ausführbar ab, einschließlich Absatz-Neuformatierung, mehrzeiliger Block-Bulk-Topologie, unabhängiger Block-Endpunkte und atomarer Multi-Dokument-Undo-/Navigationswiederherstellung. Der [Handbuch-Prozeduren-/Funktionsindex-Audit](HANDBUCH-PROZEDURENINDEX-AUDIT.md) erfasst inzwischen alle 123 gedruckten Einträge mit ersten Klassifikationen; die zugeordneten Routinen benötigen vor V1 noch einen abschließenden Testabdeckungs- und Host-Audit. MicroStar-spezifische Demonstrationen können als Samples statt als Core-Abhängigkeiten geliefert werden.

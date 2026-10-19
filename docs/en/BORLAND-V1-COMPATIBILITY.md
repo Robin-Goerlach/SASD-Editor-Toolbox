@@ -251,6 +251,10 @@ Portable window/frame and block lifecycle cases now exercise historical view nav
 
 Reformat now captures the initiating document/view, margins, cursor, block state, version and complete logical-line snapshot before any await. A final guarded commit rejects stale plans after linked-view edits, direct buffer mutations, cursor/margin changes or view reattachment. Switching the active view alone does not redirect the destination. Focused .NET tests use deterministic input-checkpoint callbacks to verify all branches.
 
+## Cooperative scheduler rundown/registration invariants
+
+The modern scheduler stops starting background slices as soon as rundown is requested, even when requested in an idle callback or an earlier background slice. Unregistered tasks are skipped in the same cycle and new tasks are deferred until a later idle cycle. External cancellation is observed before idle/slice invocation. Deterministic .NET regressions verify these modern lifecycle boundaries without introducing threaded background execution.
+
 ## V1 release gate
 
 The C#/.NET implementation now has executable coverage for the major FIRST-ED structural areas, including paragraph reformatting, whole-line block bulk topology, independent block endpoints and atomic multi-document undo/navigation restoration. The [handbook procedure/function index audit](HANDBOOK-PROCEDURE-INDEX-AUDIT.md) now records all 123 printed entries with first-pass classifications; its mapped behavior still requires a final regression-coverage and host-interface audit before calling V1 complete. MicroStar-specific demonstrations may ship as samples rather than core dependencies.

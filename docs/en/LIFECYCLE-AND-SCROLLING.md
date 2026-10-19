@@ -63,3 +63,7 @@ The FIRST-ED compatibility processor now calculates last-visible-line and page d
 ## One-row page behavior and portable fixtures
 
 When only one text row is visible, `visibleRows - 1` is zero. Page Up and Page Down therefore leave the cursor and top line unchanged; the dispatcher may still acknowledge the valid request. `conformance/v1/cases/viewport-navigation.json` makes this explicit alongside standard and extremely large viewport sizes, and covers the all-window independence of linked views.
+
+### Rundown and dynamic background task registration
+
+The modern cooperative scheduler now checks cancellation and `RundownRequested` before idle and after the host idle callback, and again before each registered background slice. If a callback asks the editor to exit, later slices in that cycle are skipped. A registration snapshot allows callbacks to add/remove tasks safely; each pending task is checked against the *live* registry immediately before execution, so removing it during an earlier slice prevents its execution. Tasks registered during an active cycle begin no sooner than the next idle cycle. These checks preserve input-first priority and are host-independent; an individual background task must still return promptly and honor cancellation.

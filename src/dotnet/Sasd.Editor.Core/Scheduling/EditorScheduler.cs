@@ -47,10 +47,39 @@ public sealed class EditorScheduler(EditorSession session)
     /// </summary>
     public async ValueTask RunIdleCycleAsync(CancellationToken cancellationToken = default)
     {
+        cancellationToken.ThrowIfCancellationRequested();
+        if (session.RundownRequested)
+        {
+            // An input pump may have requested Exit even when it returned
+            // false (no edit command processed). Do not run idle work then.
+            return;
+        }
+
         await session.Hooks.OnIdleAsync(session, cancellationToken).ConfigureAwait(false);
+        cancellationToken.ThrowIfCancellationRequested();
+        if (session.RundownRequested)
+        {
+            // Exit requested by a host idle callback takes precedence over
+            // all background tasks in the current scheduler cycle.
+            return;
+        }
+
+        // Snapshot task registration so callbacks may add/remove tasks without
+        // invalidating enumeration. Verify a task is still registered before
+        // dispatch: removal by an earlier slice takes effect immediately.
         foreach (var task in _tasks.ToArray())
         {
             cancellationToken.ThrowIfCancellationRequested();
+            if (session.RundownRequested)
+            {
+                break;
+            }
+
+            if (!_tasks.Contains(task))
+            {
+                continue;
+            }
+
             await task.ExecuteSliceAsync(session, cancellationToken).ConfigureAwait(false);
         }
     }

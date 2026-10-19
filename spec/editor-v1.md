@@ -182,6 +182,7 @@ The handbook does not separately define whether markers or other non-block ancho
 - Direct Exit requests rundown and does not save files.
 - Confirmation before interactive exit is a host/prompt responsibility declared by the input binding.
 - A scheduler cycle first offers the host one opportunity to process pending editor/host input. If input is processed, background work is skipped for that cycle.
+- Rundown requested while input, an idle hook, or a background slice executes prevents *subsequent* background slices in that cycle. A task removed during the cycle must not run from an outdated registration snapshot; newly added tasks start no earlier than the next idle cycle. External cancellation is checked before idle and between slices. These are modern cooperative execution safety rules, not DOS preemption.
 - If no input is available, one cooperative background slice runs.
 - The system loop repeats scheduler cycles until rundown is requested or external cancellation occurs.
 - Background tasks must keep their own resumable state and return after a bounded unit of work.
