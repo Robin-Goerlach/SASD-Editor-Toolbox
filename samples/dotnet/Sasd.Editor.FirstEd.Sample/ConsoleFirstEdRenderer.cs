@@ -87,7 +87,41 @@ internal sealed class ConsoleFirstEdRenderer(EditorSession session)
         var column = Math.Min(prompt.Length, width - 1);
         Console.SetCursorPosition(column, row);
         Console.CursorVisible = true;
-        return Console.ReadLine();
+        // Console.ReadLine cannot distinguish pressing Escape from other
+        // control input. For a real interactive terminal, collect keys
+        // explicitly so Escape cancels the dialog (null) rather than
+        // masquerading as an empty, potentially destructive value.
+        if (Console.IsInputRedirected)
+        {
+            return Console.ReadLine();
+        }
+
+        var answer = new System.Text.StringBuilder();
+        while (true)
+        {
+            var key = Console.ReadKey(intercept: true);
+            switch (key.Key)
+            {
+                case ConsoleKey.Escape:
+                    return null;
+                case ConsoleKey.Enter:
+                    return answer.ToString();
+                case ConsoleKey.Backspace:
+                    if (answer.Length > 0)
+                        answer.Length--;
+                    break;
+                default:
+                    if (!char.IsControl(key.KeyChar))
+                        answer.Append(key.KeyChar);
+                    break;
+            }
+
+            // Repaint just the prompt row. The editor core never sees any
+            // of these terminal cursor-positioning or echo operations.
+            var displayed = prompt + answer;
+            WriteRow(row, displayed, width);
+            Console.SetCursorPosition(Math.Min(displayed.Length, width - 1), row);
+        }
     }
 
     public char? ReadCharacterPrompt(string prompt)
@@ -98,7 +132,11 @@ internal sealed class ConsoleFirstEdRenderer(EditorSession session)
         Console.SetCursorPosition(Math.Min(prompt.Length, width - 1), row);
         Console.CursorVisible = true;
         var key = Console.ReadKey(intercept: true);
-        return key.KeyChar == '\0' ? null : key.KeyChar;
+        // Escape aborts single-character prompts as well. This is a host
+        // action, not a character intended for the editor document.
+        return key.Key is ConsoleKey.Escape || key.KeyChar == '\0'
+            ? null
+            : key.KeyChar;
     }
 
     public void Shutdown()

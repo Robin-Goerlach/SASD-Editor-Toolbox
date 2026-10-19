@@ -118,3 +118,5 @@ The `firsted-keymap.json` suite exercises Ctrl-K/O/Q prefixes directly on normal
 ## Prompt cancellation is not an empty replacement
 
 The UI-neutral `EditorCommandPromptResolver` converts already-collected host responses into semantic requests. A null answer cancels; explicitly empty Find means Find Again and explicitly empty Replace means deletion. A cancelled *second* replacement prompt therefore never becomes a delete command. Numeric, file, character and confirmation prompts share the same non-mutating cancellation boundary. The console host delegates response interpretation to the core, but still owns asking questions.
+
+In the interactive terminal sample, pressing **Escape** while entering a text/number/file/replace prompt now returns the cancelled/null outcome. Backspace edits the displayed prompt answer locally; Enter explicitly submits the current answer, including an intentionally empty replacement. The console renderer owns this interaction, while the shared prompt resolver determines its semantic meaning. Redirected console input retains line-based reading, where end-of-file still cancels.
