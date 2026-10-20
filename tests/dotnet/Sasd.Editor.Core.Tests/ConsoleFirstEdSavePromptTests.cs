@@ -106,22 +106,31 @@ public sealed class ConsoleFirstEdSavePromptTests
     }
 
     [Fact]
-    public void FirstSaveDecisionUsesSelectedDocumentRatherThanAnotherWindow()
+    public async Task FirstSaveDecisionUsesSelectedDocumentRatherThanAnotherWindow()
     {
-        var session = new EditorSession();
+        var codec = new RecordingCodec();
+        var session = new EditorSession(fileCodec: codec);
         var named = session.CreateDocument("named");
         var unnamed = session.CreateDocument("unnamed");
+        session.SetCurrentWindow(named.WindowId);
 
+        // Associate only the first document through the public Save path,
+        // never by mutating a read-only document property in the test.
+        var save = ConsoleFirstEdSavePromptPolicy.Resolve(
+            SaveBinding(), 10, named.Document.FilePath, "named.txt");
+        Assert.NotNull(save);
+        Assert.True(await new EditorCommandDispatcher(session).ExecuteAsync(save));
+
+        session.SetCurrentWindow(unnamed.WindowId);
         // No global filename/default destination is allowed to leak from one
         // window to another. The prompting decision belongs to each document.
+        Assert.False(ConsoleFirstEdSavePromptPolicy.RequiresPath(named.Document.FilePath));
         Assert.True(ConsoleFirstEdSavePromptPolicy.RequiresPath(unnamed.Document.FilePath));
         Assert.Null(ConsoleFirstEdSavePromptPolicy.Resolve(
             SaveBinding(), 10, unnamed.Document.FilePath, null));
-
-        // The already associated path belongs to the first document only.
-        named.Document.FilePath = Path.GetFullPath("named.txt");
-        Assert.False(ConsoleFirstEdSavePromptPolicy.RequiresPath(named.Document.FilePath));
-        Assert.True(ConsoleFirstEdSavePromptPolicy.RequiresPath(unnamed.Document.FilePath));
+        Assert.Equal(Path.GetFullPath("named.txt"), named.Document.FilePath);
+        Assert.Null(unnamed.Document.FilePath);
+        Assert.Single(codec.Writes);
     }
 
     [Fact]
