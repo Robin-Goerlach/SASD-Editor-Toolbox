@@ -17,6 +17,30 @@ public sealed class EditorDocument
     private long _latestAcknowledgedSaveId;
     private readonly object _saveAcknowledgementSync = new();
 
+    // Observed *disk bytes* for modern file saves, independent of editor Undo.
+    // This revision is deliberately not part of EditorDocumentSnapshot: Undo
+    // changes in-memory text but can never roll back the external filesystem.
+    private DocumentFileRevision? _observedFileRevision;
+
+    /// <summary>Last known revision of the associated on-disk file.</summary>
+    internal DocumentFileRevision? ObservedFileRevision
+    {
+        get
+        {
+            lock (_saveAcknowledgementSync) return _observedFileRevision;
+        }
+    }
+
+    /// <summary>
+    /// Records an original byte snapshot only after a complete successful
+    /// storage load. No Save operation may guess an unobserved target state.
+    /// </summary>
+    internal void RecordLoadedFileRevision(DocumentFileRevision revision)
+    {
+        ArgumentNullException.ThrowIfNull(revision);
+        lock (_saveAcknowledgementSync) _observedFileRevision = revision;
+    }
+
     public EditorDocument(ITextBuffer? buffer = null)
     {
         Buffer = buffer ?? new LinkedLineTextBuffer();
@@ -45,6 +69,10 @@ public sealed class EditorDocument
     {
         ArgumentNullException.ThrowIfNull(snapshot);
         Buffer.ReplaceAll(snapshot.Lines);
+        // A restored file association may refer to a completely different
+        // disk file. Never transfer the current baseline to that old path.
+        if (!SameFilePath(FilePath, snapshot.FilePath))
+            _observedFileRevision = null;
         FilePath = snapshot.FilePath;
         NewLine = snapshot.NewLine;
         IsDirty = snapshot.IsDirty;
@@ -62,6 +90,9 @@ public sealed class EditorDocument
         if (!string.IsNullOrWhiteSpace(filePath))
         {
             FilePath = Path.GetFullPath(filePath);
+            // This public method does not prove which bytes were written.
+            // Keep disk-revision ownership in the storage adapter.
+            _observedFileRevision = null;
         }
 
         IsDirty = false;
@@ -95,7 +126,10 @@ public sealed class EditorDocument
 
         if (!string.IsNullOrWhiteSpace(filePath))
         {
-            FilePath = Path.GetFullPath(filePath);
+            var fullPath = Path.GetFullPath(filePath);
+            if (!SameFilePath(FilePath, fullPath))
+                _observedFileRevision = null;
+            FilePath = fullPath;
         }
 
         if (Version != snapshotVersion
@@ -132,7 +166,8 @@ public sealed class EditorDocument
         long snapshotVersion,
         IReadOnlyList<EditorLineSnapshot> snapshotLines,
         string? targetPath,
-        string? writtenNewLine = null)
+        string? writtenNewLine = null,
+        DocumentFileRevision? writtenFileRevision = null)
     {
         lock (_saveAcknowledgementSync)
         {
@@ -142,17 +177,31 @@ public sealed class EditorDocument
             }
 
             _latestAcknowledgedSaveId = requestId;
-            return MarkSnapshotSaved(
+            var currentTextSaved = MarkSnapshotSaved(
                 snapshotVersion, snapshotLines, targetPath, writtenNewLine);
+
+            // A successful write changes the disk baseline even if a newer
+            // in-memory edit keeps the document Dirty. The update must share
+            // the save-order lock so an earlier, out-of-order Save As cannot
+            // overwrite the later acknowledged file association or revision.
+            _observedFileRevision = writtenFileRevision;
+            return currentTextSaved;
         }
     }
 
     public void SetPersistenceMetadata(string? filePath, string? newLine = null)
     {
         FilePath = string.IsNullOrWhiteSpace(filePath) ? null : Path.GetFullPath(filePath);
+        // External reassociation is not a file read. Requiring a new
+        // observed baseline is safer than trusting an unrelated old hash.
+        _observedFileRevision = null;
         if (!string.IsNullOrEmpty(newLine))
         {
             NewLine = newLine;
         }
     }
+
+    private static bool SameFilePath(string? a, string? b) =>
+        string.Equals(a, b, OperatingSystem.IsWindows()
+            ? StringComparison.OrdinalIgnoreCase : StringComparison.Ordinal);
 }

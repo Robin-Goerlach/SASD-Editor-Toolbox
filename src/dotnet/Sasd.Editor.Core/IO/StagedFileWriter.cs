@@ -38,7 +38,8 @@ internal static class StagedFileWriter
     internal static async ValueTask WriteAsync(
         string path,
         Func<string, CancellationToken, Task> writeStage,
-        CancellationToken cancellationToken = default)
+        CancellationToken cancellationToken = default,
+        Func<string, CancellationToken, ValueTask>? verifyBeforePublish = null)
     {
         ArgumentException.ThrowIfNullOrWhiteSpace(path);
         ArgumentNullException.ThrowIfNull(writeStage);
@@ -70,8 +71,20 @@ internal static class StagedFileWriter
                 await writeStage(temporaryPath, cancellationToken).ConfigureAwait(false);
                 cancellationToken.ThrowIfCancellationRequested();
 
-                // This final same-directory rename is intentionally not
-                // cancellable; after it succeeds, the new bytes are published.
+                // Optional modern Save precondition: run after staging, while
+                // holding our in-process path gate, immediately before rename.
+                // On conflict the finally block removes the staged file and
+                // leaves the existing destination untouched.
+                if (verifyBeforePublish is not null)
+                {
+                    await verifyBeforePublish(destination, cancellationToken)
+                        .ConfigureAwait(false);
+                    cancellationToken.ThrowIfCancellationRequested();
+                }
+
+                // Another process can still race between this check and
+                // File.Move. We promise best-effort conflict detection, NOT
+                // a cross-process compare-and-swap or durable transaction.
                 File.Move(temporaryPath, destination, overwrite: true);
             }
             finally

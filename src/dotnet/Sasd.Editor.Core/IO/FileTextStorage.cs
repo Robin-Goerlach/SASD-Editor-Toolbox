@@ -1,3 +1,4 @@
+using System.Security.Cryptography;
 using System.Text;
 using Sasd.Editor.Document;
 using Sasd.Editor.Model;
@@ -28,6 +29,7 @@ public sealed class FileTextStorage(Encoding? encoding = null) : ITextStorage
         ArgumentException.ThrowIfNullOrWhiteSpace(path);
         var fullPath = Path.GetFullPath(path);
         string text;
+        DocumentFileRevision? loadedRevision = null;
         if (_useDefaultStrictUtf8)
         {
             // File.ReadAllTextAsync delegates byte-order-mark detection to a
@@ -48,6 +50,11 @@ public sealed class FileTextStorage(Encoding? encoding = null) : ITextStorage
                 && bytes[0] == 0xEF && bytes[1] == 0xBB && bytes[2] == 0xBF
                 ? 3 : 0;
             text = _encoding.GetString(bytes, start, bytes.Length - start);
+
+            // A UTF-8 BOM and newline representation are part of on-disk
+            // bytes even though neither may appear in the normalized buffer.
+            // Record the bytes observed during THIS load, not a second read.
+            loadedRevision = RevisionOf(fullPath, bytes);
         }
         else
         {
@@ -67,17 +74,26 @@ public sealed class FileTextStorage(Encoding? encoding = null) : ITextStorage
         var document = new EditorDocument(new LinkedLineTextBuffer(lines));
         document.SetPersistenceMetadata(fullPath, newLine);
         document.MarkSaved(fullPath);
+        if (loadedRevision is not null)
+            document.RecordLoadedFileRevision(loadedRevision);
         return document;
     }
 
     public async ValueTask SaveAsync(EditorDocument document, string? path = null, CancellationToken cancellationToken = default)
     {
         ArgumentNullException.ThrowIfNull(document);
-        var target = string.IsNullOrWhiteSpace(path) ? document.FilePath : Path.GetFullPath(path);
-        if (string.IsNullOrWhiteSpace(target))
+        var requestedPath = string.IsNullOrWhiteSpace(path) ? document.FilePath : path;
+        if (string.IsNullOrWhiteSpace(requestedPath))
         {
             throw new InvalidOperationException("A target path is required for a document that has not been named.");
         }
+
+        var target = Path.GetFullPath(requestedPath);
+        // Only guard a target whose original raw bytes are known. Explicit
+        // Save As to another path and never-loaded documents retain their
+        // existing caller-controlled overwrite policy.
+        var observed = document.ObservedFileRevision;
+        var expected = SameFilePath(observed?.FullPath, target) ? observed : null;
 
         // Keep modern UTF-8 storage subject to the same in-flight edit rule
         // as the historical FIRST-ED codec: saving yesterday's snapshot must
@@ -110,16 +126,59 @@ public sealed class FileTextStorage(Encoding? encoding = null) : ITextStorage
         }
 
         var content = string.Join(newLineAtWrite, snapshot.Select(static line => line.Text));
+
+        // Capture precisely the bytes being published, including the
+        // explicitly configured encoding's preamble. We must not re-read a
+        // target after Save to establish a new baseline: an external writer
+        // might already have raced with us and supplied different bytes.
+        var encoded = _encoding.GetBytes(content);
+        var preamble = _encoding.GetPreamble();
+        var payload = new byte[preamble.Length + encoded.Length];
+        preamble.CopyTo(payload, 0);
+        encoded.CopyTo(payload, preamble.Length);
+        var publishedRevision = RevisionOf(target, payload);
+
         var saveRequestId = document.BeginSaveRequest();
-        // Publish only a fully encoded and written snapshot. An interrupted
-        // staging write leaves the old destination and document identity alone.
         await StagedFileWriter.WriteAsync(
             target,
-            (temporaryPath, token) => File.WriteAllTextAsync(temporaryPath, content, _encoding, token),
-            cancellationToken).ConfigureAwait(false);
+            (temporaryPath, token) => File.WriteAllBytesAsync(temporaryPath, payload, token),
+            cancellationToken,
+            expected is null ? null : (destination, token) =>
+                VerifyRevisionAsync(destination, expected, token)).ConfigureAwait(false);
         document.AcknowledgeSaveRequest(
-            saveRequestId, versionAtWrite, snapshot, target, newLineAtWrite);
+            saveRequestId, versionAtWrite, snapshot, target, newLineAtWrite,
+            publishedRevision);
     }
+
+    /// <summary>
+    /// Checks the target's current BYTES after staging, as close to the
+    /// overwrite as our own process can arrange. Timestamp/length alone
+    /// cannot detect an equal-size external edit or a changed byte-order mark.
+    /// </summary>
+    private static async ValueTask VerifyRevisionAsync(
+        string destination, DocumentFileRevision expected,
+        CancellationToken cancellationToken)
+    {
+        // A deleted target also fails (FileNotFoundException). Neither
+        // outcome may silently turn an ordinary Save into Save As.
+        var bytes = await File.ReadAllBytesAsync(destination, cancellationToken)
+            .ConfigureAwait(false);
+        if (!string.Equals(RevisionOf(destination, bytes).Sha256,
+                           expected.Sha256, StringComparison.Ordinal))
+        {
+            // Avoid exposing user paths in the host-facing fallback message.
+            throw new IOException(
+                "The target file changed outside the editor since it was loaded or saved.");
+        }
+    }
+
+    private static DocumentFileRevision RevisionOf(string path, byte[] bytes) =>
+        new(path, Convert.ToHexString(SHA256.HashData(bytes)));
+
+    private static bool SameFilePath(string? left, string? right) =>
+        left is not null && string.Equals(left, right,
+            OperatingSystem.IsWindows()
+                ? StringComparison.OrdinalIgnoreCase : StringComparison.Ordinal);
 
     private static string DetectNewLine(string text)
     {
