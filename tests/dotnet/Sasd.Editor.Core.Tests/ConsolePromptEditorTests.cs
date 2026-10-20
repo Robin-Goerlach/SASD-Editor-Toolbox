@@ -37,7 +37,7 @@ public sealed class ConsolePromptEditorTests
         var editor = new ConsolePromptEditor();
         editor.Process(Key('A'));
         editor.Process(Key('B'));
-        Assert.Equal("mpt:", editor.Project("Prompt:", 4).Text);
+        Assert.Equal("t:AB", editor.Project("Prompt:", 4).Text);
         editor.Process(new ConsoleKeyInfo('\b', ConsoleKey.Backspace, false, false, false));
         editor.Process(new ConsoleKeyInfo('\b', ConsoleKey.Backspace, false, false, false));
         editor.Process(new ConsoleKeyInfo('\b', ConsoleKey.Backspace, false, false, false));
