@@ -286,3 +286,7 @@ Direct and FIRST-ED Insert-mode Tab now reject unsafe generated padding and virt
 ## V1 release gate
 
 The C#/.NET implementation now has executable coverage for the major FIRST-ED structural areas, including paragraph reformatting, whole-line block bulk topology, independent block endpoints and atomic multi-document undo/navigation restoration. The [handbook procedure/function index audit](HANDBOOK-PROCEDURE-INDEX-AUDIT.md) now records all 123 printed entries with first-pass classifications; its mapped behavior still requires a final regression-coverage and host-interface audit before calling V1 complete. MicroStar-specific demonstrations may ship as samples rather than core dependencies.
+
+## Default UTF-8 malformed-input safety (.NET modern storage)
+
+The `FileTextStorage` default now decodes UTF-8 strictly: invalid byte streams fail before an editor document is created, while a valid UTF-8 BOM remains readable and the default save continues BOM-less. It also rejects unpaired UTF-16 surrogates on write without replacing existing disk bytes or acknowledging a nonexistent save. Explicit alternate encodings preserve their previous caller-selected decoding policy. This is an additional **.NET-only modern persistence-safety policy**, not a new claim of 1985 compatibility or a portable FIRST-ED conformance fixture.

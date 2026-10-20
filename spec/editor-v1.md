@@ -216,7 +216,7 @@ The core does not write directly to console/video memory. It exposes viewport/st
 
 ## 12. Persistence and compatibility file I/O
 
-- Modern document persistence is abstracted. The first .NET `ITextStorage` provider supports UTF-8 files and preserves the detected newline convention for subsequent saves.
+- Modern document persistence is abstracted. The first .NET `ITextStorage` provider supports UTF-8 files and preserves the detected newline convention for subsequent saves. Its **default** UTF-8 mode rejects malformed byte sequences on load and invalid UTF-16 surrogate sequences on save, rather than silently substituting U+FFFD. An optional UTF-8 BOM is accepted on load; the default writer continues to emit BOM-less UTF-8. Other encodings and their fallback/BOM handling must be explicitly selected by the embedding application. These are modern .NET storage-safety rules, not historical DOS file-format semantics.
 - Compatibility file commands use a separate file-codec boundary so historical formats do not become mandatory modern storage formats.
 - The Turbo Editor Toolbox wrapped-line marker is a high-bit carriage return (`0x8D`, decimal 141). Decoding it marks the preceding logical line's outgoing boundary as wrapped; encoding a wrapped boundary emits it after that line.
 - The modern UTF-8 whole-document writer must reject CR/LF *inside logical line text* and any configured newline convention other than CRLF, LF or CR before touching the destination; otherwise a save/load round trip would silently alter logical-line topology. The newline style used for the written snapshot also participates in save acknowledgement so metadata changes during async writing do not falsely acknowledge the old serialized representation.

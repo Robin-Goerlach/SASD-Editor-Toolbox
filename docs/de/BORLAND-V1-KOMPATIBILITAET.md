@@ -285,3 +285,7 @@ Der direkte Editor-Tab und der FIRST-ED-Tab im Einfügemodus lehnen übermäßig
 ## V1-Abschlusskriterium
 
 Die C#/.NET-Implementierung deckt die großen strukturellen FIRST-ED-Bereiche inzwischen ausführbar ab, einschließlich Absatz-Neuformatierung, mehrzeiliger Block-Bulk-Topologie, unabhängiger Block-Endpunkte und atomarer Multi-Dokument-Undo-/Navigationswiederherstellung. Der [Handbuch-Prozeduren-/Funktionsindex-Audit](HANDBUCH-PROZEDURENINDEX-AUDIT.md) erfasst inzwischen alle 123 gedruckten Einträge mit ersten Klassifikationen; die zugeordneten Routinen benötigen vor V1 noch einen abschließenden Testabdeckungs- und Host-Audit. MicroStar-spezifische Demonstrationen können als Samples statt als Core-Abhängigkeiten geliefert werden.
+
+## Sicheres Standard-UTF-8 bei fehlerhaften Eingaben (.NET)
+
+Der Standard-`FileTextStorage` dekodiert UTF-8 nun strikt: Ungültige Bytefolgen werden zurückgewiesen, bevor ein Editor-Dokument entstehen kann. Eine gültige UTF-8-BOM bleibt beim Lesen zulässig; der Standardspeicherweg schreibt weiterhin ohne BOM. Einzelne ungepaarte UTF-16-Surrogates werden beim Speichern abgelehnt, ohne bestehende Dateibytes zu ersetzen oder einen nicht erfolgten Speicherstand zu bestätigen. Explizit konfigurierte alternative Kodierungen behalten ihre bisherige Decoder-Policy. Dies ist ein zusätzlicher **moderner .NET-Persistenzschutz**, kein neuer Nachweis zur Kompatibilität mit dem historischen Editor von 1985.

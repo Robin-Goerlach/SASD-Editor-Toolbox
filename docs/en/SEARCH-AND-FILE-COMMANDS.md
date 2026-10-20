@@ -149,3 +149,11 @@ The ordering token belongs to the document, not a concrete UI host or codec. Dir
 FIRST-ED's 8-bit codec can reject a logical line containing non-Latin-1 characters or its reserved `0x8D` boundary value. Encoding rejection is a **file-format/output failure**, not a malformed host command: semantic Read/Write/Save now report `FileIoFailed` for `EncoderFallbackException` and preserve the original bytes because the codec validates before staging. A `SecurityException` raised by a provider is reported as `AccessDenied` alongside `UnauthorizedAccessException`. Both failures leave document text, Undo, Dirty and file association unchanged; diagnostic exception messages are not used as UI text.
 
 These are modern .NET adapter error classifications. Platform-specific permission behavior, crash durability and alias-path locking are *not* inferred from these injected-error tests.
+
+## Strict default UTF-8 decoding and encoding
+
+The modern `FileTextStorage` now defaults to **strict** UTF-8 rather than replacement-fallback UTF-8. It decodes the entire input before constructing an editor document; malformed bytes raise `DecoderFallbackException` rather than being silently converted to U+FFFD. A valid UTF-8 BOM is accepted and removed from logical text; saving continues to emit BOM-less UTF-8. In the default mode, a UTF-16/UTF-32 BOM no longer causes automatic reinterpretation of the file. Hosts wishing to read other encodings must explicitly configure an `Encoding` or an alternate `ITextStorage` provider.
+
+Strict UTF-8 also rejects unpaired surrogate code units on output via `EncoderFallbackException`. The staged writer protects the previous destination bytes when that conversion fails, while document text, file association, Dirty status and Undo remain unchanged. A *valid*, explicitly encoded U+FFFD is still ordinary Unicode text and is accepted.
+
+An explicitly supplied `Encoding` retains its own fallback and BOM-detection behavior; the strict guarantees above apply to the default UTF-8 mode. This is a modern data-integrity policy, not a statement about Turbo Editor Toolbox's 8-bit file representation. File-size/memory optimizations and external-file change detection remain separate follow-up work.
