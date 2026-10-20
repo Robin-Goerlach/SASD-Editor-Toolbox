@@ -26,7 +26,7 @@ internal sealed class ConsoleFirstEdHost : IEditorInputPump
         _hooks = hooks ?? throw new ArgumentNullException(nameof(hooks));
         _dispatcher = new EditorCommandDispatcher(session);
         _renderer = new ConsoleFirstEdRenderer(session);
-        _prompts = new ConsoleFirstEdPromptService(_renderer);
+        _prompts = new ConsoleFirstEdPromptService(_renderer, session);
     }
 
     public void Render(string? message = null) => _renderer.Render(message);

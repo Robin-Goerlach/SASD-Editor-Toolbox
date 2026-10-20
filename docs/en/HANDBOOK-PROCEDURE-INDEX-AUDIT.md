@@ -83,6 +83,10 @@ Ten new portable cooperative lifecycle cases now link the remaining five already
 
 Twelve additional host-neutral Cp wrapper cases link nine previously unlinked historical interactive procedures for window operations, marker commands, margins, tab stops and Undo limits. The tests check confirmed/cancelled prompts and rejected state-dependent values through the actual Ctrl-K/O/Q boundary. **101 of 123** historic routine names now carry direct executable portable evidence, not a blanket DOS UI certification.
 
+## Additional .NET-only sample-host evidence: first Save
+
+The FIRST-ED terminal sample now prompts for a destination when Ctrl-K S is pressed on a new, unnamed document. Tests isolate the Save prompt decision from console rendering, distinguish null/blank cancellation from an actual filename, and dispatch a first and subsequent Save through a recording codec. An existing associated document saves directly; the path is never inherited from another window. This is a **modern sample-host usability policy** with executable .NET evidence, not a portable conformance case or a verified reconstruction of the original `EditCpFileSave` dialog. That inventory row deliberately remains *unlinked* pending exact historical/dialog acceptance.
+
 ## Next review and acceptance criteria
 
 For each *needs-review* row, examine its individual handbook description, check the existing architecture and tests, add focused regression coverage for genuine behavior gaps, then independently implement only those gaps. Revisit the conceptual *implemented* mappings and identify any missing tests without fabricating Pascal-shaped APIs. Keep the English and German audit, compatibility matrix, and any affected shared specification/conformance cases synchronized.

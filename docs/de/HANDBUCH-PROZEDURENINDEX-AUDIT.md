@@ -89,3 +89,7 @@ Jeden offenen Eintrag anhand seiner eigenen Handbuchbeschreibung prüfen, die be
 
 Die Python-Vertragsprüfung sichert **123 eindeutige Namen**, die fortlaufenden gedruckten Seiten **118–240**, zulässige Statuswerte und existente Belegpfade. Das beweist die **Inventarvollständigkeit**, nicht die historische Verhaltensgleichheit. V1 bleibt bis zum Abschluss des übergreifenden Verhaltens- und Regressionstest-Audits offen.
 
+
+## Ergänzende .NET-Host-Belege: erstes Speichern
+
+Der FIRST-ED-Terminalhost fragt bei Ctrl-K S für ein neues Dokument ohne zugeordneten Dateipfad nun nach einem Zielnamen. Headless-Tests trennen die Entscheidung vom Console-Rendering, prüfen Abbruch durch `null`/leere Antwort und führen erstes sowie wiederholtes Speichern über den echten semantischen Dispatcher mit einem protokollierenden Codec aus. Ein Dokument mit bekanntem Pfad wird ohne erneute Abfrage gespeichert; die Pfadentscheidung bleibt dokumentbezogen. Dies ist eine **moderne Host-Bedienregel** mit .NET-Testbelegen, jedoch weder ein sprachneutraler Conformance-Fall noch eine bestätigte Nachbildung des ursprünglichen `EditCpFileSave`-Dialogs. Der historische Indexeintrag erhält deshalb noch **keinen** direkten portablen Testverweis.

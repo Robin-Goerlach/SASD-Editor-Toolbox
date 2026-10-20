@@ -31,6 +31,8 @@ For Ctrl-K X, the host requires the word `YES` before dispatching `EditorCommand
 
 A blank Find prompt is translated to `FindAgain`, preserving the remembered-search behavior already implemented in the core.
 
+**Ctrl-K S (Save File)** is a conditional terminal-host workflow. For a freshly created `NONAME` document with no associated path, the host asks for **Save as file path**; Escape/Ctrl-U or an empty/blank answer cancels without dispatch or disk I/O. Once a Save succeeds and the document has a filename, the same shortcut saves directly without prompting again. This choice is per *document*, not a global last-used path. The small `ConsoleFirstEdSavePromptPolicy` reuses the shared host-neutral filename resolver and has headless regression tests exercising real semantic Save dispatch through a recording file codec. This is an explicitly documented **modern host policy**, not a claim about the exact 1985 `EditCpFileSave` dialog. The shared editor core, direct Write File semantics and Unicode storage policy are unchanged.
+
 The interactive line prompt now uses a small, testable **sample-host input model**. Escape and physical Ctrl-U cancel without constructing a command; Enter submits even an empty response. When a prompt or answer is wider than the terminal row, the display follows the **rightmost characters**, while the full untruncated value is passed to the host-neutral command resolver. This is a modern terminal usability and cancellation policy, not a claim about DOS screen routines. Pure input/projection tests do not replace manual terminal smoke testing.
 
 ## Status and rendering

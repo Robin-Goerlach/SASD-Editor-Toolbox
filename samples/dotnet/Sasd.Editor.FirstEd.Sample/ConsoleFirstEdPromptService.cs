@@ -1,5 +1,6 @@
 using Sasd.Editor.Commands;
 using Sasd.Editor.Input;
+using Sasd.Editor.Editing;
 
 namespace Sasd.Editor.FirstEd.Sample;
 
@@ -7,11 +8,19 @@ namespace Sasd.Editor.FirstEd.Sample;
 /// Resolves prompt metadata produced by the core key map. The key map declares
 /// what it needs; this terminal host decides how to ask for it.
 /// </summary>
-internal sealed class ConsoleFirstEdPromptService(ConsoleFirstEdRenderer renderer)
+internal sealed class ConsoleFirstEdPromptService(ConsoleFirstEdRenderer renderer, EditorSession session)
 {
     public EditorCommandRequest? Resolve(EditorCommandBinding binding, int visibleRows)
     {
         ArgumentNullException.ThrowIfNull(binding);
+
+        // Save File has a conditional host prompt: a new NONAME document has
+        // no target, while an already associated document can save directly.
+        // Do not put this dialog decision into the reusable key map or core.
+        if (binding.CommandId == EditorCommandId.SaveFile)
+        {
+            return ResolveSaveFile(binding, visibleRows);
+        }
 
         return binding.ArgumentKind switch
         {
@@ -25,6 +34,20 @@ internal sealed class ConsoleFirstEdPromptService(ConsoleFirstEdRenderer rendere
             EditorCommandArgumentKind.Confirmation => ResolveConfirmation(binding, visibleRows),
             _ => null
         };
+    }
+
+    private EditorCommandRequest? ResolveSaveFile(EditorCommandBinding binding, int visibleRows)
+    {
+        // Capture the active document association before collecting input.
+        // Prompting is synchronous in this terminal sample; the selected view
+        // must never inherit another view's previously used file name.
+        var associatedPath = session.CurrentWindow.Document.FilePath;
+        var enteredPath = ConsoleFirstEdSavePromptPolicy.RequiresPath(associatedPath)
+            ? renderer.ReadPrompt("Save as file path: ")
+            : null;
+
+        return ConsoleFirstEdSavePromptPolicy.Resolve(
+            binding, visibleRows, associatedPath, enteredPath);
     }
 
     private EditorCommandRequest? ResolveNumber(EditorCommandBinding binding, int visibleRows)
