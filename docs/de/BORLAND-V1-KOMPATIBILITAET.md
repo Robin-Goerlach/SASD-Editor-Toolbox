@@ -289,3 +289,7 @@ Die C#/.NET-Implementierung deckt die großen strukturellen FIRST-ED-Bereiche in
 ## Sicheres Standard-UTF-8 bei fehlerhaften Eingaben (.NET)
 
 Der Standard-`FileTextStorage` dekodiert UTF-8 nun strikt: Ungültige Bytefolgen werden zurückgewiesen, bevor ein Editor-Dokument entstehen kann. Eine gültige UTF-8-BOM bleibt beim Lesen zulässig; der Standardspeicherweg schreibt weiterhin ohne BOM. Einzelne ungepaarte UTF-16-Surrogates werden beim Speichern abgelehnt, ohne bestehende Dateibytes zu ersetzen oder einen nicht erfolgten Speicherstand zu bestätigen. Explizit konfigurierte alternative Kodierungen behalten ihre bisherige Decoder-Policy. Dies ist ein zusätzlicher **moderner .NET-Persistenzschutz**, kein neuer Nachweis zur Kompatibilität mit dem historischen Editor von 1985.
+
+## Schutz vor externen Änderungen (moderne .NET-Speicherung)
+
+Ein erfolgreich über Standard-UTF-8 geladenes Dokument erhält einen SHA-256-Nachweis seiner ursprünglichen Dateibytes. Vor der Veröffentlichung eines modernen Save auf denselben Pfad vergleicht der Staging-Writer die aktuellen Bytes mit diesem Stand. Eine extern veränderte oder gelöschte Datei wird nicht überschrieben; nach erfolgreichem Save wird die dokumentgebundene Revision aktualisiert. Das ist ein **moderner, auf .NET beschränkter Best-Effort-Schutz** und weder eine historische FIRST-ED-Regel noch eine atomare Transaktion mit anderen Prozessen. Die Tests decken gleichlange Änderungen, Löschung, BOM-Änderungen, wiederholtes Save, explizites Save As und den Prüfpunkt vor der Veröffentlichung ab.

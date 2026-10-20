@@ -290,3 +290,7 @@ The C#/.NET implementation now has executable coverage for the major FIRST-ED st
 ## Default UTF-8 malformed-input safety (.NET modern storage)
 
 The `FileTextStorage` default now decodes UTF-8 strictly: invalid byte streams fail before an editor document is created, while a valid UTF-8 BOM remains readable and the default save continues BOM-less. It also rejects unpaired UTF-16 surrogates on write without replacing existing disk bytes or acknowledging a nonexistent save. Explicit alternate encodings preserve their previous caller-selected decoding policy. This is an additional **.NET-only modern persistence-safety policy**, not a new claim of 1985 compatibility or a portable FIRST-ED conformance fixture.
+
+## Protection against external changes (modern .NET storage)
+
+A successfully loaded default UTF-8 document now tracks a raw-byte SHA-256 revision. Before a modern Save publishes to the same path, the staged writer validates that the on-disk bytes still match. A changed/deleted file is not overwritten; successful publication advances the document-owned revision. This is a **.NET-only best-effort persistence safeguard**, not a portably required historical FIRST-ED behavior or cross-process atomic transaction. The relevant tests exercise equal-length changes, deletion, BOM-only changes, successive saves, explicit Save As and the pre-publication hook.
