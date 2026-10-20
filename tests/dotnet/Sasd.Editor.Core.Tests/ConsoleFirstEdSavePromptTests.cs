@@ -95,7 +95,10 @@ public sealed class ConsoleFirstEdSavePromptTests
         Assert.True(await new EditorCommandDispatcher(session).ExecuteAsync(second));
 
         Assert.Equal(2, codec.Writes.Count);
-        Assert.All(codec.Writes, entry => Assert.Equal("first-save.txt", entry.Path));
+        // First Save used the entered relative name. The acknowledged document
+        // association is normalized to an absolute path for the next Save.
+        Assert.Equal("first-save.txt", codec.Writes[0].Path);
+        Assert.Equal(Path.GetFullPath("first-save.txt"), codec.Writes[1].Path);
         Assert.Equal("new original", Assert.Single(codec.Writes[1].Lines).Text);
         Assert.Equal(Path.GetFullPath("first-save.txt"), window.Document.FilePath);
         Assert.False(window.Document.IsDirty);
