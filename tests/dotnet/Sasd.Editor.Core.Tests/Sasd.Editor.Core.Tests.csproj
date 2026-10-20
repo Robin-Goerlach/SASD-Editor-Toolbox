@@ -14,6 +14,8 @@
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="../../../src/dotnet/Sasd.Editor.Core/Sasd.Editor.Core.csproj" />
+    <!-- The console sample is a test dependency, never a dependency of Core. -->
+    <ProjectReference Include="../../../samples/dotnet/Sasd.Editor.FirstEd.Sample/Sasd.Editor.FirstEd.Sample.csproj" />
   </ItemGroup>
   <ItemGroup>
     <None Include="../../../conformance/v1/**/*.json"

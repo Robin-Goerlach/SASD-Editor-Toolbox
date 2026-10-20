@@ -31,6 +31,8 @@ Bei Ctrl-K X verlangt der Host das Wort `YES`, bevor `EditorCommandId.Exit` ausg
 
 Eine leere Find-Eingabe wird auf `FindAgain` umgesetzt und nutzt damit den bereits im Core implementierten gemerkten Suchzustand.
 
+Die interaktive Zeilenabfrage besitzt nun ein kleines, separat testbares **Eingabemodell im Beispiel-Host**. Escape und physisches Ctrl-U brechen ab, ohne einen Editorbefehl zu erzeugen; Enter bestätigt auch eine bewusst leere Eingabe. Passt die gesamte Abfrage nicht in die Terminalzeile, zeigt der Host die **zuletzt eingegebenen Zeichen**, übergibt aber weiterhin den vollständigen unveränderten Wert an die hostneutrale Befehlsauflösung. Das ist eine moderne Terminal- und Abbruchregel, keine behauptete DOS-Bildschirmkompatibilität. Automatisierte Eingabe-/Projektionsprüfungen ersetzen keinen manuellen Terminal-Smoke-Test.
+
 ## Status und Rendering
 
 Beim Start erzeugt das Beispiel ein leeres unbenanntes Dokument. Die Statuszeile beginnt daher mit Fenster 1 / `NONAME`. Angezeigt werden einbasierte Zeilen-/Spaltenwerte sowie Insert-, Word-Wrap-, Auto-Indent- und Dirty-Zustand.

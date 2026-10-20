@@ -83,44 +83,35 @@ internal sealed class ConsoleFirstEdRenderer(EditorSession session)
     {
         var width = Math.Max(1, Console.WindowWidth - 1);
         var row = Math.Max(0, Console.WindowHeight - 1);
-        WriteRow(row, prompt, width);
-        var column = Math.Min(prompt.Length, width - 1);
-        Console.SetCursorPosition(column, row);
+        // A host-local editor retains the complete response even when the
+        // last physical row is too narrow to show the whole prompt. It also
+        // makes cancellation distinguishable from a submitted empty string.
+        var editor = new ConsolePromptEditor();
+        void Paint()
+        {
+            var display = editor.Project(prompt, width);
+            WriteRow(row, display.Text, width);
+            Console.SetCursorPosition(display.CaretColumn, row);
+        }
+
+        Paint();
         Console.CursorVisible = true;
-        // Console.ReadLine cannot distinguish pressing Escape from other
-        // control input. For a real interactive terminal, collect keys
-        // explicitly so Escape cancels the dialog (null) rather than
-        // masquerading as an empty, potentially destructive value.
+        // Redirected input remains a separate non-interactive fallback; the
+        // executable sample normally rejects redirection at startup.
         if (Console.IsInputRedirected)
         {
             return Console.ReadLine();
         }
 
-        var answer = new System.Text.StringBuilder();
         while (true)
         {
-            var key = Console.ReadKey(intercept: true);
-            switch (key.Key)
-            {
-                case ConsoleKey.Escape:
-                    return null;
-                case ConsoleKey.Enter:
-                    return answer.ToString();
-                case ConsoleKey.Backspace:
-                    if (answer.Length > 0)
-                        answer.Length--;
-                    break;
-                default:
-                    if (!char.IsControl(key.KeyChar))
-                        answer.Append(key.KeyChar);
-                    break;
-            }
+            var result = editor.Process(Console.ReadKey(intercept: true));
+            if (result == ConsolePromptInputResult.Cancelled)
+                return null;
+            if (result == ConsolePromptInputResult.Submitted)
+                return editor.Answer;
 
-            // Repaint just the prompt row. The editor core never sees any
-            // of these terminal cursor-positioning or echo operations.
-            var displayed = prompt + answer;
-            WriteRow(row, displayed, width);
-            Console.SetCursorPosition(Math.Min(displayed.Length, width - 1), row);
+            Paint();
         }
     }
 

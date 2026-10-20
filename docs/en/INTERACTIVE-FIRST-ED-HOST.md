@@ -31,6 +31,8 @@ For Ctrl-K X, the host requires the word `YES` before dispatching `EditorCommand
 
 A blank Find prompt is translated to `FindAgain`, preserving the remembered-search behavior already implemented in the core.
 
+The interactive line prompt now uses a small, testable **sample-host input model**. Escape and physical Ctrl-U cancel without constructing a command; Enter submits even an empty response. When a prompt or answer is wider than the terminal row, the display follows the **rightmost characters**, while the full untruncated value is passed to the host-neutral command resolver. This is a modern terminal usability and cancellation policy, not a claim about DOS screen routines. Pure input/projection tests do not replace manual terminal smoke testing.
+
 ## Status and rendering
 
 On startup the sample creates one empty unnamed document, so the status line begins with Window 1 / `NONAME`. The renderer shows one-based line and column values and current insert, word-wrap, auto-indent and dirty state.

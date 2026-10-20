@@ -5,5 +5,7 @@
   </PropertyGroup>
   <ItemGroup>
     <ProjectReference Include="../../../src/dotnet/Sasd.Editor.Core/Sasd.Editor.Core.csproj" />
+    <!-- Permit headless regression tests of the sample-only prompt state. -->
+    <InternalsVisibleTo Include="Sasd.Editor.Core.Tests" />
   </ItemGroup>
 </Project>
