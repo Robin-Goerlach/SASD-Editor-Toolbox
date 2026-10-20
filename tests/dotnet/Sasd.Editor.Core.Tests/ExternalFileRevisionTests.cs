@@ -97,7 +97,11 @@ public sealed class ExternalFileRevisionTests
             await File.WriteAllBytesAsync(path, [(byte)'a']);
             await Assert.ThrowsAsync<IOException>(
                 async () => await new FileTextStorage().SaveAsync(document));
-            Assert.Equal([(byte)'a'], await File.ReadAllBytesAsync(path));
+            // Materialize the awaited bytes before comparing. A collection
+            // expression in Assert.Equal can select a ReadOnlySpan overload,
+            // which must not be kept live across an await boundary.
+            var actualBytes = await File.ReadAllBytesAsync(path);
+            Assert.Equal(new byte[] { (byte)'a' }, actualBytes);
             Assert.False(document.IsDirty);
             Assert.Equal(Path.GetFullPath(path), document.FilePath);
         }
