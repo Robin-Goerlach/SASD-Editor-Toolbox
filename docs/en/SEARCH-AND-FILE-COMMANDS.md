@@ -143,3 +143,9 @@ The newline convention is also captured alongside the version and line snapshot.
 The normalized-path staging gate cannot help if the *same document* is saved simultaneously to two different filenames. Both file writes may finish in either order. The editor therefore reserves a monotonically increasing save-request ID before each awaited Save/Save As and accepts only **the newest successfully completed request** as the current file association. A slower earlier save may still write its own target, but cannot revert `FilePath` or clear dirty state after a later successful Save As. A newer failed or cancelled request does not advance the acknowledgement watermark, so an older successful save can still be acknowledged. Text/version and newline snapshot comparisons remain required before clearing dirty status.
 
 The ordering token belongs to the document, not a concrete UI host or codec. Direct historical Write File intentionally does not participate because it never changes document identity. Tests use a controllable injected codec to complete writes in either order without timing assumptions.
+
+## Legacy file encoding and permission failures
+
+FIRST-ED's 8-bit codec can reject a logical line containing non-Latin-1 characters or its reserved `0x8D` boundary value. Encoding rejection is a **file-format/output failure**, not a malformed host command: semantic Read/Write/Save now report `FileIoFailed` for `EncoderFallbackException` and preserve the original bytes because the codec validates before staging. A `SecurityException` raised by a provider is reported as `AccessDenied` alongside `UnauthorizedAccessException`. Both failures leave document text, Undo, Dirty and file association unchanged; diagnostic exception messages are not used as UI text.
+
+These are modern .NET adapter error classifications. Platform-specific permission behavior, crash durability and alias-path locking are *not* inferred from these injected-error tests.

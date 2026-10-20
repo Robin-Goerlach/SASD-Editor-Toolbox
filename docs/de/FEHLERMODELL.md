@@ -42,8 +42,8 @@ Normale Navigations-No-ops bleiben hingegen gewöhnliche `false`-Ergebnisse. Das
 
 Der Dispatcher ordnet erwartete Exception-Familien stabil zu, ohne deren Wortlaut zum UI-Vertrag zu machen:
 
-- `IOException` -> `FileIoFailed`;
-- `UnauthorizedAccessException` -> `AccessDenied`;
+- `IOException` und `EncoderFallbackException` -> `FileIoFailed`;
+- `UnauthorizedAccessException` und `SecurityException` -> `AccessDenied`;
 - `NotSupportedException` -> `UnsupportedOperation`;
 - verbleibende `ArgumentException` -> `InvalidCommandArgument`;
 - `InvalidOperationException` -> `OperationFailed`.

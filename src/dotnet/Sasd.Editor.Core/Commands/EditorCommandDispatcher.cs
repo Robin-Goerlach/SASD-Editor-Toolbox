@@ -1,3 +1,4 @@
+using System.Security;
 using Sasd.Editor.Editing;
 using Sasd.Editor.Hooks;
 using Sasd.Editor.Search;
@@ -160,6 +161,7 @@ public sealed class EditorCommandDispatcher(EditorSession session)
                                           or InvalidOperationException
                                           or IOException
                                           or UnauthorizedAccessException
+                                          or SecurityException
                                           or NotSupportedException)
         {
             return await ReportErrorAsync(

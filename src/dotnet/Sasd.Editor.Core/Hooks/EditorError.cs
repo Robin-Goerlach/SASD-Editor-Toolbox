@@ -1,3 +1,5 @@
+using System.Security;
+using System.Text;
 using Sasd.Editor.Commands;
 
 namespace Sasd.Editor.Hooks;
@@ -194,8 +196,13 @@ public static class EditorErrorCatalog
 
         var id = exception switch
         {
-            UnauthorizedAccessException => EditorErrorId.AccessDenied,
+            UnauthorizedAccessException or SecurityException => EditorErrorId.AccessDenied,
             IOException => EditorErrorId.FileIoFailed,
+            // EncoderFallbackException derives from ArgumentException, but a
+            // codec refusing to encode a document is not a malformed command
+            // request. It is a file-format failure; keep the source document
+            // untouched and report it as such to all host implementations.
+            EncoderFallbackException => EditorErrorId.FileIoFailed,
             NotSupportedException => EditorErrorId.UnsupportedOperation,
             ArgumentException => EditorErrorId.InvalidCommandArgument,
             InvalidOperationException => EditorErrorId.OperationFailed,

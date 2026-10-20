@@ -42,8 +42,8 @@ Ordinary navigation no-ops remain normal `false` results rather than becoming er
 
 The dispatcher maps expected exception families without leaking their text into the UI contract:
 
-- `IOException` -> `FileIoFailed`;
-- `UnauthorizedAccessException` -> `AccessDenied`;
+- `IOException` and `EncoderFallbackException` -> `FileIoFailed`;
+- `UnauthorizedAccessException` and `SecurityException` -> `AccessDenied`;
 - `NotSupportedException` -> `UnsupportedOperation`;
 - residual `ArgumentException` -> `InvalidCommandArgument`;
 - `InvalidOperationException` -> `OperationFailed`.
