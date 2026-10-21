@@ -315,3 +315,8 @@ A reviewed `EditJoinLine`/Delete Left/Right Character/Word grouping exposed an o
 ## V1 structural split outgoing-boundary audit
 
 The handbook-described `EditInsertLine`/`EditNewLine` shared splitter had a real outgoing `Wrapped` misassignment: the original soft separator to a later line must move behind the newly created lower fragment, while the fresh upper-to-lower boundary is hard. `UserColored` stays on the surviving upper descriptor and transient `InBlock` is reprojected. Seven additional portable tests (251 total), native legacy-byte verification and Undo/linked-window tests now cover the three split positions and both commands. `EditDeleteLine`'s only-line blanking exception has additional direct regression coverage. The existing 103/123 mapped rows have stronger evidence; full interactive terminal and remaining historical audits are not signed off.
+
+
+## V1 block Move no-op and atomicity audit
+
+The original `EditBlockMove` restriction on destinations inside a selected block remains enforced. SASD now treats a same-document move immediately before the block's existing successor as a **successful non-mutating operation**; historical Dirty/Undo bookkeeping for this edge case is undocumented, so this is an explicit modern policy. Direct tests also verify a real upward move, copying into the selection, and moving the entire source stream into another document with atomic Undo. Two portable cases (253 V1 cases total) are linked to the existing `EditBlockMove` routine evidence; the inventory remains **103/123** linked. Final Windows/Linux terminal and full handbook sign-off remain outstanding.
