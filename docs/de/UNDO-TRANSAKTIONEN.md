@@ -88,3 +88,12 @@ Der FIRST-ED-Kompatibilitätsbefehl zum Setzen des Limits verlangt weiterhin min
 - das Zerstören eines Dokuments verwirft die gesamte Compound-Transaktion.
 
 Das Snapshot-Design bevorzugt bewusst nachvollziehbare Korrektheit gegenüber Speichereffizienz. Ein späteres Delta-/Journal-Backend kann die Speicherstrategie ersetzen, ohne diese Transaktionssemantik zu verändern.
+
+
+## Fensteridentität nach Link Window – Sicherheit des älteren Capture-Zugangs
+
+Das bevorzugte transaktionsbasierte Undo speichert zu jedem Fenster sowohl `WindowId` als auch das zugeordnete `DocumentId`. Navigationszustände werden nur bei weiterhin passender Zuordnung wiederhergestellt. Der ältere öffentliche Aufruf `EditorUndoManager.Capture(EditorWindow, description)` bleibt für bestehende Anwendungen verfügbar. Bisher stellte er seine Cursorposition allein anhand der `WindowId` wieder her. Wenn der historische Befehl **Link Window** das Fenster zwischenzeitlich mit einem anderen Textstrom verbunden hatte, konnte Undo das falsche Fenster aktivieren und die alte Cursorposition in ein fremdes Dokument übertragen. Die Textwiederherstellung selbst erfolgte bereits korrekt anhand der `DocumentId`.
+
+`RestoreLegacyCursor` prüft jetzt zusätzlich die Dokumentidentität. Ist das ursprüngliche Fenster **noch vorhanden, aber umgekoppelt**, bleiben dessen Navigation und die aktuelle Fensterauswahl unangetastet; der ursprüngliche Text wird dennoch über ein weiterhin verbundenes Geschwisterfenster restauriert. Wurde das ursprüngliche Fenster **geschlossen**, darf die bisherige Fallback-Regel ein überlebendes Geschwisterfenster des alten Dokuments auswählen. Ohne Umkopplung funktioniert die gewohnte Cursorwiederherstellung weiterhin. Der Fix führt weder Pascal-Zeigerlogik ein noch verändert er die atomare Undo-Buchführung.
+
+Vier direkte Regressionstests in `UndoWindowIdentityTests` prüfen Umkopplung, unveränderten Capture-Zugang, Fallback nach Schließen und den modernen Transaktionsweg. Ein portabler Fall `windows.undo-relinked-view-preserves-unrelated-current-window` belegt außerdem das hostneutrale Navigationsverhalten. Das sind konkrete Regressionsnachweise und keine Behauptungen über den ursprünglichen DOS-Undo-Stack.
