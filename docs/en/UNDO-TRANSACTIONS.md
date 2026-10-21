@@ -88,3 +88,12 @@ The FIRST-ED compatibility command for setting the limit still requires a value 
 - destroying one document discards the whole compound transaction.
 
 The snapshot design intentionally favors reviewable correctness over memory efficiency. A future delta/journal backend can replace the storage strategy without changing these transaction semantics.
+
+
+## Window identity after Link Window — legacy Capture safety
+
+The preferred transaction-based Undo records each window's `WindowId` **and** attached `DocumentId`, and restores navigation only while the recorded post-command view still matches. The older public low-level `EditorUndoManager.Capture(EditorWindow, description)` path is retained for existing integrations. It originally restored its cursor by `WindowId` alone. After historical **Link Window** reattached that view to another text stream, Undo could wrongly activate the now unrelated window and place the captured cursor into the wrong document. The text itself was already restored by its correct `DocumentId`.
+
+`RestoreLegacyCursor` now also checks document identity. If the captured view is **still present but relinked**, it does **not** restore navigation to that view, and it preserves the current focus. An original document kept alive by a linked sibling is still restored as text. If the captured view was actually **closed**, the established fallback may select a surviving sibling of the original document. A captured view that still displays the original document retains the ordinary cursor restoration. This change does not create a Pascal pointer-emulation layer or change compound Undo accounting.
+
+Four direct regression tests in `UndoWindowIdentityTests` cover relinking, intact capture, closed-view fallback and the newer transaction API. A portable `windows.undo-relinked-view-preserves-unrelated-current-window` case additionally checks the modern, host-neutral navigation behavior. These are focused regression guarantees, not historical Undo-stack internals.
