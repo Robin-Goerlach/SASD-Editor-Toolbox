@@ -27,12 +27,10 @@ internal static class ConsoleFirstEdControlCharacterPromptPolicy
         // prompt. In particular Ctrl-U must NOT insert U / 0x15 by mistake.
         // On some terminals Ctrl+U arrives as the literal control code even
         // when the corresponding ConsoleKey is unavailable.
-        if (key.Key == ConsoleKey.Escape
-            || (key.Key == ConsoleKey.U
-                && (key.Modifiers & ConsoleModifiers.Control) != 0
-                && (key.Modifiers & ConsoleModifiers.Alt) == 0)
-            || (key.KeyChar == '\u0015'
-                && (key.Modifiers & ConsoleModifiers.Alt) == 0))
+        // Use precisely the same host-level cancellation decision as the
+        // multi-character Askfor prompt; raw Ctrl-U and raw ESC may arrive
+        // without a named ConsoleKey on some terminals.
+        if (ConsolePromptKeyPolicy.IsCancellation(key))
         {
             return null;
         }
