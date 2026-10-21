@@ -97,3 +97,25 @@ The Python repository-contract gate validates **123 distinct names**, sequential
 ## .NET terminal sample: overwrite consent for first Save and Write File
 
 The sample host now asks for an explicit YES before overwriting an existing filename selected by a first Ctrl-K S Save As or by Ctrl-K W Write File. Cancellation produces no semantic request, while a confirmed Write File still preserves document name/Dirty/Undo. Tests exercise the pure host decision, real temporary files and actual semantic dispatch. An ordinary Save to an already associated path remains direct. This is **sample-only modern host evidence**, not a direct historical portable conformance mapping for `EditCpFileSave` or the original DOS confirmation UI.
+
+## V1 acceptance — focused evidence review (October 2026)
+
+The release-gate inspection cross-checked all 123 inventory rows against the 14 files listed in the portable conformance manifest and the .NET conformance adapter. Before the new fixtures, the repository held **228 cases, 101 linked routine rows and 172 links** (a routine may cite several cases); every linked case had a nonempty expected-state object. Four of these existing links (`EditK` twice, `EditO` and `EditQ`) deliberately test **key translation only**, not a prompted command execution. Keymap evidence is valid for those responsibilities, but must not be generalized into UI parity.
+
+The following previously unlinked responsibilities now have newly executed portable test cases:
+
+- **`EditCprfw` (printed p. 151):** Ctrl-K R prompts for a Read File path. A null/cancelled filename does not dispatch or insert. A filename surrounded by whitespace is trimmed and passed through the actual semantic dispatcher and decoded-line fixture: the import occurs after the initiating line with the cursor preserved, Dirty set, and one Undo entry. DOS prompt appearance and byte decoding are **not** asserted.
+- **`EditCvts2i` (printed p. 158):** The modern numeric host-input boundary accepts surrounding whitespace for a valid one-based Go To Line command and rejects an overflowing 32-bit integer without mutation. These checks do **not** prove the historical Pascal helper's internal parsing behavior.
+
+The repository verifier now rejects a portable case with an empty `expect` object. This prevents assertion-free fixtures being counted as evidence. It does **not** certify the correctness or completeness of each expected result.
+
+**New auditable totals:** 232 portable cases, 103/123 linked rows, 20 without portable case links (7 modern replacements, 9 host/sample, 1 documented divergence, 3 non-applicable DOS routines). In particular, **`EditCpFileSave` remains unlinked** because the modern terminal first-Save and overwrite prompts were not verified against the exact historical DOS dialog.
+
+### Outstanding sign-off checks
+
+- Independently review the actual handbook description, observable .NET behavior and meaningful edge cases for the **84 routines classified implemented**; a linked test is focused regression evidence, not full historical parity.
+- Review the **20 unlinked** responsibilities on their merits; avoid inventing a core API for obsolete screen hardware or host presentation machinery.
+- Perform real keyboard/terminal smoke tests under Windows and Linux: Ctrl-key input, prompt cancellation, Save/Read/Write, abort, linked windows and terminal resize. Headless CI cannot confirm hardware/terminal delivery.
+- Audit public APIs, persistence compatibility, Undo/anchor behavior and final clean release readiness. Tag, package and release remain explicitly approval-gated.
+
+**This is a partial release-gate audit, not a V1 sign-off.**
