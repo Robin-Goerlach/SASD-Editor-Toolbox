@@ -158,8 +158,10 @@ def verify_conformance() -> int:
                 raise ContractError(f"Case '{case_id}' requires a non-empty string area")
             if not isinstance(case["initial"], dict):
                 raise ContractError(f"Case '{case_id}' initial state must be an object")
-            if not isinstance(case["expect"], dict):
-                raise ContractError(f"Case '{case_id}' expected state must be an object")
+            if not isinstance(case["expect"], dict) or not case["expect"]:
+                # A fixture without any expected observable result can run
+                # without testing behavior. It must not count as V1 evidence.
+                raise ContractError(f"Case '{case_id}' requires a non-empty expected state")
 
             # Preserve all original single-operation cases, but allow a
             # mutually exclusive multi-command sequence for stateful behavior.
