@@ -224,9 +224,23 @@ public sealed class EditorEngine
         }
 
         var current = line[window.Cursor.Column];
+
+        // EditChangeCase (handbook p. 135) switches ONLY uppercase letters
+        // to lowercase and lowercase letters to uppercase. Do not assume
+        // that every non-uppercase code unit is lowercase: modern Unicode
+        // also contains titlecase letters (e.g. U+01C5), uncased scripts,
+        // punctuation and standalone surrogate code units. Attempting to
+        // uppercase one of these would silently extend the historical
+        // command beyond its two stated cases.
+        //
+        // The invariant, one-code-unit conversion remains the established
+        // modern Unicode policy. It intentionally avoids culture-dependent
+        // casing and cannot expand a single character into multiple units.
         var converted = char.IsUpper(current)
             ? char.ToLowerInvariant(current)
-            : char.ToUpperInvariant(current);
+            : char.IsLower(current)
+                ? char.ToUpperInvariant(current)
+                : current;
         if (current == converted)
         {
             // Punctuation, digits and other unchanged characters do not
