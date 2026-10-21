@@ -1,3 +1,4 @@
+using System.Globalization;
 using System.Text;
 
 namespace Sasd.Editor.FirstEd.Sample;
@@ -42,7 +43,19 @@ internal sealed class ConsolePromptEditor
         {
             if (_answer.Length > 0)
             {
-                _answer.Length--;
+                // A .NET char is a UTF-16 code unit, not necessarily one
+                // user-visible character. A surrogate pair (emoji) or a
+                // base letter plus combining accent must disappear as one
+                // text element when Backspace is pressed. Removing only
+                // the last code unit could leave an invalid surrogate or
+                // orphaned combining mark in a filename/search argument.
+                //
+                // StringInfo is used only in this sample-host input model.
+                // The reusable editor's text-storage representation and
+                // semantic commands remain completely unaffected.
+                var textElements = StringInfo.ParseCombiningCharacters(
+                    _answer.ToString());
+                _answer.Length = textElements[^1];
             }
 
             return ConsolePromptInputResult.Continue;
@@ -70,9 +83,33 @@ internal sealed class ConsolePromptEditor
         ArgumentOutOfRangeException.ThrowIfNegativeOrZero(visibleColumns);
 
         var complete = prompt + _answer;
-        var visible = complete.Length > visibleColumns
-            ? complete[^visibleColumns..]
-            : complete;
+        var firstVisibleCodeUnit = Math.Max(0, complete.Length - visibleColumns);
+
+        if (firstVisibleCodeUnit > 0)
+        {
+            // Right-scrolling by raw UTF-16 offsets can start in the
+            // middle of a surrogate pair or combining sequence. Choose
+            // the NEXT whole text-element boundary instead of painting
+            // broken Unicode onto the command/status row. It is safer
+            // to show one fewer code unit than to output half a symbol.
+            //
+            // VisibleColumns is the current conservative UTF-16 budget.
+            // Exact cell widths of wide/emoji glyphs are terminal-specific,
+            // and still require platform smoke tests.
+            var alignedStart = complete.Length;
+            foreach (var boundary in StringInfo.ParseCombiningCharacters(complete))
+            {
+                if (boundary >= firstVisibleCodeUnit)
+                {
+                    alignedStart = boundary;
+                    break;
+                }
+            }
+
+            firstVisibleCodeUnit = alignedStart;
+        }
+
+        var visible = complete[firstVisibleCodeUnit..];
 
         // The host deliberately reserves the last physical column to avoid
         // terminal auto-wrap; position the cursor inside the visible range.
