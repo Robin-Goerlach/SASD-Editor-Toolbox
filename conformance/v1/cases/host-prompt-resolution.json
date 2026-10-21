@@ -3084,6 +3084,394 @@
           }
         }
       }
+    },
+    {
+      "id": "host.read-file-cancelled-path-does-not-import",
+      "area": "host-prompts",
+      "initial": {
+        "documents": [
+          {
+            "id": "d",
+            "lines": [
+              {
+                "text": "before",
+                "flags": []
+              },
+              {
+                "text": "after",
+                "flags": []
+              }
+            ]
+          }
+        ],
+        "windows": [
+          {
+            "id": "w",
+            "documentId": "d",
+            "cursor": {
+              "line": 0,
+              "column": 3
+            },
+            "topLine": 0,
+            "leftColumn": 0
+          }
+        ],
+        "currentWindowId": "w",
+        "fileReadLines": [
+          {
+            "text": "inserted",
+            "flags": []
+          },
+          {
+            "text": "more",
+            "flags": []
+          }
+        ]
+      },
+      "operations": [
+        {
+          "id": "translate_firsted_key",
+          "character": "K",
+          "control": true,
+          "expectAction": "prefix_pending",
+          "expectPrefixDisplay": "Ctrl-K",
+          "expectPendingPrefix": "ctrl_k"
+        },
+        {
+          "id": "translate_firsted_key",
+          "character": "r",
+          "expectAction": "command",
+          "expectCommand": "read_file",
+          "expectArgument": "file_path",
+          "expectPendingPrefix": "none"
+        },
+        {
+          "id": "resolve_host_prompt",
+          "firstResponse": null,
+          "expectCancelled": true
+        },
+        {
+          "id": "execute_resolved_prompt",
+          "commandSucceeded": false
+        }
+      ],
+      "expect": {
+        "commandSucceeded": false,
+        "documents": {
+          "d": {
+            "lines": [
+              {
+                "text": "before",
+                "flags": []
+              },
+              {
+                "text": "after",
+                "flags": []
+              }
+            ],
+            "isDirty": false,
+            "version": 0
+          }
+        },
+        "windows": {
+          "w": {
+            "cursor": {
+              "line": 0,
+              "column": 3
+            }
+          }
+        },
+        "undo": {
+          "count": 0
+        }
+      }
+    },
+    {
+      "id": "host.read-file-named-path-inserts-after-cursor-line",
+      "area": "host-prompts",
+      "initial": {
+        "documents": [
+          {
+            "id": "d",
+            "lines": [
+              {
+                "text": "before",
+                "flags": []
+              },
+              {
+                "text": "after",
+                "flags": []
+              }
+            ]
+          }
+        ],
+        "windows": [
+          {
+            "id": "w",
+            "documentId": "d",
+            "cursor": {
+              "line": 0,
+              "column": 3
+            },
+            "topLine": 0,
+            "leftColumn": 0
+          }
+        ],
+        "currentWindowId": "w",
+        "fileReadLines": [
+          {
+            "text": "inserted",
+            "flags": []
+          },
+          {
+            "text": "more",
+            "flags": []
+          }
+        ]
+      },
+      "operations": [
+        {
+          "id": "translate_firsted_key",
+          "character": "K",
+          "control": true,
+          "expectAction": "prefix_pending",
+          "expectPrefixDisplay": "Ctrl-K",
+          "expectPendingPrefix": "ctrl_k"
+        },
+        {
+          "id": "translate_firsted_key",
+          "character": "r",
+          "expectAction": "command",
+          "expectCommand": "read_file",
+          "expectArgument": "file_path",
+          "expectPendingPrefix": "none"
+        },
+        {
+          "id": "resolve_host_prompt",
+          "firstResponse": "  fixture.dat  ",
+          "expectCancelled": false,
+          "expectRequest": {
+            "id": "read_file",
+            "text": "fixture.dat"
+          }
+        },
+        {
+          "id": "execute_resolved_prompt"
+        }
+      ],
+      "expect": {
+        "documents": {
+          "d": {
+            "lines": [
+              {
+                "text": "before",
+                "flags": []
+              },
+              {
+                "text": "inserted",
+                "flags": []
+              },
+              {
+                "text": "more",
+                "flags": []
+              },
+              {
+                "text": "after",
+                "flags": []
+              }
+            ],
+            "isDirty": true,
+            "version": 1
+          }
+        },
+        "windows": {
+          "w": {
+            "cursor": {
+              "line": 0,
+              "column": 3
+            }
+          }
+        },
+        "undo": {
+          "count": 1
+        }
+      }
+    },
+    {
+      "id": "host.number-conversion-trims-space-before-goto",
+      "area": "host-prompts",
+      "initial": {
+        "documents": [
+          {
+            "id": "d",
+            "lines": [
+              {
+                "text": "first",
+                "flags": []
+              },
+              {
+                "text": "second",
+                "flags": []
+              }
+            ]
+          }
+        ],
+        "windows": [
+          {
+            "id": "w",
+            "documentId": "d",
+            "cursor": {
+              "line": 0,
+              "column": 0
+            },
+            "topLine": 0,
+            "leftColumn": 0
+          }
+        ],
+        "currentWindowId": "w"
+      },
+      "operations": [
+        {
+          "id": "translate_firsted_key",
+          "character": "O",
+          "control": true,
+          "expectAction": "prefix_pending",
+          "expectPrefixDisplay": "Ctrl-O",
+          "expectPendingPrefix": "ctrl_o"
+        },
+        {
+          "id": "translate_firsted_key",
+          "character": "n",
+          "expectAction": "command",
+          "expectCommand": "go_to_line",
+          "expectArgument": "number",
+          "expectPendingPrefix": "none"
+        },
+        {
+          "id": "resolve_host_prompt",
+          "expectCancelled": false,
+          "firstResponse": "   2   ",
+          "expectRequest": {
+            "id": "go_to_line",
+            "number": 2
+          }
+        },
+        {
+          "id": "execute_resolved_prompt"
+        }
+      ],
+      "expect": {
+        "documents": {
+          "d": {
+            "lines": [
+              {
+                "text": "first",
+                "flags": []
+              },
+              {
+                "text": "second",
+                "flags": []
+              }
+            ],
+            "isDirty": false,
+            "version": 0
+          }
+        },
+        "undo": {
+          "count": 0
+        },
+        "windows": {
+          "w": {
+            "cursor": {
+              "line": 1,
+              "column": 0
+            }
+          }
+        }
+      }
+    },
+    {
+      "id": "host.number-conversion-overflow-rejects-input",
+      "area": "host-prompts",
+      "initial": {
+        "documents": [
+          {
+            "id": "d",
+            "lines": [
+              {
+                "text": "alpha beta",
+                "flags": []
+              }
+            ]
+          }
+        ],
+        "windows": [
+          {
+            "id": "w",
+            "documentId": "d",
+            "cursor": {
+              "line": 0,
+              "column": 0
+            },
+            "topLine": 0,
+            "leftColumn": 0
+          }
+        ],
+        "currentWindowId": "w"
+      },
+      "operations": [
+        {
+          "id": "translate_firsted_key",
+          "character": "O",
+          "control": true,
+          "expectAction": "prefix_pending",
+          "expectPrefixDisplay": "Ctrl-O",
+          "expectPendingPrefix": "ctrl_o"
+        },
+        {
+          "id": "translate_firsted_key",
+          "character": "n",
+          "expectAction": "command",
+          "expectCommand": "go_to_line",
+          "expectArgument": "number",
+          "expectPendingPrefix": "none"
+        },
+        {
+          "id": "resolve_host_prompt",
+          "expectCancelled": true,
+          "firstResponse": "  2147483648  "
+        },
+        {
+          "id": "execute_resolved_prompt",
+          "commandSucceeded": false
+        }
+      ],
+      "expect": {
+        "commandSucceeded": false,
+        "documents": {
+          "d": {
+            "lines": [
+              {
+                "text": "alpha beta",
+                "flags": []
+              }
+            ],
+            "isDirty": false,
+            "version": 0
+          }
+        },
+        "undo": {
+          "count": 0
+        },
+        "windows": {
+          "w": {
+            "cursor": {
+              "line": 0,
+              "column": 0
+            }
+          }
+        }
+      }
     }
   ]
 }
