@@ -119,3 +119,7 @@ Die Repository-Verifikation verbietet nun Fälle mit leerem `expect`-Objekt. Dam
 - Öffentliche APIs, Persistenzverträge, Undo-/Anker-Invarianten und Release-Unterlagen final prüfen. Tag, Paket und Release nur nach ausdrücklicher Zustimmung.
 
 **Dies ist ein Teil der V1-Abnahme und noch keine Freigabe.**
+
+## Konkreter Handbuchbefund: EditCptabdef (gedruckte S. 155)
+
+Bei der direkten Prüfung der Handbuchbeschreibung wurde eine tatsächliche Host-Lücke sichtbar, die reine Indexzahlen nicht zeigen: Eine bewusst leer bestätigte Tabulatorbreite ist **nicht** einfach ein abgebrochener Befehl. Der historische Wrapper leitet den Tabulatorabstand aus der aktuellen Cursor-Spalte minus eins ab. Bisher verwarf der Terminalhost eine leere Eingabe. Eine neue reine Host-Policy samt Headless-Tests prüft jetzt leeres Enter, tatsächlichen Abbruch, positive Eingaben, Überlauf, die Null-Grenze in der ersten Spalte und die Isolation der Fensteroptionen. Das einbasierte historische Verhalten wird auf die nullbasierte Cursorposition übertragen, ohne die allgemeine Zahlenauflösung anderer Befehle zu ändern. Die bewusste Abweichung zwischen historisch globalem und modern fensterbezogenem Tabulatorabstand bleibt dokumentiert. Diese gezielte Korrektur verbessert die echte historische Abnahme, ersetzt aber nicht den vollständigen Einzelvergleich.
