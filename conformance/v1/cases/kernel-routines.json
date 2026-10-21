@@ -720,6 +720,472 @@
           "complete": true
         }
       }
+    },
+    {
+      "id": "kernel.join-right-clears-deleted-soft-boundary",
+      "area": "kernel-routines",
+      "initial": {
+        "documents": [
+          {
+            "id": "d",
+            "lines": [
+              {
+                "text": "abc   ",
+                "flags": [
+                  "wrapped",
+                  "user_colored"
+                ]
+              },
+              {
+                "text": "def",
+                "flags": []
+              },
+              {
+                "text": "tail",
+                "flags": []
+              }
+            ]
+          }
+        ],
+        "windows": [
+          {
+            "id": "w",
+            "documentId": "d",
+            "cursor": {
+              "line": 0,
+              "column": 3
+            },
+            "topLine": 0,
+            "leftColumn": 0
+          }
+        ],
+        "currentWindowId": "w"
+      },
+      "operation": {
+        "id": "delete_right_character"
+      },
+      "expect": {
+        "documents": {
+          "d": {
+            "lines": [
+              {
+                "text": "abcdef",
+                "flags": [
+                  "user_colored"
+                ]
+              },
+              {
+                "text": "tail",
+                "flags": []
+              }
+            ],
+            "isDirty": true,
+            "version": 1
+          }
+        },
+        "windows": {
+          "w": {
+            "cursor": {
+              "line": 0,
+              "column": 3
+            }
+          }
+        },
+        "undo": {
+          "count": 1
+        }
+      }
+    },
+    {
+      "id": "kernel.join-right-inherits-following-soft-boundary",
+      "area": "kernel-routines",
+      "initial": {
+        "documents": [
+          {
+            "id": "d",
+            "lines": [
+              {
+                "text": "abc   ",
+                "flags": [
+                  "user_colored"
+                ]
+              },
+              {
+                "text": "def",
+                "flags": [
+                  "wrapped"
+                ]
+              },
+              {
+                "text": "tail",
+                "flags": []
+              }
+            ]
+          }
+        ],
+        "windows": [
+          {
+            "id": "w",
+            "documentId": "d",
+            "cursor": {
+              "line": 0,
+              "column": 3
+            },
+            "topLine": 0,
+            "leftColumn": 0
+          }
+        ],
+        "currentWindowId": "w"
+      },
+      "operation": {
+        "id": "delete_right_character"
+      },
+      "expect": {
+        "documents": {
+          "d": {
+            "lines": [
+              {
+                "text": "abcdef",
+                "flags": [
+                  "wrapped",
+                  "user_colored"
+                ]
+              },
+              {
+                "text": "tail",
+                "flags": []
+              }
+            ],
+            "isDirty": true,
+            "version": 1
+          }
+        },
+        "windows": {
+          "w": {
+            "cursor": {
+              "line": 0,
+              "column": 3
+            }
+          }
+        },
+        "undo": {
+          "count": 1
+        }
+      }
+    },
+    {
+      "id": "kernel.join-word-inherits-following-soft-boundary",
+      "area": "kernel-routines",
+      "initial": {
+        "documents": [
+          {
+            "id": "d",
+            "lines": [
+              {
+                "text": "abc   ",
+                "flags": [
+                  "user_colored"
+                ]
+              },
+              {
+                "text": "def",
+                "flags": [
+                  "wrapped"
+                ]
+              },
+              {
+                "text": "tail",
+                "flags": []
+              }
+            ]
+          }
+        ],
+        "windows": [
+          {
+            "id": "w",
+            "documentId": "d",
+            "cursor": {
+              "line": 0,
+              "column": 3
+            },
+            "topLine": 0,
+            "leftColumn": 0
+          }
+        ],
+        "currentWindowId": "w"
+      },
+      "operation": {
+        "id": "delete_right_word"
+      },
+      "expect": {
+        "documents": {
+          "d": {
+            "lines": [
+              {
+                "text": "abcdef",
+                "flags": [
+                  "wrapped",
+                  "user_colored"
+                ]
+              },
+              {
+                "text": "tail",
+                "flags": []
+              }
+            ],
+            "isDirty": true,
+            "version": 1
+          }
+        },
+        "windows": {
+          "w": {
+            "cursor": {
+              "line": 0,
+              "column": 3
+            }
+          }
+        },
+        "undo": {
+          "count": 1
+        }
+      }
+    },
+    {
+      "id": "kernel.join-left-clears-deleted-soft-boundary",
+      "area": "kernel-routines",
+      "initial": {
+        "documents": [
+          {
+            "id": "d",
+            "lines": [
+              {
+                "text": "abc   ",
+                "flags": [
+                  "wrapped",
+                  "user_colored"
+                ]
+              },
+              {
+                "text": "def",
+                "flags": []
+              },
+              {
+                "text": "tail",
+                "flags": []
+              }
+            ]
+          }
+        ],
+        "windows": [
+          {
+            "id": "w",
+            "documentId": "d",
+            "cursor": {
+              "line": 1,
+              "column": 0
+            },
+            "topLine": 0,
+            "leftColumn": 0
+          }
+        ],
+        "currentWindowId": "w"
+      },
+      "operation": {
+        "id": "delete_left_character"
+      },
+      "expect": {
+        "documents": {
+          "d": {
+            "lines": [
+              {
+                "text": "abcdef",
+                "flags": [
+                  "user_colored"
+                ]
+              },
+              {
+                "text": "tail",
+                "flags": []
+              }
+            ],
+            "isDirty": true,
+            "version": 1
+          }
+        },
+        "windows": {
+          "w": {
+            "cursor": {
+              "line": 1,
+              "column": 0
+            }
+          }
+        },
+        "undo": {
+          "count": 1
+        }
+      }
+    },
+    {
+      "id": "kernel.join-left-inherits-following-soft-boundary",
+      "area": "kernel-routines",
+      "initial": {
+        "documents": [
+          {
+            "id": "d",
+            "lines": [
+              {
+                "text": "abc   ",
+                "flags": [
+                  "user_colored"
+                ]
+              },
+              {
+                "text": "def",
+                "flags": [
+                  "wrapped"
+                ]
+              },
+              {
+                "text": "tail",
+                "flags": []
+              }
+            ]
+          }
+        ],
+        "windows": [
+          {
+            "id": "w",
+            "documentId": "d",
+            "cursor": {
+              "line": 1,
+              "column": 0
+            },
+            "topLine": 0,
+            "leftColumn": 0
+          }
+        ],
+        "currentWindowId": "w"
+      },
+      "operation": {
+        "id": "delete_left_character"
+      },
+      "expect": {
+        "documents": {
+          "d": {
+            "lines": [
+              {
+                "text": "abcdef",
+                "flags": [
+                  "wrapped",
+                  "user_colored"
+                ]
+              },
+              {
+                "text": "tail",
+                "flags": []
+              }
+            ],
+            "isDirty": true,
+            "version": 1
+          }
+        },
+        "windows": {
+          "w": {
+            "cursor": {
+              "line": 1,
+              "column": 0
+            }
+          }
+        },
+        "undo": {
+          "count": 1
+        }
+      }
+    },
+    {
+      "id": "kernel.undo-join-restores-two-independent-wrapped-boundaries",
+      "area": "kernel-routines",
+      "initial": {
+        "documents": [
+          {
+            "id": "d",
+            "lines": [
+              {
+                "text": "abc   ",
+                "flags": [
+                  "wrapped",
+                  "user_colored"
+                ]
+              },
+              {
+                "text": "def",
+                "flags": []
+              },
+              {
+                "text": "tail",
+                "flags": []
+              }
+            ]
+          }
+        ],
+        "windows": [
+          {
+            "id": "w",
+            "documentId": "d",
+            "cursor": {
+              "line": 0,
+              "column": 3
+            },
+            "topLine": 0,
+            "leftColumn": 0
+          }
+        ],
+        "currentWindowId": "w"
+      },
+      "operations": [
+        {
+          "id": "delete_right_character"
+        },
+        {
+          "id": "undo"
+        }
+      ],
+      "expect": {
+        "documents": {
+          "d": {
+            "lines": [
+              {
+                "text": "abc   ",
+                "flags": [
+                  "wrapped",
+                  "user_colored"
+                ]
+              },
+              {
+                "text": "def",
+                "flags": []
+              },
+              {
+                "text": "tail",
+                "flags": []
+              }
+            ],
+            "isDirty": false,
+            "version": 0
+          }
+        },
+        "windows": {
+          "w": {
+            "cursor": {
+              "line": 0,
+              "column": 3
+            }
+          }
+        },
+        "undo": {
+          "count": 0
+        }
+      }
     }
   ]
 }
