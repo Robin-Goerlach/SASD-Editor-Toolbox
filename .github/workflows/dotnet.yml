@@ -8,7 +8,21 @@ on:
 
 jobs:
   build-test:
-    runs-on: ubuntu-latest
+    # V1 must remain usable from both Linux and Windows terminals.
+    # Run the *same* headless solution tests on both runner families so
+    # OS-dependent console key models, Unicode globalization behavior,
+    # path handling and sample compilation cannot silently drift.
+    #
+    # This is deliberately NOT described as interactive terminal smoke:
+    # GitHub's hosted runners have no real human-operated console window
+    # or terminal font/cell-width configuration. Manual PTY/Windows Terminal
+    # release checks remain in docs/*/TERMINAL*-V1-*.md.
+    name: build-test (${{ matrix.os }})
+    runs-on: ${{ matrix.os }}
+    strategy:
+      fail-fast: false
+      matrix:
+        os: [ubuntu-latest, windows-latest]
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-dotnet@v4
