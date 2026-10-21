@@ -669,9 +669,13 @@
       "handbookPage": 183,
       "status": "implemented",
       "evidence": "docs/en/LINE-INSERTION-AND-NEWLINE.md",
-      "note": "Separate new-line and insert-line commands.",
+      "note": "Separate new-line and insert-line commands. V1 audit: lower fragment inherits old outgoing Wrapped boundary; new upper-to-lower separator is hard, with direct Undo and legacy-byte verification.",
       "conformanceCases": [
-        "blocks.standalone-endpoint-follows-line-insertion"
+        "blocks.standalone-endpoint-follows-line-insertion",
+        "editing.insert-line-split-transfers-wrapped-outgoing-boundary",
+        "editing.insert-line-column-zero-transfers-wrapped-to-old-text",
+        "editing.insert-line-at-end-transfers-wrapped-to-blank-new-line",
+        "editing.insert-line-undo-restores-both-boundaries"
       ]
     },
     {
@@ -755,9 +759,12 @@
       "handbookPage": 191,
       "status": "implemented",
       "evidence": "docs/en/LINE-INSERTION-AND-NEWLINE.md",
-      "note": "Separate new-line and insert-line commands.",
+      "note": "Separate new-line and insert-line commands. V1 audit: lower fragment inherits old outgoing Wrapped boundary; new upper-to-lower separator is hard, with direct Undo and legacy-byte verification.",
       "conformanceCases": [
-        "editing.new-line-insert-mode-splits-and-moves-cursor"
+        "editing.new-line-insert-mode-splits-and-moves-cursor",
+        "editing.new-line-insert-split-transfers-old-outgoing-boundary",
+        "editing.new-line-insert-autoindent-split-transfers-boundary",
+        "editing.new-line-undo-restores-both-boundaries"
       ]
     },
     {
