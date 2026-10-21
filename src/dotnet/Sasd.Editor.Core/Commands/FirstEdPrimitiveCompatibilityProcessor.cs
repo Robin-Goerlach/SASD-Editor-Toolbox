@@ -485,9 +485,26 @@ internal static class FirstEdPrimitiveCompatibilityProcessor
             lowerText = line.Text[splitColumn..];
         }
 
-        document.Buffer.ReplaceLine(lineIndex, upperText, line.Flags);
+        // Wrapped describes the outgoing boundary AFTER a logical line.
+        // Splitting creates a NEW, explicitly hard boundary between the
+        // upper and lower fragments. The old outgoing boundary is still
+        // behind the original text and therefore follows the NEW lower line.
+        //
+        // This is important even for a split at column zero or after the
+        // last non-blank: a formerly wrapped continuation to an existing
+        // third line must not silently become a CR/LF paragraph break.
+        // Keeping Wrapped on the upper descriptor would instead turn the
+        // newly inserted boundary into a 0x8D soft continuation.
+        //
+        // Other presentation flags (notably UserColored) remain attached
+        // to the surviving upper descriptor. The new lower descriptor only
+        // inherits the previous outgoing Wrapped bit; InBlock is recalculated
+        // from logical block endpoints after Topology.LinesInserted.
+        var lowerFlags = line.Flags & EditorLineFlags.Wrapped;
+        var upperFlags = line.Flags & ~EditorLineFlags.Wrapped;
+        document.Buffer.ReplaceLine(lineIndex, upperText, upperFlags);
         var insertedLine = lineIndex + 1;
-        document.Buffer.InsertLine(insertedLine, lowerText);
+        document.Buffer.InsertLine(insertedLine, lowerText, lowerFlags);
         session.Topology.LinesInserted(document, insertedLine, 1);
         document.MarkChanged();
         return insertedLine;
