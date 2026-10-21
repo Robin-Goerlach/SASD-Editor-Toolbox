@@ -86,7 +86,12 @@ public sealed class BlockMoveAcceptanceTests
         Assert.Equal(1, session.Block.LastLine);
         Assert.Equal(new TextPosition(2, 6), source.Cursor);
         Assert.Equal(new TextPosition(4, 11), linked.Cursor);
-        Assert.Equal(3, linked.TopLine);
+        // The linked cursor still refers to surviving "e". Its TopLine
+        // originally referred to the *removed* "d" descriptor, so the
+        // central deletion policy reattaches it to the next surviving line
+        // before the move inserts the block at the beginning. This places
+        // the resulting top-of-view on the final logical line, index 4.
+        Assert.Equal(4, linked.TopLine);
         Assert.True(source.Document.IsDirty);
         Assert.Equal(1, session.Undo.Count);
 
