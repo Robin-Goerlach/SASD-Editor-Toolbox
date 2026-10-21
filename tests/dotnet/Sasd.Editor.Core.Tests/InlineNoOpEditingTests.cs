@@ -39,6 +39,11 @@ public sealed class InlineNoOpEditingTests
     [InlineData("a1c")]
     [InlineData("a!c")]
     [InlineData("a c")]
+    // Unicode includes titlecase letters and scripts with no upper/lower
+    // distinction. Neither is a lowercase letter merely because it is
+    // not uppercase; EditChangeCase must leave them untouched.
+    [InlineData("a\u01C5c")] // U+01C5: titlecase letter DZ with caron.
+    [InlineData("a\u754Cc")] // U+754C: CJK letter without letter case.
     public async Task ChangeCase_CharactersWithoutCaseMappingDoNotDirtyText(string content)
     {
         var session = new EditorSession();
