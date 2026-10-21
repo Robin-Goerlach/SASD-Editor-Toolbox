@@ -125,7 +125,13 @@ internal sealed class ConsoleFirstEdPromptService(ConsoleFirstEdRenderer rendere
 
     private EditorCommandRequest? ResolveCharacter(EditorCommandBinding binding, int visibleRows)
     {
-        var value = renderer.ReadCharacterPrompt("Character to insert: ");
+        // Ctrl-P is not ordinary character insertion: the next printable
+        // ASCII key *names* a control code. Describe the accepted alphabet
+        // in the prompt so users are not forced to guess whether to press
+        // Control a second time. Physical Control+A also works when the
+        // terminal reports its already-translated 0x01 code.
+        var value = renderer.ReadCharacterPrompt(
+            "Control code (A-Z, @ [ \\ ] ^ _): ");
         return EditorCommandPromptResolver.Resolve(
             binding, visibleRows, characterResponse: value);
     }
