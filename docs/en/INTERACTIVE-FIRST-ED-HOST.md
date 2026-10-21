@@ -50,3 +50,11 @@ Console and terminal APIs do not expose every control-key combination identicall
 The sample now renders every stacked `EditorWindowFrame`, including its own status row and text rows. The active window owns the physical terminal cursor; the core's `EditorSession.EnsureAllWindowCursorsHorizontallyVisible(width)` keeps the cursor visible **in every view** before rendering, not only the active view.
 
 This arrangement keeps both the historical all-window horizontal policy and per-window line-number status projections in the reusable editor model. Modern terminal resizing and platform-specific key delivery remain host policies; MicroStar pull-down menus and pop-ups remain later host samples.
+
+## Overwrite confirmation for host-selected output filenames
+
+When Ctrl-K S first saves an unnamed `NONAME` document or Ctrl-K W exports text to a **filename newly selected by the user**, the terminal host now probes whether that target already exists. If it does, the host requires a separate `YES` confirmation before it constructs a dispatchable write request. Escape, Ctrl-U, an empty answer, and any other response cancel before any editor command or file I/O runs. The shared prompt resolver supplies the existing YES semantics, while a small console-sample-only `ConsoleFirstEdOverwritePolicy` preserves the original filename and page-size parameters after approval. This policy is covered by headless regression tests with real temporary files and actual semantic dispatch.
+
+A repeated Save to a document's **already associated filename** remains direct; the user has already selected that file. The direct Write File command still does not associate the document with its exported filename or clear the Dirty flag. Read File never asks for overwrite approval. The reusable editor core and its historical file-command semantics remain unchanged.
+
+This is a **modern terminal usability guard**, not a historical 1985 DOS claim, not a replacement for file permissions, and not an atomic guarantee: another process may create or change a file after the host's `File.Exists` probe. Other hosts must choose their own overwrite-confirmation policies.

@@ -50,3 +50,11 @@ Console-/Terminal-APIs melden nicht auf jedem Betriebssystem und Terminalemulato
 Das Beispiel rendert inzwischen alle übereinander angeordneten `EditorWindowFrame`-Bereiche mit eigenen Status- und Textzeilen. Das aktuelle Fenster besitzt den physischen Terminal-Cursor; `EditorSession.EnsureAllWindowCursorsHorizontallyVisible(width)` stellt **in jeder View** die horizontale Sichtbarkeit sicher, bevor gerendert wird.
 
 Damit bleiben die historische All-Fenster-Regel und die fensterspezifischen absoluten Zeilennummern Teil des wiederverwendbaren Editor-Modells. Dynamisches Terminal-Resize und plattformspezifische Tasten bleiben Host-Policy; MicroStar-Pulldown-Menüs und Pop-ups sind spätere Host-Beispiele.
+
+## Überschreibbestätigung bei neu ausgewählten Ausgabedateien
+
+Wenn Ctrl-K S ein neues `NONAME`-Dokument erstmals unter einem **vom Benutzer gewählten Dateinamen** speichert oder Ctrl-K W Text in eine **neu benannte Ausgabedatei** schreibt, prüft der Terminalhost jetzt zunächst, ob das Ziel existiert. Ist das der Fall, muss zusätzlich ausdrücklich `YES` bestätigt werden, bevor überhaupt ein Dateischreibbefehl ausgeführt wird. Escape, Ctrl-U, leere Eingabe und jede andere Antwort brechen ohne Dispatch und Datei-I/O ab. Die bereits vorhandene hostneutrale Auswertung prüft `YES`; die kleine, ausschließlich zum Konsolenbeispiel gehörende `ConsoleFirstEdOverwritePolicy` erhält nach Bestätigung den ursprünglichen Dateinamen und die sonstigen Befehlsargumente. Headless-Tests prüfen dies anhand echter temporärer Dateien und des semantischen Dispatchers.
+
+Ein wiederholtes Save auf einen dem Dokument **bereits zugeordneten Dateipfad** bleibt direkt ausführbar; diesen Pfad hat der Nutzer zuvor ausgewählt. Direktes Write File verändert weiterhin weder Dateizuordnung noch Dirty-Flag des Dokuments. Read File benötigt keine Überschreibbestätigung. Der wiederverwendbare Editor-Kern und die historischen Unterschiede der Dateibefehle bleiben unverändert.
+
+Das ist eine **moderne Schutzabfrage des Terminalhosts**, keine Behauptung über den originalen DOS-Dialog von 1985 und keine atomare Dateisperre: Nach `File.Exists` kann ein anderer Prozess die Datei weiterhin ändern oder neu anlegen. Andere Oberflächen müssen eine eigene Überschreib-Policy vorsehen.

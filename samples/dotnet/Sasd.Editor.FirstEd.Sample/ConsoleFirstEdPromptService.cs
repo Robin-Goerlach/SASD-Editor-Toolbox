@@ -46,8 +46,16 @@ internal sealed class ConsoleFirstEdPromptService(ConsoleFirstEdRenderer rendere
             ? renderer.ReadPrompt("Save as file path: ")
             : null;
 
-        return ConsoleFirstEdSavePromptPolicy.Resolve(
+        var request = ConsoleFirstEdSavePromptPolicy.Resolve(
             binding, visibleRows, associatedPath, enteredPath);
+
+        // For a first Save As, the user's chosen name may already belong to
+        // another file. The historical core's Save operation deliberately
+        // contains no terminal prompts: ask here, before a semantic write can
+        // reach the dispatcher. Existing *associated* files save directly,
+        // as they were already selected by an earlier Save.
+        return ConfirmExistingTargetIfNeeded(
+            request, isNewDestination: ConsoleFirstEdSavePromptPolicy.RequiresPath(associatedPath));
     }
 
     private EditorCommandRequest? ResolveNumber(EditorCommandBinding binding, int visibleRows)
@@ -114,8 +122,43 @@ internal sealed class ConsoleFirstEdPromptService(ConsoleFirstEdRenderer rendere
     private EditorCommandRequest? ResolveFilePath(EditorCommandBinding binding, int visibleRows)
     {
         var path = renderer.ReadPrompt("File path: ");
-        return EditorCommandPromptResolver.Resolve(
+        var request = EditorCommandPromptResolver.Resolve(
             binding, visibleRows, firstResponse: path);
+
+        // Ctrl-K W is an *export* and may name an existing destination even
+        // when the editor document itself is unrelated to that file. Ask
+        // before an overwrite, but preserve direct Write File semantics:
+        // after a confirmed write the document remains Dirty and unnamed.
+        // Read File never writes its input and never needs confirmation.
+        return ConfirmExistingTargetIfNeeded(
+            request, isNewDestination: binding.CommandId == EditorCommandId.WriteFile);
+    }
+
+    private EditorCommandRequest? ConfirmExistingTargetIfNeeded(
+        EditorCommandRequest? request, bool isNewDestination)
+    {
+        if (request is null)
+        {
+            // Cancelled filename prompt: no File.Exists call, no I/O and no
+            // accidental empty-path dispatch.
+            return null;
+        }
+
+        // The probe is intentionally in the host, never inside reusable Core.
+        // File.Exists is a usability guard, *not* a race-free file lock:
+        // another process can create/replace a target after this check.
+        var exists = isNewDestination && request.Text is not null
+            && File.Exists(request.Text);
+
+        if (!ConsoleFirstEdOverwritePolicy.RequiresConfirmation(request, exists))
+        {
+            return request;
+        }
+
+        // An explicit YES is required. Escape/Ctrl-U/null and plain Enter all
+        // cancel before command dispatch, leaving disk and Undo untouched.
+        var response = renderer.ReadPrompt("File exists. Type YES to overwrite: ");
+        return ConsoleFirstEdOverwritePolicy.Confirm(request, response);
     }
 
     private EditorCommandRequest? ResolveConfirmation(EditorCommandBinding binding, int visibleRows)

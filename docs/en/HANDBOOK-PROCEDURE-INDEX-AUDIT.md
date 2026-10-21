@@ -93,3 +93,7 @@ For each *needs-review* row, examine its individual handbook description, check 
 
 The Python repository-contract gate validates **123 distinct names**, sequential printed pages **118–240**, classification vocabulary and existence of evidence paths. This guarantees **inventory integrity**, not runtime equivalence. V1 remains open until the wider behavioral and regression-coverage release audit is signed off.
 
+
+## .NET terminal sample: overwrite consent for first Save and Write File
+
+The sample host now asks for an explicit YES before overwriting an existing filename selected by a first Ctrl-K S Save As or by Ctrl-K W Write File. Cancellation produces no semantic request, while a confirmed Write File still preserves document name/Dirty/Undo. Tests exercise the pure host decision, real temporary files and actual semantic dispatch. An ordinary Save to an already associated path remains direct. This is **sample-only modern host evidence**, not a direct historical portable conformance mapping for `EditCpFileSave` or the original DOS confirmation UI.
