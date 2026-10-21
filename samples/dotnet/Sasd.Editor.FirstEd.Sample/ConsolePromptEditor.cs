@@ -25,10 +25,10 @@ internal sealed class ConsolePromptEditor
     /// </summary>
     public ConsolePromptInputResult Process(ConsoleKeyInfo key)
     {
-        if (key.Key == ConsoleKey.Escape ||
-            (key.Key == ConsoleKey.U &&
-             (key.Modifiers & ConsoleModifiers.Control) != 0 &&
-             (key.Modifiers & ConsoleModifiers.Alt) == 0))
+        // Named control keys are not portable: some Unix terminal drivers
+        // report Ctrl-U only as KeyChar 0x15 with an unspecified ConsoleKey.
+        // Share the host's cancellation policy with the Ctrl-P prompt.
+        if (ConsolePromptKeyPolicy.IsCancellation(key))
         {
             return ConsolePromptInputResult.Cancelled;
         }
