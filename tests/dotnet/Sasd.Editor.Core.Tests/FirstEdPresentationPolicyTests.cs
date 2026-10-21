@@ -14,16 +14,19 @@ namespace Sasd.Editor.Core.Tests;
 public sealed class FirstEdPresentationPolicyTests
 {
     [Theory]
-    [InlineData(EditorLineFlags.None, FirstEdColorRole.Text)]
-    [InlineData(EditorLineFlags.Wrapped, FirstEdColorRole.Text)]
-    [InlineData(EditorLineFlags.InBlock, FirstEdColorRole.Block)]
-    [InlineData(EditorLineFlags.UserColored, FirstEdColorRole.User)]
+    [InlineData(EditorLineFlags.None, (int)FirstEdColorRole.Text)]
+    [InlineData(EditorLineFlags.Wrapped, (int)FirstEdColorRole.Text)]
+    [InlineData(EditorLineFlags.InBlock, (int)FirstEdColorRole.Block)]
+    [InlineData(EditorLineFlags.UserColored, (int)FirstEdColorRole.User)]
     [InlineData(EditorLineFlags.InBlock | EditorLineFlags.UserColored,
-        FirstEdColorRole.User)]
+        (int)FirstEdColorRole.User)]
     public void ColorFlagHasPriorityOverVisibleBlock(
-        EditorLineFlags flags, FirstEdColorRole expected)
+        EditorLineFlags flags, int expected)
     {
-        Assert.Equal(expected, ConsoleFirstEdPresentationPolicy.TextRole(flags));
+        // xUnit discovers public methods. The sample's color role remains an
+        // internal host detail, so expose only its integer value as test data.
+        Assert.Equal((FirstEdColorRole)expected,
+            ConsoleFirstEdPresentationPolicy.TextRole(flags));
     }
 
     [Fact]
