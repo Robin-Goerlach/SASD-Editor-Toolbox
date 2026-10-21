@@ -568,7 +568,7 @@
       "handbookPage": 173,
       "status": "implemented",
       "evidence": "docs/en/SEARCH-AND-FILE-COMMANDS.md",
-      "note": "Search, replace and compatible file read/write paths.",
+      "note": "Search, replace and compatible file read/write paths. October V1 file-codec audit: seven .NET-only byte round-trip and Read File/Undo tests cover explicitly empty final logical descriptors, 0x8D, unchanged foreign single-CRLF decoding and failed-write preservation. This is an explicit SASD 8-bit round-trip policy, not a claim of historical Pascal writer byte identity. Existing portable routine links unchanged.",
       "conformanceCases": [
         "files.read-after-cursor-line-preserves-cursor",
         "files.read-preserves-wrapped-but-strips-ephemeral-in-block"
@@ -579,7 +579,7 @@
       "handbookPage": 174,
       "status": "implemented",
       "evidence": "docs/en/SEARCH-AND-FILE-COMMANDS.md",
-      "note": "Search, replace and compatible file read/write paths.",
+      "note": "Search, replace and compatible file read/write paths. October V1 file-codec audit: seven .NET-only byte round-trip and Read File/Undo tests cover explicitly empty final logical descriptors, 0x8D, unchanged foreign single-CRLF decoding and failed-write preservation. This is an explicit SASD 8-bit round-trip policy, not a claim of historical Pascal writer byte identity. Existing portable routine links unchanged.",
       "conformanceCases": [
         "files.write-direct-leaves-dirty-state-and-identity-untouched",
         "files.write-direct-preserves-wrapped-and-colored-line-flags",
@@ -856,7 +856,7 @@
       "handbookPage": 199,
       "status": "implemented",
       "evidence": "docs/en/SEARCH-AND-FILE-COMMANDS.md",
-      "note": "Search, replace and compatible file read/write paths.",
+      "note": "Search, replace and compatible file read/write paths. October V1 file-codec audit: seven .NET-only byte round-trip and Read File/Undo tests cover explicitly empty final logical descriptors, 0x8D, unchanged foreign single-CRLF decoding and failed-write preservation. This is an explicit SASD 8-bit round-trip policy, not a claim of historical Pascal writer byte identity. Existing portable routine links unchanged.",
       "conformanceCases": [
         "files.read-after-cursor-line-preserves-cursor",
         "files.read-realigns-linked-view-block-and-markers",
