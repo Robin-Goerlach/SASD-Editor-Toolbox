@@ -292,7 +292,7 @@ internal static class FirstEdPrimitiveCompatibilityProcessor
         document.Buffer.ReplaceLine(
             previousLineIndex,
             PrefixToColumn(previous.Text, joinColumn) + current.Text,
-            previous.Flags);
+            JoinedLineFlags(previous.Flags, current.Flags));
         document.Buffer.RemoveLine(lineIndex);
         session.Topology.LinesDeleted(document, lineIndex, 1);
         window.Cursor = new TextPosition(previousLineIndex, joinColumn);
@@ -516,7 +516,7 @@ internal static class FirstEdPrimitiveCompatibilityProcessor
         document.Buffer.ReplaceLine(
             lineIndex,
             PrefixToColumn(current.Text, joinColumn) + following.Text,
-            current.Flags);
+            JoinedLineFlags(current.Flags, following.Flags));
         document.Buffer.RemoveLine(lineIndex + 1);
         session.Topology.LinesDeleted(document, lineIndex + 1, 1);
         document.MarkChanged();
@@ -524,6 +524,32 @@ internal static class FirstEdPrimitiveCompatibilityProcessor
         undo.Commit();
         return true;
     }
+
+    /// <summary>
+    /// Reconciles line metadata after the separator *between* two logical
+    /// lines has been removed by EditDeleteLeftChar, EditDeleteRightChar or
+    /// EditDeleteRightWord.
+    /// </summary>
+    /// <remarks>
+    /// Wrapped is not a property of the characters on a line. It describes
+    /// the OUTGOING boundary after that line. After merging upper + lower,
+    /// the upper line's original outgoing boundary no longer exists. The
+    /// resulting line ends at the lower line's former outgoing boundary, so
+    /// its Wrapped bit must come from lower.
+    ///
+    /// All other flags remain attached to the surviving upper descriptor:
+    /// for example UserColored describes that line's presentation, not its
+    /// separator. InBlock is reprojected from the block endpoints by the
+    /// existing RefreshBlockFlags step following the topology update.
+    ///
+    /// Preserving upper.Wrapped here incorrectly serializes a hard boundary
+    /// as legacy 0x8D; dropping lower.Wrapped incorrectly turns an original
+    /// soft boundary into a hard CR/LF. Both would change file semantics.
+    /// </remarks>
+    private static EditorLineFlags JoinedLineFlags(
+        EditorLineFlags upper, EditorLineFlags lower) =>
+        (upper & ~EditorLineFlags.Wrapped)
+        | (lower & EditorLineFlags.Wrapped);
 
     private static string PrefixToColumn(string text, int column)
     {
