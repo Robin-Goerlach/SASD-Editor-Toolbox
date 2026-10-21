@@ -129,3 +129,8 @@ Four portable Tab boundary cases verify that Insert-mode requests with extreme t
 ## V1 evidence-quality requirement
 
 The repository verifier rejects portable cases with an empty `expect` object; merely executing a sequence without checking observable state is insufficient release evidence. The historical index links to focused tests, not automatically to complete 1985 behavioral equivalence. Four new host-prompt cases exercise Ctrl-K R Read File cancellation/dispatch and numeric whitespace/overflow handling through the .NET semantic command boundary.
+
+
+## Linked-window Undo and original-view lifetime
+
+The portable window-lifecycle suite now checks that after an edited view has been relinked to another document, Undo can restore the original text through its surviving sibling while preserving the user's later explicitly selected current window. This is the host-neutral `windows.undo-relinked-view-preserves-unrelated-current-window` fixture. Low-level legacy `Capture` cursor compatibility is exercised separately by focused .NET tests because that call is intentionally **not** a portable historical Pascal API. Portable suite total: **254**; the new case is mapped to `EditUndo` and `EditWindowLink` responsibilities.
