@@ -2,6 +2,14 @@
 
 ## Source and interpretation
 
+**Coverage boundary:** This catalog is the 123-entry *printed* index only.
+The handbook also names helpers and extension/example routines outside that
+index; those are separately tracked in the
+[supplemental handbook inventory](HANDBOOK-SUPPLEMENT-V1.md)
+and [machine-readable symbols](../handbook-supplemental-symbols-v1.json).
+Neither catalog alone proves complete historical behavior.
+
+
 The *Turbo Editor Toolbox Owner's Handbook* (1985), **Procedures and Functions Index** on printed pages **243–244**, references **123** named routine descriptions on printed pages **118–240**. Each independently transcribed name and page reference is in [the machine-readable inventory](../handbook-procedure-index-v1.json). The historical handbook itself and any Pascal code remain outside the repository.
 
 The classification describes **observable responsibility**, never source-level Pascal API parity. Each row references SASD technical documentation. The status `implemented` is an initial conceptual mapping to the active .NET reference, **not** proof of exact historical behavior on every edge case. The audit is **not yet a V1 release sign-off**.

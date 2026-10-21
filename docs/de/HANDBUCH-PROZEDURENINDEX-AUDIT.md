@@ -2,6 +2,13 @@
 
 ## Quelle und Einordnung
 
+**Grenze des Bestands:** Hier werden ausschließlich die 123 gedruckten
+Indexeinträge bewertet. Weitere Namen aus Fließtext, Hooks und MicroStar
+sind in der [Handbuchergänzung](HANDBUCH-ERGAENZUNG-V1.md) und im
+[Zusatzinventar](../handbook-supplemental-symbols-v1.json) getrennt
+erfasst. Keine der beiden Listen beweist allein historische Vollständigkeit.
+
+
 Das *Turbo Editor Toolbox Owner's Handbook* (1985) enthält auf den gedruckten Seiten **243–244** einen Prozeduren-/Funktionsindex mit **123** Einträgen. Die Einzelbeschreibungen stehen auf den gedruckten Seiten **118–240**. Eigenständig erfasste Namen und Seitenverweise liegen in [der maschinenlesbaren Inventarliste](../handbook-procedure-index-v1.json). Weder das historische Handbuch noch Pascal-Quellcode werden ins Repository übernommen.
 
 Die Klassifikation beschreibt **beobachtbare Aufgaben**, keine 1:1-Abbildung historischer Pascal-APIs. Jeder Datensatz verweist auf die aktuelle SASD-Dokumentation. `implemented` bedeutet eine zunächst plausible konzeptionelle .NET-Zuordnung, **keinen** Nachweis vollständiger historischer Randfallparität. Dies ist **noch keine V1-Freigabe**.

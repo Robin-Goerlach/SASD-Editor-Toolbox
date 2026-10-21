@@ -12,6 +12,19 @@ The long-term goal is broader than a stand-alone text editor: the toolbox should
 
 ## V1 target: Turbo Editor Toolbox compatibility set
 
+**Handbook-gap implementation (October 2026):** The FIRST-ED console sample
+now renders the manual's five screen attribute roles and optional hard/soft/EOF
+right-edge markers. Find/Replace can pass Core's already-supported search
+settings through the semantic command; the sample's C/W/R option letters are
+**modern**, not asserted historical Optstr syntax. Headless regression tests
+cover these additions. See the [rendering audit](docs/en/FIRST-ED-PRESENTATION-V1.md),
+[search options](docs/en/FIRST-ED-SEARCH-OPTIONS-V1.md) and
+[supplemental symbol/feature inventory](docs/en/HANDBOOK-SUPPLEMENT-V1.md).
+MicroStar-specific menus, pop-ups, printing, file utilities, block-file
+commands and optional spell-check integration remain separate unfinished
+sample features; V1 is **not** historically signed off.
+
+
 Version 1 uses the functional scope of Borland's historical **Turbo Editor Toolbox 1.0 (1985)** as a compatibility/reference milestone. This is a **clean-room reimplementation**: the historical handbook is treated as a behavioral requirements source; historical source code is not copied.
 
 The historical design is especially useful because it separates the editor into text streams, windows, command dispatchers/processors, hooks, file operations, screen updating, buffered input and a cooperative background task mechanism. SASD keeps those responsibilities, but exposes them through modern, testable abstractions rather than DOS/video-memory-specific code.
