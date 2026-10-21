@@ -103,8 +103,13 @@ internal sealed class ConsoleFirstEdPromptService(ConsoleFirstEdRenderer rendere
             : "Text: ");
 
         // A cancelled (null) Find is not an explicitly empty Find Again.
-        return EditorCommandPromptResolver.Resolve(
+        // An intentionally empty Find repeats the last pattern AND its
+        // remembered options; it must not open another options prompt.
+        var request = EditorCommandPromptResolver.Resolve(
             binding, visibleRows, firstResponse: text);
+        return request?.Id == EditorCommandId.FindNext
+            ? ResolveSearchOptions(request)
+            : request;
     }
 
     private EditorCommandRequest? ResolveFindReplace(EditorCommandBinding binding, int visibleRows)
@@ -119,8 +124,25 @@ internal sealed class ConsoleFirstEdPromptService(ConsoleFirstEdRenderer rendere
         // Coalescing null to "" here previously made an abandoned prompt
         // unintentionally destructive.
         var replacement = renderer.ReadPrompt("Replace with: ");
-        return EditorCommandPromptResolver.Resolve(
+        var request = EditorCommandPromptResolver.Resolve(
             binding, visibleRows, firstResponse: find, secondResponse: replacement);
+        return ResolveSearchOptions(request);
+    }
+
+    /// <summary>
+    /// Expose the CORE'S existing modern search options without pretending
+    /// that the letters C/W/R are Borland's 1985 Optstr vocabulary. Only the
+    /// FIRST-ED example prompts; the editor's semantic command and search
+    /// services remain usable without Console APIs.
+    /// </summary>
+    private EditorCommandRequest? ResolveSearchOptions(EditorCommandRequest? request)
+    {
+        if (request is null)
+            return null; // cancelled find or replace; never prompt again
+
+        var answer = renderer.ReadPrompt(
+            "Options (Enter=normal, C=case, W=whole word, R=wrap): ");
+        return ConsoleFirstEdSearchOptionsPolicy.Attach(request, answer);
     }
 
     private EditorCommandRequest? ResolveCharacter(EditorCommandBinding binding, int visibleRows)
