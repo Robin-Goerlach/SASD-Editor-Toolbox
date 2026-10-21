@@ -220,6 +220,8 @@ Error notifications use stable semantic categories independent of UI wording. A 
 ## 11. Rendering
 
 The core does not write directly to console/video memory. It exposes viewport/status projections for individual windows plus host-neutral window frames. WPF, WinForms, terminal, web and other hosts decide how those projections are drawn.
+- The FIRST-ED **console sample** must never write raw document/status/prompt control characters directly to the terminal. Its host-only output projection renders ASCII C0 bytes as caret notation, DEL as `^?` and C1 control bytes as inert ASCII markers before `Console.Write`. Rendered text may be clipped only at complete Unicode text-element boundaries; the physical caret accounts for expanded control notation and a documented host-local estimate of wide Unicode cells. Stored document bytes, logical UTF-16 cursor columns, file encodings and the portable viewport model are not altered. Exact `wcwidth` parity for every terminal, emoji sequence or ambiguous-width glyph is **not** claimed by the headless tests; real Windows/Linux terminal smoke tests remain a separate V1 release gate. See `docs/en/TERMINAL-OUTPUT-V1-ACCEPTANCE.md` and `docs/de/TERMINALAUSGABE-V1-ABNAHME.md`.
+
 
 - A viewport requested with positive `height` and `width` projects at most the remaining logical document lines. Its row count must not overflow integer arithmetic when a host reports a very large positive height; zero and negative dimensions are invalid.
 - Projecting a viewport is observational. It must not change the document, dirty state, cursor, top line, horizontal offset or Undo history.
