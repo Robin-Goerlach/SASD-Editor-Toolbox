@@ -1065,10 +1065,11 @@
       "handbookPage": 219,
       "status": "implemented",
       "evidence": "docs/en/UNDO-TRANSACTIONS.md",
-      "note": "Transactional undo restores one logical operation.",
+      "note": "Transactional undo restores one logical operation. V1 audit: after relinking an edited window, Undo restores the original document through surviving linked views without changing later explicit window focus. The old Capture API additionally requires matching view and document identity for cursor restore.",
       "conformanceCases": [
         "blocks.cross-document-move-undo-restores-both-streams",
-        "undo.delete-boundary-restores-anchors-of-linked-windows"
+        "undo.delete-boundary-restores-anchors-of-linked-windows",
+        "windows.undo-relinked-view-preserves-unrelated-current-window"
       ]
     },
     {
@@ -1206,10 +1207,11 @@
       "handbookPage": 234,
       "status": "implemented",
       "evidence": "docs/en/WINDOW-GEOMETRY.md",
-      "note": "Window lifecycle and linked document views.",
+      "note": "Window lifecycle and linked document views. V1 audit: after relinking an edited window, Undo restores the original document through surviving linked views without changing later explicit window focus. The old Capture API additionally requires matching view and document identity for cursor restore.",
       "conformanceCases": [
         "windows.link-replaces-last-destination-view-and-releases-history",
-        "windows.link-keeps-history-when-old-stream-has-linked-view"
+        "windows.link-keeps-history-when-old-stream-has-linked-view",
+        "windows.undo-relinked-view-preserves-unrelated-current-window"
       ]
     },
     {
