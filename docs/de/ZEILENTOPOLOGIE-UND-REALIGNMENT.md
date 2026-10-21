@@ -71,3 +71,11 @@ Ergänzende Tests in `BlockEndpointStateTests`, `BlockCompatibilityTests`, `Refo
 ## Performance-Policy
 
 Die aktuelle Implementierung durchläuft bei gemeldeten Strukturänderungen die geöffneten Fenster und die Markertabelle. V1 priorisiert Korrektheit, Nachvollziehbarkeit und einfache Invarianten. Falls Profiling später zeigt, dass sehr große Dokumente oder viele Anker eine schnellere Repräsentation benötigen, können Intervallstrukturen, persistente Anker oder buffer-native Anchor-Mechanismen intern eingesetzt werden, ohne den Kompatibilitätsvertrag zu verändern.
+
+## Invariante beim Zeilenverbinden: ausgehender Zeilenübergang (V1-Handbuchprüfung, Oktober 2026)
+
+Die historische Verantwortung von `EditJoinLine` und die an Zeilengrenzen verbindenden Löschbefehle entfernen **den Übergang zwischen** zwei logischen Zeilen. Das Flag `Wrapped` beschreibt in unserem V1-Dateimodell jedoch den **Übergang nach** der jeweiligen Zeile, nicht ihren Zeicheninhalt. Nach einer Verbindung muss die neue Zeile deshalb den **ausgehenden Wrapped-Zustand der unteren Zeile** übernehmen. Bliebe das Wrapped-Flag der oberen Zeile erhalten, könnte ein späterer harter Absatzumbruch fälschlich als weicher 0x8D-Übergang geschrieben werden. Ginge das Wrapped-Flag der unteren Zeile verloren, würde ein weicher Übergang zu CR/LF.
+
+Die gemeinsame Hilfsmethode `JoinedLineFlags(upper, lower)` hält diese Regel für `DeleteLeftCharacter` in Spalte eins sowie für `DeleteRightCharacter` und `DeleteRightWord` am Zeilenende fest. Alle anderen Flags der oberen Zeile, darunter `UserColored`, bleiben erhalten; nur `Wrapped` kommt von der unteren Zeile. Wie bisher repariert `EditorLineTopology.LinesDeleted` Fenster, Marker und Blockgrenzen; `RefreshBlockFlags` rekonstruiert das flüchtige `InBlock`-Flag. Undo stellt Zeilen und Flags gemeinsam wieder her.
+
+**Ausführbare Nachweise:** Sechs portable Fälle in `kernel-routines.json` prüfen die beiden Übergangsrichtungen und Undo; neun weitere .NET-Testausführungen in `LineJoinWrappedBoundaryTests` prüfen Vorwärts-/Rückwärts-/Wort-Verbindung, verknüpfte Fenster, Undo und die tatsächlichen Bytes des `FirstEdLegacyFileCodec` (`0x8D` bzw. `CR/LF`). Es handelt sich um einen nachgewiesenen und behobenen Verhaltensfehler, nicht um eine zusätzliche GUI- oder Pascal-Zeigerschnittstelle.

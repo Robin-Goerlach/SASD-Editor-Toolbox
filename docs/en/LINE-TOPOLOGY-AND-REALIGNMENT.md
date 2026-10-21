@@ -71,3 +71,11 @@ Additional coverage in `BlockEndpointStateTests`, `BlockCompatibilityTests`, `Re
 ## Performance policy
 
 The current implementation scans the open windows and marker table when a structural change is reported. V1 favors correctness, traceability and simple invariants. If profiling later shows that large documents or many anchors need a faster representation, interval trees, persistent anchors or buffer-native anchor tracking can replace the internal strategy without changing the compatibility contract.
+
+## Join-line outgoing-boundary invariant (V1 handbook audit, October 2026)
+
+The historic `EditJoinLine` responsibility and the deletion commands which join at a line boundary remove **the separator between** two line descriptors. In our V1 file model, `Wrapped` belongs to the **outgoing boundary** of a logical line, not to its characters. Thus, after joining an upper line to the lower line, the resulting line must keep the **lower line's outgoing Wrapped status**. Preserving the upper line's now-deleted outgoing status would mis-encode a later hard paragraph boundary as a legacy 0x8D soft boundary; dropping the lower Wrapped status would incorrectly serialize a soft boundary as CR/LF.
+
+The shared `JoinedLineFlags(upper, lower)` helper makes this rule explicit for `DeleteLeftCharacter` at column zero and `DeleteRightCharacter` / `DeleteRightWord` at the right edge. It retains the upper line's other flags (including `UserColored`) and inherits only the lower line's `Wrapped` bit. As before, `EditorLineTopology.LinesDeleted` repairs cursor/top-line anchors, markers, and block endpoints; `RefreshBlockFlags` reprojects transient `InBlock` state from the surviving endpoints. Undo restores original descriptors/flags in one transaction.
+
+**Executable verification:** six portable cases in `kernel-routines.json` exercise both outgoing-boundary directions and Undo; nine additional native test invocations in `LineJoinWrappedBoundaryTests` cover forward/backward/word joins, linked-window realignment, one-step Undo and the actual bytes emitted by `FirstEdLegacyFileCodec` (`0x8D` versus `CR/LF`). This is an identified and fixed V1 behavioral defect, not a new UI or Pascal-pointer dependency.
