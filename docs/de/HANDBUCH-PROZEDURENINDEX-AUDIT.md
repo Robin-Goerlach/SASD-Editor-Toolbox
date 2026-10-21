@@ -164,3 +164,12 @@ Die Handbuchstellen S. 127 (`EditBlockCopy`), S. 128 (`EditBlockDelete`) und S. 
 Neue Headless-Tests prüfen sichtbare/verborgene benachbarte Moves, eine echte Verschiebung nach oben samt Neuverankerung einer zuvor entfernten TopLine, vollständige dokumentübergreifende Verschiebung (eine leere Quellzeile bleibt, Undo stellt beide Texte gemeinsam wieder her) und Copy innerhalb der eigenen Auswahl (die Einfügung gehört danach zum zusammenhängenden hervorgehobenen Block). Diese SASD-Regeln werden nicht als unbelegte Pascal-Interna ausgegeben.
 
 Zwei portable Fälle in `block-topology-and-undo.json` unterscheiden No-op und tatsächliche Verschiebung und sind mit `EditBlockMove` verknüpft. **253 portable V1-Fälle**, **103/123 historische Routinen mit direkten Verweisen**. Echte Windows-/Linux-Terminaltests und die übrigen historischen Einzelprüfungen bleiben offen.
+
+
+## V1-Prüfschritt: EditUndo und EditWindowLink nach Umkopplung
+
+Der Vergleich von `EditUndo` und `EditWindowLink` aus dem Handbuch von 1985 mit der ausdrücklich modernen Snapshot-Undo-Policy von SASD deckte eine Lücke im erhaltenen **älteren Capture-API** auf: Die Cursorwiederherstellung wählte ein Fenster allein anhand der `WindowId` – selbst wenn dieses Fenster zwischenzeitlich einem anderen `DocumentId` zugeordnet worden war. Der Text wurde schon zuvor im richtigen Dokument restauriert, jedoch konnte ein unbeteiligtes Fenster die alte Cursorposition erhalten und unerwartet den Fokus übernehmen.
+
+Der Fix setzt voraus, dass das ursprüngliche Fenster noch dasselbe Dokument zeigt. Ist es **umgekoppelt**, bleiben Cursor und spätere Fensterauswahl unangetastet; ist es **geschlossen**, greift weiterhin die bisherige Fallback-Regel für ein überlebendes verknüpftes Fenster. Moderne zusammengesetzte Undo-Transaktionen prüfen beide Identitäten bereits. Vier direkte Regressionstests prüfen diese Grenzen. Ein neuer portabler Fall `windows.undo-relinked-view-preserves-unrelated-current-window` bestätigt das moderne semantische Undo-/Fensterverhalten und ist beiden historischen Routinen zugeordnet.
+
+Das portable Manifest umfasst jetzt **254 Fälle**; **103/123 Handbuchroutinen** haben weiterhin direkte Verweise (die neuen Fälle vertiefen bestehende Belege). Pascal-interne Undo-Stacks/Zeiger und echte Terminaltasten sind damit nicht freigegeben; die V1-Abnahme ist noch offen.
