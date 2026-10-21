@@ -1660,6 +1660,135 @@
           "count": 0
         }
       }
+    },
+    {
+      "id": "windows.undo-relinked-view-preserves-unrelated-current-window",
+      "area": "windows",
+      "initial": {
+        "documents": [
+          {
+            "id": "a",
+            "lines": [
+              {
+                "text": "old",
+                "flags": []
+              }
+            ]
+          },
+          {
+            "id": "b",
+            "lines": [
+              {
+                "text": "new",
+                "flags": []
+              }
+            ]
+          }
+        ],
+        "windows": [
+          {
+            "id": "wa",
+            "documentId": "a",
+            "cursor": {
+              "line": 0,
+              "column": 0
+            },
+            "topLine": 0,
+            "leftColumn": 0
+          },
+          {
+            "id": "sibling",
+            "documentId": "a",
+            "cursor": {
+              "line": 0,
+              "column": 0
+            },
+            "topLine": 0,
+            "leftColumn": 0
+          },
+          {
+            "id": "wb",
+            "documentId": "b",
+            "cursor": {
+              "line": 0,
+              "column": 0
+            },
+            "topLine": 0,
+            "leftColumn": 0
+          }
+        ],
+        "currentWindowId": "wa"
+      },
+      "operations": [
+        {
+          "id": "change_case"
+        },
+        {
+          "id": "link_window",
+          "number": 1,
+          "number2": 3
+        },
+        {
+          "id": "select_window",
+          "windowId": "wb"
+        },
+        {
+          "id": "undo"
+        }
+      ],
+      "expect": {
+        "currentWindowId": "wb",
+        "windowCount": 3,
+        "windows": {
+          "wa": {
+            "documentId": "b",
+            "sameDocumentAs": "wb",
+            "cursor": {
+              "line": 0,
+              "column": 0
+            }
+          },
+          "sibling": {
+            "documentId": "a",
+            "cursor": {
+              "line": 0,
+              "column": 0
+            }
+          },
+          "wb": {
+            "documentId": "b",
+            "cursor": {
+              "line": 0,
+              "column": 0
+            }
+          }
+        },
+        "documents": {
+          "a": {
+            "lines": [
+              {
+                "text": "old",
+                "flags": []
+              }
+            ],
+            "isDirty": false,
+            "version": 0
+          },
+          "b": {
+            "lines": [
+              {
+                "text": "new",
+                "flags": []
+              }
+            ],
+            "isDirty": false,
+            "version": 0
+          }
+        },
+        "undo": {
+          "count": 0
+        }
+      }
     }
   ]
 }
