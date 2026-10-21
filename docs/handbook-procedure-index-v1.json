@@ -1084,7 +1084,7 @@
       "handbookPage": 221,
       "status": "modern-replacement",
       "evidence": "docs/en/ARCHITECTURE.md",
-      "note": "Viewport/host renderer replaces a physical video-memory update."
+      "note": "Viewport/host renderer replaces a physical video-memory update. October V1 renderer audit: the .NET sample now projects stored controls to inert caret/ASCII notation before terminal writes, clips Unicode graphemes and estimates physical cell columns. Host-only xUnit tests and a Windows/Linux manual checklist: docs/en/TERMINAL-OUTPUT-V1-ACCEPTANCE.md. No DOS video-memory or portable per-routine parity is claimed."
     },
     {
       "name": "EditUpdrowasm",
@@ -1098,7 +1098,7 @@
       "handbookPage": 223,
       "status": "host-sample",
       "evidence": "docs/en/ARCHITECTURE.md",
-      "note": "Window status and screen projection are host/renderer responsibilities."
+      "note": "Window status and screen projection are host/renderer responsibilities. October V1 renderer audit: the .NET sample now projects stored controls to inert caret/ASCII notation before terminal writes, clips Unicode graphemes and estimates physical cell columns. Host-only xUnit tests and a Windows/Linux manual checklist: docs/en/TERMINAL-OUTPUT-V1-ACCEPTANCE.md. No DOS video-memory or portable per-routine parity is claimed."
     },
     {
       "name": "EditUpdwinsl",
