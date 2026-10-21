@@ -1006,6 +1006,238 @@
           "count": 0
         }
       }
+    },
+    {
+      "id": "blocks.move-immediately-before-following-line-is-noop",
+      "area": "blocks",
+      "initial": {
+        "documents": [
+          {
+            "id": "a",
+            "lines": [
+              {
+                "text": "a",
+                "flags": []
+              },
+              {
+                "text": "b",
+                "flags": []
+              },
+              {
+                "text": "c",
+                "flags": []
+              },
+              {
+                "text": "d",
+                "flags": []
+              }
+            ]
+          }
+        ],
+        "windows": [
+          {
+            "id": "w",
+            "documentId": "a",
+            "cursor": {
+              "line": 1,
+              "column": 0
+            },
+            "topLine": 0,
+            "leftColumn": 0
+          }
+        ],
+        "currentWindowId": "w"
+      },
+      "operations": [
+        {
+          "id": "begin_block"
+        },
+        {
+          "id": "position_cursor",
+          "line": 2,
+          "column": 0
+        },
+        {
+          "id": "end_block"
+        },
+        {
+          "id": "position_cursor",
+          "line": 3,
+          "column": 7
+        },
+        {
+          "id": "move_block"
+        }
+      ],
+      "expect": {
+        "documents": {
+          "a": {
+            "lines": [
+              {
+                "text": "a",
+                "flags": []
+              },
+              {
+                "text": "b",
+                "flags": [
+                  "in_block"
+                ]
+              },
+              {
+                "text": "c",
+                "flags": [
+                  "in_block"
+                ]
+              },
+              {
+                "text": "d",
+                "flags": []
+              }
+            ],
+            "isDirty": false,
+            "version": 0
+          }
+        },
+        "blockState": {
+          "start": {
+            "documentId": "a",
+            "line": 1
+          },
+          "end": {
+            "documentId": "a",
+            "line": 2
+          },
+          "hidden": false,
+          "complete": true
+        },
+        "windows": {
+          "w": {
+            "cursor": {
+              "line": 3,
+              "column": 7
+            }
+          }
+        },
+        "undo": {
+          "count": 0
+        }
+      }
+    },
+    {
+      "id": "blocks.move-before-earlier-line-still-reorders-with-one-undo",
+      "area": "blocks",
+      "initial": {
+        "documents": [
+          {
+            "id": "a",
+            "lines": [
+              {
+                "text": "a",
+                "flags": []
+              },
+              {
+                "text": "b",
+                "flags": []
+              },
+              {
+                "text": "c",
+                "flags": []
+              },
+              {
+                "text": "d",
+                "flags": []
+              }
+            ]
+          }
+        ],
+        "windows": [
+          {
+            "id": "w",
+            "documentId": "a",
+            "cursor": {
+              "line": 1,
+              "column": 0
+            },
+            "topLine": 0,
+            "leftColumn": 0
+          }
+        ],
+        "currentWindowId": "w"
+      },
+      "operations": [
+        {
+          "id": "begin_block"
+        },
+        {
+          "id": "position_cursor",
+          "line": 2,
+          "column": 0
+        },
+        {
+          "id": "end_block"
+        },
+        {
+          "id": "position_cursor",
+          "line": 0,
+          "column": 7
+        },
+        {
+          "id": "move_block"
+        }
+      ],
+      "expect": {
+        "documents": {
+          "a": {
+            "lines": [
+              {
+                "text": "b",
+                "flags": [
+                  "in_block"
+                ]
+              },
+              {
+                "text": "c",
+                "flags": [
+                  "in_block"
+                ]
+              },
+              {
+                "text": "a",
+                "flags": []
+              },
+              {
+                "text": "d",
+                "flags": []
+              }
+            ],
+            "isDirty": true,
+            "version": 1
+          }
+        },
+        "blockState": {
+          "start": {
+            "documentId": "a",
+            "line": 0
+          },
+          "end": {
+            "documentId": "a",
+            "line": 1
+          },
+          "hidden": false,
+          "complete": true
+        },
+        "windows": {
+          "w": {
+            "cursor": {
+              "line": 2,
+              "column": 7
+            }
+          }
+        },
+        "undo": {
+          "count": 1
+        }
+      }
     }
   ]
 }
