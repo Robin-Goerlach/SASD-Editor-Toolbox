@@ -13,6 +13,13 @@ internal sealed class ConsoleFirstEdRenderer(EditorSession session)
 {
     private readonly EditorViewportBuilder _viewportBuilder = new(session);
 
+    /// <summary>
+    /// FIRST-ED may display hard/soft line-end and end-of-file indicators in
+    /// one right-edge column (handbook p. 69). MicroStar deliberately hides
+    /// these indicators. This switch belongs to the sample host, not Core.
+    /// </summary>
+    internal bool ShowRightEdgeMarkers { get; set; } = true;
+
     public int VisibleTextRows
     {
         get
@@ -42,13 +49,17 @@ internal sealed class ConsoleFirstEdRenderer(EditorSession session)
         // EditHscroll affects all displayed windows, not just the active one.
         // The terminal supplies the current text width; no Console dependency
         // is needed in the reusable Core to enforce horizontal visibility.
-        session.EnsureAllWindowCursorsHorizontallyVisible(width);
+        // Reserve one safe cell for a historical line-end indicator when
+        // enabled. The terminal's final physical column remains untouched to
+        // avoid implicit line wrapping on consoles with different VT behavior.
+        var textWidth = ShowRightEdgeMarkers && width > 1 ? width - 1 : width;
+        session.EnsureAllWindowCursorsHorizontallyVisible(textWidth);
 
         foreach (var frame in session.WindowLayout.Frames)
         {
             var window = session.Windows.First(candidate => candidate.WindowId == frame.WindowId);
             EnsureCursorVerticallyVisible(window, frame.TextRows);
-            var viewport = _viewportBuilder.Build(window, frame.TextRows, width);
+            var viewport = _viewportBuilder.Build(window, frame.TextRows, textWidth);
             var windowNumber = GetWindowNumber(window.WindowId);
             var current = window.WindowId == session.CurrentWindow.WindowId;
 
@@ -59,7 +70,8 @@ internal sealed class ConsoleFirstEdRenderer(EditorSession session)
                 frame.TopRow,
                 $"{active}W{windowNumber} {viewport.Status.FileName}  Ln {viewport.Status.Line}  Col {viewport.Status.Column}  {mode}" +
                 $"  WW:{OnOff(viewport.Status.WordWrap)} AI:{OnOff(viewport.Status.AutoIndent)}{dirty}",
-                width);
+                width,
+                role: FirstEdColorRole.Status);
 
             for (var row = 0; row < frame.TextRows; row++)
             {
@@ -72,12 +84,23 @@ internal sealed class ConsoleFirstEdRenderer(EditorSession session)
                 // Render from the complete stored logical line, applying
                 // the independent host-only text-element and control-code
                 // projection at the window's horizontal offset.
-                var text = row < viewport.Lines.Count
+                var hasLine = row < viewport.Lines.Count;
+                var text = hasLine
                     ? window.Document.Buffer.GetLine(viewport.Lines[row].DocumentLine).Text
                     : string.Empty;
+                var flags = hasLine ? viewport.Lines[row].Flags : Model.EditorLineFlags.None;
+
+                // Colored is dominant over InBlock in the handbook: the
+                // user's special-color flag overrides block/ordinary text.
+                // InBlock is already cleared by Core when the block is hidden.
+                // Neither selection nor the outgoing Wrapped flag is mutated
+                // by this purely physical drawing step.
+                var role = ConsoleFirstEdPresentationPolicy.TextRole(flags);
+                var marker = ConsoleFirstEdPresentationPolicy.RightEdgeMarker(
+                    ShowRightEdgeMarkers && width > 1, hasLine, flags);
                 WriteRow(
                     frame.TopRow + EditorWindowFrame.StatusRowCount + row,
-                    text, width, window.LeftColumn);
+                    text, width, window.LeftColumn, role, marker);
             }
         }
 
@@ -86,9 +109,10 @@ internal sealed class ConsoleFirstEdRenderer(EditorSession session)
             string.IsNullOrWhiteSpace(message)
                 ? "Ctrl-O O New window | Ctrl-O Y Delete | Ctrl-K X Exit | Esc Undo | Ctrl-Q F Find"
                 : message,
-            width);
+            width,
+            role: FirstEdColorRole.Command);
 
-        PositionCursor(width);
+        PositionCursor(textWidth);
         Console.CursorVisible = true;
     }
 
@@ -230,7 +254,8 @@ internal sealed class ConsoleFirstEdRenderer(EditorSession session)
     private static string OnOff(bool value) => value ? "ON" : "OFF";
 
     private static void WriteRow(
-        int row, string text, int width, int firstCodeUnit = 0)
+        int row, string text, int width, int firstCodeUnit = 0,
+        FirstEdColorRole role = FirstEdColorRole.Text, char? rightEdgeMarker = null)
     {
         if (row < 0 || row >= Console.WindowHeight)
         {
@@ -246,9 +271,39 @@ internal sealed class ConsoleFirstEdRenderer(EditorSession session)
         // complete Unicode text elements, estimates terminal cell widths
         // and pads the row to erase stale characters from prior frames.
         // The last real terminal column is reserved by the caller.
+        // A marker consumes its own physical cell; it is not part of the
+        // stored line, and its special glyph must never affect document text,
+        // Unicode grapheme clipping, horizontal scrolling or cursor offsets.
+        var markerCells = rightEdgeMarker.HasValue && width > 1 ? 1 : 0;
         var display = ConsoleFirstEdRowProjection.Project(
-            text, Math.Max(0, firstCodeUnit), width);
+            text, Math.Max(0, firstCodeUnit), width - markerCells);
         Console.SetCursorPosition(0, row);
-        Console.Write(display.Text);
+
+        // Restore the caller's terminal colors after EACH row, including
+        // exceptions during output. Core exposes semantic flags only; the
+        // five historic roles are represented by host-local theme colors.
+        var previousForeground = Console.ForegroundColor;
+        var previousBackground = Console.BackgroundColor;
+        try
+        {
+            var textColors = ConsoleFirstEdPresentationPolicy.Colors(role);
+            Console.ForegroundColor = textColors.Foreground;
+            Console.BackgroundColor = textColors.Background;
+            Console.Write(display.Text);
+
+            if (markerCells != 0)
+            {
+                var markerColors = ConsoleFirstEdPresentationPolicy.Colors(
+                    FirstEdColorRole.Status);
+                Console.ForegroundColor = markerColors.Foreground;
+                Console.BackgroundColor = markerColors.Background;
+                Console.Write(rightEdgeMarker!.Value);
+            }
+        }
+        finally
+        {
+            Console.ForegroundColor = previousForeground;
+            Console.BackgroundColor = previousBackground;
+        }
     }
 }
