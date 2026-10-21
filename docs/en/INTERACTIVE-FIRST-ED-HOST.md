@@ -58,3 +58,9 @@ When Ctrl-K S first saves an unnamed `NONAME` document or Ctrl-K W exports text 
 A repeated Save to a document's **already associated filename** remains direct; the user has already selected that file. The direct Write File command still does not associate the document with its exported filename or clear the Dirty flag. Read File never asks for overwrite approval. The reusable editor core and its historical file-command semantics remain unchanged.
 
 This is a **modern terminal usability guard**, not a historical 1985 DOS claim, not a replacement for file permissions, and not an atomic guarantee: another process may create or change a file after the host's `File.Exists` probe. Other hosts must choose their own overwrite-confirmation policies.
+
+## Historical empty Set Tab Width prompt (Ctrl-K T)
+
+The handbook's `EditCptabdef` wrapper has a useful exception to ordinary numeric prompting: deliberately submitting an **empty** tab-width answer derives the interval from the current displayed cursor column minus one. The FIRST-ED console host now implements this in the small, headless-testable `ConsoleFirstEdTabWidthPromptPolicy`. Our model's zero-based cursor column is already the required value. Null/Escape remains **cancellation**, while a supplied integer still uses the shared numeric resolver. At the first cursor column the derived interval would be zero: the host declines to dispatch the invalid value, preserving the current tab width.
+
+This is a historical host-prompt behavior with a documented modern boundary. The original editor's Tabsize was global; SASD deliberately keeps per-window `TabSize`. The reusable command dispatcher and all other numeric prompts are unchanged. Automated tests do not certify the visual appearance or key delivery of a real DOS terminal.
