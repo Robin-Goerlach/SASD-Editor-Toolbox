@@ -661,7 +661,7 @@
       "handbookPage": 182,
       "status": "implemented",
       "evidence": "docs/en/FIRST-ED-COMMAND-MAP.md",
-      "note": "Normalized control-character insertion.",
+      "note": "Normalized control-character insertion. V1 handbook p. 182: console Ctrl-P prompt now translates plain ASCII A-Z and @ [ \\\\ ] ^ _ to 0x00-0x1F literal control codes before semantic dispatch. Host-only tests cover physical keys, cancellation, unsupported characters, insertion and Undo. The existing portable case proves only already-resolved semantic control insertion, not DOS keyboard/typeahead parity.",
       "conformanceCases": [
         "kernel.insert-control-character-writes-literal-control-into-line"
       ]
