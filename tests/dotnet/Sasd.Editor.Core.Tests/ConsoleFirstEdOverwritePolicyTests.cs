@@ -42,7 +42,10 @@ public sealed class ConsoleFirstEdOverwritePolicyTests
             Assert.Null(window.Document.FilePath);
             Assert.Equal(undoCount, session.Undo.Count);
 
-            var approved = ConsoleFirstEdOverwritePolicy.Confirm(request, " yes ");
+            // Assert.IsType returns a non-null command for the dispatcher,
+            // so nullability analysis knows confirmation really succeeded.
+            var approved = Assert.IsType<EditorCommandRequest>(
+                ConsoleFirstEdOverwritePolicy.Confirm(request, " yes "));
             Assert.Same(request, approved);
             Assert.True(await new EditorCommandDispatcher(session).ExecuteAsync(approved));
             Assert.Equal("modified new content", await File.ReadAllTextAsync(path));
@@ -81,7 +84,8 @@ public sealed class ConsoleFirstEdOverwritePolicyTests
             Assert.True(document.IsDirty);
             Assert.Null(document.FilePath);
 
-            var approved = ConsoleFirstEdOverwritePolicy.Confirm(request, "YES");
+            var approved = Assert.IsType<EditorCommandRequest>(
+                ConsoleFirstEdOverwritePolicy.Confirm(request, "YES"));
             Assert.True(await new EditorCommandDispatcher(session).ExecuteAsync(approved));
             Assert.Equal("local export body", await File.ReadAllTextAsync(path));
 
