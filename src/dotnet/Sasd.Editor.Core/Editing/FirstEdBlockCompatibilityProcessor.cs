@@ -83,7 +83,28 @@ internal static class FirstEdBlockCompatibilityProcessor
             && targetWindow.Cursor.Line >= block.FirstLine
             && targetWindow.Cursor.Line <= block.LastLine)
         {
+            // This is an explicit historical restriction: inserting a block
+            // into its own selected range has no well-defined destination.
+            // Reject before starting any Undo or changing any line.
             throw new InvalidOperationException("The cursor cannot be inside the block being moved.");
+        }
+
+        // A whole-line move inserts immediately BEFORE the target cursor's
+        // logical line. If that line ALREADY follows the selected block, the
+        // remove-and-reinsert algorithm would reproduce exactly the same text,
+        // flags, block endpoints and navigation state. This is a successful
+        // no-op, not a text mutation.
+        //
+        // The 1985 handbook documents the destination placement but does
+        // not specify Dirty/Undo accounting for this adjacent-boundary case.
+        // SASD's modern no-op policy avoids a phantom document version bump
+        // and an Undo item that cannot actually undo any visible change.
+        //
+        // Check before taking snapshots or touching the topology coordinator,
+        // so linked windows, markers and incomplete block state stay intact.
+        if (sameDocument && targetWindow.Cursor.Line == block.LastLine + 1)
+        {
+            return true;
         }
 
         var movedLines = SnapshotBlock(sourceDocument, block);
