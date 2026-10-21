@@ -1,0 +1,168 @@
+{
+  "formatVersion": 1,
+  "source": "Turbo Editor Toolbox Owner's Handbook (1985), references outside printed Procedures and Functions Index (pp. 243-244). Printed handbook page numbers.",
+  "scope": "non-exhaustive",
+  "auditPolicy": "Separate historically named helpers, required extension hooks and demonstration/example routines from the indexed 123; no assertion of exhaustive symbol extraction or source-level parity.",
+  "entries": [
+    {
+      "name": "EditCtrlChar",
+      "handbookPage": 41,
+      "layer": "toolbox-helper",
+      "status": "host-replacement",
+      "evidence": "src/dotnet/Sasd.Editor.Core/Input/FirstEdKeyMap.cs",
+      "note": "Second control-character decoding for prefixed commands; modern normalized two-step input replaces direct console logic."
+    },
+    {
+      "name": "EditCuradr",
+      "handbookPage": 121,
+      "layer": "toolbox-helper",
+      "status": "host-replacement",
+      "evidence": "samples/dotnet/Sasd.Editor.FirstEd.Sample/ConsoleFirstEdRenderer.cs",
+      "note": "Command-row cursor positioning helper mentioned in a See Also reference; original signature is not established here."
+    },
+    {
+      "name": "EditFileSave",
+      "handbookPage": 82,
+      "layer": "toolbox-helper",
+      "status": "modern-replacement",
+      "evidence": "src/dotnet/Sasd.Editor.Core/IO/EditorFileService.cs",
+      "note": "Named in chapter 12's file-operation overview outside the printed index; SaveFile provides the modern operation. Direct historical helper parity is not claimed."
+    },
+    {
+      "name": "EditFileerror",
+      "handbookPage": 83,
+      "layer": "toolbox-helper",
+      "status": "modern-replacement",
+      "evidence": "src/dotnet/Sasd.Editor.Core/IO/EditorFileService.cs",
+      "note": "DOS file error flag/query is replaced by typed I/O exceptions and semantic error reporting."
+    },
+    {
+      "name": "EditGetinput",
+      "handbookPage": 110,
+      "layer": "toolbox-helper",
+      "status": "implemented",
+      "evidence": "src/dotnet/Sasd.Editor.Core/Input/EditorTypeaheadBuffer.cs",
+      "note": "Editor typeahead dequeue; linked from EditPushtbf and global Circout description."
+    },
+    {
+      "name": "EditInsbuf",
+      "handbookPage": 83,
+      "layer": "toolbox-helper",
+      "status": "modern-replacement",
+      "evidence": "src/dotnet/Sasd.Editor.Core/Document/LinkedLineTextBuffer.cs",
+      "note": "Logical line insertion helper used by the sample file reader. Modern text buffer and topology service replace pointer allocation."
+    },
+    {
+      "name": "EditKeypressed",
+      "handbookPage": 65,
+      "layer": "toolbox-helper",
+      "status": "host-replacement",
+      "evidence": "samples/dotnet/Sasd.Editor.FirstEd.Sample/ConsoleFirstEdHost.cs",
+      "note": "Check physical keyboard availability and transfer input into editor typeahead; immediate Ctrl-U semantics live at the host boundary."
+    },
+    {
+      "name": "EditMessage",
+      "handbookPage": 54,
+      "layer": "toolbox-helper",
+      "status": "modern-replacement",
+      "evidence": "src/dotnet/Sasd.Editor.Core/Hooks/EditorError.cs",
+      "note": "Historical lookup from EDITERR.MSG is not reproduced; typed errors and host resources replace the lookup. A replaceable message file is a deliberate divergence."
+    },
+    {
+      "name": "EditScanpat",
+      "handbookPage": 175,
+      "layer": "toolbox-helper",
+      "status": "implemented",
+      "evidence": "src/dotnet/Sasd.Editor.Core/Search/EditorSearchService.cs",
+      "note": "Line-by-line pattern search used by EditFind; modern search service is functionally equivalent in its specified literal forward scan."
+    },
+    {
+      "name": "EditSizeline",
+      "handbookPage": 39,
+      "layer": "toolbox-helper",
+      "status": "modern-replacement",
+      "evidence": "src/dotnet/Sasd.Editor.Core/Document/LinkedLineTextBuffer.cs",
+      "note": "Reallocate/shrink Pascal line text storage; managed variable-length strings avoid manual buffer sizing."
+    },
+    {
+      "name": "EditWrline",
+      "handbookPage": 71,
+      "layer": "toolbox-helper",
+      "status": "host-replacement",
+      "evidence": "samples/dotnet/Sasd.Editor.FirstEd.Sample/ConsoleFirstEdRenderer.cs",
+      "note": "Historically compares an image row and its color before physical display; console host safely projects and repaints rows rather than copying video memory."
+    },
+    {
+      "name": "UserCommand",
+      "handbookPage": 35,
+      "layer": "extension-hook",
+      "status": "implemented",
+      "evidence": "src/dotnet/Sasd.Editor.Core/Hooks/IEditorHooks.cs",
+      "note": "Command filtering is exposed via FilterCommand, with typed semantic commands instead of byte mutation."
+    },
+    {
+      "name": "UserError",
+      "handbookPage": 35,
+      "layer": "extension-hook",
+      "status": "implemented",
+      "evidence": "src/dotnet/Sasd.Editor.Core/Hooks/IEditorHooks.cs",
+      "note": "Error handling hook provided as OnErrorAsync with semantic error identity."
+    },
+    {
+      "name": "UserStatusline",
+      "handbookPage": 35,
+      "layer": "extension-hook",
+      "status": "implemented",
+      "evidence": "src/dotnet/Sasd.Editor.Core/Hooks/IEditorHooks.cs",
+      "note": "Per-window status transformation exposed as TransformStatus."
+    },
+    {
+      "name": "UserReplace",
+      "handbookPage": 35,
+      "layer": "extension-hook",
+      "status": "implemented",
+      "evidence": "src/dotnet/Sasd.Editor.Core/Hooks/IEditorHooks.cs",
+      "note": "Replace confirmation exposed as BeforeReplaceAsync."
+    },
+    {
+      "name": "UserTask",
+      "handbookPage": 67,
+      "layer": "extension-hook",
+      "status": "implemented",
+      "evidence": "src/dotnet/Sasd.Editor.Core/Scheduling/EditorScheduler.cs",
+      "note": "Cooperative idle/background task extension point, without claiming any particular sample task."
+    },
+    {
+      "name": "DupLine",
+      "handbookPage": 81,
+      "layer": "handbook-example",
+      "status": "example-only",
+      "evidence": "src/dotnet/Sasd.Editor.Core/Editing/FirstEdBlockCompatibilityProcessor.cs",
+      "note": "Example composite operation in chapter 12 built from Begin/End/Copy/Hide; not a separately specified toolbox primitive."
+    },
+    {
+      "name": "MakeWindow",
+      "handbookPage": 53,
+      "layer": "microstar-sample",
+      "status": "sample-missing",
+      "evidence": "docs/en/HANDBOOK-SUPPLEMENT-V1.md",
+      "note": "MicroStar pop-up utility draws a temporary dialog area, preserving the underlying screen."
+    },
+    {
+      "name": "RestoreWindow",
+      "handbookPage": 53,
+      "layer": "microstar-sample",
+      "status": "sample-missing",
+      "evidence": "docs/en/HANDBOOK-SUPPLEMENT-V1.md",
+      "note": "MicroStar pop-up utility restores the underlying screen region."
+    },
+    {
+      "name": "PrintNext",
+      "handbookPage": 53,
+      "layer": "microstar-sample",
+      "status": "sample-missing",
+      "evidence": "docs/en/HANDBOOK-SUPPLEMENT-V1.md",
+      "note": "MicroStar cooperative printing slice; the generic scheduler exists, but no sample print spooler has been added."
+    }
+  ]
+}

@@ -17,6 +17,7 @@ ROOT = Path(__file__).resolve().parents[1]
 IMPLEMENTATIONS_FILE = ROOT / "implementations.json"
 CONFORMANCE_MANIFEST = ROOT / "conformance" / "v1" / "manifest.json"
 HANDBOOK_INVENTORY = ROOT / "docs" / "handbook-procedure-index-v1.json"
+HANDBOOK_SUPPLEMENT = ROOT / "docs" / "handbook-supplemental-symbols-v1.json"
 
 
 class ContractError(RuntimeError):
@@ -264,11 +265,67 @@ def verify_handbook_inventory() -> tuple[int, int, int]:
     return len(entries), pending, linked_rows
 
 
+def verify_handbook_supplement() -> int:
+    """Validate named handbook symbols omitted from the PRINTED index.
+
+    The original 123 entries remain untouched and ordered by printed page.
+    A separate, explicitly non-exhaustive supplement captures routines,
+    extension hooks and MicroStar examples mentioned elsewhere in the book.
+    Reject duplicate names across inventories: otherwise a future revision
+    could silently count an indexed routine as a newly discovered feature.
+    Status describes engineering traceability, NOT historical parity.
+    """
+    data = load_json(HANDBOOK_SUPPLEMENT)
+    if not isinstance(data, dict) or data.get("formatVersion") != 1:
+        raise ContractError("Handbook supplement needs formatVersion 1")
+    if data.get("scope") != "non-exhaustive":
+        raise ContractError("Handbook supplement must declare non-exhaustive scope")
+
+    entries = data.get("entries")
+    if not isinstance(entries, list) or not entries:
+        raise ContractError("Handbook supplement needs a non-empty entries array")
+
+    original = load_json(HANDBOOK_INVENTORY)
+    printed_names = {entry["name"] for entry in original["entries"]}
+    seen: set[str] = set()
+    allowed_status = {
+        "implemented", "modern-replacement", "host-replacement",
+        "sample-missing", "example-only", "needs-review",
+    }
+    for entry in entries:
+        if not isinstance(entry, dict):
+            raise ContractError("Non-object handbook supplement entry")
+        name = entry.get("name")
+        if not isinstance(name, str) or not name.isidentifier():
+            raise ContractError("Invalid handbook supplement symbol name")
+        if name in printed_names or name in seen:
+            raise ContractError(f"Duplicate handbook symbol across inventories: {name}")
+        seen.add(name)
+        page = entry.get("handbookPage")
+        if type(page) is not int or not 1 <= page <= 244:
+            raise ContractError(f"{name}: handbookPage must be a printed page in 1..244")
+        if entry.get("status") not in allowed_status:
+            raise ContractError(f"{name}: invalid supplement status")
+        if not isinstance(entry.get("layer"), str) or not entry["layer"].strip():
+            raise ContractError(f"{name}: missing historical role/layer")
+        if not isinstance(entry.get("note"), str) or not entry["note"].strip():
+            raise ContractError(f"{name}: missing explanation")
+        evidence = entry.get("evidence")
+        if not isinstance(evidence, str) or not evidence.strip():
+            raise ContractError(f"{name}: missing evidence path")
+        require_repo_path(evidence, f"Supplemental handbook symbol {name}")
+
+    require_repo_path("docs/en/HANDBOOK-SUPPLEMENT-V1.md", "Handbook supplement EN")
+    require_repo_path("docs/de/HANDBUCH-ERGAENZUNG-V1.md", "Handbook supplement DE")
+    return len(entries)
+
+
 def main() -> int:
     try:
         implementation_ids = verify_implementations()
         case_count = verify_conformance()
         handbook_count, pending, linked_rows = verify_handbook_inventory()
+        supplement_count = verify_handbook_supplement()
     except ContractError as exc:
         print(f"Repository contract FAILED: {exc}", file=sys.stderr)
         return 1
@@ -278,7 +335,8 @@ def main() -> int:
         f"{len(implementation_ids)} implementation lanes "
         f"({', '.join(implementation_ids)}), {case_count} V1 conformance cases, "
         f"{handbook_count} handbook routines ({pending} pending review, "
-        f"{linked_rows} linked to portable test cases)."
+        f"{linked_rows} linked to portable test cases), "
+        f"{supplement_count} separately inventoried handbook symbols."
     )
     return 0
 
