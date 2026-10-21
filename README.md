@@ -120,6 +120,22 @@ dotnet run --project samples/dotnet/Sasd.Editor.FirstEd.Sample/Sasd.Editor.First
 
 The sample starts with Window 1 editing `NONAME`. Historical Ctrl-K / Ctrl-O / Ctrl-Q sequences are accepted alongside modern cursor keys. **Ctrl-O O** creates a stacked window by asking for its screen-row count and donor window number; **Ctrl-O Y** deletes a window. Use **Ctrl-K X**, then type **YES**, to exit.
 
+### Developer demo and public API V1 acceptance
+
+The FIRST-ED sample is also a **real editor demonstration** built with the public Core API; it does not implement its own editor engine. With the .NET 10 SDK installed, run from the repository root:
+
+```bash
+# Discover launch options (also works without an interactive terminal).
+dotnet run --project samples/dotnet/Sasd.Editor.FirstEd.Sample -- --help
+
+# Start a prefilled, editable in-memory demonstration.
+dotnet run --project samples/dotnet/Sasd.Editor.FirstEd.Sample -- --demo
+```
+
+The `--demo` mode starts an unnamed clean document without writing any files. It provides hands-on search/edit/block/marker/window examples plus a saved ESC control character that must be **shown as text**, not executed by the terminal. The `--demo` sample remains Latin-1 compatible, since the FIRST-ED Save command uses the historical 8-bit codec; modern UTF-8 integration instead uses `FileTextStorage`.
+
+Developer walkthrough and public API release gates: [English](docs/en/DEMO-EDITOR-AND-PUBLIC-API-ACCEPTANCE.md) · [Deutsch](docs/de/DEMO-EDITOR-UND-PUBLIC-API-ABNAHME.md). Automated public API acceptance runs on Linux and Windows; hands-on terminal and final API versioning/release decisions remain separate. A small WinForms demo is recommended for a later host milestone, **not currently implemented**.
+
 ## Build the .NET reference implementation
 
 ```bash
