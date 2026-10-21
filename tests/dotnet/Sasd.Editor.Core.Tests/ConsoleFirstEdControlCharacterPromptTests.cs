@@ -66,6 +66,19 @@ public sealed class ConsoleFirstEdControlCharacterPromptTests
     }
 
     [Theory]
+    [InlineData('\u0015')]
+    [InlineData('\u001b')]
+    public void UnnamedRawTerminalAbortCodesAlsoCancelControlCharacterPrompt(char code)
+    {
+        // Both line prompts and the historical Ctrl-P single-character
+        // prompt must agree when a pseudo-terminal reports only a control
+        // byte and no named ConsoleKey. The same pure cancellation policy
+        // guards both code paths.
+        Assert.Null(ConsoleFirstEdControlCharacterPromptPolicy.Resolve(
+            new ConsoleKeyInfo(code, ConsoleKey.NoName, false, false, false)));
+    }
+
+    [Theory]
     [InlineData('\r', ConsoleKey.Enter)]
     [InlineData('\b', ConsoleKey.Backspace)]
     [InlineData('\0', ConsoleKey.F1)]
