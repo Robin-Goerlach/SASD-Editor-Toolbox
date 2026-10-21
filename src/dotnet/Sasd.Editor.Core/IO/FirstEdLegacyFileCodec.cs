@@ -128,12 +128,36 @@ public sealed class FirstEdLegacyFileCodec : IEditorFileCodec
 
             if (lineIndex == lines.Count - 1)
             {
-                // A final wrapped marker is retained if a caller deliberately
-                // supplies one. Normally a wrapped paragraph has a following
-                // logical continuation line.
+                // The decoder deliberately does NOT invent a new empty line
+                // merely because an external file ends with one hard CR/LF.
+                // Without the matching writer rule, however, a buffer that
+                // explicitly contains a FINAL BLANK DESCRIPTOR is lossy:
+                //
+                //   ["one", ""] -> bytes "one\r\n" -> ["one"]
+                //
+                // Encode the last empty descriptor with its *own* outgoing
+                // hard CR/LF. The decoder will then recognize the explicit
+                // blank record without changing its handling of foreign
+                // files which end in just one normal delimiter:
+                //
+                //   ["one", ""] -> "one\r\n\r\n" -> ["one", ""]
+                //
+                // This also distinguishes one empty logical descriptor from
+                // a physically empty input (whose decoding means zero lines
+                // inserted by EditReadFile). The distinction is a deliberate
+                // SASD round-trip rule at the 8-bit codec boundary, not a
+                // claim about undocumented Pascal descriptor internals.
+                //
+                // A final Wrapped flag already has an outgoing 0x8D marker,
+                // including when its text is empty; do NOT add CR/LF as well.
                 if (line.Flags.HasFlag(EditorLineFlags.Wrapped))
                 {
                     bytes.Add(WrappedLineTerminator);
+                }
+                else if (line.Text.Length == 0)
+                {
+                    bytes.Add((byte)'\r');
+                    bytes.Add((byte)'\n');
                 }
 
                 continue;
