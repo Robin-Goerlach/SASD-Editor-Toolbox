@@ -37,7 +37,6 @@ public sealed class ConsoleFirstEdRowProjectionTests
         Assert.StartsWith(safe, projected.Text);
         Assert.Equal(8, projected.Text.Length);
         Assert.DoesNotContain(projected.Text, char.IsControl);
-        Assert.Equal(raw, raw); // The source is not mutated by the projector.
     }
 
     [Fact]
@@ -52,7 +51,6 @@ public sealed class ConsoleFirstEdRowProjectionTests
         Assert.StartsWith("safe^[[2J^[[Htail", projected.Text);
         Assert.DoesNotContain('\u001b', projected.Text);
         Assert.DoesNotContain(projected.Text, char.IsControl);
-        Assert.Equal(documentLine, "safe\u001b[2J\u001b[Htail");
     }
 
     [Fact]
@@ -99,9 +97,11 @@ public sealed class ConsoleFirstEdRowProjectionTests
     public void ProjectionNeverBreaksWideGlyphOrSurrogateAtRightEdge()
     {
         Assert.Equal("a ", ConsoleFirstEdRowProjection.Project("a界b", 0, 2).Text);
-        Assert.Equal("a  ", ConsoleFirstEdRowProjection.Project(
-            "a\ud83d\ude00b", 0, 3).Text);
+        Assert.Equal("a ", ConsoleFirstEdRowProjection.Project(
+            "a\ud83d\ude00b", 0, 2).Text);
         Assert.Equal("a界", ConsoleFirstEdRowProjection.Project("a界b", 0, 3).Text);
+        Assert.Equal("a\ud83d\ude00", ConsoleFirstEdRowProjection.Project(
+            "a\ud83d\ude00b", 0, 3).Text);
         Assert.Equal("e\u0301", ConsoleFirstEdRowProjection.Project(
             "e\u0301b", 0, 1).Text);
     }
