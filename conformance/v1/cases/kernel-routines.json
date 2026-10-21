@@ -1015,8 +1015,8 @@
         "windows": {
           "w": {
             "cursor": {
-              "line": 1,
-              "column": 0
+              "line": 0,
+              "column": 3
             }
           }
         },
@@ -1092,8 +1092,8 @@
         "windows": {
           "w": {
             "cursor": {
-              "line": 1,
-              "column": 0
+              "line": 0,
+              "column": 3
             }
           }
         },
