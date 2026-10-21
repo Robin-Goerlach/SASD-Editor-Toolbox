@@ -324,3 +324,8 @@ Das historische `EditBlockMove`-Verbot für Ziele innerhalb der eigenen Auswahl 
 ## Undo nach Link Window: Dokument-/Fensteridentität (V1-Abnahme)
 
 Bei der Prüfung von `EditUndo` und `EditWindowLink` wurde ein Navigationsfehler im erhaltenen älteren `EditorUndoManager.Capture`-Zugang gefunden: Eine Cursorposition konnte auf ein inzwischen mit einem anderen Dokument verknüpftes Fenster zurückgeschrieben werden. Die Kompatibilität prüft jetzt die gespeicherte `DocumentId`, bevor Cursor/Fokus wiederhergestellt werden. Das bevorzugte transaktionsbasierte Undo prüfte Fenster- und Dokumentidentität bereits; es wurde nicht verändert. Vier direkte Tests sowie ein portabler Fenster-Lebenszyklusfall sichern normale, umgekoppelte und geschlossene Ansichten ab. Der Vertrag enthält 254 portable Fälle und 103/123 direkte Handbuchverweise. Dies behebt eine moderne Snapshot-/Navigationslücke, keine Pascal-Zeigerschnittstelle.
+
+
+## Historische Ctrl-P-Steuerzeichenübersetzung (EditInsertCtrlChar, S. 182)
+
+Das Handbuch verlangt nach der Zeichenabfrage ausdrücklich eine Übersetzung zum ASCII-Steuerzeichen. Das Konsolenbeispiel reichte bislang den druckbaren Tastennamen ungeändert an die semantische Einfügung weiter; es übersetzt jetzt ASCII A-Z und Steuercode-Satzzeichen und respektiert Escape/Ctrl-U als Abbruch. Der Kern akzeptiert weiterhin nur das fertig aufgelöste Steuerzeichen und bleibt oberflächenunabhängig. Zusätzliche reine Host-xUnit-Tests prüfen Übersetzung, Dispatcher/Undo und ungültige Tasten; der bereits vorhandene portable Fall prüft die semantische Einfügung. **254 portable Fälle und 103/123 direkt verknüpfte Routinen** bleiben unverändert. Originale DOS-Scancodes und reale Windows-/Linux-Terminalparität sind damit nicht abgenommen.
