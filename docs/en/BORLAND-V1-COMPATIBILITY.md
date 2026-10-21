@@ -294,3 +294,7 @@ The `FileTextStorage` default now decodes UTF-8 strictly: invalid byte streams f
 ## Protection against external changes (modern .NET storage)
 
 A successfully loaded default UTF-8 document now tracks a raw-byte SHA-256 revision. Before a modern Save publishes to the same path, the staged writer validates that the on-disk bytes still match. A changed/deleted file is not overwritten; successful publication advances the document-owned revision. This is a **.NET-only best-effort persistence safeguard**, not a portably required historical FIRST-ED behavior or cross-process atomic transaction. The relevant tests exercise equal-length changes, deletion, BOM-only changes, successive saves, explicit Save As and the pre-publication hook.
+
+## V1 historical evidence-review checkpoint
+
+The 123-routine inventory has now been checked against the full portable conformance manifest. **103/123** routine rows reference executable cases; four new host-level sequences cover the Ctrl-K R Read File filename workflow and validated numeric input. An empty expected-state object now fails the repository contract. These links confirm **specific observable outcomes**, not complete 1985 parity. The one-by-one handbook review, 20 non-linked non-core/host/divergence classifications, actual Windows/Linux terminal smoke tests and final API/persistence review remain **release blockers**. No V1 acceptance sign-off has been issued.
