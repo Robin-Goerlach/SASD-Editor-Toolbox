@@ -443,9 +443,11 @@
       "handbookPage": 161,
       "status": "implemented",
       "evidence": "docs/en/DELETION-COMPATIBILITY.md",
-      "note": "Character/word/line deletion and joining.",
+      "note": "Character/word/line deletion and joining. V1 audit: joined-line outgoing Wrapped boundary and Undo are now covered by explicit portable cases.",
       "conformanceCases": [
-        "compat.delete-left-in-virtual-space-does-not-dirty"
+        "compat.delete-left-in-virtual-space-does-not-dirty",
+        "kernel.join-left-clears-deleted-soft-boundary",
+        "kernel.join-left-inherits-following-soft-boundary"
       ]
     },
     {
@@ -463,9 +465,11 @@
       "handbookPage": 163,
       "status": "implemented",
       "evidence": "docs/en/DELETION-COMPATIBILITY.md",
-      "note": "Character/word/line deletion and joining.",
+      "note": "Character/word/line deletion and joining. V1 audit: joined-line outgoing Wrapped boundary and Undo are now covered by explicit portable cases.",
       "conformanceCases": [
-        "compat.delete-right-character-removes-one-stored-character"
+        "compat.delete-right-character-removes-one-stored-character",
+        "kernel.join-right-clears-deleted-soft-boundary",
+        "kernel.join-right-inherits-following-soft-boundary"
       ]
     },
     {
@@ -473,9 +477,10 @@
       "handbookPage": 164,
       "status": "implemented",
       "evidence": "docs/en/DELETION-COMPATIBILITY.md",
-      "note": "Character/word/line deletion and joining.",
+      "note": "Character/word/line deletion and joining. V1 audit: joined-line outgoing Wrapped boundary and Undo are now covered by explicit portable cases.",
       "conformanceCases": [
-        "compat.delete-right-word-removes-punctuation-and-following-blanks"
+        "compat.delete-right-word-removes-punctuation-and-following-blanks",
+        "kernel.join-word-inherits-following-soft-boundary"
       ]
     },
     {
@@ -674,10 +679,11 @@
       "handbookPage": 184,
       "status": "implemented",
       "evidence": "docs/en/DELETION-COMPATIBILITY.md",
-      "note": "Character/word/line deletion and joining.",
+      "note": "Character/word/line deletion and joining. V1 audit: joined-line outgoing Wrapped boundary and Undo are now covered by explicit portable cases.",
       "conformanceCases": [
         "kernel.join-next-line-at-last-nonblank",
-        "kernel.undo-join-restores-two-logical-lines"
+        "kernel.undo-join-restores-two-logical-lines",
+        "kernel.undo-join-restores-two-independent-wrapped-boundaries"
       ]
     },
     {
