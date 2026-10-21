@@ -123,11 +123,14 @@ internal sealed class ConsoleFirstEdRenderer(EditorSession session)
         Console.SetCursorPosition(Math.Min(prompt.Length, width - 1), row);
         Console.CursorVisible = true;
         var key = Console.ReadKey(intercept: true);
-        // Escape aborts single-character prompts as well. This is a host
-        // action, not a character intended for the editor document.
-        return key.Key is ConsoleKey.Escape || key.KeyChar == '\0'
-            ? null
-            : key.KeyChar;
+
+        // The historical EditInsertCtrlChar (Ctrl-P) accepts a key and then
+        // converts it into an ASCII control byte before text insertion.
+        // ConsoleKeyInfo is deliberately interpreted by a pure sample-host
+        // policy: the renderer reads, the policy normalizes, and the core
+        // receives only the already-resolved semantic control character.
+        // Escape/Ctrl-U and unsupported input cancel without dispatch.
+        return ConsoleFirstEdControlCharacterPromptPolicy.Resolve(key);
     }
 
     public void Shutdown()
