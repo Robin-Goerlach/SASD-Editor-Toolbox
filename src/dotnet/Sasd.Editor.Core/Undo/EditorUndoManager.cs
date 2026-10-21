@@ -415,9 +415,31 @@ public sealed class EditorUndoManager
             return;
         }
 
-        var target = session.Windows.FirstOrDefault(window => window.WindowId == entry.LegacyWindowId.Value)
-            ?? session.Windows.FirstOrDefault(window =>
-                entry.Documents.Any(document => document.DocumentId == window.Document.DocumentId));
+        // The legacy Capture API remembers a specific view AND its document.
+        // A historical Link Window command may later attach that same view to
+        // an entirely different text stream while a linked sibling continues
+        // to display the captured document. Restoring the saved cursor solely
+        // by WindowId would then *steal focus* and place the old document's
+        // position into an unrelated document.
+        //
+        // The text snapshot is restored separately using DocumentId. Its
+        // navigation snapshot is safe only when the captured view still
+        // displays that same document. If the view has been reattached, leave
+        // the user's newer view/focus untouched. If it has been closed, retain
+        // the legacy fallback of selecting a surviving view of the document.
+        var capturedDocumentId = entry.Documents[0].DocumentId;
+        var originalView = session.Windows.FirstOrDefault(
+            window => window.WindowId == entry.LegacyWindowId.Value);
+
+        if (originalView is not null
+            && originalView.Document.DocumentId != capturedDocumentId)
+        {
+            return;
+        }
+
+        var target = originalView
+            ?? session.Windows.FirstOrDefault(
+                window => window.Document.DocumentId == capturedDocumentId);
 
         if (target is null)
         {
