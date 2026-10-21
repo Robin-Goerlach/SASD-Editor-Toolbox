@@ -34,3 +34,10 @@ jobs:
         run: dotnet build Sasd.Editor.Toolbox.slnx --configuration Release --no-restore
       - name: Test
         run: dotnet test Sasd.Editor.Toolbox.slnx --configuration Release --no-build
+      # The FIRST-ED reference application's help must work *without* an
+      # interactive terminal: GitHub Actions supplies redirected streams.
+      # This is an executable consumer entry-point check on both Windows
+      # and Linux. The guided --demo still needs a real human-operated
+      # terminal for visual/key-delivery sign-off.
+      - name: Developer demo CLI help smoke
+        run: dotnet run --project samples/dotnet/Sasd.Editor.FirstEd.Sample --configuration Release --no-build -- --help
