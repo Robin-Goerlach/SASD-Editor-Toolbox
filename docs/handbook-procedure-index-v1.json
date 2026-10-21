@@ -346,7 +346,11 @@
       "handbookPage": 151,
       "status": "host-sample",
       "evidence": "docs/en/COMMAND-PROCESSOR-TRANSFER.md",
-      "note": "The historical interactive Cp wrapper maps to commands and host prompts."
+      "note": "The historical interactive Cp wrapper maps to commands and host prompts. Portable tests confirm filename cancellation, trimmed path, source-line insertion and Undo through ReadFile. No DOS prompt rendering claim.",
+      "conformanceCases": [
+        "host.read-file-cancelled-path-does-not-import",
+        "host.read-file-named-path-inserts-after-cursor-line"
+      ]
     },
     {
       "name": "EditCpsetlm",
@@ -414,7 +418,11 @@
       "handbookPage": 158,
       "status": "host-sample",
       "evidence": "docs/en/COMMAND-PROCESSOR-TRANSFER.md",
-      "note": "The historical interactive Cp wrapper maps to commands and host prompts."
+      "note": "The historical interactive Cp wrapper maps to commands and host prompts. Portable tests check numeric whitespace parsing, overflow cancellation and one-based Go To Line; historical Pascal converter internals are not claimed.",
+      "conformanceCases": [
+        "host.number-conversion-trims-space-before-goto",
+        "host.number-conversion-overflow-rejects-input"
+      ]
     },
     {
       "name": "EditDecline",
