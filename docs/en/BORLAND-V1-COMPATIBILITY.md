@@ -302,3 +302,7 @@ The 123-routine inventory has now been checked against the full portable conform
 ## Audited EditCptabdef blank prompt (host-only)
 
 The handbook's Set Tab Width wrapper handles a deliberately empty response by using the displayed cursor column minus one. The terminal sample now resolves this to the initiating view's zero-based column before dispatch, while null cancels and an explicit numeric answer follows ordinary validated input. At column one the resulting zero is rejected rather than installed. This fixes a concrete sample-host behavioral gap without changing the documented global-vs-per-window TabSize divergence or creating a Pascal-shaped core API. Headless .NET regression tests cover the boundary; physical DOS prompt parity is not claimed.
+
+## V1 handbook check: Change Case and Delete Text Right
+
+Direct review of handbook pages 135 and 165 prompted one narrowly scoped code correction: Change Case now toggles only uppercase/lowercase characters, without accidentally modifying Unicode titlecase letters. This is an explicit modern Unicode interpretation of the historical two-case operation. Delete Text Right already removed the current-to-end **same-line** suffix; new portable tests strengthen proof of preserved following lines, presentation flags and Undo. Six portable cases (V1 total 238) and two additional .NET theory cases support the change. The mapping inventory remains 103/123 linked, and these results **do not** constitute full historical V1 acceptance.

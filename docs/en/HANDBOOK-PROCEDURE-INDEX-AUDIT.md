@@ -123,3 +123,16 @@ The repository verifier now rejects a portable case with an empty `expect` objec
 ## Specific handbook finding: EditCptabdef (printed p. 155)
 
 Direct review of the handbook description identified a concrete sample-host gap that was not visible from the index count: deliberately empty numeric input to Set Tab Width is **not** simply a cancelled command. The original wrapper derives a tab interval from the current cursor column minus one. The console host previously treated blank input as cancellation. A new sample-only prompt policy and headless tests now cover empty Enter, true cancellation, positive explicit input, overflow, the column-one zero boundary and per-window configuration isolation. The one-based historical rule is adapted to the zero-based view model without changing `EditorCommandPromptResolver` for other commands. The deliberate global-vs-per-window tab divergence remains documented. This targeted correction strengthens actual historical behavioral acceptance but does not constitute a full routine-by-routine sign-off.
+
+## Historical routine review: Change Case and Delete Text Right (21 October 2026)
+
+This audit slice directly compared the handbook's printed procedure descriptions with the actual .NET dispatcher, engine and executable fixtures, **rather than merely counting existing index links**.
+
+| Manual entry | Printed page | Behavior confirmed and test evidence | Remaining boundary |
+|---|---:|---|---|
+| `EditChangeCase` | 135 | The current character changes uppercase ↔ lowercase without moving the cursor. A non-case character produces no modification or Undo. Four additional portable fixtures now test Unicode titlecase, an uncased CJK character, lowercase ä → Ä and uppercase Ä → ä; two direct .NET theory cases reinforce the no-op guarantee. | The 1985 document does not define Unicode; invariant, one-code-unit handling is an explicit **modern extension**, not a claim of DOS Unicode semantics. |
+| `EditDeleteTextRight` | 165 | The character at the cursor and everything to its right on the **same** line are removed. New portable fixtures confirm the following logical line remains untouched, existing `UserColored` flags survive, and one Undo restores original lines and flags. | Physical video redraw, original DOS memory layout and any untested interaction with external hosts remain outside this focused slice. |
+
+**Concrete defect corrected:** the .NET Change Case implementation formerly treated *every non-uppercase code unit* as a candidate for uppercasing. Unicode titlecase letters are neither lowercase nor uppercase; the algorithm now explicitly checks `char.IsLower` before calling `ToUpperInvariant`. Uncased symbols remain no-ops. The code comments document the source rule, modern Unicode policy and Undo reasoning. The Delete To End Of Line implementation needed no code change; its existing behavior gained stronger portable regression evidence.
+
+This reviews **two of the 84 implemented-classification responsibilities in this particular audit slice**; it does not assert that the other 82 have been manually signed off. The inventory remains **103 of 123** routine rows linked to portable tests. Six new fixtures bring the portable V1 suite from 232 to **238 cases**. Headless CI is necessary but real Windows/Linux terminal smoke tests and final release-readiness review remain open.
