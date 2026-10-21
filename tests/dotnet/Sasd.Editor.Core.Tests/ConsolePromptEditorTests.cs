@@ -83,6 +83,81 @@ public sealed class ConsolePromptEditorTests
         Assert.Throws<ArgumentOutOfRangeException>(() => editor.Project("Find:", 0));
     }
 
+    [Theory]
+    [InlineData('\u0015', ConsoleKey.NoName)]
+    [InlineData('\u0015', ConsoleKey.U)]
+    [InlineData('\u001b', ConsoleKey.NoName)]
+    public void RawTerminalControlBytesCancelWithoutNamedConsoleKey(
+        char code, ConsoleKey key)
+    {
+        // Unix pseudo-terminals may deliver a raw control byte with no
+        // reliable ConsoleKey or modifier bit. A silently ignored Ctrl-U
+        // would leave a dangerous Save/Replace prompt active.
+        var editor = new ConsolePromptEditor();
+        editor.Process(Key('x'));
+        var actual = editor.Process(
+            new ConsoleKeyInfo(code, key, false, false, false));
+
+        Assert.Equal(ConsolePromptInputResult.Cancelled, actual);
+        Assert.Equal("x", editor.Answer);
+    }
+
+    [Fact]
+    public void AltGrPrintableInputDoesNotAccidentallyCancelPrompt()
+    {
+        var editor = new ConsolePromptEditor();
+        var key = new ConsoleKeyInfo('@', ConsoleKey.Q, false, true, true);
+        Assert.Equal(ConsolePromptInputResult.Continue, editor.Process(key));
+        Assert.Equal("@", editor.Answer);
+    }
+
+    [Fact]
+    public void BackspaceDeletesEntireSupplementaryUnicodeCharacter()
+    {
+        var editor = new ConsolePromptEditor();
+        editor.Process(Key('a'));
+        // ConsoleKeyInfo gives UTF-16 chars; a supplementary-plane symbol
+        // arrives as two code units, but Backspace must remove it as ONE.
+        editor.Process(Key('\ud83d'));
+        editor.Process(Key('\ude00'));
+        Assert.Equal("a\ud83d\ude00", editor.Answer);
+
+        editor.Process(new ConsoleKeyInfo('\b', ConsoleKey.Backspace, false, false, false));
+        Assert.Equal("a", editor.Answer);
+    }
+
+    [Fact]
+    public void BackspaceDeletesBaseLetterAndCombiningAccentTogether()
+    {
+        var editor = new ConsolePromptEditor();
+        editor.Process(Key('a'));
+        editor.Process(Key('e'));
+        editor.Process(Key('\u0301'));
+
+        editor.Process(new ConsoleKeyInfo('\b', ConsoleKey.Backspace, false, false, false));
+        Assert.Equal("a", editor.Answer);
+    }
+
+    [Fact]
+    public void NarrowProjectionNeverCutsIntoSurrogatePairOrCombiningSequence()
+    {
+        var emoji = new ConsolePromptEditor();
+        emoji.Process(Key('a'));
+        emoji.Process(Key('\ud83d'));
+        emoji.Process(Key('\ude00'));
+        Assert.Equal("\ud83d\ude00", emoji.Project("P:", 2).Text);
+        Assert.Equal("", emoji.Project("P:", 1).Text);
+        Assert.Equal("a\ud83d\ude00", emoji.Answer);
+
+        var accented = new ConsolePromptEditor();
+        accented.Process(Key('a'));
+        accented.Process(Key('e'));
+        accented.Process(Key('\u0301'));
+        Assert.Equal("e\u0301", accented.Project("P:", 2).Text);
+        Assert.Equal("", accented.Project("P:", 1).Text);
+        Assert.Equal("ae\u0301", accented.Answer);
+    }
+
     private static ConsoleKeyInfo Key(char character) =>
         new(character, ConsoleKey.A, false, false, false);
 }
