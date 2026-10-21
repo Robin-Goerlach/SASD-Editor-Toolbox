@@ -310,3 +310,8 @@ Direct review of handbook pages 135 and 165 prompted one narrowly scoped code co
 ## V1 joined-line separator correctness (historical audit)
 
 A reviewed `EditJoinLine`/Delete Left/Right Character/Word grouping exposed an outgoing `Wrapped` propagation error in the .NET reference. The surviving line's **outgoing** boundary belongs to the former lower line, while `UserColored` and other upper-line presentation annotations remain on the surviving upper descriptor. The compatibility helper now makes that ownership explicit without altering the shared topology coordinator or public APIs. Six additional portable cases (244 total) and nine native regression invocations verify joins, Undo, linked windows and real `0x8D` versus `CR/LF` file bytes. The inventory remains 103/123 linked routine rows. This is targeted V1 acceptance evidence, not full release sign-off.
+
+
+## V1 structural split outgoing-boundary audit
+
+The handbook-described `EditInsertLine`/`EditNewLine` shared splitter had a real outgoing `Wrapped` misassignment: the original soft separator to a later line must move behind the newly created lower fragment, while the fresh upper-to-lower boundary is hard. `UserColored` stays on the surviving upper descriptor and transient `InBlock` is reprojected. Seven additional portable tests (251 total), native legacy-byte verification and Undo/linked-window tests now cover the three split positions and both commands. `EditDeleteLine`'s only-line blanking exception has additional direct regression coverage. The existing 103/123 mapped rows have stronger evidence; full interactive terminal and remaining historical audits are not signed off.

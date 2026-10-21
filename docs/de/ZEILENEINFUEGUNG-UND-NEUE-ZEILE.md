@@ -75,3 +75,14 @@ V1 bevorzugt Korrektheit und Prüfbarkeit. Eine einzelne kompatible Zeileneinfü
 - Realignment von verknüpftem Fenster und Marker beim automatischen Wordwrap.
 
 Die Join-Seite der Zeilenlöschung ist separat durch `DeletionCompatibilityTests` abgesichert, sodass Einfüge- und Lösch-Topologie aus beiden Richtungen getestet werden.
+
+
+## V1-Handbuchprüfung: Erhaltung des ausgehenden Wrapped-Übergangs
+
+Die gezielte Prüfung von `EditInsertLine` (gedruckte S. 183), `EditNewLine` (S. 191) und der bereits festgelegten V1-Regel für ausgehende Zeilenübergänge deckte einen bisher nicht abgesicherten Persistenzfehler auf: `InsertLineCore` ließ das ursprüngliche `Wrapped`-Flag auf der oberen Zeile und erzeugte eine untere Zeile ohne dieses Flag. War der ursprüngliche Übergang zur bereits bestehenden nächsten Zeile weich, ist dies falsch. Eine Teilung erzeugt einen **neuen harten Übergang zwischen oberer und unterer Zeile** und erhält den **alten weichen Übergang hinter der unteren Zeile**. Andernfalls konnte der historische 8-Bit-Dateicodec am falschen Übergang 0x8D bzw. CR/LF schreiben, obwohl der sichtbare Text korrekt war.
+
+Der gemeinsame Split-Code berechnet jetzt vor der Textänderung `upperFlags = oldFlags & ~Wrapped` und `lowerFlags = oldFlags & Wrapped`. `UserColored` und andere Darstellungsflags verbleiben bewusst auf dem überlebenden oberen Zeilendeskriptor; das temporäre `InBlock`-Flag wird nach `EditorLineTopology.LinesInserted` aus den Blockgrenzen rekonstruiert. Diese Regel gilt für die erste Spalte, innerhalb des Textes und hinter dem letzten Nicht-Leerzeichen. `NewLine` im Insert-Modus bewegt weiterhin den Cursor auf die untere Zeile, im Overtype-Modus wird weiterhin `Wrapped` auf der bisherigen Zeile gelöscht, auch wenn kein Split stattfindet. Autoindent, verknüpfte Fenster, Marker, Blockgrenzen und ein einzelner Undo-Schritt behalten ihre Verantwortung.
+
+**Ausführbare Belege:** Sieben portable Fälle in `core-smoke.json` prüfen alle Teilungspositionen, beide Befehle, Autoindent und Undo. `LineSplitOutgoingBoundaryTests` prüft zusätzlich die tatsächlich geschriebenen Legacy-Bytes (CR/LF bzw. 0x8D), die Darstellungsflags, Fenster- und Markerzuordnung, Undo sowie den weiterhin korrekten Sonderfall von `EditDeleteLine` bei nur einer Zeile (S. 162): Der gespeicherte Zeichenbereich wird mit Leerzeichen gefüllt, der einzige Zeilendeskriptor bleibt erhalten, Marker-/Blockreferenzen werden ungültig.
+
+Dies ist ein gegen das normative Übergangsmodell nachgewiesener und korrigierter V1-Fehler der .NET-Referenz. Eine vollständige historische Spezifikation der internen Pascal-Flags und ihrer Speicherübergänge wird nicht behauptet.

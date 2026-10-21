@@ -75,3 +75,14 @@ V1 favors correctness and auditability. A single compatibility line-insertion/Ne
 - linked-window and marker realignment during automatic word-wrap.
 
 Deletion-side joins are covered independently by `DeletionCompatibilityTests` so insertion and deletion topology remain testable from both directions.
+
+
+## V1 handbook audit: preservation of the outgoing Wrapped boundary
+
+A targeted review of `EditInsertLine` (printed p. 183) and `EditNewLine` (p. 191), together with the already defined V1 outgoing-boundary model, exposed a previously untested serialization defect: `InsertLineCore` retained the old `Wrapped` bit on the upper descriptor and created an unwrapped lower descriptor. That was incorrect when the original line already ended at a soft boundary to the *following* existing line: a split must insert a **new hard separator between upper and lower**, then preserve the **old outgoing soft separator after lower**. Without this transfer, writing the legacy 8-bit file format could emit 0x8D at the new boundary and CR/LF at the old boundary, changing paragraph semantics despite correctly displayed text.
+
+The corrected shared splitter now computes `upperFlags = oldFlags & ~Wrapped` and `lowerFlags = oldFlags & Wrapped` before modifying text. This deliberately keeps `UserColored` and other presentation annotations on the surviving upper descriptor; transient `InBlock` is reprojected after `EditorLineTopology.LinesInserted`. The rule is consistent for column zero, middle and beyond-last-nonblank insertion. Insert-mode `NewLine` keeps the lower fragment's outgoing boundary and moves the cursor; Overtype mode still clears the old upper `Wrapped` boundary without splitting, as directly stated in the handbook. Autoindent, linked-window realignment, markers, block endpoints and single-step Undo retain their established responsibilities.
+
+**Executable evidence:** Seven portable cases in `core-smoke.json` exercise all split positions, both command forms, autoindent and Undo. New `LineSplitOutgoingBoundaryTests` directly verify actual legacy CR/LF and 0x8D output bytes, surviving presentation flags, linked window/marker realignment, Undo, and the existing one-line `EditDeleteLine` exception. The final-line delete rule (p. 162) remains implemented as **blank the existing stored span without deleting its descriptor**, while invalidating marker and block references.
+
+This is an observed V1 .NET bug fixed against the normative outgoing-boundary model, not a claim that every internal Pascal flag or exact 1985 storage transition was independently specified by the manual.
