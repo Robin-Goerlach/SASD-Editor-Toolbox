@@ -330,3 +330,8 @@ Focused review of `EditUndo` and `EditWindowLink` found a navigation safety bug 
 ## Historical Ctrl-P input normalization (EditInsertCtrlChar, p. 182)
 
 The handbook specifies a prompted key-to-ASCII-control translation. The sample previously submitted the raw printable key to semantic insertion; it now normalizes ASCII A-Z and control punctuation and respects Escape/Ctrl-U cancellation before dispatch. The core still accepts only the resolved literal control byte, preserving a host-neutral contract. Focused host-only xUnit regressions cover translation, dispatcher/Undo and unsupported keys; the pre-existing portable case covers literal control insertion. **254 portable cases and 103/123 linked routine rows** remain unchanged. Neither raw DOS scan-code behavior nor interactive Windows/Linux terminal parity is certified.
+
+
+## V1 prompt-host helpers (handbook pp. 120–122, 237)
+
+`EditAppchar`, `EditAppcmdnam`, `EditAskfor` and `EditZapcmdnam` have now been reviewed against the 1985 descriptions. Their remaining differences are intentionally **host-local**, not missing cross-platform editor-core operations: managed untruncated input instead of fixed Defnocols; dedicated terminal row instead of global Cmdcol; no status-line overwrite; and modern Ctrl-U cancellation/right-scrolling instead of classic prior-Varstring recall/no-more-input-at-row-end. New host regression tests close an actual raw Ctrl-U/Escape recognition gap and protect Unicode text elements during Backspace/narrow projection. Details: `docs/en/HOST-COMMAND-LINE-V1-AUDIT.md`. The four rows remain host-sample; 254 portable cases and 103/123 directly linked historical rows are unchanged. Real Windows/Linux key delivery remains unverified.
