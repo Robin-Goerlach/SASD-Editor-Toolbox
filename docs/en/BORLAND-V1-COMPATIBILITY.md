@@ -298,3 +298,7 @@ A successfully loaded default UTF-8 document now tracks a raw-byte SHA-256 revis
 ## V1 historical evidence-review checkpoint
 
 The 123-routine inventory has now been checked against the full portable conformance manifest. **103/123** routine rows reference executable cases; four new host-level sequences cover the Ctrl-K R Read File filename workflow and validated numeric input. An empty expected-state object now fails the repository contract. These links confirm **specific observable outcomes**, not complete 1985 parity. The one-by-one handbook review, 20 non-linked non-core/host/divergence classifications, actual Windows/Linux terminal smoke tests and final API/persistence review remain **release blockers**. No V1 acceptance sign-off has been issued.
+
+## Audited EditCptabdef blank prompt (host-only)
+
+The handbook's Set Tab Width wrapper handles a deliberately empty response by using the displayed cursor column minus one. The terminal sample now resolves this to the initiating view's zero-based column before dispatch, while null cancels and an explicit numeric answer follows ordinary validated input. At column one the resulting zero is rejected rather than installed. This fixes a concrete sample-host behavioral gap without changing the documented global-vs-per-window TabSize divergence or creating a Pascal-shaped core API. Headless .NET regression tests cover the boundary; physical DOS prompt parity is not claimed.
