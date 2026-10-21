@@ -340,3 +340,8 @@ The handbook specifies a prompted key-to-ASCII-control translation. The sample p
 ## V1 physical terminal output safety (host replacement)
 
 The reusable core still stores literal control codes and projects logical text without console APIs. The FIRST-ED sample now escapes C0/DEL/C1 controls before every `Console.Write`; an inserted ESC no longer reaches the terminal as an executable ANSI control sequence. Rendering uses complete Unicode text elements and a conservative physical cell-width estimate, without changing file bytes or logical cursor offsets. Headless tests confirm safe output, Undo, Unicode clipping and caret positioning. Historical `EditUpdphyscr`/`EditUpdwindow` remain modern-renderer/host responsibilities, **not** portable DOS screen-memory APIs. Real Windows/Linux terminals, font-specific widths and resize behavior remain pending manual acceptance. See `docs/en/TERMINAL-OUTPUT-V1-ACCEPTANCE.md`.
+
+
+## Legacy 8-bit final blank-line preservation (V1 round-trip audit)
+
+The established decoder does not invent a blank line after a single external terminal CR/LF. The writer previously produced the **same bytes** for an explicitly empty final editor descriptor, silently discarding that descriptor on reload. The codec now emits an additional outgoing hard CR/LF for that *explicit* final empty descriptor (or 0x8D when Wrapped). Exact-byte, repeated blank, empty input, direct file-command Undo and invalid-input preservation tests run on Windows and Linux. This is a clearly labeled modern SASD round-trip policy for ambiguous historical byte streams, not a claim of Pascal byte-for-byte identity. The 254 portable cases and 103/123 linked historical routines remain unchanged.
