@@ -325,3 +325,8 @@ The original `EditBlockMove` restriction on destinations inside a selected block
 ## Undo after Link Window: document/view identity (V1 acceptance)
 
 Focused review of `EditUndo` and `EditWindowLink` found a navigation safety bug in the retained legacy `EditorUndoManager.Capture` path: a cursor could be restored into a window since relinked to a different document. The compatibility implementation now checks captured `DocumentId` before restoring legacy cursor/focus. Preferred compound Undo already checks window/document identity; its behavior remains unchanged. Four direct tests and one portable window-lifecycle fixture prove the ordinary, relinked and closed-view cases. The contract has 254 portable cases and 103/123 linked historical rows. This fixes a modern snapshot/navigation hazard, not a Pascal pointer implementation.
+
+
+## Historical Ctrl-P input normalization (EditInsertCtrlChar, p. 182)
+
+The handbook specifies a prompted key-to-ASCII-control translation. The sample previously submitted the raw printable key to semantic insertion; it now normalizes ASCII A-Z and control punctuation and respects Escape/Ctrl-U cancellation before dispatch. The core still accepts only the resolved literal control byte, preserving a host-neutral contract. Focused host-only xUnit regressions cover translation, dispatcher/Undo and unsupported keys; the pre-existing portable case covers literal control insertion. **254 portable cases and 103/123 linked routine rows** remain unchanged. Neither raw DOS scan-code behavior nor interactive Windows/Linux terminal parity is certified.
