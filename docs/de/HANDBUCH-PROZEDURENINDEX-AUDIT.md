@@ -155,3 +155,12 @@ Das historische Handbuch beschreibt `EditInsertLine` (S. 183), `EditNewLine` (S.
 - **DeleteLine:** Der historische Sonderfall bei nur einer vorhandenen Zeile erhält den Deskriptor und die Länge des bisherigen Zeichenbereichs und füllt diesen mit Leerzeichen. Zusätzliche direkte Tests prüfen das Entfernen des bisherigen `Wrapped`, den Erhalt von `UserColored`, ungültig werdende Marker, verknüpfte Fenster und Undo. Die bereits zentrale Mehrzeilen-Topologie bleibt unverändert.
 
 Sieben neue portable Fälle in `core-smoke.json` sowie direkte .NET-Regressionsprüfungen für die Legacy-Dateibytes, verknüpfte Fenster und Undo sichern die konkreten Ergebnisse ab. Die 123 historischen Routinen bleiben klassifiziert, die Anzahl **bereits** direkt verknüpfter Routinen bleibt bei 103. Die portable Sammlung wächst durch sieben Fälle von **244 auf 251**. Die vollständige historische Pascal-Implementationsgleichheit wird damit nicht behauptet. Reale Windows-/Linux-Terminaltests und die weiteren Einzelprüfungen bleiben offen.
+
+
+## Gezielte V1-Blockabnahme: Copy, Delete, Move (21. Oktober 2026)
+
+Die Handbuchstellen S. 127 (`EditBlockCopy`), S. 128 (`EditBlockDelete`) und S. 131 (`EditBlockMove`) wurden mit der tatsächlichen Kompatibilitätsschicht, Topologie und Undo geprüft. Das historische Verbot, einen Block **in sich selbst** zu verschieben, bleibt vor jeder Mutation bestehen. Das Handbuch macht keine Aussage über Dirty/Version/Undo beim Verschieben **direkt vor die unmittelbar folgende Zeile**. SASD behandelt dies jetzt ausdrücklich als **erfolgreichen modernen No-op**, da der Block dabei in seiner ursprünglichen Position verbleibt. So entstehen keine künstlichen Änderungen oder Undo-Einträge.
+
+Neue Headless-Tests prüfen sichtbare/verborgene benachbarte Moves, eine echte Verschiebung nach oben samt Neuverankerung einer zuvor entfernten TopLine, vollständige dokumentübergreifende Verschiebung (eine leere Quellzeile bleibt, Undo stellt beide Texte gemeinsam wieder her) und Copy innerhalb der eigenen Auswahl (die Einfügung gehört danach zum zusammenhängenden hervorgehobenen Block). Diese SASD-Regeln werden nicht als unbelegte Pascal-Interna ausgegeben.
+
+Zwei portable Fälle in `block-topology-and-undo.json` unterscheiden No-op und tatsächliche Verschiebung und sind mit `EditBlockMove` verknüpft. **253 portable V1-Fälle**, **103/123 historische Routinen mit direkten Verweisen**. Echte Windows-/Linux-Terminaltests und die übrigen historischen Einzelprüfungen bleiben offen.
