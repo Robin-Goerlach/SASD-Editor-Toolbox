@@ -60,9 +60,20 @@ internal sealed class ConsoleFirstEdPromptService(ConsoleFirstEdRenderer rendere
 
     private EditorCommandRequest? ResolveNumber(EditorCommandBinding binding, int visibleRows)
     {
+        // Capture the initiating view's column before the synchronous prompt
+        // begins. Unlike the generic numeric prompts, the historical
+        // EditCptabdef accepts deliberately empty Enter as "tab interval =
+        // displayed column minus one". Cursor columns are already zero-based
+        // in our model. This is terminal wrapper behavior, not a core rule.
+        var cursorColumn = binding.CommandId == EditorCommandId.SetTabWidth
+            ? session.CurrentWindow.Cursor.Column
+            : 0;
         var raw = renderer.ReadPrompt(NumberPrompt(binding.CommandId));
-        return EditorCommandPromptResolver.Resolve(
-            binding, visibleRows, firstResponse: raw);
+        return binding.CommandId == EditorCommandId.SetTabWidth
+            ? ConsoleFirstEdTabWidthPromptPolicy.Resolve(
+                binding, visibleRows, cursorColumn, raw)
+            : EditorCommandPromptResolver.Resolve(
+                binding, visibleRows, firstResponse: raw);
     }
 
     private EditorCommandRequest? ResolveTwoNumbers(EditorCommandBinding binding, int visibleRows)
