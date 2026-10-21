@@ -61,10 +61,17 @@ internal static class ConsoleFirstEdControlCharacterPromptPolicy
         // The ordinary prompt takes a printable A..Z key, without requiring
         // the user to hold Ctrl twice. Letter case must not affect the result.
         // ASCII's standard control mapping is uppercase letter minus '@'.
-        var upper = char.ToUpperInvariant(character);
-        if (upper is >= 'A' and <= 'Z')
+        // Test the ASCII ranges *before* mapping. Unicode case folding can
+        // turn non-ASCII letters (for example long s) into ASCII 'S'; those
+        // characters are not part of the original ASCII control alphabet.
+        if (character is >= 'A' and <= 'Z')
         {
-            return (char)(upper - '@');
+            return (char)(character - '@');
+        }
+
+        if (character is >= 'a' and <= 'z')
+        {
+            return (char)(character - 'a' + 1);
         }
 
         // The six punctuation keys adjacent to the alphabetic range form
