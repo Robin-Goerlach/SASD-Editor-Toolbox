@@ -314,3 +314,8 @@ Bei der Handbuchabnahme der Gruppe `EditJoinLine` und Delete Left/Right Characte
 ## V1-Prüfung ausgehender Zeilengrenzen beim Split
 
 Die gemeinsame Split-Funktion für `EditInsertLine` und `EditNewLine` hatte einen tatsächlichen Fehler bei der Zuordnung von `Wrapped`: Ein ursprünglicher weicher Übergang zur späteren Zeile muss hinter die neue untere Zeile wandern; zwischen oberer und unterer entsteht ein harter Übergang. `UserColored` bleibt beim oberen Deskriptor, das temporäre `InBlock` wird neu projiziert. Sieben neue portable Fälle (251 insgesamt), direkte Legacy-Byteprüfungen und Tests für Undo/verknüpfte Fenster decken drei Split-Positionen und beide Befehle ab. Der Sonderfall des einzigen Zeilendeskriptors von `EditDeleteLine` erhielt zusätzliche Tests. Die 103/123 schon verknüpften Routinen besitzen stärkere Belege; die vollständige historische und interaktive Terminalabnahme steht weiterhin aus.
+
+
+## V1-Block-Move: No-op und atomarer Undo-Schritt
+
+Das historische `EditBlockMove`-Verbot für Ziele innerhalb der eigenen Auswahl bleibt erhalten. SASD behandelt ein Move innerhalb desselben Dokuments unmittelbar vor die bereits folgende Zeile nun als **erfolgreiche nicht verändernde Operation**. Das historische Dirty-/Undo-Verhalten dieses Spezialfalls ist nicht beschrieben; daher ist dies eine ausdrückliche moderne Regel. Direkte Tests prüfen auch die tatsächliche Verschiebung nach oben, Copy in die eigene Auswahl und das komplette Verschieben eines Quelldokuments mit atomarem Undo beider Texte. Zwei portable Fälle (253 insgesamt) ergänzen die bereits verknüpfte `EditBlockMove`-Routine; der Index verbleibt bei **103/123** direkten Belegen. Reale Windows-/Linux-Terminaltests und die vollständige Einzelabnahme stehen noch aus.
