@@ -97,3 +97,25 @@ Der FIRST-ED-Terminalhost fragt bei Ctrl-K S für ein neues Dokument ohne zugeor
 ## .NET-Terminalbeispiel: Bestätigung vor dem Überschreiben
 
 Der Terminalhost verlangt jetzt ein ausdrückliches YES, bevor bei einem ersten Ctrl-K S Save As oder bei Ctrl-K W Write File eine vorhandene, neu ausgewählte Datei überschrieben wird. Ein Abbruch erzeugt keinen semantischen Schreibauftrag; ein bestätigtes direktes Write File lässt Dateizuordnung, Dirty und Undo weiterhin unverändert. Tests prüfen die reine Host-Entscheidung, echte temporäre Dateien und den semantischen Dispatcher. Normales Save auf einen bereits zugeordneten Pfad bleibt ohne neue Bestätigung. Diese Regel ist **moderne Host-Beleglage**, kein direkter sprachneutraler historischer Kompatibilitätsnachweis für `EditCpFileSave` oder originale DOS-Dialoge.
+
+## V1-Abnahme – gezielte Belegprüfung (Oktober 2026)
+
+Für diesen Freigabeschritt wurden alle 123 Inventarzeilen gegen die 14 Dateien des portablen Conformance-Manifests und den .NET-Testadapter abgeglichen. Vor den neuen Fällen enthielt das Repository **228 portable Fälle, 101 verknüpfte Routinen und 172 Verweise** (eine Routine kann mehrere Fälle referenzieren); sämtliche verknüpften Fälle hatten ein nichtleeres Erwartungsobjekt. Vier bisherige Verweise (`EditK` zweimal, `EditO`, `EditQ`) prüfen bewusst **nur die Tastenübersetzung**, nicht die Ausführung einer Host-Abfrage. Das ist für Keymap-Aufgaben sinnvoll, aber kein Beweis für DOS-Dialogparität.
+
+Für zwei bisher unverknüpfte Verantwortlichkeiten gibt es nun neue ausführbare portable Testfolgen:
+
+- **`EditCprfw` (gedruckte S. 151):** Ctrl-K R fordert einen Read-File-Pfad an. Eine abgebrochene Dateinamensabfrage löst weder einen Dateiimport noch eine Textänderung aus. Ein mit Leerzeichen umgebener Name wird bereinigt und durch den echten semantischen Dispatcher an einen Test-Decoder geleitet. Geprüft werden Einfügung nach der Ausgangszeile, unveränderter Cursor, Dirty und genau ein Undo-Schritt. **Nicht** geprüft: DOS-Darstellung und physische Dateidekodierung.
+- **`EditCvts2i` (gedruckte S. 158):** Die moderne Grenze für numerische Host-Eingaben akzeptiert Leerzeichen um eine gültige einbasierte Go-To-Line-Zahl; 32-Bit-Überlauf beendet die Abfrage ohne Mutation. Die **internen Pascal-Konvertierungsregeln** werden damit nicht behauptet.
+
+Die Repository-Verifikation verbietet nun Fälle mit leerem `expect`-Objekt. Damit können reine Ausführungen ohne Ergebnisprüfung die Belegzahl nicht erhöhen. Die historische Richtigkeit und Vollständigkeit der erwarteten Ergebnisse wird dadurch noch nicht bewiesen.
+
+**Neuer prüfbarer Stand:** 232 portable Fälle, 103/123 Routinen mit konkreten Verweisen und 20 ohne portablen Direktbeleg (7 moderne Ersetzungen, 9 Host-/Beispielaufgaben, 1 dokumentierte Abweichung, 3 obsolet gewordene DOS-Routinen). **`EditCpFileSave` bleibt bewusst unverknüpft**, weil das moderne erstmalige Speichern und die Überschreibabfrage des Terminalhosts noch nicht auf exakte historische DOS-Dialogtreue geprüft wurden.
+
+### Noch offene Freigabeprüfungen
+
+- Handbuchbeschreibung, .NET-Verhalten und wichtige Randfälle aller **84 als `implemented` eingestuften Routinen** individuell prüfen. Ein konkreter Testverweis ist Regressionsschutz, kein umfassendes historisches Gleichwertigkeitszertifikat.
+- Die **20 unverknüpften** Routinen sachlich bewerten. Obsolete Bildschirm-Hardware und reine UI-Aufgaben sollen keine künstlichen Core-APIs erzeugen.
+- Echte Windows- und Linux-Terminal-Smoke-Tests durchführen: Steuerkombinationen, Prompt-Abbruch, Speichern/Lesen/Schreiben, Ctrl-U, verknüpfte Fenster und Größenänderungen. Headless-Tests beweisen keine reale Tastenausgabe.
+- Öffentliche APIs, Persistenzverträge, Undo-/Anker-Invarianten und Release-Unterlagen final prüfen. Tag, Paket und Release nur nach ausdrücklicher Zustimmung.
+
+**Dies ist ein Teil der V1-Abnahme und noch keine Freigabe.**
