@@ -119,3 +119,7 @@ The repository verifier now rejects a portable case with an empty `expect` objec
 - Audit public APIs, persistence compatibility, Undo/anchor behavior and final clean release readiness. Tag, package and release remain explicitly approval-gated.
 
 **This is a partial release-gate audit, not a V1 sign-off.**
+
+## Specific handbook finding: EditCptabdef (printed p. 155)
+
+Direct review of the handbook description identified a concrete sample-host gap that was not visible from the index count: deliberately empty numeric input to Set Tab Width is **not** simply a cancelled command. The original wrapper derives a tab interval from the current cursor column minus one. The console host previously treated blank input as cancellation. A new sample-only prompt policy and headless tests now cover empty Enter, true cancellation, positive explicit input, overflow, the column-one zero boundary and per-window configuration isolation. The one-based historical rule is adapted to the zero-based view model without changing `EditorCommandPromptResolver` for other commands. The deliberate global-vs-per-window tab divergence remains documented. This targeted correction strengthens actual historical behavioral acceptance but does not constitute a full routine-by-routine sign-off.
