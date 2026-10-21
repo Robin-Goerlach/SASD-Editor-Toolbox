@@ -164,3 +164,12 @@ Compared handbook p. 127 (`EditBlockCopy`), p. 128 (`EditBlockDelete`) and p. 13
 New headless tests cover hidden/visible no-op moves; real upwards relocation and linked-window reattachment of a deleted top-line anchor; a cross-document move of the **entire source stream**, which retains one blank source descriptor and undoes both documents atomically; and copy within the source selection, whose inserted lines become part of its contiguous highlight via original endpoints. These are observable SASD policies, not unverified Pascal-internal behaviors.
 
 Two portable `block-topology-and-undo.json` cases assert adjacent no-op versus actual upward move. They are linked to the already evidenced `EditBlockMove` routine. **253 portable V1 cases**, **103/123 linked historical rows**. This remains a focused acceptance slice: manual Windows/Linux terminals and the remaining routine-by-routine historical acceptance are outstanding.
+
+
+## V1 checkpoint: EditUndo and EditWindowLink identity after relinking
+
+Review of the 1985 `EditUndo` and `EditWindowLink` responsibilities against SASD's explicit modern snapshot Undo policy exposed an issue in the retained **low-level legacy Capture API**: its cursor restore selected a view by `WindowId` even after that view was reattached to another `DocumentId`. The text snapshot already restored the correct document, but the unrelated window could receive the old cursor and unexpectedly gain focus.
+
+The fix requires the original view to still display its captured document before replaying that legacy cursor. A **relinked** original view preserves its current cursor and user-selected focus; a **closed** original view retains the older fallback to a surviving linked sibling. Modern compound transactions already validate both identities. Four new direct regression tests guard these cases. One new portable V1 case, `windows.undo-relinked-view-preserves-unrelated-current-window`, confirms the modern semantic undo/navigation outcome and is mapped to both indexed historical responsibilities.
+
+The portable manifest now has **254 cases**; **103/123 handbook rows** remain directly linked (the new evidence strengthens existing linked rows). Historic Pascal Undo stack/pointer internals and real terminal key delivery are not claimed as verified; release sign-off remains outstanding.
