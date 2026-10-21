@@ -297,6 +297,559 @@
           "resourceKey": "Editor.Errors.Command.InvalidArgument"
         }
       }
+    },
+    {
+      "id": "editing.insert-line-split-transfers-wrapped-outgoing-boundary",
+      "area": "editing",
+      "initial": {
+        "documents": [
+          {
+            "id": "doc-1",
+            "lines": [
+              {
+                "text": "abcdef",
+                "flags": [
+                  "wrapped",
+                  "user_colored"
+                ]
+              },
+              {
+                "text": "tail",
+                "flags": []
+              }
+            ]
+          }
+        ],
+        "windows": [
+          {
+            "id": "win-1",
+            "documentId": "doc-1",
+            "cursor": {
+              "line": 0,
+              "column": 3
+            },
+            "options": {
+              "insertMode": true,
+              "autoIndent": false
+            }
+          }
+        ],
+        "currentWindowId": "win-1"
+      },
+      "operation": {
+        "id": "insert_line"
+      },
+      "expect": {
+        "documents": {
+          "doc-1": {
+            "lines": [
+              {
+                "text": "abc",
+                "flags": [
+                  "user_colored"
+                ]
+              },
+              {
+                "text": "def",
+                "flags": [
+                  "wrapped"
+                ]
+              },
+              {
+                "text": "tail",
+                "flags": []
+              }
+            ],
+            "isDirty": true,
+            "version": 1
+          }
+        },
+        "windows": {
+          "win-1": {
+            "cursor": {
+              "line": 0,
+              "column": 3
+            }
+          }
+        },
+        "undo": {
+          "count": 1
+        }
+      }
+    },
+    {
+      "id": "editing.insert-line-column-zero-transfers-wrapped-to-old-text",
+      "area": "editing",
+      "initial": {
+        "documents": [
+          {
+            "id": "doc-1",
+            "lines": [
+              {
+                "text": "abcdef",
+                "flags": [
+                  "wrapped",
+                  "user_colored"
+                ]
+              },
+              {
+                "text": "tail",
+                "flags": []
+              }
+            ]
+          }
+        ],
+        "windows": [
+          {
+            "id": "win-1",
+            "documentId": "doc-1",
+            "cursor": {
+              "line": 0,
+              "column": 0
+            },
+            "options": {
+              "insertMode": true,
+              "autoIndent": false
+            }
+          }
+        ],
+        "currentWindowId": "win-1"
+      },
+      "operation": {
+        "id": "insert_line"
+      },
+      "expect": {
+        "documents": {
+          "doc-1": {
+            "lines": [
+              {
+                "text": "",
+                "flags": [
+                  "user_colored"
+                ]
+              },
+              {
+                "text": "abcdef",
+                "flags": [
+                  "wrapped"
+                ]
+              },
+              {
+                "text": "tail",
+                "flags": []
+              }
+            ],
+            "isDirty": true,
+            "version": 1
+          }
+        },
+        "windows": {
+          "win-1": {
+            "cursor": {
+              "line": 0,
+              "column": 0
+            }
+          }
+        },
+        "undo": {
+          "count": 1
+        }
+      }
+    },
+    {
+      "id": "editing.insert-line-at-end-transfers-wrapped-to-blank-new-line",
+      "area": "editing",
+      "initial": {
+        "documents": [
+          {
+            "id": "doc-1",
+            "lines": [
+              {
+                "text": "abc   ",
+                "flags": [
+                  "wrapped",
+                  "user_colored"
+                ]
+              },
+              {
+                "text": "tail",
+                "flags": []
+              }
+            ]
+          }
+        ],
+        "windows": [
+          {
+            "id": "win-1",
+            "documentId": "doc-1",
+            "cursor": {
+              "line": 0,
+              "column": 6
+            },
+            "options": {
+              "insertMode": true,
+              "autoIndent": false
+            }
+          }
+        ],
+        "currentWindowId": "win-1"
+      },
+      "operation": {
+        "id": "insert_line"
+      },
+      "expect": {
+        "documents": {
+          "doc-1": {
+            "lines": [
+              {
+                "text": "abc   ",
+                "flags": [
+                  "user_colored"
+                ]
+              },
+              {
+                "text": "",
+                "flags": [
+                  "wrapped"
+                ]
+              },
+              {
+                "text": "tail",
+                "flags": []
+              }
+            ],
+            "isDirty": true,
+            "version": 1
+          }
+        },
+        "windows": {
+          "win-1": {
+            "cursor": {
+              "line": 0,
+              "column": 6
+            }
+          }
+        },
+        "undo": {
+          "count": 1
+        }
+      }
+    },
+    {
+      "id": "editing.new-line-insert-split-transfers-old-outgoing-boundary",
+      "area": "editing",
+      "initial": {
+        "documents": [
+          {
+            "id": "doc-1",
+            "lines": [
+              {
+                "text": "abcdef",
+                "flags": [
+                  "wrapped",
+                  "user_colored"
+                ]
+              },
+              {
+                "text": "tail",
+                "flags": []
+              }
+            ]
+          }
+        ],
+        "windows": [
+          {
+            "id": "win-1",
+            "documentId": "doc-1",
+            "cursor": {
+              "line": 0,
+              "column": 3
+            },
+            "options": {
+              "insertMode": true,
+              "autoIndent": false
+            }
+          }
+        ],
+        "currentWindowId": "win-1"
+      },
+      "operation": {
+        "id": "new_line"
+      },
+      "expect": {
+        "documents": {
+          "doc-1": {
+            "lines": [
+              {
+                "text": "abc",
+                "flags": [
+                  "user_colored"
+                ]
+              },
+              {
+                "text": "def",
+                "flags": [
+                  "wrapped"
+                ]
+              },
+              {
+                "text": "tail",
+                "flags": []
+              }
+            ],
+            "isDirty": true,
+            "version": 1
+          }
+        },
+        "windows": {
+          "win-1": {
+            "cursor": {
+              "line": 1,
+              "column": 0
+            }
+          }
+        },
+        "undo": {
+          "count": 1
+        }
+      }
+    },
+    {
+      "id": "editing.new-line-insert-autoindent-split-transfers-boundary",
+      "area": "editing",
+      "initial": {
+        "documents": [
+          {
+            "id": "doc-1",
+            "lines": [
+              {
+                "text": "    abcdef",
+                "flags": [
+                  "wrapped",
+                  "user_colored"
+                ]
+              },
+              {
+                "text": "tail",
+                "flags": []
+              }
+            ]
+          }
+        ],
+        "windows": [
+          {
+            "id": "win-1",
+            "documentId": "doc-1",
+            "cursor": {
+              "line": 0,
+              "column": 6
+            },
+            "options": {
+              "insertMode": true,
+              "autoIndent": true
+            }
+          }
+        ],
+        "currentWindowId": "win-1"
+      },
+      "operation": {
+        "id": "new_line"
+      },
+      "expect": {
+        "documents": {
+          "doc-1": {
+            "lines": [
+              {
+                "text": "    ab",
+                "flags": [
+                  "user_colored"
+                ]
+              },
+              {
+                "text": "cdef",
+                "flags": [
+                  "wrapped"
+                ]
+              },
+              {
+                "text": "tail",
+                "flags": []
+              }
+            ],
+            "isDirty": true,
+            "version": 1
+          }
+        },
+        "windows": {
+          "win-1": {
+            "cursor": {
+              "line": 1,
+              "column": 4
+            }
+          }
+        },
+        "undo": {
+          "count": 1
+        }
+      }
+    },
+    {
+      "id": "editing.insert-line-undo-restores-both-boundaries",
+      "area": "editing",
+      "initial": {
+        "documents": [
+          {
+            "id": "doc-1",
+            "lines": [
+              {
+                "text": "abcdef",
+                "flags": [
+                  "wrapped",
+                  "user_colored"
+                ]
+              },
+              {
+                "text": "tail",
+                "flags": []
+              }
+            ]
+          }
+        ],
+        "windows": [
+          {
+            "id": "win-1",
+            "documentId": "doc-1",
+            "cursor": {
+              "line": 0,
+              "column": 3
+            },
+            "options": {
+              "insertMode": true,
+              "autoIndent": false
+            }
+          }
+        ],
+        "currentWindowId": "win-1"
+      },
+      "operations": [
+        {
+          "id": "insert_line"
+        },
+        {
+          "id": "undo"
+        }
+      ],
+      "expect": {
+        "documents": {
+          "doc-1": {
+            "lines": [
+              {
+                "text": "abcdef",
+                "flags": [
+                  "wrapped",
+                  "user_colored"
+                ]
+              },
+              {
+                "text": "tail",
+                "flags": []
+              }
+            ],
+            "isDirty": false,
+            "version": 0
+          }
+        },
+        "windows": {
+          "win-1": {
+            "cursor": {
+              "line": 0,
+              "column": 3
+            }
+          }
+        },
+        "undo": {
+          "count": 0
+        }
+      }
+    },
+    {
+      "id": "editing.new-line-undo-restores-both-boundaries",
+      "area": "editing",
+      "initial": {
+        "documents": [
+          {
+            "id": "doc-1",
+            "lines": [
+              {
+                "text": "abcdef",
+                "flags": [
+                  "wrapped",
+                  "user_colored"
+                ]
+              },
+              {
+                "text": "tail",
+                "flags": []
+              }
+            ]
+          }
+        ],
+        "windows": [
+          {
+            "id": "win-1",
+            "documentId": "doc-1",
+            "cursor": {
+              "line": 0,
+              "column": 3
+            },
+            "options": {
+              "insertMode": true,
+              "autoIndent": false
+            }
+          }
+        ],
+        "currentWindowId": "win-1"
+      },
+      "operations": [
+        {
+          "id": "new_line"
+        },
+        {
+          "id": "undo"
+        }
+      ],
+      "expect": {
+        "documents": {
+          "doc-1": {
+            "lines": [
+              {
+                "text": "abcdef",
+                "flags": [
+                  "wrapped",
+                  "user_colored"
+                ]
+              },
+              {
+                "text": "tail",
+                "flags": []
+              }
+            ],
+            "isDirty": false,
+            "version": 0
+          }
+        },
+        "windows": {
+          "win-1": {
+            "cursor": {
+              "line": 0,
+              "column": 3
+            }
+          }
+        },
+        "undo": {
+          "count": 0
+        }
+      }
     }
   ]
 }
