@@ -319,3 +319,8 @@ Die gemeinsame Split-Funktion für `EditInsertLine` und `EditNewLine` hatte eine
 ## V1-Block-Move: No-op und atomarer Undo-Schritt
 
 Das historische `EditBlockMove`-Verbot für Ziele innerhalb der eigenen Auswahl bleibt erhalten. SASD behandelt ein Move innerhalb desselben Dokuments unmittelbar vor die bereits folgende Zeile nun als **erfolgreiche nicht verändernde Operation**. Das historische Dirty-/Undo-Verhalten dieses Spezialfalls ist nicht beschrieben; daher ist dies eine ausdrückliche moderne Regel. Direkte Tests prüfen auch die tatsächliche Verschiebung nach oben, Copy in die eigene Auswahl und das komplette Verschieben eines Quelldokuments mit atomarem Undo beider Texte. Zwei portable Fälle (253 insgesamt) ergänzen die bereits verknüpfte `EditBlockMove`-Routine; der Index verbleibt bei **103/123** direkten Belegen. Reale Windows-/Linux-Terminaltests und die vollständige Einzelabnahme stehen noch aus.
+
+
+## Undo nach Link Window: Dokument-/Fensteridentität (V1-Abnahme)
+
+Bei der Prüfung von `EditUndo` und `EditWindowLink` wurde ein Navigationsfehler im erhaltenen älteren `EditorUndoManager.Capture`-Zugang gefunden: Eine Cursorposition konnte auf ein inzwischen mit einem anderen Dokument verknüpftes Fenster zurückgeschrieben werden. Die Kompatibilität prüft jetzt die gespeicherte `DocumentId`, bevor Cursor/Fokus wiederhergestellt werden. Das bevorzugte transaktionsbasierte Undo prüfte Fenster- und Dokumentidentität bereits; es wurde nicht verändert. Vier direkte Tests sowie ein portabler Fenster-Lebenszyklusfall sichern normale, umgekoppelte und geschlossene Ansichten ab. Der Vertrag enthält 254 portable Fälle und 103/123 direkte Handbuchverweise. Dies behebt eine moderne Snapshot-/Navigationslücke, keine Pascal-Zeigerschnittstelle.
