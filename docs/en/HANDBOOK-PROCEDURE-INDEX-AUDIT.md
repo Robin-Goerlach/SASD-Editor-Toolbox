@@ -155,3 +155,12 @@ The original handbook describes `EditInsertLine` (p. 183), `EditNewLine` (p. 191
 - **DeleteLine:** the historical sole-line exception still preserves the one descriptor and its stored character count by filling it with spaces. New direct tests additionally check clearing the former outgoing `Wrapped` bit, preserving `UserColored`, marker invalidation, linked-view stability and Undo. Multi-line deletion/marker/block realignment already resides in `EditorLineTopology`; this step did not change its established rules.
 
 Seven new portable `core-smoke.json` cases plus direct .NET byte-level and linked-view regression tests provide focused executable evidence. The 123 historical routines remain classified, and the **existing** directly linked row count remains 103; seven new cases increase portable coverage from **244 to 251**. These tests demonstrate specific byte/Undo/topology outcomes, not complete historical Pascal implementation identity. Manual Windows/Linux terminal acceptance and the remaining one-by-one V1 review are still required.
+
+
+## V1 focused block-family audit: Copy, Delete, Move (21 October 2026)
+
+Compared handbook p. 127 (`EditBlockCopy`), p. 128 (`EditBlockDelete`) and p. 131 (`EditBlockMove`) against the current compatibility processor and topology/Undo tests. The historical Move prohibition on inserting into its own block remains enforced **before mutation**. The manual is silent about Dirty/version/Undo effects when moving a block immediately before the already-following line. SASD now handles this as a **successful modern no-op**: the contiguous block has not changed location, so a remove-and-reinsert must not manufacture Dirty state or an Undo item.
+
+New headless tests cover hidden/visible no-op moves; real upwards relocation and linked-window reattachment of a deleted top-line anchor; a cross-document move of the **entire source stream**, which retains one blank source descriptor and undoes both documents atomically; and copy within the source selection, whose inserted lines become part of its contiguous highlight via original endpoints. These are observable SASD policies, not unverified Pascal-internal behaviors.
+
+Two portable `block-topology-and-undo.json` cases assert adjacent no-op versus actual upward move. They are linked to the already evidenced `EditBlockMove` routine. **253 portable V1 cases**, **103/123 linked historical rows**. This remains a focused acceptance slice: manual Windows/Linux terminals and the remaining routine-by-routine historical acceptance are outstanding.
