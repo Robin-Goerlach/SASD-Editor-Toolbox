@@ -58,3 +58,9 @@ Wenn Ctrl-K S ein neues `NONAME`-Dokument erstmals unter einem **vom Benutzer ge
 Ein wiederholtes Save auf einen dem Dokument **bereits zugeordneten Dateipfad** bleibt direkt ausführbar; diesen Pfad hat der Nutzer zuvor ausgewählt. Direktes Write File verändert weiterhin weder Dateizuordnung noch Dirty-Flag des Dokuments. Read File benötigt keine Überschreibbestätigung. Der wiederverwendbare Editor-Kern und die historischen Unterschiede der Dateibefehle bleiben unverändert.
 
 Das ist eine **moderne Schutzabfrage des Terminalhosts**, keine Behauptung über den originalen DOS-Dialog von 1985 und keine atomare Dateisperre: Nach `File.Exists` kann ein anderer Prozess die Datei weiterhin ändern oder neu anlegen. Andere Oberflächen müssen eine eigene Überschreib-Policy vorsehen.
+
+## Historische leere Tabulator-Abfrage (Ctrl-K T)
+
+Der Handbuchbefehl `EditCptabdef` hat gegenüber normalen Zahlenabfragen eine Besonderheit: Eine **bewusst leere** Antwort setzt den Tabulatorabstand auf die aktuelle angezeigte Cursor-Spalte minus eins. Der FIRST-ED-Terminalhost bildet dies jetzt in der separat testbaren `ConsoleFirstEdTabWidthPromptPolicy` ab. Die Cursor-Spalte wird im .NET-Modell bereits nullbasiert gespeichert und ist daher genau der benötigte Wert. Null/Escape bleibt ein **Abbruch**; eine ausdrücklich eingegebene Zahl verwendet weiterhin die gemeinsame numerische Befehlsauflösung. In der ersten Spalte ergäbe die historische Formel null; der Host verwirft den ungültigen Wert, statt die bestehende Tabulatorbreite zu beschädigen.
+
+Das ist historisches Host-Prompt-Verhalten mit einer dokumentierten modernen Grenze. Während der ursprüngliche Tabulatorabstand global war, verwendet SASD bewusst `TabSize` je Fenster. Der Core-Dispatcher und alle anderen numerischen Prompts bleiben unverändert. Die Headless-Tests bestätigen keine physische DOS-Tastatur- oder Bildschirmdarstellung.
