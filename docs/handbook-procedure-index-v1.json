@@ -134,10 +134,12 @@
       "handbookPage": 131,
       "status": "implemented",
       "evidence": "docs/en/BLOCK-COMPATIBILITY.md",
-      "note": "Whole-line block operations and independent endpoints.",
+      "note": "Whole-line block operations and independent endpoints. Modern V1 policy: moving a contiguous block directly before its already-adjacent successor is a successful no-op (no Dirty/version/Undo change); real earlier-target moves and associated topology remain undoable. This corner case is not a claim about original DOS Undo bookkeeping.",
       "conformanceCases": [
         "blocks.cross-document-move-undo-restores-both-streams",
-        "blocks.move-into-own-source-range-is-rejected"
+        "blocks.move-into-own-source-range-is-rejected",
+        "blocks.move-immediately-before-following-line-is-noop",
+        "blocks.move-before-earlier-line-still-reorders-with-one-undo"
       ]
     },
     {
