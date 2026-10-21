@@ -29,22 +29,22 @@
       "name": "EditAppchar",
       "handbookPage": 120,
       "status": "host-sample",
-      "evidence": "docs/en/INTERACTIVE-FIRST-ED-HOST.md",
-      "note": "Prompt/command-line display belongs to the host."
+      "evidence": "docs/en/HOST-COMMAND-LINE-V1-AUDIT.md",
+      "note": "Prompt/command-line display belongs to the host. Direct handbook audit (pp. 120-122, 237) confirms modern terminal-row, bounded-display/unbounded-answer and Ctrl-U cancellation differences. Headless host tests cover unnamed raw Ctrl-U/Escape and Unicode text-element editing/projection. Historical Varstring recall/typeahead and DOS Cmdcol parity are not claimed; no portable routine-link invented."
     },
     {
       "name": "EditAppcmdnam",
       "handbookPage": 121,
       "status": "host-sample",
-      "evidence": "docs/en/INTERACTIVE-FIRST-ED-HOST.md",
-      "note": "Prompt/command-line display belongs to the host."
+      "evidence": "docs/en/HOST-COMMAND-LINE-V1-AUDIT.md",
+      "note": "Prompt/command-line display belongs to the host. Direct handbook audit (pp. 120-122, 237) confirms modern terminal-row, bounded-display/unbounded-answer and Ctrl-U cancellation differences. Headless host tests cover unnamed raw Ctrl-U/Escape and Unicode text-element editing/projection. Historical Varstring recall/typeahead and DOS Cmdcol parity are not claimed; no portable routine-link invented."
     },
     {
       "name": "EditAskfor",
       "handbookPage": 122,
       "status": "host-sample",
-      "evidence": "docs/en/INTERACTIVE-FIRST-ED-HOST.md",
-      "note": "Prompt/command-line display belongs to the host."
+      "evidence": "docs/en/HOST-COMMAND-LINE-V1-AUDIT.md",
+      "note": "Prompt/command-line display belongs to the host. Direct handbook audit (pp. 120-122, 237) confirms modern terminal-row, bounded-display/unbounded-answer and Ctrl-U cancellation differences. Headless host tests cover unnamed raw Ctrl-U/Escape and Unicode text-element editing/projection. Historical Varstring recall/typeahead and DOS Cmdcol parity are not claimed; no portable routine-link invented."
     },
     {
       "name": "EditBackground",
@@ -1238,8 +1238,8 @@
       "name": "EditZapcmdnam",
       "handbookPage": 237,
       "status": "host-sample",
-      "evidence": "docs/en/INTERACTIVE-FIRST-ED-HOST.md",
-      "note": "Prompt/command-line display belongs to the host."
+      "evidence": "docs/en/HOST-COMMAND-LINE-V1-AUDIT.md",
+      "note": "Prompt/command-line display belongs to the host. Direct handbook audit (pp. 120-122, 237) confirms modern terminal-row, bounded-display/unbounded-answer and Ctrl-U cancellation differences. Headless host tests cover unnamed raw Ctrl-U/Escape and Unicode text-element editing/projection. Historical Varstring recall/typeahead and DOS Cmdcol parity are not claimed; no portable routine-link invented."
     },
     {
       "name": "MoveFromScreen",
