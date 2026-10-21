@@ -320,3 +320,8 @@ The handbook-described `EditInsertLine`/`EditNewLine` shared splitter had a real
 ## V1 block Move no-op and atomicity audit
 
 The original `EditBlockMove` restriction on destinations inside a selected block remains enforced. SASD now treats a same-document move immediately before the block's existing successor as a **successful non-mutating operation**; historical Dirty/Undo bookkeeping for this edge case is undocumented, so this is an explicit modern policy. Direct tests also verify a real upward move, copying into the selection, and moving the entire source stream into another document with atomic Undo. Two portable cases (253 V1 cases total) are linked to the existing `EditBlockMove` routine evidence; the inventory remains **103/123** linked. Final Windows/Linux terminal and full handbook sign-off remain outstanding.
+
+
+## Undo after Link Window: document/view identity (V1 acceptance)
+
+Focused review of `EditUndo` and `EditWindowLink` found a navigation safety bug in the retained legacy `EditorUndoManager.Capture` path: a cursor could be restored into a window since relinked to a different document. The compatibility implementation now checks captured `DocumentId` before restoring legacy cursor/focus. Preferred compound Undo already checks window/document identity; its behavior remains unchanged. Four direct tests and one portable window-lifecycle fixture prove the ordinary, relinked and closed-view cases. The contract has 254 portable cases and 103/123 linked historical rows. This fixes a modern snapshot/navigation hazard, not a Pascal pointer implementation.
