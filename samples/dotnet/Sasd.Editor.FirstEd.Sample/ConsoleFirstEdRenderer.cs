@@ -63,8 +63,21 @@ internal sealed class ConsoleFirstEdRenderer(EditorSession session)
 
             for (var row = 0; row < frame.TextRows; row++)
             {
-                var text = row < viewport.Lines.Count ? viewport.Lines[row].Text : string.Empty;
-                WriteRow(frame.TopRow + EditorWindowFrame.StatusRowCount + row, text, width);
+                // ViewportLine supplies the logical line *identity*. Its
+                // generic UTF-16 substring is intentionally not used for
+                // physical console painting: a substring could start/end
+                // inside a surrogate pair, and document text may contain
+                // terminal control bytes inserted via historical Ctrl-P.
+                //
+                // Render from the complete stored logical line, applying
+                // the independent host-only text-element and control-code
+                // projection at the window's horizontal offset.
+                var text = row < viewport.Lines.Count
+                    ? window.Document.Buffer.GetLine(viewport.Lines[row].DocumentLine).Text
+                    : string.Empty;
+                WriteRow(
+                    frame.TopRow + EditorWindowFrame.StatusRowCount + row,
+                    text, width, window.LeftColumn);
             }
         }
 
@@ -91,7 +104,13 @@ internal sealed class ConsoleFirstEdRenderer(EditorSession session)
         {
             var display = editor.Project(prompt, width);
             WriteRow(row, display.Text, width);
-            Console.SetCursorPosition(display.CaretColumn, row);
+            // The prompt model uses UTF-16 offsets, but the physical
+            // terminal caret needs the measured display-cell column.
+            // For example, "界" occupies approximately two cells while
+            // "e" with a combining accent occupies one.
+            var cellCaret = ConsoleFirstEdRowProjection.Project(
+                display.Text, 0, width, display.CaretColumn).CursorColumn;
+            Console.SetCursorPosition(cellCaret, row);
         }
 
         Paint();
@@ -120,7 +139,9 @@ internal sealed class ConsoleFirstEdRenderer(EditorSession session)
         var width = Math.Max(1, Console.WindowWidth - 1);
         var row = Math.Max(0, Console.WindowHeight - 1);
         WriteRow(row, prompt, width);
-        Console.SetCursorPosition(Math.Min(prompt.Length, width - 1), row);
+        var cellCaret = ConsoleFirstEdRowProjection.Project(
+            prompt, 0, width, prompt.Length).CursorColumn;
+        Console.SetCursorPosition(cellCaret, row);
         Console.CursorVisible = true;
         var key = Console.ReadKey(intercept: true);
 
@@ -182,7 +203,14 @@ internal sealed class ConsoleFirstEdRenderer(EditorSession session)
 
         var visibleRow = Math.Clamp(window.Cursor.Line - window.TopLine, 0, frame.TextRows - 1);
         var row = frame.TopRow + EditorWindowFrame.StatusRowCount + visibleRow;
-        var column = Math.Clamp(window.Cursor.Column - window.LeftColumn, 0, width - 1);
+        // Cursor.Column and LeftColumn are logical UTF-16 offsets. Never
+        // subtract them directly to obtain a *physical* terminal column:
+        // a stored ESC shows as "^[", an emoji may occupy two cells, and
+        // combining accents must not advance the terminal cursor twice.
+        var line = window.Document.Buffer.GetLine(window.Cursor.Line).Text;
+        var column = ConsoleFirstEdRowProjection.Project(
+            line, Math.Max(0, window.LeftColumn), width,
+            Math.Max(0, window.Cursor.Column)).CursorColumn;
         Console.SetCursorPosition(column, Math.Min(row, Console.WindowHeight - 2));
     }
 
@@ -201,15 +229,26 @@ internal sealed class ConsoleFirstEdRenderer(EditorSession session)
 
     private static string OnOff(bool value) => value ? "ON" : "OFF";
 
-    private static void WriteRow(int row, string text, int width)
+    private static void WriteRow(
+        int row, string text, int width, int firstCodeUnit = 0)
     {
         if (row < 0 || row >= Console.WindowHeight)
         {
             return;
         }
 
-        var clipped = text.Length > width ? text[..width] : text;
+        // This is the SINGLE boundary before emitting untrusted document,
+        // filename, hook/status and prompt text to the terminal. Raw ESC,
+        // CR, LF and other controls must never reach Console.Write:
+        // otherwise editing text such as ESC[2J could clear the display.
+        //
+        // The projection expands controls into caret notation, clips at
+        // complete Unicode text elements, estimates terminal cell widths
+        // and pads the row to erase stale characters from prior frames.
+        // The last real terminal column is reserved by the caller.
+        var display = ConsoleFirstEdRowProjection.Project(
+            text, Math.Max(0, firstCodeUnit), width);
         Console.SetCursorPosition(0, row);
-        Console.Write(clipped.PadRight(width));
+        Console.Write(display.Text);
     }
 }
