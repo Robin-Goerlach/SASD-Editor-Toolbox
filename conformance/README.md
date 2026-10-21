@@ -125,3 +125,7 @@ The host-prompt suite now checks two-parameter window creation, window deletion,
 ## Tab safety at extreme virtual positions
 
 Four portable Tab boundary cases verify that Insert-mode requests with extreme tab widths or distant virtual-column gap fill reject the operation *before* any mutation or Undo; an unrepresentable next tab stop is rejected even in Overtype mode. By contrast, Overtype Tab can advance the cursor at a distant but representable virtual position without creating text. The conservative 4,096-space insertion budget is a documented modern safety rule, not a claimed historical DOS size limit. Ordinary Insert-mode and Overtype-mode Tab fixtures remain part of the same suite.
+
+## V1 evidence-quality requirement
+
+The repository verifier rejects portable cases with an empty `expect` object; merely executing a sequence without checking observable state is insufficient release evidence. The historical index links to focused tests, not automatically to complete 1985 behavioral equivalence. Four new host-prompt cases exercise Ctrl-K R Read File cancellation/dispatch and numeric whitespace/overflow handling through the .NET semantic command boundary.
