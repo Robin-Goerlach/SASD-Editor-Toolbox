@@ -97,3 +97,8 @@ The preferred transaction-based Undo records each window's `WindowId` **and** at
 `RestoreLegacyCursor` now also checks document identity. If the captured view is **still present but relinked**, it does **not** restore navigation to that view, and it preserves the current focus. An original document kept alive by a linked sibling is still restored as text. If the captured view was actually **closed**, the established fallback may select a surviving sibling of the original document. A captured view that still displays the original document retains the ordinary cursor restoration. This change does not create a Pascal pointer-emulation layer or change compound Undo accounting.
 
 Four direct regression tests in `UndoWindowIdentityTests` cover relinking, intact capture, closed-view fallback and the newer transaction API. A portable `windows.undo-relinked-view-preserves-unrelated-current-window` case additionally checks the modern, host-neutral navigation behavior. These are focused regression guarantees, not historical Undo-stack internals.
+
+
+### Explicit marker reassignment after a cross-document block move
+
+`UndoMarkerReassignmentTests` checks an independent selective-restoration invariant. When Move Block deletes a marked source line or shifts a marker on a surviving line, Undo restores those *command-induced* changes. However, if the user explicitly reassigns another marker after the move, that later choice remains authoritative. One compound Undo restores both documents and the moved block endpoints, but does not rewind the separately updated marker. This is modern SASD state ownership, not historical Pascal pointer recreation.
