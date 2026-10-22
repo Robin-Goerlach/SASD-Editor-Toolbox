@@ -68,3 +68,16 @@ This contributes to predictable host lifecycle handling. It is **not** a
 claim of exact `EditZapcmdnam` or `EditAskfor` historical behavior:
 DOS `Cmdcol`, Varstring recall, and physical terminal interaction still
 require the separate documented review.
+
+## Delete versus Backspace in append-only prompts
+
+The portable `ConsolePromptEditor` keeps its input caret at the end.
+Consequently, **Delete** has no following character to erase, while
+**Backspace** removes the preceding user-visible text element. This
+difference is now enforced explicitly rather than depending on a terminal's
+choice of `KeyChar` for Delete. A deterministic headless test covers
+both keys on the same input.
+
+This is a modern host-input policy; historical Pascal Varstring edit keys,
+`Cmdcol` handling and real terminal integration still require independent
+acceptance and are not presented as Borland parity.
