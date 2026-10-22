@@ -56,6 +56,16 @@ internal sealed class ConsolePromptEditor
             return ConsolePromptInputResult.Submitted;
         }
 
+        if (key.Key == ConsoleKey.Delete)
+        {
+            // The sample prompt is an append-only editing surface: its
+            // caret is always at the end. Delete therefore has no character
+            // to remove on the right. Distinguishing Delete from Backspace
+            // is essential on keyboards that provide both keys; removing
+            // the final character here would corrupt paths and find terms.
+            return ConsolePromptInputResult.Continue;
+        }
+
         if (key.Key == ConsoleKey.Backspace)
         {
             if (_answer.Length > 0)
