@@ -93,6 +93,17 @@ public sealed class EditorFileService
             !original.Buffer.Snapshot().SequenceEqual(originalSnapshot))
             return false;
 
+        // Cancellation can arrive after a custom decoder has completed but
+        // before the view is reattached. Treat this last boundary as a
+        // commit gate: cancellation must never turn into a successful switch.
+        // The subsequent reattachment is synchronous and intentionally short.
+        cancellationToken.ThrowIfCancellationRequested();
+
+        // If the user switched to another view during async decoding, do not
+        // steal keyboard focus when committing this initiating view. Core's
+        // AttachWindowDocument changes only its document association; active
+        // window identity continues to belong to the user's later action.
+        // The caller may choose to surface a nonintrusive status message.
         _session.AttachWindowDocument(window, incoming);
         window.Cursor = new TextPosition(0, 0);
         window.TopLine = 0;
