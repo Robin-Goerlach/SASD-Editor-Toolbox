@@ -69,8 +69,8 @@ public sealed class EditorFileService
         {
             cancellationToken.ThrowIfCancellationRequested();
             if (line is null || line.Text is null ||
-                line.Text.Contains('\\r') || line.Text.Contains('\\n') ||
-                line.Text.Contains('\\u008D') ||
+                line.Text.Contains('\r') || line.Text.Contains('\n') ||
+                line.Text.Contains('\u008D') ||
                 (line.Flags & ~allowed) != EditorLineFlags.None)
                 throw new IOException("Invalid decoded logical line.");
         }
