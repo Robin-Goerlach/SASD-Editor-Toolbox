@@ -30,6 +30,7 @@ internal interface IMicroStarPrintSink
 internal sealed class MicroStarPrintJob : IEditorBackgroundTask
 {
     private readonly string[] _lines;
+    private readonly MicroStarPrintRecord[]? _typedRecords;
     private readonly IMicroStarPrintSink _sink;
     private int _next;
     private bool _sinkClosed;
@@ -48,9 +49,24 @@ internal sealed class MicroStarPrintJob : IEditorBackgroundTask
             CloseSink();
     }
 
-    internal int TotalLines => _lines.Length;
+    /// <summary>
+    /// Typed records are deliberately stored independently of legacy text.
+    /// No control-byte detection is performed on actual document text.
+    /// </summary>
+    internal MicroStarPrintJob(
+        IEnumerable<MicroStarPrintRecord> records, MicroStarPrintFileSink sink)
+    {
+        ArgumentNullException.ThrowIfNull(records);
+        _sink = sink ?? throw new ArgumentNullException(nameof(sink));
+        _typedRecords = records.ToArray();
+        _lines = [];
+        if (_typedRecords.Length == 0)
+            CloseSink();
+    }
+
+    internal int TotalLines => _typedRecords?.Length ?? _lines.Length;
     internal int CompletedLines => _next;
-    internal bool IsFinished => _next == _lines.Length || IsCancelled;
+    internal bool IsFinished => _next == TotalLines || IsCancelled;
     internal bool IsCancelled { get; private set; }
     internal Exception? Failure { get; private set; }
 
@@ -96,8 +112,19 @@ internal sealed class MicroStarPrintJob : IEditorBackgroundTask
         // have printed a line immediately before reporting an I/O failure.
         try
         {
-            await _sink.WriteLineAsync(_lines[_next], cancellationToken)
-                .ConfigureAwait(false);
+            if (_typedRecords is not null)
+            {
+                // Only the explicitly typed path can express a page break.
+                // A literal form-feed line stays text, regardless of content.
+                await ((MicroStarPrintFileSink)_sink)
+                    .WriteRecordAsync(_typedRecords[_next], cancellationToken)
+                    .ConfigureAwait(false);
+            }
+            else
+            {
+                await _sink.WriteLineAsync(_lines[_next], cancellationToken)
+                    .ConfigureAwait(false);
+            }
             _next++;
             if (IsFinished) CloseSink();
         }
@@ -161,6 +188,25 @@ internal sealed class MicroStarPrintQueue(EditorSession session)
         if (_active is not null)
             session.Scheduler.Remove(_active);
         var job = new MicroStarPrintJob(lines, sink);
+        _active = job;
+        if (!job.IsFinished)
+            session.Scheduler.Add(job);
+        return true;
+    }
+
+    /// <summary>
+    /// Register a typed print-file job without converting control records
+    /// back to ambiguous strings. Existing callers of the legacy overload
+    /// continue to work until they can be migrated independently.
+    /// </summary>
+    internal bool TryStartTyped(
+        IEnumerable<MicroStarPrintRecord> records, MicroStarPrintFileSink sink)
+    {
+        if (_active is { IsFinished: false, Failure: null })
+            return false;
+        if (_active is not null)
+            session.Scheduler.Remove(_active);
+        var job = new MicroStarPrintJob(records, sink);
         _active = job;
         if (!job.IsFinished)
             session.Scheduler.Add(job);
