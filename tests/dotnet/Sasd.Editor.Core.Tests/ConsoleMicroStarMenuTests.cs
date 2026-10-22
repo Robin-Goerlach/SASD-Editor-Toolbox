@@ -56,6 +56,31 @@ public sealed class ConsoleMicroStarMenuTests
     }
 
     [Fact]
+    public void HistoricalSampleMenuChoicesRemainReachableAndExplicit()
+    {
+        // The handbook supplement lists several MicroStar application
+        // workflows beyond the reusable FIRST-ED semantic commands.
+        // These entries deliberately return no Core binding because the
+        // host must perform file selection, consent or print coordination.
+        // Keeping this regression next to the ordinary command map helps
+        // prevent a future menu refactor from silently losing access to
+        // already implemented sample workflows.
+        foreach (var choice in "TLPAHJK")
+        {
+            Assert.True(ConsoleMicroStarPopupLayout.IsMenuChoice(choice));
+            Assert.Null(ConsoleMicroStarMenuPolicy.Resolve(choice.ToString()));
+        }
+
+        // Q is cancellation, not an executable sample or core command.
+        Assert.True(ConsoleMicroStarPopupLayout.IsMenuChoice('Q'));
+        Assert.Null(ConsoleMicroStarMenuPolicy.Resolve("Q"));
+        Assert.Contains(ConsoleMicroStarPopupLayout.MenuLines,
+            line => line.Contains("Save/Open", StringComparison.Ordinal));
+        Assert.Contains(ConsoleMicroStarPopupLayout.MenuLines,
+            line => line.Contains("Print status", StringComparison.Ordinal));
+    }
+
+    [Fact]
     public void MenuUsesReadableActionLabelsAndExposesF10()
     {
         Assert.Contains("F10", ConsoleMicroStarMenuPolicy.Prompt);
