@@ -51,8 +51,13 @@ internal sealed class ConsolePromptEditor
             return ConsolePromptInputResult.Cancelled;
         }
 
-        if (key.Key == ConsoleKey.Enter)
+        if (key.Key == ConsoleKey.Enter || key.KeyChar == '\r' || key.KeyChar == '\n')
         {
+            // Some POSIX consoles supply Enter as a raw carriage return or
+            // line feed without a meaningful ConsoleKey. Treat both byte
+            // representations as submission, never as printable filename
+            // content. Cancellation was checked first, so an abort cannot
+            // be accidentally reclassified as acceptance.
             return ConsolePromptInputResult.Submitted;
         }
 
