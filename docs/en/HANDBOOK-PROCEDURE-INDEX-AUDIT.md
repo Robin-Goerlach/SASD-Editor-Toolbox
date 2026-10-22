@@ -233,3 +233,17 @@ This report therefore explicitly sets `projectParityEstablished: false` and
 `historicallyAccepted: false` until a distinct evidence-backed review
 mechanism exists. Supplementary historical names beyond the printed 123
 remain separately inventoried.
+
+## Prioritized evidence discovery from the generated report
+
+The report now additionally supplies `unlinkedRoutines` in printed-page
+order, each with its classification and documentary reference, as well as
+`classificationSummary` totals for linked and unlinked portable cases.
+This makes the next review candidates explicit while recognizing that
+`host-sample` and `not-applicable` routines may require terminal or
+platform evidence rather than shared portable fixtures.
+
+These additional fields are **coverage planning aids**, not passing test
+results. An unlinked item is not automatically unimplemented, and a
+linked item is not automatically historically accepted. The complete
+123-entry inventory remains authoritative for the scope of this report.
