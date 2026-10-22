@@ -92,11 +92,47 @@ internal sealed class ConsoleFirstEdHost : IEditorInputPump
             }
         }
 
+        // MicroStar's F10 application menu is a host feature, not part of
+        // the historical FIRST-ED command vocabulary. Intercept it before
+        // handing input to the generic key map; a pending Ctrl-K/O/Q prefix
+        // must not leak into the menu's eventual semantic command.
+        if (keyStroke.Key == EditorKey.F10
+            && keyStroke.Modifiers == EditorKeyModifiers.None)
+        {
+            _keyMap.Reset();
+            var menuMessage = await ExecuteMicroStarMenuAsync(cancellationToken)
+                .ConfigureAwait(false);
+            Render(_hooks.TakeMessage() ?? menuMessage);
+            return true;
+        }
+
         var action = _keyMap.Translate(keyStroke);
         var message = await ExecuteActionAsync(action, cancellationToken).ConfigureAwait(false);
         message = _hooks.TakeMessage() ?? message;
         Render(message);
         return true;
+    }
+
+    /// <summary>
+    /// Executes a menu action through precisely the same prompt resolver and
+    /// command dispatcher as a keyboard action. F10 never edits the document
+    /// merely by opening the menu; cancellation is a strict no-op.
+    /// </summary>
+    private async ValueTask<string?> ExecuteMicroStarMenuAsync(
+        CancellationToken cancellationToken)
+    {
+        var choice = _renderer.ReadMicroStarMenu();
+        var binding = ConsoleMicroStarMenuPolicy.Resolve(choice);
+        if (binding is null)
+            return "Menu cancelled.";
+
+        var request = _prompts.Resolve(binding, _renderer.VisibleTextRows);
+        if (request is null)
+            return "Menu command cancelled.";
+
+        var executed = await _dispatcher.ExecuteAsync(request, cancellationToken)
+            .ConfigureAwait(false);
+        return executed ? null : "Menu command was not executed.";
     }
 
     private async ValueTask<string?> ExecuteActionAsync(

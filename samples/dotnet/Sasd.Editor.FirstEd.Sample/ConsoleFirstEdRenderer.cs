@@ -107,13 +107,26 @@ internal sealed class ConsoleFirstEdRenderer(EditorSession session)
         WriteRow(
             height - 1,
             string.IsNullOrWhiteSpace(message)
-                ? "Ctrl-O O New window | Ctrl-O Y Delete | Ctrl-K X Exit | Esc Undo | Ctrl-Q F Find"
+                ? "F10 Menu | Ctrl-O O New window | Ctrl-K X Exit | Esc Undo | Ctrl-Q F Find"
                 : message,
             width,
             role: FirstEdColorRole.Command);
 
         PositionCursor(textWidth);
         Console.CursorVisible = true;
+    }
+
+    /// <summary>
+    /// Displays a MicroStar-style application menu in the existing command
+    /// area. This FIRST slice intentionally reuses the safe prompt renderer:
+    /// actual overlapping screen popups (MakeWindow/RestoreWindow) are a
+    /// separate historical feature and are not claimed by this method.
+    /// </summary>
+    public string? ReadMicroStarMenu()
+    {
+        // A normal Render restores all underlying editor rows after the
+        // choice. No document buffer or viewport state is changed here.
+        return ReadPrompt(ConsoleMicroStarMenuPolicy.Prompt);
     }
 
     public string? ReadPrompt(string prompt)
