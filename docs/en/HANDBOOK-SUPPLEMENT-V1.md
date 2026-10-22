@@ -29,7 +29,7 @@ unmodified in their own ordered inventory.
 | `EDITERR.MSG` customizable numeric message file | p. 54 | Deliberately replaced by typed/localizable error catalog; legacy file interchange not implemented |
 | MicroStar F10 pull-down menus | pp. 42, 44-52 | Not implemented |
 | MicroStar pop-ups `MakeWindow` / `RestoreWindow` | p. 53 | Not implemented |
-| MicroStar incremental background printing `PrintNext` | p. 53 | Scheduler implemented, print feature missing |
+| MicroStar incremental background printing `PrintNext` | p. 53 | Partial: print-to-file, pagination and status implemented; exact historical printer behavior remains unverified |
 | MicroStar directory browser and file rename/copy/delete | p. 42 | Not implemented |
 | MicroStar Read Block / Write Block | p. 45 | Not implemented as block-specific file commands |
 | MicroStar Save & Open / Abandon & Open | p. 45 | Not implemented as combined workflows |
