@@ -182,11 +182,11 @@ internal sealed class ConsoleFirstEdHost : IEditorInputPump
             // scheduling, so subsequent edits cannot change page boundaries.
             // The 60-row default is explicitly a modern SASD policy, not an
             // assertion about undocumented historical printer settings.
-            var lines = MicroStarPrintPagination.Prepare(
+            var lines = MicroStarTypedPrintPagination.Prepare(
                 _session.CurrentWindow.Document.Buffer.Snapshot()
                     .Select(line => line.Text));
             var sink = new MicroStarPrintFileSink(path);
-            if (!_printQueue.TryStart(lines, sink))
+            if (!_printQueue.TryStartTyped(lines, sink))
             {
                 sink.Dispose();
                 return "A background print job is already active.";
