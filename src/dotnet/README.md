@@ -1,5 +1,7 @@
 # .NET implementation lane
 
+**English** | [Deutsch](README.de.md)
+
 This directory contains the active **C#/.NET reference implementation** of the SASD Editor Toolbox.
 
 > **Status:** active reference implementation  
