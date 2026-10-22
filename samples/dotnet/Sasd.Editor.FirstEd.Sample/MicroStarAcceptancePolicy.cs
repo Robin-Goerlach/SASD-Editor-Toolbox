@@ -33,11 +33,10 @@ internal static class MicroStarAcceptancePolicy
         // to see exactly which proof obligations define full acceptance.
         // This method is a policy for future sign-off, not a claim that
         // today's MicroStar sample already satisfies all of them.
-        return evidence.HandbookBehaviorReviewed
-            && evidence.ImplementationTraced
-            && evidence.AutomatedTestsPassed
-            && (!evidence.InteractiveCheckRequired || evidence.InteractiveCheckPassed)
-            && evidence.DivergencesReviewed
-            && evidence.FinalParityReviewPassed;
+        // One source of truth: the detailed report and yes/no decision must
+        // never disagree after a new evidence gate is introduced. Future
+        // policy changes should be implemented in Missing(), where the
+        // reviewer can also see the precise reason for non-acceptance.
+        return MicroStarAcceptanceReport.IsReady(evidence);
     }
 }
