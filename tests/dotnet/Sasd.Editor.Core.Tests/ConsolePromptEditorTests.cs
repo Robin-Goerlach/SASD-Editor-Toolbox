@@ -175,7 +175,7 @@ public sealed class ConsolePromptEditorTests
         Assert.Equal(ConsolePromptInputResult.Continue, editor.Process(Key('n')));
         Assert.Equal("n", editor.Answer);
         Assert.Equal(ConsolePromptInputResult.Submitted,
-            editor.Process(new ConsoleKeyInfo('\\r', ConsoleKey.Enter, false, false, false)));
+            editor.Process(new ConsoleKeyInfo('\r', ConsoleKey.Enter, false, false, false)));
     }
 
     [Fact]
@@ -184,7 +184,7 @@ public sealed class ConsolePromptEditorTests
         var editor = new ConsolePromptEditor();
         editor.Process(Key('x'));
         Assert.Equal(ConsolePromptInputResult.Cancelled,
-            editor.Process(new ConsoleKeyInfo('\\u001b', ConsoleKey.Escape,
+            editor.Process(new ConsoleKeyInfo('\u001b', ConsoleKey.Escape,
                 false, false, false)));
 
         // Cancellation is a result of one keystroke, not sticky state.
