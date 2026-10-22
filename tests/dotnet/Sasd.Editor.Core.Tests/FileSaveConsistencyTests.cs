@@ -96,6 +96,43 @@ public sealed class FileSaveConsistencyTests
     }
 
     [Fact]
+    public async Task Save_ExternalCancellationDuringWrite_DoesNotAcknowledgeUnwrittenSnapshot()
+    {
+        using var cancellation = new CancellationTokenSource();
+        var codec = new PausingWriteCodec();
+        var session = new EditorSession(fileCodec: codec);
+        var window = session.CreateDocument("original");
+        session.Engine.InsertText("edited ");
+        var document = window.Document;
+        var previousLines = document.Buffer.Snapshot();
+        var previousVersion = document.Version;
+        var previousCursor = window.Cursor;
+        var previousUndoCount = session.Undo.Count;
+        var path = Path.Combine(Path.GetTempPath(), $"sasd-cancelled-{Guid.NewGuid():N}.txt");
+
+        // Hold the codec before it can complete its write. An external
+        // cancellation is control flow, not proof that the snapshot reached
+        // durable storage; acknowledging it would silently lose the dirty
+        // indicator and falsely associate the requested destination path.
+        var pending = session.Files.SaveCurrentWindowAsync(
+            path, cancellation.Token).AsTask();
+        await codec.Started;
+        cancellation.Cancel();
+
+        // The test codec honors the token through WaitAsync; no delay, polling
+        // or platform-specific filesystem permissions are needed.
+        await Assert.ThrowsAnyAsync<OperationCanceledException>(
+            async () => await pending);
+
+        Assert.Equal(previousLines, document.Buffer.Snapshot());
+        Assert.Equal(previousVersion, document.Version);
+        Assert.Equal(previousCursor, window.Cursor);
+        Assert.Equal(previousUndoCount, session.Undo.Count);
+        Assert.True(document.IsDirty);
+        Assert.Null(document.FilePath);
+    }
+
+    [Fact]
     public void MarkSnapshotSaved_RejectsDifferentContentEvenWithMatchingVersion()
     {
         var session = new EditorSession();
