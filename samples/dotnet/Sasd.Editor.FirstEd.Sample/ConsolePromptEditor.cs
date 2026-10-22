@@ -20,6 +20,23 @@ internal sealed class ConsolePromptEditor
     public string Answer => _answer.ToString();
 
     /// <summary>
+    /// Clear the editable response when a host starts a new prompt or
+    /// explicitly dismisses the old command-line contents.
+    /// </summary>
+    /// <remarks>
+    /// This is an in-memory reset only. It deliberately does not move the
+    /// terminal cursor, overwrite the physical command row or mutate the
+    /// editor document. Those are separate presentation responsibilities.
+    /// Because cancellation is returned as a per-key result rather than
+    /// stored in this model, resetting cannot leak an old abort into a
+    /// subsequent prompt.
+    /// </remarks>
+    public void Reset()
+    {
+        _answer.Clear();
+    }
+
+    /// <summary>
     /// Handles one physical prompt key without performing console operations.
     /// Ctrl-U cancels an active prompt as a host-level interruption; it does not
     /// leave an editor-wide abort flag that could affect a later command.
