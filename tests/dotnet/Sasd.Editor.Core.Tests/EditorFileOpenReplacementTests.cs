@@ -52,7 +52,7 @@ public sealed class EditorFileOpenReplacementTests
     public async Task MalformedCodecDoesNotDetachSource()
     {
         var session = new EditorSession(fileCodec: new FixtureCodec(
-            new EditorLineSnapshot("valid"), new EditorLineSnapshot("bad\\nline")));
+            new EditorLineSnapshot("valid"), new EditorLineSnapshot("bad\nline")));
         var window = session.CreateDocument("preserve");
         var doc = window.Document;
         await Assert.ThrowsAsync<IOException>(async () =>
