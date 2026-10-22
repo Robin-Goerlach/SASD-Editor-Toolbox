@@ -278,14 +278,14 @@ internal sealed class ConsoleFirstEdRenderer(EditorSession session)
             // Unicode/control-character sanitization before Console.Write.
             var content = new List<string> { "MICROSTAR FILE BROWSER" };
             var folder = browser.CurrentDirectory;
-            content.Add(folder.Length > 50 ? "..." + folder[^47..] : folder);
+            content.Add(MicroStarBrowserDisplay.SafeLabel(folder, 50));
             var visible = browser.VisibleEntries;
             var index = 0;
             foreach (var entry in visible)
             {
                 var selected = browser.Selection.Selected?.Id == entry.FullPath;
                 var label = (entry.IsDirectory ? "[DIR] " : "      ") + entry.Name;
-                if (label.Length > 50) label = label[..47] + "...";
+                label = MicroStarBrowserDisplay.SafeLabel(label, 50);
                 content.Add((selected ? "> " : "  ") + label);
                 index++;
             }
