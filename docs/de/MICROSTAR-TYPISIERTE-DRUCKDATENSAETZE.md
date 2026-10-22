@@ -14,3 +14,13 @@ Die alte String-Schnittstelle bleibt vorerst für vorhandene Aufrufer
 erhalten. Der produktive F10-Dateidruck nutzt den typisierten Pfad.
 Echte Druckerhardware, Seiteneinstellungen und die genaue historische
 Borland-`PrintNext`-Semantik sind weiterhin nicht abgenommen.
+
+## Prüfung der vollständigen Druckanweisungen
+
+Vor der Scheduler-Anmeldung werden alle typisierten Datensätze geprüft:
+Textdatensätze benötigen Text, Seitenwechsel dürfen keinen Text tragen
+und unbekannte Datensatzarten werden abgewiesen. Ein ungültiger späterer
+Datensatz kann dadurch nicht erst nach teilweiser Ausgabe entdeckt werden.
+Scheitert die Prüfung, verbleibt die Verantwortung für die Freigabe des
+Ausgabeadapters beim Aufrufer. Ein Regressionstest prüft, dass weder
+Scheduler-Arbeit noch Ausgabebytes entstehen.
