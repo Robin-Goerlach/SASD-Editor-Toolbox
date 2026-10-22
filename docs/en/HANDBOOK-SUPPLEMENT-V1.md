@@ -101,3 +101,13 @@ historical parity for any real feature.
 MicroStar features, much less all 123 indexed FIRST-ED procedures, are
 covered. The feature inventory must be independently reconciled before
 a project-wide parity statement can be made.
+
+## Defensive parsing of modern search options
+
+The console sample's C/W/R options are a **modern** user-interface grammar,
+not a reconstructed Borland `Optstr` format. Only ordinary ASCII spaces,
+commas and semicolons separate option letters. Control characters, pasted
+newlines and Unicode whitespace are rejected; the search command is not
+created on invalid input. Headless tests guard these cases while preserving
+existing case-sensitive, whole-word and wrap semantics. Exact historical
+`Optstr` syntax and behavior remain unverified.
