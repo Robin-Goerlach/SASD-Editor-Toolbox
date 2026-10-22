@@ -91,8 +91,18 @@ internal sealed class MicroStarPrintJob : IEditorBackgroundTask
         }
         catch (OperationCanceledException) when (cancellationToken.IsCancellationRequested)
         {
-            // External cancellation belongs to scheduler control flow.
-            // It must not be mistaken for a failed printer.
+            // Cancellation can reach us AFTER an output slice has begun.
+            // A file-backed sink keeps an exclusive handle open until its
+            // owning job releases it. Without cleanup here, cancelling the
+            // editor loop could strand a partially written print file until
+            // process exit. Preserve cancellation as caller control flow,
+            // but terminate this job and release its owned output first.
+            //
+            // Do NOT increment _next: a cancelled write may have produced
+            // a partial record. Do NOT automatically retry: the destination
+            // may already have accepted those bytes.
+            IsCancelled = true;
+            CloseSink();
             throw;
         }
         catch (Exception error) when (error is IOException or UnauthorizedAccessException
