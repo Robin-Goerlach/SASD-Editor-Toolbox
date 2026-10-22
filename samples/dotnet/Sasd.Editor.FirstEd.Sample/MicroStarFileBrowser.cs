@@ -55,6 +55,22 @@ internal sealed class MicroStarFileBrowser
     internal int FirstVisible => _selection.FirstVisible;
     internal int TotalEntries => _entries.Length;
 
+    /// <summary>
+    /// Current filesystem identity, not the abbreviated screen caption.
+    /// File operations must use this value and refuse directories.
+    /// </summary>
+    internal MicroStarDirectoryEntry? SelectedEntry =>
+        _selection.Selected is { } item
+            ? _entries.First(entry => entry.FullPath == item.Id)
+            : null;
+
+    /// <summary>
+    /// After a successful copy/rename, obtain a fresh listing. The same
+    /// prepare-then-commit logic is used as directory navigation, so an
+    /// I/O error leaves the old list intact.
+    /// </summary>
+    internal void Refresh() => Navigate(CurrentDirectory);
+
     internal MicroStarBrowserResult Handle(ConsoleKey key, ConsoleModifiers modifiers = 0)
     {
         if (key == ConsoleKey.Escape ||

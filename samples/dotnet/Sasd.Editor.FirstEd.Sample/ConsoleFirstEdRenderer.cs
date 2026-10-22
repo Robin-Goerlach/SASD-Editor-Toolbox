@@ -290,7 +290,7 @@ internal sealed class ConsoleFirstEdRenderer(EditorSession session)
                 index++;
             }
             if (index == 0) content.Add("  (Empty directory)");
-            content.Add("Enter=Open/Select  Backspace=Up  Esc=Cancel");
+            content.Add("Enter=Open  F5=Copy  F6=Rename  Backspace=Up  Esc=Cancel");
             var layout = ConsoleMicroStarPopupLayout.Create(
                 Console.WindowWidth, Console.WindowHeight, content);
 
@@ -311,6 +311,48 @@ internal sealed class ConsoleFirstEdRenderer(EditorSession session)
             {
                 lease.Dispose();
                 Render();
+            }
+
+            // F5/F6 are browser-only file actions. Do not feed them to
+            // the normal editor key map or interpret directory captions
+            // as paths. The operation is performed only after explicitly
+            // entering a new target name; existing destinations are refused
+            // by the filesystem service itself.
+            var fileAction = MicroStarFileActionPolicy.Resolve(key.Key,
+                key.Modifiers, browser.SelectedEntry);
+            if (fileAction.HasValue)
+            {
+                var destinationText = ReadPrompt(
+                    fileAction.Value == MicroStarFileAction.Copy
+                        ? "Copy to new file path: "
+                        : "Rename to new file path: ");
+                if (string.IsNullOrWhiteSpace(destinationText))
+                    continue;
+
+                var destination = MicroStarFileActionPolicy.ResolveDestination(
+                    browser.CurrentDirectory, destinationText);
+                try
+                {
+                    var source = browser.SelectedEntry!.FullPath;
+                    if (fileAction.Value == MicroStarFileAction.Copy)
+                        MicroStarFileOperations.Copy(source, destination);
+                    else
+                        MicroStarFileOperations.Rename(source, destination);
+                    browser.Refresh();
+                }
+                catch (IOException error)
+                {
+                    // A failed operation must be visible instead of silently
+                    // looking successful. Never offer to overwrite on error.
+                    ReadPrompt("File operation failed: " +
+                        MicroStarBrowserDisplay.SafeLabel(error.Message, 50) +
+                        "  Press Enter: ");
+                }
+                catch (UnauthorizedAccessException)
+                {
+                    ReadPrompt("Access denied. Press Enter: ");
+                }
+                continue;
             }
 
             // A failed directory transition propagates as an error; no
