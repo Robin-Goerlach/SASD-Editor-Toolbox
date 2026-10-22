@@ -44,6 +44,16 @@ class TraceabilityReportTests(unittest.TestCase):
         self.assertFalse(report["projectParityEstablished"])
         self.assertTrue(all(not r["historicallyAccepted"] for r in report["routines"]))
 
+    def test_unlinked_review_queue_is_page_ordered_and_classified(self):
+        report = build_report(self.root)
+        self.assertEqual(
+            [{"name": "B", "page": 118, "classification": "implemented",
+              "evidenceDocument": "docs/en/proof.md"}],
+            report["unlinkedRoutines"])
+        self.assertEqual(
+            {"total": 2, "withPortableFixture": 1, "withoutPortableFixture": 1},
+            report["classificationSummary"]["implemented"])
+
     def test_unknown_fixture_is_rejected(self):
         self._json("docs/handbook-procedure-index-v1.json",
                    {"entries": [self.entry("A", ["nonexistent"])]})
