@@ -141,25 +141,29 @@ internal sealed class ConsoleFirstEdRenderer(EditorSession session)
         if (layout is null)
             return ReadPrompt(ConsoleMicroStarMenuPolicy.Prompt);
 
+        // Navigation state is independent of physical Console APIs. The host
+        // translates the keyboard into a pure policy result; no text mutation
+        // or editor command occurs until a selection is explicitly accepted.
+        var navigation = new ConsoleMicroStarMenuNavigation();
         using var lease = _overlays.Push(layout);
         try
         {
             Render();
+            DrawMicroStarPopup(layout, navigation.SelectedChoice);
             while (true)
             {
                 var key = Console.ReadKey(intercept: true);
-                if (key.Key == ConsoleKey.Escape ||
-                    (key.Modifiers.HasFlag(ConsoleModifiers.Control) &&
-                     key.Key == ConsoleKey.U))
+                var result = navigation.Handle(key.Key, key.KeyChar, key.Modifiers);
+                if (result.Kind == MicroStarMenuResultKind.Cancel)
                     return null;
+                if (result.Kind == MicroStarMenuResultKind.Accept)
+                    return result.Choice.ToString();
 
-                // The popup uses direct one-key actions. No ambiguity from
-                // Ctrl-K/O/Q prefixes and no keyboard focus kept afterwards.
-                if (key.KeyChar == '\0' || char.IsControl(key.KeyChar))
-                    continue;
-                var letter = char.ToUpperInvariant(key.KeyChar);
-                if (ConsoleMicroStarPopupLayout.IsMenuChoice(letter))
-                    return letter.ToString();
+                // Only selection changes require repainting. The underlying
+                // editor remains the source of truth and is never edited by
+                // navigating a menu.
+                if (result.Kind == MicroStarMenuResultKind.SelectionChanged)
+                    DrawMicroStarPopup(layout, navigation.SelectedChoice);
             }
         }
         finally
@@ -170,11 +174,12 @@ internal sealed class ConsoleFirstEdRenderer(EditorSession session)
         }
     }
 
-    private static void DrawMicroStarPopup(ConsoleMicroStarPopupLayout layout)
+    private static void DrawMicroStarPopup(
+        ConsoleMicroStarPopupLayout layout, char? selected = null)
     {
         for (var row = 0; row < layout.Height; row++)
         {
-            var line = layout.GetRow(row);
+            var line = layout.GetRow(row, selected);
             // Reuse WriteRow's Unicode/control-code sanitization. Draw only
             // a bounded horizontal span and preserve cells on either side.
             // Popup rows intentionally consist of safe printable ASCII.

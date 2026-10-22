@@ -75,7 +75,7 @@ internal sealed class ConsoleMicroStarPopupLayout
     /// previous popup's content into the terminal. The renderer never writes
     /// beyond the exclusive Right boundary.
     /// </summary>
-    internal string GetRow(int row)
+    internal string GetRow(int row, char? selectedChoice = null)
     {
         if (row < 0 || row >= Height)
             throw new ArgumentOutOfRangeException(nameof(row));
@@ -84,6 +84,26 @@ internal sealed class ConsoleMicroStarPopupLayout
             return "+" + new string('-', Width - 2) + "+";
 
         var content = _lines[row - 1];
+
+        // The selected command is indicated by replacing its shortcut with
+        // a '>' cursor. Selection never changes the original menu definition
+        // or the fixed popup width; no leftover glyphs survive repainting.
+        // A token must begin at the start of a menu item (line start or after
+        // whitespace), avoiding accidental highlighting inside descriptions.
+        if (selectedChoice.HasValue)
+        {
+            var letter = char.ToUpperInvariant(selectedChoice.Value);
+            for (var i = 0; i < content.Length; i++)
+            {
+                if (content[i] == letter
+                    && (i == 0 || content[i - 1] == ' ')
+                    && i + 1 < content.Length && content[i + 1] == ' ')
+                {
+                    content = content[..i] + ">" + content[(i + 1)..];
+                    break;
+                }
+            }
+        }
         return "| " + content.PadRight(Width - 4) + " |";
     }
 
