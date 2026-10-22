@@ -182,6 +182,57 @@ public sealed class MicroStarPrintJobTests
         public void Dispose() => Disposals++;
     }
 
+    [Fact]
+    public async Task CompletedJobUnregistersItselfButRetainsReadableStatus()
+    {
+        var session = new EditorSession();
+        var queue = new MicroStarPrintQueue(session);
+        Assert.True(queue.TryStart(["done"], new RecordingSink()));
+
+        await session.Scheduler.RunIdleCycleAsync();
+
+        // Terminal status remains available through the queue after the
+        // scheduler releases the task registration. An idle cycle must not
+        // retain dead work or accidentally repeat a completed print record.
+        Assert.True(queue.Active!.IsFinished);
+        Assert.Empty(session.Scheduler.Tasks);
+        Assert.Equal("Print complete: 1/1 records.",
+            MicroStarPrintStatus.Describe(queue.Active));
+    }
+
+    [Fact]
+    public async Task FailedJobUnregistersItselfWithoutLosingError()
+    {
+        var session = new EditorSession();
+        var queue = new MicroStarPrintQueue(session);
+        Assert.True(queue.TryStart(["cannot write"], new RecordingSink { Fail = true }));
+
+        await session.Scheduler.RunIdleCycleAsync();
+
+        Assert.Empty(session.Scheduler.Tasks);
+        Assert.IsType<IOException>(queue.Active!.Failure);
+        Assert.Equal("Print failed after 0/1 records.",
+            MicroStarPrintStatus.Describe(queue.Active));
+    }
+
+    [Fact]
+    public async Task MidSliceCancellationUnregistersJob()
+    {
+        var session = new EditorSession();
+        var sink = new CancelledOutputSink();
+        var queue = new MicroStarPrintQueue(session);
+        Assert.True(queue.TryStart(["partial"], sink));
+        using var cancellation = new CancellationTokenSource();
+        sink.CancelDuringWrite = cancellation;
+
+        await Assert.ThrowsAnyAsync<OperationCanceledException>(async () =>
+            await session.Scheduler.RunIdleCycleAsync(cancellation.Token));
+
+        Assert.True(queue.Active!.IsCancelled);
+        Assert.True(sink.Disposed);
+        Assert.Empty(session.Scheduler.Tasks);
+    }
+
     private sealed class RecordingSink : IMicroStarPrintSink
     {
         internal List<string> Lines { get; } = [];
