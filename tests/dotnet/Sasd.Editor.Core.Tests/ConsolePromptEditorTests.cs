@@ -234,6 +234,25 @@ public sealed class ConsolePromptEditorTests
         Assert.Equal("a", editor.Answer);
     }
 
+    [Theory]
+    [InlineData('\r')]
+    [InlineData('\n')]
+    public void UnnamedTerminalEnterSubmitsWithoutAppendingControlBytes(char terminator)
+    {
+        var editor = new ConsolePromptEditor();
+        editor.Process(Key('a'));
+
+        // Linux pseudo-terminals can report Return as a raw byte with
+        // ConsoleKey.NoName rather than ConsoleKey.Enter. Both CR and LF
+        // must submit exactly the answer the user typed. This is a host
+        // portability rule, not a claim of historical DOS input parity.
+        var result = editor.Process(new ConsoleKeyInfo(
+            terminator, ConsoleKey.NoName, false, false, false));
+
+        Assert.Equal(ConsolePromptInputResult.Submitted, result);
+        Assert.Equal("a", editor.Answer);
+    }
+
     private static ConsoleKeyInfo Key(char character) =>
         new(character, ConsoleKey.A, false, false, false);
 }
