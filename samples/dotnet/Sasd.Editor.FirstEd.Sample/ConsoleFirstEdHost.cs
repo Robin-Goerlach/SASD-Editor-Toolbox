@@ -140,6 +140,8 @@ internal sealed class ConsoleFirstEdHost : IEditorInputPump
 
         if (string.Equals(choice, "H", StringComparison.OrdinalIgnoreCase))
             return BeginMicroStarPrint();
+        if (string.Equals(choice, "J", StringComparison.OrdinalIgnoreCase))
+            return MicroStarPrintStatus.Describe(_printQueue.Active);
         if (string.Equals(choice, "K", StringComparison.OrdinalIgnoreCase))
         {
             _printQueue.Cancel();
