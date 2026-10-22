@@ -61,6 +61,16 @@ internal sealed class ConsolePromptEditor
             return ConsolePromptInputResult.Submitted;
         }
 
+        if (key.Key == ConsoleKey.Tab || key.KeyChar == '\t')
+        {
+            // The prompt edits file paths and search expressions, not a
+            // tabular document. A physical Tab is a navigation/control key
+            // and must not silently become part of the command argument.
+            // Some terminal drivers provide only raw HT (0x09), so both
+            // named and unnamed forms are intentionally covered.
+            return ConsolePromptInputResult.Continue;
+        }
+
         if (key.Key == ConsoleKey.Delete)
         {
             // The sample prompt is an append-only editing surface: its
