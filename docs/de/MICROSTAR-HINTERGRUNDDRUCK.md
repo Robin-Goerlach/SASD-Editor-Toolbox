@@ -50,3 +50,15 @@ Dies sind moderne Sicherheitsregeln für den Ressourcenlebenszyklus und keine
 behauptete 1:1-Umsetzung historischer Borland-Druckerhardware. Zwei
 Regressionstests überprüfen die Freigabe bei leerem Auftrag und genau
 einmalige Freigabe nach erfolgreicher Ausgabe.
+
+## Beendete Druckaufträge aus dem Scheduler entfernen
+
+Nach Abschluss, Fehler oder Abbruch trägt sich ein Druckauftrag jetzt
+automatisch aus dem kooperativen Scheduler aus. Das geschieht auch dann,
+wenn während der Ausgabe eine Abbruchausnahme weitergereicht wird.
+
+Die Druckwarteschlange behält das letzte Auftragsobjekt zur Statusanzeige
+(`F10 → J`). Die Registrierung im Scheduler bedeutet also nur noch,
+dass echte Hintergrundarbeit aussteht. Die bereits vorhandene
+Snapshot-Iteration des Schedulers erlaubt die sichere Abmeldung während
+eines Schritts. Zusätzliche Tests sichern alle drei Endzustände ab.
