@@ -60,6 +60,37 @@ public sealed class MicroStarPrintFileSinkTests
     }
 
     [Fact]
+    public async Task TypedPrintKeepsLiteralFormFeedTextSeparateFromPageBreak()
+    {
+        var root = Path.Combine(Path.GetTempPath(),
+            "sasd-print-" + Guid.NewGuid().ToString("N"));
+        Directory.CreateDirectory(root);
+        try
+        {
+            var file = Path.Combine(root, "typed.txt");
+            var session = new EditorSession();
+            var queue = new MicroStarPrintQueue(session);
+
+            // Page size 1 forces a page break between two actual document
+            // lines. The first line is itself a literal FF: it must still
+            // receive its normal newline rather than be treated as an eject.
+            var records = MicroStarTypedPrintPagination.Prepare(["\f", "next"], 1);
+            Assert.Equal(3, records.Count);
+            Assert.Equal(MicroStarPrintRecordKind.Text, records[0].Kind);
+            Assert.Equal(MicroStarPrintRecordKind.PageBreak, records[1].Kind);
+            Assert.True(queue.TryStartTyped(records, new MicroStarPrintFileSink(file)));
+            while (!queue.Active!.IsFinished)
+                await session.Scheduler.RunIdleCycleAsync();
+
+            var expected = System.Text.Encoding.UTF8.GetBytes(
+                "\f" + Environment.NewLine + "\f" + "next" + Environment.NewLine);
+            Assert.Equal(expected, await File.ReadAllBytesAsync(file));
+            Assert.Empty(session.Scheduler.Tasks);
+        }
+        finally { Directory.Delete(root, true); }
+    }
+
+    [Fact]
     public void ExistingDestinationIsNeverTruncated()
     {
         var root = Path.Combine(Path.GetTempPath(), "sasd-print-" + Guid.NewGuid().ToString("N"));
