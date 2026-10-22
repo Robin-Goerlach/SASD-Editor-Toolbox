@@ -31,9 +31,23 @@ public sealed class EditorFileService
     /// import is rejected before mutation because its saved line anchor may no
     /// longer identify the intended location.
     /// </remarks>
-    public async ValueTask<int> ReadIntoCurrentWindowAsync(
+    public ValueTask<int> ReadIntoCurrentWindowAsync(
         string path,
-        CancellationToken cancellationToken = default)
+        CancellationToken cancellationToken = default) =>
+        ReadLinesAsync(path, selectImportedBlock: false, cancellationToken);
+
+    /// <summary>
+    /// Read Block reuses the existing fully validated import path. The only
+    /// semantic difference from Read File is marking the inserted whole lines
+    /// in the SAME transaction as the text insertion and topology repair.
+    /// </summary>
+    public ValueTask<int> ReadBlockIntoCurrentWindowAsync(
+        string path,
+        CancellationToken cancellationToken = default) =>
+        ReadLinesAsync(path, selectImportedBlock: true, cancellationToken);
+
+    private async ValueTask<int> ReadLinesAsync(
+        string path, bool selectImportedBlock, CancellationToken cancellationToken)
     {
         ArgumentException.ThrowIfNullOrWhiteSpace(path);
 
@@ -127,6 +141,16 @@ public sealed class EditorFileService
         _session.Topology.LinesInserted(document, insertionLine, decodedLines.Length);
 
         document.MarkChanged();
+
+        if (selectImportedBlock)
+        {
+            // The original initiating document is captured before awaited IO.
+            // Replacing the complete block avoids cursor movement, transient
+            // half-defined endpoints and a second, non-undoable state change.
+            _session.ReplaceBlockForTopology(new EditorBlock(
+                document.DocumentId, insertionLine,
+                insertionLine + decodedLines.Length - 1));
+        }
 
         // Do not restore the initiating cursor blindly: the host may have
         // explicitly navigated while I/O was pending. Topology realignment

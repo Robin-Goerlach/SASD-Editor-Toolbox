@@ -125,6 +125,9 @@ internal sealed class ConsoleFirstEdHost : IEditorInputPump
         if (string.Equals(choice, "T", StringComparison.OrdinalIgnoreCase))
             return await ExportSelectedBlockAsync(cancellationToken)
                 .ConfigureAwait(false);
+        if (string.Equals(choice, "L", StringComparison.OrdinalIgnoreCase))
+            return await ImportSelectedBlockAsync(cancellationToken)
+                .ConfigureAwait(false);
 
         var binding = ConsoleMicroStarMenuPolicy.Resolve(choice);
         if (binding is null)
@@ -164,6 +167,24 @@ internal sealed class ConsoleFirstEdHost : IEditorInputPump
         var exported = await ConsoleMicroStarBlockFileService.ExportAsync(
             _session, path, cancellationToken).ConfigureAwait(false);
         return exported ? "Marked block exported." : "Block export was not executed.";
+    }
+
+    /// <summary>
+    /// Only prompting and user feedback belong here. Actual block insertion,
+    /// all integrity checks and a single Undo step belong to Core's file
+    /// service, shared with the already-tested Read File implementation.
+    /// </summary>
+    private async ValueTask<string?> ImportSelectedBlockAsync(
+        CancellationToken cancellationToken)
+    {
+        var path = _renderer.ReadPrompt("Read block file: ");
+        if (string.IsNullOrWhiteSpace(path))
+            return "Block import cancelled.";
+
+        var count = await _session.Files.ReadBlockIntoCurrentWindowAsync(
+            path, cancellationToken).ConfigureAwait(false);
+        return count == 0 ? "Empty file; block selection unchanged."
+            : $"Imported and selected {count} line(s).";
     }
 
     private async ValueTask<string?> ExecuteActionAsync(
