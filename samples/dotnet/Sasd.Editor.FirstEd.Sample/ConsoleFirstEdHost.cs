@@ -176,8 +176,13 @@ internal sealed class ConsoleFirstEdHost : IEditorInputPump
 
         try
         {
-            var lines = _session.CurrentWindow.Document.Buffer.Snapshot()
-                .Select(line => line.Text).ToArray();
+            // Pagination is performed on a stable document snapshot BEFORE
+            // scheduling, so subsequent edits cannot change page boundaries.
+            // The 60-row default is explicitly a modern SASD policy, not an
+            // assertion about undocumented historical printer settings.
+            var lines = MicroStarPrintPagination.Prepare(
+                _session.CurrentWindow.Document.Buffer.Snapshot()
+                    .Select(line => line.Text));
             var sink = new MicroStarPrintFileSink(path);
             if (!_printQueue.TryStart(lines, sink))
             {
