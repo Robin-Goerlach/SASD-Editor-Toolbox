@@ -195,6 +195,27 @@ public sealed class ConsolePromptEditorTests
         Assert.Equal("y", editor.Answer);
     }
 
+    [Fact]
+    public void ResetAfterUnicodeEntryLeavesNoPartialGraphemeOrSurrogate()
+    {
+        var editor = new ConsolePromptEditor();
+
+        // A filename prompt can receive a combining sequence followed by
+        // a supplementary-plane symbol as separate ConsoleKeyInfo UTF-16
+        // values. Reset must discard the complete model buffer, not only
+        // clear the visible suffix of a narrow terminal projection.
+        foreach (var codeUnit in "e\u0301\ud83d\ude00")
+            editor.Process(Key(codeUnit));
+        Assert.NotEmpty(editor.Answer);
+
+        editor.Reset();
+
+        Assert.Empty(editor.Answer);
+        Assert.Equal("Name: ", editor.Project("Name: ", 30).Text);
+        editor.Process(Key('x'));
+        Assert.Equal("x", editor.Answer);
+    }
+
     private static ConsoleKeyInfo Key(char character) =>
         new(character, ConsoleKey.A, false, false, false);
 }
