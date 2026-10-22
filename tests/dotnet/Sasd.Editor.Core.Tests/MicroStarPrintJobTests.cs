@@ -134,6 +134,54 @@ public sealed class MicroStarPrintJobTests
         public void Dispose() => Disposed = true;
     }
 
+    [Fact]
+    public void EmptyJobReleasesSinkWithoutNeedingIdleCycle()
+    {
+        var session = new EditorSession();
+        var sink = new DisposeCountingSink();
+        var queue = new MicroStarPrintQueue(session);
+
+        Assert.True(queue.TryStart([], sink));
+        Assert.True(queue.Active!.IsFinished);
+        Assert.Empty(session.Scheduler.Tasks);
+        Assert.Equal(1, sink.Disposals);
+
+        // An already finished job is not cancelled retroactively, and its
+        // owned sink must not be disposed a second time.
+        queue.Cancel();
+        Assert.False(queue.Active.IsCancelled);
+        Assert.Equal(1, sink.Disposals);
+    }
+
+    [Fact]
+    public async Task CompletedJobDisposesExactlyOnceEvenAfterCancellation()
+    {
+        var session = new EditorSession();
+        var sink = new DisposeCountingSink();
+        var queue = new MicroStarPrintQueue(session);
+        Assert.True(queue.TryStart(["one"], sink));
+        await session.Scheduler.RunIdleCycleAsync();
+
+        Assert.True(queue.Active!.IsFinished);
+        Assert.Equal(1, sink.Disposals);
+        queue.Cancel();
+        Assert.Equal(1, sink.Disposals);
+        Assert.False(queue.Active.IsCancelled);
+    }
+
+    private sealed class DisposeCountingSink : IMicroStarPrintSink, IDisposable
+    {
+        internal int Disposals { get; private set; }
+
+        public ValueTask WriteLineAsync(string text, CancellationToken cancellationToken)
+        {
+            cancellationToken.ThrowIfCancellationRequested();
+            return ValueTask.CompletedTask;
+        }
+
+        public void Dispose() => Disposals++;
+    }
+
     private sealed class RecordingSink : IMicroStarPrintSink
     {
         internal List<string> Lines { get; } = [];
