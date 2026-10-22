@@ -44,6 +44,22 @@ public sealed class ConsoleFirstEdSearchOptionsTests
         Assert.Null(ConsoleFirstEdSearchOptionsPolicy.Attach(request, answer));
     }
 
+    [Theory]
+    [InlineData("C\nW")]
+    [InlineData("C\tW")]
+    [InlineData("C\rW")]
+    [InlineData("C\u00a0W")]
+    public void HiddenWhitespaceCannotSilentlyChangeSearchOptions(string answer)
+    {
+        // The modern option prompt intentionally accepts only ordinary
+        // spaces, commas and semicolons as separators. Pasted control or
+        // invisible Unicode whitespace must fail closed rather than
+        // quietly running a search with possibly unintended flags.
+        var request = new EditorCommandRequest(EditorCommandId.FindNext, Text: "needle");
+        Assert.Null(ConsoleFirstEdSearchOptionsPolicy.Attach(request, answer));
+        Assert.Null(request.Options); // never mutate an incoming request
+    }
+
     [Fact]
     public async Task SemanticFindHonorsOptionsAndRemembersThemForFindAgain()
     {
