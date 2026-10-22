@@ -15,7 +15,7 @@ internal static class ConsoleMicroStarMenuPolicy
     // A single line works even in the minimum three-row console. A later
     // actual pop-up/window layer can present the same bindings as a menu grid.
     internal const string Prompt =
-        "F10: F=Find R=Replace G=Goto S=Save W=Write I=Read U=Undo B=Begin E=End C=Copy M=Move D=Delete N=Next Q=Cancel: ";
+        "F10: F=Find R=Replace G=Goto S=Save W=Write I=Read U=Undo B=Begin E=End C=Copy M=Move D=Delete N=Next T=BlockFile Q=Cancel: ";
 
     /// <summary>
     /// Normalize only a single user-chosen menu letter. Enter, Escape,
@@ -41,6 +41,8 @@ internal static class ConsoleMicroStarMenuPolicy
             'M' => new(EditorCommandId.MoveBlock),
             'D' => new(EditorCommandId.DeleteBlock),
             'N' => new(EditorCommandId.NextWindow),
+            // T is a sample-local file command, not a Core command. It is
+            // handled by the host before trying to resolve a binding.
             'Q' => null,
             _ => null
         };

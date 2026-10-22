@@ -122,6 +122,10 @@ internal sealed class ConsoleFirstEdHost : IEditorInputPump
         CancellationToken cancellationToken)
     {
         var choice = _renderer.ReadMicroStarMenu();
+        if (string.Equals(choice, "T", StringComparison.OrdinalIgnoreCase))
+            return await ExportSelectedBlockAsync(cancellationToken)
+                .ConfigureAwait(false);
+
         var binding = ConsoleMicroStarMenuPolicy.Resolve(choice);
         if (binding is null)
             return "Menu cancelled.";
@@ -133,6 +137,33 @@ internal sealed class ConsoleFirstEdHost : IEditorInputPump
         var executed = await _dispatcher.ExecuteAsync(request, cancellationToken)
             .ConfigureAwait(false);
         return executed ? null : "Menu command was not executed.";
+    }
+
+    /// <summary>
+    /// MicroStar's block-only Write is distinct from Ctrl-K W, which writes
+    /// the entire document. The exporter is a sample application service;
+    /// the editor's reusable file/undo semantics remain unchanged.
+    /// </summary>
+    private async ValueTask<string?> ExportSelectedBlockAsync(
+        CancellationToken cancellationToken)
+    {
+        if (!ConsoleMicroStarBlockFileService.HasExportableBlock(_session))
+            return "Define a valid block before exporting it.";
+
+        var path = _renderer.ReadPrompt("Write marked block to file: ");
+        if (string.IsNullOrWhiteSpace(path))
+            return "Block export cancelled.";
+
+        // Match the existing write-file host safety policy: a pre-existing
+        // destination needs explicit YES, not the default Enter. Like normal
+        // File.Exists checks this is a UX safeguard, not a race-free lock.
+        if (File.Exists(path) && _renderer.ReadPrompt(
+            "File exists. Type YES to overwrite: ") != "YES")
+            return "Block export cancelled.";
+
+        var exported = await ConsoleMicroStarBlockFileService.ExportAsync(
+            _session, path, cancellationToken).ConfigureAwait(false);
+        return exported ? "Marked block exported." : "Block export was not executed.";
     }
 
     private async ValueTask<string?> ExecuteActionAsync(
