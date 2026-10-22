@@ -6,13 +6,13 @@ namespace Sasd.Editor.Core.Tests;
 public sealed class MicroStarFileActionPolicyTests
 {
     [Theory]
-    [InlineData(ConsoleKey.F5, MicroStarFileAction.Copy)]
-    [InlineData(ConsoleKey.F6, MicroStarFileAction.Rename)]
+    [InlineData(ConsoleKey.F5, 0)]
+    [InlineData(ConsoleKey.F6, 1)]
     public void OnlyExplicitFunctionKeysAllowRegularFileOperation(
-        ConsoleKey key, MicroStarFileAction expected)
+        ConsoleKey key, int expected)
     {
         var entry = new MicroStarDirectoryEntry("/tmp/file", "file", false);
-        Assert.Equal(expected, MicroStarFileActionPolicy.Resolve(key,
+        Assert.Equal((MicroStarFileAction)expected, MicroStarFileActionPolicy.Resolve(key,
             ConsoleModifiers.None, entry));
         Assert.Null(MicroStarFileActionPolicy.Resolve(key,
             ConsoleModifiers.Control, entry));
