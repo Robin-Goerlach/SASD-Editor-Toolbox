@@ -216,6 +216,24 @@ public sealed class ConsolePromptEditorTests
         Assert.Equal("x", editor.Answer);
     }
 
+    [Fact]
+    public void DeleteAtEndDoesNotBehaveLikeBackspace()
+    {
+        var editor = new ConsolePromptEditor();
+        editor.Process(Key('a'));
+        editor.Process(Key('b'));
+
+        // Prompt input is append-only and always keeps the caret after
+        // the last entered grapheme. Delete has nothing to remove to the
+        // right of the caret; Backspace must still remove the last item.
+        Assert.Equal(ConsolePromptInputResult.Continue,
+            editor.Process(new ConsoleKeyInfo('\0', ConsoleKey.Delete, false, false, false)));
+        Assert.Equal("ab", editor.Answer);
+
+        editor.Process(new ConsoleKeyInfo('\b', ConsoleKey.Backspace, false, false, false));
+        Assert.Equal("a", editor.Answer);
+    }
+
     private static ConsoleKeyInfo Key(char character) =>
         new(character, ConsoleKey.A, false, false, false);
 }
