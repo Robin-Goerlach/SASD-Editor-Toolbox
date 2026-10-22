@@ -123,6 +123,21 @@ internal sealed class MicroStarPrintJob : IEditorBackgroundTask
             Failure = error;
             CloseSink();
         }
+        finally
+        {
+            // Scheduler registration is an execution concern, not part of
+            // durable job status: the queue keeps the last job for display,
+            // while the scheduler should only retain work that can progress.
+            // Removing ourselves here is safe because EditorScheduler
+            // traverses a snapshot and checks current registration.
+            //
+            // This also runs while cancellation propagates to the caller;
+            // merely closing a sink must not leave a terminal task in the
+            // idle-task list. Keep unfinished jobs registered for their next
+            // cooperative slice.
+            if (IsFinished || Failure is not null)
+                session.Scheduler.Remove(this);
+        }
     }
 }
 
