@@ -46,3 +46,15 @@ cannot subsequently be changed into a cancelled job by a late host action.
 These are explicitly modern resource-lifecycle guarantees, not historical
 claims about Borland printer device ownership. Deterministic tests verify
 zero-line handling and disposal exactly once after normal completion.
+
+## Terminal job scheduler cleanup
+
+Completed, failed and cancelled print jobs remove themselves from the
+cooperative scheduler inside a `finally` block. This also applies if
+cancellation propagates out of an in-progress output operation.
+
+The print queue deliberately keeps the last job object so the `J`
+status command can still show the final result. Thus task registration
+means *work still to be executed*, not history. The scheduler already
+iterates a registration snapshot and tolerates callbacks removing their
+own task. Tests cover completion, I/O failure and mid-slice cancellation.
