@@ -51,7 +51,23 @@ internal sealed class MicroStarPrintJob : IEditorBackgroundTask
     /// Cancellation is local to this job, not to the EditorSession. The next
     /// scheduler callback becomes a no-op and cannot print an extra line.
     /// </summary>
-    internal void Cancel() => IsCancelled = true;
+    internal void Cancel()
+    {
+        if (IsFinished) return;
+        IsCancelled = true;
+        CloseSink();
+    }
+
+    /// <summary>
+    /// Relinquish an owned physical print-file handle at completion, failure
+    /// or explicit cancellation. Non-owning mock sinks remain unaffected.
+    /// This lets another process inspect or rename the completed output.
+    /// </summary>
+    private void CloseSink()
+    {
+        if (_sink is IDisposable disposable)
+            disposable.Dispose();
+    }
 
     public async ValueTask ExecuteSliceAsync(
         EditorSession session, CancellationToken cancellationToken)
@@ -71,6 +87,7 @@ internal sealed class MicroStarPrintJob : IEditorBackgroundTask
             await _sink.WriteLineAsync(_lines[_next], cancellationToken)
                 .ConfigureAwait(false);
             _next++;
+            if (IsFinished) CloseSink();
         }
         catch (OperationCanceledException) when (cancellationToken.IsCancellationRequested)
         {
@@ -82,6 +99,7 @@ internal sealed class MicroStarPrintJob : IEditorBackgroundTask
             or InvalidOperationException)
         {
             Failure = error;
+            CloseSink();
         }
     }
 }

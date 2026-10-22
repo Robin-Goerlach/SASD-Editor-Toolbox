@@ -26,6 +26,7 @@ internal sealed class ConsoleMicroStarPopupLayout
         "D Delete      T Write block",
         "L Read block  P Save/Open",
         "A Abandon/Open Q Cancel",
+        "H Print file   K Stop print",
         "ESC cancels"
     ];
 
@@ -109,5 +110,5 @@ internal sealed class ConsoleMicroStarPopupLayout
     }
 
     internal static bool IsMenuChoice(char letter) =>
-        "FRGUSWINBECMDTLPAQ".Contains(char.ToUpperInvariant(letter));
+        "FRGUSWINBECMDTLPAQHK".Contains(char.ToUpperInvariant(letter));
 }

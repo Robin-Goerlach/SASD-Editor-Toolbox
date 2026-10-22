@@ -19,6 +19,7 @@ internal sealed class ConsoleFirstEdHost : IEditorInputPump
     private readonly FirstEdKeyMap _keyMap = new();
     private readonly ConsoleFirstEdRenderer _renderer;
     private readonly ConsoleFirstEdPromptService _prompts;
+    private readonly MicroStarPrintQueue _printQueue;
 
     public ConsoleFirstEdHost(EditorSession session, ConsoleFirstEdHooks hooks)
     {
@@ -27,6 +28,7 @@ internal sealed class ConsoleFirstEdHost : IEditorInputPump
         _dispatcher = new EditorCommandDispatcher(session);
         _renderer = new ConsoleFirstEdRenderer(session);
         _prompts = new ConsoleFirstEdPromptService(_renderer, session);
+        _printQueue = new MicroStarPrintQueue(session);
     }
 
     public void Render(string? message = null) => _renderer.Render(message);
@@ -136,6 +138,14 @@ internal sealed class ConsoleFirstEdHost : IEditorInputPump
             return await SwitchMicroStarFileAsync(
                 MicroStarOpenDisposition.AbandonThenOpen, cancellationToken).ConfigureAwait(false);
 
+        if (string.Equals(choice, "H", StringComparison.OrdinalIgnoreCase))
+            return BeginMicroStarPrint();
+        if (string.Equals(choice, "K", StringComparison.OrdinalIgnoreCase))
+        {
+            _printQueue.Cancel();
+            return "Background print cancelled.";
+        }
+
         var binding = ConsoleMicroStarMenuPolicy.Resolve(choice);
         if (binding is null)
             return "Menu cancelled.";
@@ -147,6 +157,44 @@ internal sealed class ConsoleFirstEdHost : IEditorInputPump
         var executed = await _dispatcher.ExecuteAsync(request, cancellationToken)
             .ConfigureAwait(false);
         return executed ? null : "Menu command was not executed.";
+    }
+
+    /// <summary>
+    /// Start print-to-file without blocking on the document length. A new
+    /// physical output file is exclusively created before scheduling any
+    /// slices. The queue snapshots document lines; edits after this point
+    /// cannot redirect content already committed for printing.
+    /// </summary>
+    private string BeginMicroStarPrint()
+    {
+        if (_printQueue.Active is { IsFinished: false, Failure: null })
+            return "A background print job is already active.";
+
+        var path = _renderer.ReadPrompt("Print to NEW UTF-8 file path: ");
+        if (string.IsNullOrWhiteSpace(path))
+            return "Print cancelled.";
+
+        try
+        {
+            var lines = _session.CurrentWindow.Document.Buffer.Snapshot()
+                .Select(line => line.Text).ToArray();
+            var sink = new MicroStarPrintFileSink(path);
+            if (!_printQueue.TryStart(lines, sink))
+            {
+                sink.Dispose();
+                return "A background print job is already active.";
+            }
+            return $"Printing {lines.Length} line(s) in background.";
+        }
+        catch (IOException error)
+        {
+            return "Print not started: " +
+                MicroStarBrowserDisplay.SafeLabel(error.Message, 60);
+        }
+        catch (UnauthorizedAccessException)
+        {
+            return "Print not started: access denied.";
+        }
     }
 
     /// <summary>
