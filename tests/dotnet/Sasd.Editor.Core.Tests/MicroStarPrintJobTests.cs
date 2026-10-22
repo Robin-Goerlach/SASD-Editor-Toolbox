@@ -90,6 +90,50 @@ public sealed class MicroStarPrintJobTests
         Assert.Empty(session.Scheduler.Tasks);
     }
 
+    [Fact]
+    public async Task CancellationInsideOutputSliceClosesOwnedSinkAndPreservesCancellation()
+    {
+        var session = new EditorSession();
+        using var cancellation = new CancellationTokenSource();
+        var sink = new CancelledOutputSink();
+        var queue = new MicroStarPrintQueue(session);
+        Assert.True(queue.TryStart(["first", "second"], sink));
+
+        // Simulate cancellation while an output adapter has already been
+        // invoked. This differs from cancellation before scheduler dispatch:
+        // the adapter is now owned by the job and must be released.
+        cancellation.Cancel();
+        // The scheduler normally refuses a pre-cancelled token, so invoke
+        // the slice with a fresh token that the sink itself cancels.
+        using var duringWrite = new CancellationTokenSource();
+        sink.CancelDuringWrite = duringWrite;
+        await Assert.ThrowsAnyAsync<OperationCanceledException>(async () =>
+            await queue.Active!.ExecuteSliceAsync(session, duringWrite.Token));
+
+        Assert.True(queue.Active!.IsCancelled);
+        Assert.True(sink.Disposed);
+        Assert.Equal(0, queue.Active.CompletedLines);
+        await session.Scheduler.RunIdleCycleAsync();
+        Assert.Equal(1, sink.Attempts);
+    }
+
+    private sealed class CancelledOutputSink : IMicroStarPrintSink, IDisposable
+    {
+        internal CancellationTokenSource? CancelDuringWrite { get; set; }
+        internal int Attempts { get; private set; }
+        internal bool Disposed { get; private set; }
+
+        public ValueTask WriteLineAsync(string text, CancellationToken cancellationToken)
+        {
+            Attempts++;
+            CancelDuringWrite!.Cancel();
+            cancellationToken.ThrowIfCancellationRequested();
+            return ValueTask.CompletedTask;
+        }
+
+        public void Dispose() => Disposed = true;
+    }
+
     private sealed class RecordingSink : IMicroStarPrintSink
     {
         internal List<string> Lines { get; } = [];
