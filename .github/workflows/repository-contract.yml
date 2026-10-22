@@ -13,3 +13,7 @@ jobs:
       - uses: actions/checkout@v4
       - name: Verify multi-language repository contract
         run: python3 tools/verify_repository_contract.py
+      - name: Test handbook traceability report
+        run: python3 -m unittest discover -s tools -p 'test_report_handbook_traceability.py'
+      - name: Verify handbook traceability report against indexed inventory
+        run: python3 tools/report_handbook_traceability.py --output /tmp/handbook-traceability.json
