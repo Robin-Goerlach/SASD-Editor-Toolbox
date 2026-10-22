@@ -81,3 +81,14 @@ both keys on the same input.
 This is a modern host-input policy; historical Pascal Varstring edit keys,
 `Cmdcol` handling and real terminal integration still require independent
 acceptance and are not presented as Borland parity.
+
+## Raw terminal Return without a named key
+
+On some POSIX terminals Return reaches the host as a raw CR (`0x0D`) or
+LF (`0x0A`) with `ConsoleKey.NoName`. `ConsolePromptEditor.Process` now
+accepts both as submission, exactly like a named Enter key, without
+appending the control character to a search term or filename. This check
+comes after the host cancellation policy so cancellation remains dominant.
+A headless parameterized regression test covers both raw representations.
+Real terminal smoke testing and historical DOS `EditAskfor` parity remain
+separate acceptance tasks.
