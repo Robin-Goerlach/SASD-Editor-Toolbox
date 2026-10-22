@@ -14,3 +14,15 @@ sind weiterhin offene Punkte.
 
 Zusätzliche Tests prüfen Seitenwechsel, leere Eingaben und die
 Unveränderlichkeit vorbereiteter Ausdrucke.
+
+## Form-Feed in der Druckdatei
+
+Der Dateiausgabeadapter schreibt einen Seitenwechsel als einzelnes
+Byte `0x0C` ohne zusätzliches Zeilenende. Normale Textzeilen behalten
+das plattformübliche Zeilenende. Ein Byte-genauer Test kontrolliert
+diesen Unterschied unter Windows und Ubuntu. Es handelt sich um eine
+moderne SASD-Konvention, nicht um nachgewiesene historische
+Druckersteuerung. Eine Dokumentzeile, die nur aus Form-Feed besteht,
+ist im derzeitigen String-basierten Ausgabeformat nicht von einem
+Seitenwechsel zu unterscheiden; typisierte Druckdatensätze sind daher
+als mögliche spätere Verbesserung vorgesehen.
