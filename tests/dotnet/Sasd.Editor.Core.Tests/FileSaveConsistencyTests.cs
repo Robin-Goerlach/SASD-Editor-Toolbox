@@ -46,6 +46,35 @@ public sealed class FileSaveConsistencyTests
     }
 
     [Fact]
+    public async Task Save_SwitchingToDifferentDocumentDuringWrite_DoesNotAlterActiveDocument()
+    {
+        var codec = new PausingWriteCodec();
+        var session = new EditorSession(fileCodec: codec);
+        var source = session.CreateDocument("source");
+        session.Engine.InsertText("edited ");
+        var other = session.CreateDocument("unrelated");
+        session.SetCurrentWindow(source.WindowId);
+        var path = Path.Combine(Path.GetTempPath(), $"sasd-origin-{Guid.NewGuid():N}.txt");
+
+        // The pending save belongs to the initiating document, not to whatever
+        // view becomes active while the codec is awaiting external I/O.
+        var pending = session.Files.SaveCurrentWindowAsync(path).AsTask();
+        await codec.Started;
+        session.SetCurrentWindow(other.WindowId);
+        codec.Complete();
+
+        Assert.True(await pending);
+        Assert.Same(other, session.CurrentWindow);
+        Assert.Equal("edited source", Assert.Single(codec.WrittenLines!).Text);
+        Assert.Equal(Path.GetFullPath(path), source.Document.FilePath);
+        Assert.False(source.Document.IsDirty);
+        Assert.Equal("unrelated", other.Document.Buffer.GetLine(0).Text);
+        Assert.Null(other.Document.FilePath);
+        Assert.False(other.Document.IsDirty);
+        Assert.Equal(1, session.Undo.Count);
+    }
+
+    [Fact]
     public async Task Save_WithoutInterveningEdit_MarksExactlyWrittenSnapshotClean()
     {
         var codec = new PausingWriteCodec();
