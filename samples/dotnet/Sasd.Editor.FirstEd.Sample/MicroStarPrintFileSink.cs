@@ -53,6 +53,41 @@ internal sealed class MicroStarPrintFileSink : IMicroStarPrintSink, IDisposable
         await _writer.FlushAsync(cancellationToken).ConfigureAwait(false);
     }
 
+    /// <summary>
+    /// Write a typed output instruction. Unlike the legacy string-based
+    /// WriteLineAsync adapter, a text record containing a form feed is not
+    /// mistaken for a page eject. Calling this method also keeps the page
+    /// separator's encoding independent of the operating system.
+    /// </summary>
+    internal async ValueTask WriteRecordAsync(
+        MicroStarPrintRecord record, CancellationToken cancellationToken)
+    {
+        ObjectDisposedException.ThrowIf(_disposed, this);
+        cancellationToken.ThrowIfCancellationRequested();
+
+        switch (record.Kind)
+        {
+            case MicroStarPrintRecordKind.Text:
+                ArgumentNullException.ThrowIfNull(record.Text);
+                await _writer.WriteLineAsync(record.Text.AsMemory(), cancellationToken)
+                    .ConfigureAwait(false);
+                break;
+            case MicroStarPrintRecordKind.PageBreak:
+                // Page break carries no user data: write exactly one FF.
+                if (record.Text != string.Empty)
+                    throw new ArgumentException("Page break cannot contain text.", nameof(record));
+                await _writer.WriteAsync("\f".AsMemory(), cancellationToken)
+                    .ConfigureAwait(false);
+                break;
+            default:
+                throw new ArgumentOutOfRangeException(nameof(record), "Unknown print record kind.");
+        }
+
+        // Keep the same partial-output contract as the legacy adapter:
+        // each accepted instruction becomes visible before the next slice.
+        await _writer.FlushAsync(cancellationToken).ConfigureAwait(false);
+    }
+
     public void Dispose()
     {
         if (_disposed) return;
