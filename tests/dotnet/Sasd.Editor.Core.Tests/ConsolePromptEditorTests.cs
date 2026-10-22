@@ -253,6 +253,24 @@ public sealed class ConsolePromptEditorTests
         Assert.Equal("a", editor.Answer);
     }
 
+    [Theory]
+    [InlineData(ConsoleKey.Tab)]
+    [InlineData(ConsoleKey.NoName)]
+    public void NamedOrRawTabCannotEnterFilePathOrSearchPrompt(ConsoleKey key)
+    {
+        var editor = new ConsolePromptEditor();
+        editor.Process(Key('a'));
+
+        // Some terminals deliver Tab as a named key; others send only
+        // horizontal tab without a reliable key name. Neither may insert
+        // hidden whitespace into a user-entered file path or search term.
+        Assert.Equal(ConsolePromptInputResult.Continue,
+            editor.Process(new ConsoleKeyInfo('\t', key, false, false, false)));
+        Assert.Equal("a", editor.Answer);
+        editor.Process(Key('b'));
+        Assert.Equal("ab", editor.Answer);
+    }
+
     private static ConsoleKeyInfo Key(char character) =>
         new(character, ConsoleKey.A, false, false, false);
 }
