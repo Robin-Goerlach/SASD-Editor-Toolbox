@@ -37,3 +37,16 @@ weiterer Ausgabeschritte.
 
 Dies ist eine moderne Sicherheitsgarantie, keine Behauptung über die
 exakte historische Borland-`PrintNext`-Semantik.
+
+## Leere Aufträge und Freigabe der Ausgaberessource
+
+Ein leerer Druckauftrag bekommt keinen Scheduler-Aufruf. Deshalb gibt er
+seinen eigenen Ausgabekanal sofort frei. Eine zusätzliche Schutzvariable
+verhindert, dass Abschluss, Abbruch und Fehlerbehandlung denselben Kanal
+mehrmals schließen. Ein bereits erfolgreich beendeter oder fehlgeschlagener
+Auftrag wird durch einen späteren Abbruch nicht rückwirkend umklassifiziert.
+
+Dies sind moderne Sicherheitsregeln für den Ressourcenlebenszyklus und keine
+behauptete 1:1-Umsetzung historischer Borland-Druckerhardware. Zwei
+Regressionstests überprüfen die Freigabe bei leerem Auftrag und genau
+einmalige Freigabe nach erfolgreicher Ausgabe.
