@@ -35,8 +35,21 @@ internal sealed class MicroStarPrintFileSink : IMicroStarPrintSink, IDisposable
         // Flush each bounded scheduler slice so the file has an observable
         // prefix after any error or cancellation. A partial output file is
         // retained intentionally rather than pretending printing is atomic.
-        await _writer.WriteLineAsync(text.AsMemory(), cancellationToken)
-            .ConfigureAwait(false);
+        // Pagination emits a stand-alone form-feed record. Unlike a text
+        // row, FF is a device-control character, not a logical line. Writing
+        // it with WriteLineAsync would append an unintended platform-specific
+        // LF/CRLF byte sequence after the page eject, changing the output
+        // stream depending on the host OS. Keep this explicit boundary
+        // local to the file adapter; the cooperative job stays agnostic.
+        //
+        // This is SASD's modern print-file encoding convention and does
+        // not claim to reconstruct all historical printer escape sequences.
+        if (text == "\f")
+            await _writer.WriteAsync(text.AsMemory(), cancellationToken)
+                .ConfigureAwait(false);
+        else
+            await _writer.WriteLineAsync(text.AsMemory(), cancellationToken)
+                .ConfigureAwait(false);
         await _writer.FlushAsync(cancellationToken).ConfigureAwait(false);
     }
 
