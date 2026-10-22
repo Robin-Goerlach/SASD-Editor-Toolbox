@@ -115,7 +115,7 @@ The goal is behavioral coverage, not source-level or public-name identity.
 | Interactive FIRST-ED demonstration host | `Sasd.Editor.FirstEd.Sample` terminal host | Implemented sample |
 | MicroStar pull-down menus | host sample | Planned |
 | MicroStar pop-up helpers | host sample | Planned |
-| Background printing | scheduler sample | Planned |
+| Background printing | Cooperative scheduler, file output, pagination and read-only job status | Partial; historical `PrintNext`, physical printer output and terminal acceptance remain open |
 | Historical error-message catalog | deliberately not copied; modern `EditorErrorId` + stable codes/resource keys replace presentation-specific text | Replaced / Implemented |
 | Typed host-neutral error/resource model | `EditorErrorCatalog`, `IEditorHooks.OnErrorAsync` | Implemented |
 | DOS/video-memory assembly routines | intentionally not reproduced | Replaced by host rendering |
