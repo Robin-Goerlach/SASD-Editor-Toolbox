@@ -124,9 +124,61 @@ internal sealed class ConsoleFirstEdRenderer(EditorSession session)
     /// </summary>
     public string? ReadMicroStarMenu()
     {
-        // A normal Render restores all underlying editor rows after the
-        // choice. No document buffer or viewport state is changed here.
-        return ReadPrompt(ConsoleMicroStarMenuPolicy.Prompt);
+        // This overlay is temporary terminal presentation, not an editor
+        // window. Do NOT insert it into WindowLayout: that would change
+        // document view geometry, cursor anchoring and historical commands.
+        var layout = ConsoleMicroStarPopupLayout.Create(
+            Console.WindowWidth, Console.WindowHeight,
+            ConsoleMicroStarPopupLayout.MenuLines);
+
+        // With a very small terminal there is no safe rectangle. Preserve
+        // the previous command-line fallback rather than writing off-screen.
+        if (layout is null)
+            return ReadPrompt(ConsoleMicroStarMenuPolicy.Prompt);
+
+        try
+        {
+            DrawMicroStarPopup(layout);
+            while (true)
+            {
+                var key = Console.ReadKey(intercept: true);
+                if (key.Key == ConsoleKey.Escape ||
+                    (key.Modifiers.HasFlag(ConsoleModifiers.Control) &&
+                     key.Key == ConsoleKey.U))
+                    return null;
+
+                // The popup uses direct one-key actions. No ambiguity from
+                // Ctrl-K/O/Q prefixes and no keyboard focus kept afterwards.
+                if (key.KeyChar == '\0' || char.IsControl(key.KeyChar))
+                    continue;
+                var letter = char.ToUpperInvariant(key.KeyChar);
+                if (ConsoleMicroStarPopupLayout.IsMenuChoice(letter))
+                    return letter.ToString();
+            }
+        }
+        finally
+        {
+            // A complete redraw reconstitutes the visible editor from its
+            // authoritative model. Reading back terminal cells is fragile
+            // across Windows VT, Unix terminals and Unicode wide glyphs.
+            // In particular, cancellation must not alter text, Undo or view.
+            Render();
+        }
+    }
+
+    private static void DrawMicroStarPopup(ConsoleMicroStarPopupLayout layout)
+    {
+        for (var row = 0; row < layout.Height; row++)
+        {
+            var line = layout.GetRow(row);
+            // Reuse WriteRow's Unicode/control-code sanitization. Draw only
+            // a bounded horizontal span and preserve cells on either side.
+            // Popup rows intentionally consist of safe printable ASCII.
+            Console.SetCursorPosition(layout.Left, layout.Top + row);
+            Console.Write(line);
+        }
+
+        Console.SetCursorPosition(layout.Left + 2, layout.Top + 1);
     }
 
     public string? ReadPrompt(string prompt)
