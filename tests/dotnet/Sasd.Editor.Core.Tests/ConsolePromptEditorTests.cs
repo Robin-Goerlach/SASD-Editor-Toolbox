@@ -158,6 +158,43 @@ public sealed class ConsolePromptEditorTests
         Assert.Equal("ae\u0301", accented.Answer);
     }
 
+    [Fact]
+    public void ResetClearsFullAnswerWithoutMutatingFollowingPrompt()
+    {
+        var editor = new ConsolePromptEditor();
+        foreach (var character in "old filename.txt")
+            editor.Process(Key(character));
+
+        // A visual clearing operation is not enough: a subsequent Save
+        // prompt must not inherit an undisplayed suffix from an old path.
+        Assert.NotEmpty(editor.Answer);
+        editor.Reset();
+
+        Assert.Equal(string.Empty, editor.Answer);
+        Assert.Equal("Save: ", editor.Project("Save: ", 20).Text);
+        Assert.Equal(ConsolePromptInputResult.Continue, editor.Process(Key('n')));
+        Assert.Equal("n", editor.Answer);
+        Assert.Equal(ConsolePromptInputResult.Submitted,
+            editor.Process(new ConsoleKeyInfo('\\r', ConsoleKey.Enter, false, false, false)));
+    }
+
+    [Fact]
+    public void ResetAfterCancelAllowsIndependentNewPrompt()
+    {
+        var editor = new ConsolePromptEditor();
+        editor.Process(Key('x'));
+        Assert.Equal(ConsolePromptInputResult.Cancelled,
+            editor.Process(new ConsoleKeyInfo('\\u001b', ConsoleKey.Escape,
+                false, false, false)));
+
+        // Cancellation is a result of one keystroke, not sticky state.
+        // Resetting removes old content without leaving the next dialog
+        // permanently cancelled.
+        editor.Reset();
+        Assert.Equal(ConsolePromptInputResult.Continue, editor.Process(Key('y')));
+        Assert.Equal("y", editor.Answer);
+    }
+
     private static ConsoleKeyInfo Key(char character) =>
         new(character, ConsoleKey.A, false, false, false);
 }
