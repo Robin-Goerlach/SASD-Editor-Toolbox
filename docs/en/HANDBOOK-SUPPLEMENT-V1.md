@@ -50,3 +50,28 @@ block file operations, combined Save/Open actions and a modern cooperative
 print-to-file sample. **Partial implementation is not historical parity.**
 Avoid pretending that missing historical UI sources can be reconstructed
 solely from a short feature name in the handbook.
+
+## Acceptance gates for the MicroStar sample
+
+The table above distinguishes source-level implementation from original
+observable behavior. A row may be called **historically accepted** only
+when all applicable gates are satisfied:
+
+1. **Source evidence:** cite the relevant handbook page and explicitly
+   record details the handbook does not establish.
+2. **Implementation trace:** point to the actual sample host, policy or
+   core service rather than an assumed feature based on its name.
+3. **Deterministic verification:** identify automated tests for ordinary,
+   cancellation and failure paths where those paths exist.
+4. **Interactive verification:** check keyboard, focus, overlay restore and
+   file prompts on real Windows and Linux terminals where applicable.
+5. **Divergence classification:** distinguish an intentional modern
+   substitute (such as redraw-based popups) from claimed literal DOS
+   behavior. Document unavoidable deviations.
+6. **Parity review:** do not mark a row fully accepted merely because an
+   implementation and tests exist; a final reviewer must compare the
+   evidence with the observed historical contract.
+
+This gate is a **review policy**, not an assertion that the listed
+features have already passed historical acceptance. The separate
+handbook procedure index still requires its own coverage audit.
