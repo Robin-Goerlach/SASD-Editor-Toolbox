@@ -55,3 +55,16 @@ terminal implementation details.
   separate host policy. It must not silently break the current cancel-on-
   Ctrl-U safety contract used by Save/Replace prompts.
 - Keep video-memory/BIOS conventions and global `Cmdcol` out of Core.
+
+## Reusable prompt reset (modern host feature)
+
+The headless `ConsolePromptEditor.Reset()` now explicitly clears its
+complete answer buffer. It has no console side effects: painting the command
+row is still the host renderer's responsibility. Tests demonstrate that an
+earlier filename cannot leak into a later prompt and that a prior Escape
+cancellation does not poison the next input attempt.
+
+This contributes to predictable host lifecycle handling. It is **not** a
+claim of exact `EditZapcmdnam` or `EditAskfor` historical behavior:
+DOS `Cmdcol`, Varstring recall, and physical terminal interaction still
+require the separate documented review.
