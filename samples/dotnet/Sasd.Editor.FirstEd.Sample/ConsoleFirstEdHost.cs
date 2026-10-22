@@ -189,7 +189,7 @@ internal sealed class ConsoleFirstEdHost : IEditorInputPump
                 sink.Dispose();
                 return "A background print job is already active.";
             }
-            return $"Printing {lines.Length} line(s) in background.";
+            return $"Printing {lines.Count} output record(s) in background.";
         }
         catch (IOException error)
         {
