@@ -255,6 +255,74 @@ internal sealed class ConsoleFirstEdRenderer(EditorSession session)
         }
     }
 
+    /// <summary>
+    /// Interactive, read-only file selection for MicroStar Read Block.
+    /// Filesystem discovery and navigation stay in MicroStarFileBrowser;
+    /// this method only paints a bounded overlay and normalizes keys.
+    /// </summary>
+    public string? BrowseMicroStarFile(string startDirectory)
+    {
+        // One row for the folder title, one for help and up to eight entries.
+        // The popup layout reserves a frame and avoids the terminal's last
+        // physical column. Small consoles fall back to the existing prompt.
+        const int visibleRows = 8;
+        if (Console.WindowWidth < 32 || Console.WindowHeight < 12)
+            return ReadPrompt("Read block file path: ");
+
+        var browser = new MicroStarFileBrowser(startDirectory, visibleRows);
+        while (true)
+        {
+            // Project the current directory and selected page afresh. Never
+            // use a filename as a terminal command or as unvalidated markup.
+            // Limit very long captions; the reusable row projection handles
+            // Unicode/control-character sanitization before Console.Write.
+            var content = new List<string> { "MICROSTAR FILE BROWSER" };
+            var folder = browser.CurrentDirectory;
+            content.Add(folder.Length > 50 ? "..." + folder[^47..] : folder);
+            var visible = browser.VisibleEntries;
+            var index = 0;
+            foreach (var entry in visible)
+            {
+                var selected = browser.Selection.Selected?.Id == entry.FullPath;
+                var label = (entry.IsDirectory ? "[DIR] " : "      ") + entry.Name;
+                if (label.Length > 50) label = label[..47] + "...";
+                content.Add((selected ? "> " : "  ") + label);
+                index++;
+            }
+            if (index == 0) content.Add("  (Empty directory)");
+            content.Add("Enter=Open/Select  Backspace=Up  Esc=Cancel");
+            var layout = ConsoleMicroStarPopupLayout.Create(
+                Console.WindowWidth, Console.WindowHeight, content);
+
+            // If a resize made the terminal too small, require an explicit
+            // typed path; do not attempt to draw outside the screen bounds.
+            if (layout is null)
+                return ReadPrompt("Read block file path: ");
+
+            using var lease = _overlays.Push(layout);
+            ConsoleKeyInfo key;
+            try
+            {
+                Render();
+                DrawMicroStarPopup(layout);
+                key = Console.ReadKey(intercept: true);
+            }
+            finally
+            {
+                lease.Dispose();
+                Render();
+            }
+
+            // A failed directory transition propagates as an error; no
+            // editor text or current-document association has changed.
+            var result = browser.Handle(key.Key, key.Modifiers);
+            if (result.Kind == MicroStarBrowserResultKind.FileChosen)
+                return result.Path;
+            if (result.Kind == MicroStarBrowserResultKind.Cancelled)
+                return null;
+        }
+    }
+
     public string? ReadPrompt(string prompt)
     {
         var width = Math.Max(1, Console.WindowWidth - 1);

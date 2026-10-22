@@ -176,7 +176,10 @@ internal sealed class ConsoleFirstEdHost : IEditorInputPump
     private async ValueTask<string?> ImportSelectedBlockAsync(
         CancellationToken cancellationToken)
     {
-        var path = _renderer.ReadPrompt("Read block file: ");
+        // Prefer a navigable, read-only picker. It returns only a path:
+        // the existing Core file service still owns decoding, validating,
+        // topology realignment and Undo as a single transaction.
+        var path = _renderer.BrowseMicroStarFile(Environment.CurrentDirectory);
         if (string.IsNullOrWhiteSpace(path))
             return "Block import cancelled.";
 
