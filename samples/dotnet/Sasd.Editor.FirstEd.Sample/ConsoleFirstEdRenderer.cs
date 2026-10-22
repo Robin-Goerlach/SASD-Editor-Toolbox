@@ -12,6 +12,7 @@ namespace Sasd.Editor.FirstEd.Sample;
 internal sealed class ConsoleFirstEdRenderer(EditorSession session)
 {
     private readonly EditorViewportBuilder _viewportBuilder = new(session);
+    private readonly ConsoleMicroStarOverlayStack _overlays = new();
 
     /// <summary>
     /// FIRST-ED may display hard/soft line-end and end-of-file indicators in
@@ -112,8 +113,12 @@ internal sealed class ConsoleFirstEdRenderer(EditorSession session)
             width,
             role: FirstEdColorRole.Command);
 
-        PositionCursor(textWidth);
-        Console.CursorVisible = true;
+        // Recompose nested overlays from the model rather than terminal cells.
+        foreach (var overlay in _overlays.Active)
+            DrawMicroStarPopup(overlay);
+        if (_overlays.Count == 0)
+            PositionCursor(textWidth);
+        Console.CursorVisible = _overlays.Count == 0;
     }
 
     /// <summary>
@@ -136,9 +141,10 @@ internal sealed class ConsoleFirstEdRenderer(EditorSession session)
         if (layout is null)
             return ReadPrompt(ConsoleMicroStarMenuPolicy.Prompt);
 
+        using var lease = _overlays.Push(layout);
         try
         {
-            DrawMicroStarPopup(layout);
+            Render();
             while (true)
             {
                 var key = Console.ReadKey(intercept: true);
@@ -158,10 +164,8 @@ internal sealed class ConsoleFirstEdRenderer(EditorSession session)
         }
         finally
         {
-            // A complete redraw reconstitutes the visible editor from its
-            // authoritative model. Reading back terminal cells is fragile
-            // across Windows VT, Unix terminals and Unicode wide glyphs.
-            // In particular, cancellation must not alter text, Undo or view.
+            // Pop first; repainting then restores the parent, if any.
+            lease.Dispose();
             Render();
         }
     }
