@@ -64,8 +64,30 @@ def build_report(root: Path) -> dict:
             "historicallyAccepted": False,
         })
 
+    # Make the next review work actionable without treating missing
+    # portable fixtures as a historical test failure. Classifications such
+    # as host-sample or not-applicable have different verification routes.
+    # Preserve printed-page ordering so reviews can be performed against
+    # the handbook without manually re-sorting a generated report.
+    unlinked = [
+        {"name": row["name"], "page": row["page"],
+         "classification": row["classification"],
+         "evidenceDocument": row["evidenceDocument"]}
+        for row in routines if not row["hasPortableFixture"]
+    ]
+    classification_summary = {}
+    for row in routines:
+        key = row["classification"]
+        bucket = classification_summary.setdefault(
+            key, {"total": 0, "withPortableFixture": 0, "withoutPortableFixture": 0})
+        bucket["total"] += 1
+        bucket["withPortableFixture" if row["hasPortableFixture"]
+               else "withoutPortableFixture"] += 1
+
     return {
         "schemaVersion": 1,
+        "unlinkedRoutines": unlinked,
+        "classificationSummary": classification_summary,
         "historicalScope": "printed routine index only; supplemental helpers excluded",
         "totalRoutines": len(routines),
         "routinesWithPortableFixtures": sum(x["hasPortableFixture"] for x in routines),
