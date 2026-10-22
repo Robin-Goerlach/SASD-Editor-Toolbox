@@ -160,8 +160,7 @@ internal sealed class ConsoleFirstEdHost : IEditorInputPump
         // Match the existing write-file host safety policy: a pre-existing
         // destination needs explicit YES, not the default Enter. Like normal
         // File.Exists checks this is a UX safeguard, not a race-free lock.
-        if (File.Exists(path) && _renderer.ReadPrompt(
-            "File exists. Type YES to overwrite: ") != "YES")
+        if (File.Exists(path) && !_renderer.ConfirmMicroStarOverwrite())
             return "Block export cancelled.";
 
         var exported = await ConsoleMicroStarBlockFileService.ExportAsync(

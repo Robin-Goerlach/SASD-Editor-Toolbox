@@ -190,6 +190,71 @@ internal sealed class ConsoleFirstEdRenderer(EditorSession session)
         Console.SetCursorPosition(layout.Left + 2, layout.Top + 1);
     }
 
+    /// <summary>
+    /// An actual modal Yes/No dialog built upon the reusable focus policy
+    /// and overlay stack. It is deliberately conservative: the initial
+    /// focused action is NO, so an unintended Enter cannot overwrite a file.
+    /// This is a host concern; no disk operation occurs inside this method.
+    /// </summary>
+    public bool ConfirmMicroStarOverwrite()
+    {
+        const string question = "Overwrite existing block file?";
+        var contents = new[]
+        {
+            question,
+            "N No       Y Yes",
+            "Tab / arrows to choose",
+            "Enter confirms, ESC cancels"
+        };
+        var layout = ConsoleMicroStarPopupLayout.Create(
+            Console.WindowWidth, Console.WindowHeight, contents);
+
+        // Tiny terminals cannot display the popup while preserving the
+        // editor's top/bottom rows. Keep an explicit typed confirmation,
+        // never assume confirmation when the window is too small.
+        if (layout is null)
+            return ReadPrompt("File exists. Type YES to overwrite: ") == "YES";
+
+        var focus = new MicroStarDialogFocus(
+        [
+            new("no", MicroStarDialogControlKind.Action),
+            new("yes", MicroStarDialogControlKind.Action)
+        ]);
+
+        using var lease = _overlays.Push(layout);
+        try
+        {
+            Render();
+            DrawMicroStarPopup(layout, focus.FocusedId == "no" ? 'N' : 'Y');
+            while (true)
+            {
+                var key = Console.ReadKey(intercept: true);
+                // The direct Y/N shortcuts are deliberately an explicit
+                // action. Modified combinations must not bypass confirmation.
+                if ((key.Modifiers & (ConsoleModifiers.Control | ConsoleModifiers.Alt)) == 0)
+                {
+                    if (char.ToUpperInvariant(key.KeyChar) == 'Y') return true;
+                    if (char.ToUpperInvariant(key.KeyChar) == 'N') return false;
+                }
+
+                var result = focus.Handle(key.Key, key.Modifiers);
+                if (result == MicroStarDialogNavigationResult.Cancel)
+                    return false;
+                if (result == MicroStarDialogNavigationResult.Activate)
+                    return focus.FocusedId == "yes";
+                if (result == MicroStarDialogNavigationResult.FocusChanged)
+                    DrawMicroStarPopup(layout, focus.FocusedId == "no" ? 'N' : 'Y');
+            }
+        }
+        finally
+        {
+            // Always pop before rebuilding the screen. If this dialog was
+            // nested, repaint re-exposes its parent rather than erasing it.
+            lease.Dispose();
+            Render();
+        }
+    }
+
     public string? ReadPrompt(string prompt)
     {
         var width = Math.Max(1, Console.WindowWidth - 1);
