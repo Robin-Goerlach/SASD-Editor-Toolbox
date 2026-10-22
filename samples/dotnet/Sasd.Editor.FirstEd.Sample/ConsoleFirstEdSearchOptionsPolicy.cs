@@ -34,8 +34,20 @@ internal static class ConsoleFirstEdSearchOptionsPolicy
         var seen = new HashSet<char>();
         foreach (var raw in response)
         {
-            if (char.IsWhiteSpace(raw) || raw is ',' or ';')
+            // Accept only the documented separators. char.IsWhiteSpace
+            // also recognizes line breaks and other invisible Unicode
+            // separators; silently swallowing those would turn pasted,
+            // multiline input into a different search request. The prompt
+            // is one line and its option grammar is deliberately ASCII.
+            if (raw is ' ' or ',' or ';')
                 continue;
+
+            // Reject control/invisible formatting characters rather than
+            // normalizing them. This keeps diagnostic failure safe: an
+            // unexpected pasted option must never dispatch a search with
+            // flags the user did not intend.
+            if (char.IsControl(raw) || char.IsWhiteSpace(raw))
+                return null;
 
             var option = char.ToUpperInvariant(raw);
             if (option is not ('C' or 'W' or 'R') || !seen.Add(option))
