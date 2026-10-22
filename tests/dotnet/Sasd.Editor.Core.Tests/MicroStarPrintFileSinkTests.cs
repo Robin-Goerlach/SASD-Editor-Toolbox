@@ -91,7 +91,7 @@ public sealed class MicroStarPrintFileSinkTests
     }
 
     [Fact]
-    public void MalformedTypedRecordsAreRejectedBeforeAnyOutputSlice()
+    public async Task MalformedTypedRecordsAreRejectedBeforeAnyOutputSlice()
     {
         var root = Path.Combine(Path.GetTempPath(),
             "sasd-print-" + Guid.NewGuid().ToString("N"));
