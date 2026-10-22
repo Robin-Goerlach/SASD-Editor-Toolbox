@@ -42,6 +42,33 @@ internal static class MicroStarFileOperations
         File.Move(source, destination, overwrite: false);
     }
 
+    /// <summary>
+    /// Delete one explicit regular-file path, and only after the caller has
+    /// collected an affirmative confirmation. This service never prompts:
+    /// keeping user approval in the host makes denial and cancellation easy
+    /// to audit and prevents a service call from implying consent.
+    /// </summary>
+    /// <remarks>
+    /// This operation is permanent (not a recycle-bin move) and is not part
+    /// of document Undo. Reject symbolic links/reparse points and directories
+    /// in this conservative first slice; following links could affect an
+    /// unintended file. The filesystem remains authoritative if the entry
+    /// changes between validation and deletion. A stronger race-free
+    /// capability/handle-based deletion API is future hardening work.
+    /// </remarks>
+    internal static void Delete(string path)
+    {
+        ArgumentException.ThrowIfNullOrWhiteSpace(path);
+        var fullPath = Path.GetFullPath(path);
+        var attributes = File.GetAttributes(fullPath);
+        if ((attributes & (FileAttributes.Directory | FileAttributes.ReparsePoint)) != 0)
+            throw new IOException("Only regular, non-linked files may be deleted.");
+
+        // The host must never invoke this after a denied confirmation.
+        // We intentionally do not recursively delete directories.
+        File.Delete(fullPath);
+    }
+
     private static (string Source, string Destination) Validate(
         string sourcePath, string destinationPath)
     {

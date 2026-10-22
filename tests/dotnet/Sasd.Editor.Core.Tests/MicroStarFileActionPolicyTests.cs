@@ -8,6 +8,7 @@ public sealed class MicroStarFileActionPolicyTests
     [Theory]
     [InlineData(ConsoleKey.F5, 0)]
     [InlineData(ConsoleKey.F6, 1)]
+    [InlineData(ConsoleKey.F8, 2)]
     public void OnlyExplicitFunctionKeysAllowRegularFileOperation(
         ConsoleKey key, int expected)
     {

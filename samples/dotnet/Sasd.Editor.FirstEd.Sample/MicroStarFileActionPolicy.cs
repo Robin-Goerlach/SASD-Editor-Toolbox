@@ -4,7 +4,7 @@ namespace Sasd.Editor.FirstEd.Sample;
 /// Browser-local interpretation of file-management shortcuts. This is
 /// separate from FIRST-ED's semantic editing command key map.
 /// </summary>
-internal enum MicroStarFileAction { Copy, Rename }
+internal enum MicroStarFileAction { Copy, Rename, Delete }
 
 internal static class MicroStarFileActionPolicy
 {
@@ -25,6 +25,7 @@ internal static class MicroStarFileActionPolicy
         {
             ConsoleKey.F5 => MicroStarFileAction.Copy,
             ConsoleKey.F6 => MicroStarFileAction.Rename,
+            ConsoleKey.F8 => MicroStarFileAction.Delete,
             _ => null
         };
     }

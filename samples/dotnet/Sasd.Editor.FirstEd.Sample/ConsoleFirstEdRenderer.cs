@@ -290,7 +290,7 @@ internal sealed class ConsoleFirstEdRenderer(EditorSession session)
                 index++;
             }
             if (index == 0) content.Add("  (Empty directory)");
-            content.Add("Enter=Open  F5=Copy  F6=Rename  Backspace=Up  Esc=Cancel");
+            content.Add("Enter=Open  F5=Copy  F6=Rename  F8=Delete  Backspace=Up  Esc=Cancel");
             var layout = ConsoleMicroStarPopupLayout.Create(
                 Console.WindowWidth, Console.WindowHeight, content);
 
@@ -322,6 +322,37 @@ internal sealed class ConsoleFirstEdRenderer(EditorSession session)
                 key.Modifiers, browser.SelectedEntry);
             if (fileAction.HasValue)
             {
+                // Permanent deletion is separately approved, never inferred
+                // from F8 alone. The user must type the exact affirmative
+                // token; Enter, Escape, and any other response deny it.
+                if (fileAction.Value == MicroStarFileAction.Delete)
+                {
+                    var source = browser.SelectedEntry!.FullPath;
+                    var name = MicroStarBrowserDisplay.SafeLabel(
+                        Path.GetFileName(source), 35);
+                    var answer = ReadPrompt(
+                        $"PERMANENTLY delete {name}? Type DELETE: ");
+                    if (answer != "DELETE")
+                        continue;
+
+                    try
+                    {
+                        MicroStarFileOperations.Delete(source);
+                        browser.Refresh();
+                    }
+                    catch (IOException error)
+                    {
+                        ReadPrompt("Delete failed: " +
+                            MicroStarBrowserDisplay.SafeLabel(error.Message, 50) +
+                            "  Press Enter: ");
+                    }
+                    catch (UnauthorizedAccessException)
+                    {
+                        ReadPrompt("Access denied. Press Enter: ");
+                    }
+                    continue;
+                }
+
                 var destinationText = ReadPrompt(
                     fileAction.Value == MicroStarFileAction.Copy
                         ? "Copy to new file path: "
