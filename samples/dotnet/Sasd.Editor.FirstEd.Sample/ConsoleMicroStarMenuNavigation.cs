@@ -29,7 +29,7 @@ internal sealed class ConsoleMicroStarMenuNavigation
 {
     // Visual reading order, across the two-column menu. Q cancels rather
     // than dispatching a command. These letters match the existing host.
-    private const string Choices = "FRGU SWIN BECM DTLP AQHK";
+    private const string Choices = "FRGU SWIN BECM DTLP AHKQ";
     private static readonly char[] Ordered =
         Choices.Where(c => c != ' ').ToArray();
 

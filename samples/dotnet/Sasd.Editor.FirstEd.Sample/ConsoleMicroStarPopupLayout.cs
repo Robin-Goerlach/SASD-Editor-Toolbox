@@ -25,8 +25,8 @@ internal sealed class ConsoleMicroStarPopupLayout
         "C Copy block  M Move block",
         "D Delete      T Write block",
         "L Read block  P Save/Open",
-        "A Abandon/Open Q Cancel",
-        "H Print file   K Stop print",
+        "A Abandon/Open H Print file",
+        "K Stop print   Q Cancel",
         "ESC cancels"
     ];
 
