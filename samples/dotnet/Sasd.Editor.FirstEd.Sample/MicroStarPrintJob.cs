@@ -32,6 +32,7 @@ internal sealed class MicroStarPrintJob : IEditorBackgroundTask
     private readonly string[] _lines;
     private readonly IMicroStarPrintSink _sink;
     private int _next;
+    private bool _sinkClosed;
 
     internal MicroStarPrintJob(IEnumerable<string> lines, IMicroStarPrintSink sink)
     {
@@ -39,6 +40,12 @@ internal sealed class MicroStarPrintJob : IEditorBackgroundTask
         _sink = sink ?? throw new ArgumentNullException(nameof(sink));
         _lines = lines.Select(line => line ??
             throw new ArgumentException("Print lines must not be null.", nameof(lines))).ToArray();
+
+        // Even an empty job owns its supplied sink. No scheduler callback
+        // will ever run for an empty sequence, so release the output here
+        // instead of leaving an empty print file exclusively locked.
+        if (_lines.Length == 0)
+            CloseSink();
     }
 
     internal int TotalLines => _lines.Length;
@@ -53,7 +60,7 @@ internal sealed class MicroStarPrintJob : IEditorBackgroundTask
     /// </summary>
     internal void Cancel()
     {
-        if (IsFinished) return;
+        if (IsFinished || Failure is not null) return;
         IsCancelled = true;
         CloseSink();
     }
@@ -65,6 +72,11 @@ internal sealed class MicroStarPrintJob : IEditorBackgroundTask
     /// </summary>
     private void CloseSink()
     {
+        // Cancellation, failure and completion all share this cleanup path.
+        // Disposal must happen only once even if a host calls Cancel after
+        // observing a failed job or the scheduler reports cancellation.
+        if (_sinkClosed) return;
+        _sinkClosed = true;
         if (_sink is IDisposable disposable)
             disposable.Dispose();
     }
