@@ -91,6 +91,37 @@ public sealed class MicroStarPrintFileSinkTests
     }
 
     [Fact]
+    public void MalformedTypedRecordsAreRejectedBeforeAnyOutputSlice()
+    {
+        var root = Path.Combine(Path.GetTempPath(),
+            "sasd-print-" + Guid.NewGuid().ToString("N"));
+        Directory.CreateDirectory(root);
+        try
+        {
+            var file = Path.Combine(root, "invalid.txt");
+            var session = new EditorSession();
+            var queue = new MicroStarPrintQueue(session);
+
+            // Record structs are directly constructible. Neither a malformed
+            // page break containing text nor an unknown tag may enter a
+            // scheduled print job and fail after earlier records were sent.
+            using (var sink = new MicroStarPrintFileSink(file))
+            {
+                var invalid = new[]
+                {
+                    MicroStarPrintRecord.Line("valid"),
+                    new MicroStarPrintRecord(MicroStarPrintRecordKind.PageBreak, "unexpected")
+                };
+                Assert.Throws<ArgumentException>(() => queue.TryStartTyped(invalid, sink));
+                Assert.Empty(session.Scheduler.Tasks);
+                Assert.Null(queue.Active);
+            }
+            Assert.Empty(await File.ReadAllBytesAsync(file));
+        }
+        finally { Directory.Delete(root, true); }
+    }
+
+    [Fact]
     public void ExistingDestinationIsNeverTruncated()
     {
         var root = Path.Combine(Path.GetTempPath(), "sasd-print-" + Guid.NewGuid().ToString("N"));
