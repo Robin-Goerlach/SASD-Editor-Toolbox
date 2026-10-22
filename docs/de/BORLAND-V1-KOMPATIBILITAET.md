@@ -114,7 +114,7 @@ Ziel ist funktionale Abdeckung, nicht eine identische Quellcode- oder API-Strukt
 | Text-/Status-/Block-/Sonderattribute | Zeilenflags + Host-Renderer | Grundlage |
 | Interaktiver FIRST-ED-Demohost | Terminalhost in `Sasd.Editor.FirstEd.Sample` | Implementiertes Beispiel |
 | MicroStar-Menüs/Pop-ups | Host-Beispiele | Geplant |
-| Hintergrunddruck | Scheduler-Beispiel | Geplant |
+| Hintergrunddruck | Kooperativer Scheduler, Druckdatei, Seitenaufteilung und lesender Druckstatus | Teilweise; historisches `PrintNext`, physischer Druck und Terminalabnahme offen |
 | Historischer Fehlertext-Katalog | bewusst nicht kopiert; modernes `EditorErrorId` + stabile Codes/Ressourcenschlüssel ersetzen präsentationsgebundene Texte | Ersetzt / Implementiert |
 | Typisiertes hostneutrales Fehler-/Ressourcenmodell | `EditorErrorCatalog`, `IEditorHooks.OnErrorAsync` | Implementiert |
 | DOS-/Videospeicher-Routinen | bewusst durch Host-Rendering ersetzt | Ersetzt |
