@@ -1,5 +1,7 @@
 # .NET samples
 
+**Languages:** English · [Deutsch](README.de.md)
+
 This directory contains executable .NET hosts and developer examples for the
 [SASD Editor Toolbox](../../README.md). The samples demonstrate how an
 application can connect user input, prompts, rendering, persistence, and
