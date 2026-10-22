@@ -86,3 +86,18 @@ tests or assumes that green CI establishes historical fidelity. Its
 protect the absent-evidence and terminal-check cases. The report is a
 building block for later per-feature acceptance records, **not** a
 completed assessment of the original 123 indexed routines.
+
+## Per-feature audit records
+
+`MicroStarFeatureAudit` accepts explicitly named review entries containing
+a handbook page/reference, implementation reference, test reference and
+the independently reviewed evidence gates. The report returns missing
+gates for **each** feature. Duplicate IDs (case insensitive) and absent
+references are rejected. An empty review set can never be counted as
+complete. The tests deliberately use synthetic evidence and do not assert
+historical parity for any real feature.
+
+**Scope:** a passing audit of a selected subset does not imply that all
+MicroStar features, much less all 123 indexed FIRST-ED procedures, are
+covered. The feature inventory must be independently reconciled before
+a project-wide parity statement can be made.
