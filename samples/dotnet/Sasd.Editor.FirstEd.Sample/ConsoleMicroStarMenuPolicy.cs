@@ -15,7 +15,7 @@ internal static class ConsoleMicroStarMenuPolicy
     // A single line works even in the minimum three-row console. A later
     // actual pop-up/window layer can present the same bindings as a menu grid.
     internal const string Prompt =
-        "F10: F=Find R=Replace G=Goto S=Save W=Write I=Read U=Undo B=Begin E=End C=Copy M=Move D=Delete N=Next T=WriteBlock L=ReadBlock Q=Cancel: ";
+        "F10: F=Find R=Replace G=Goto S=Save W=Write I=Read U=Undo B=Begin E=End C=Copy M=Move D=Delete N=Next T=WriteBlock L=ReadBlock P=SaveOpen A=AbandonOpen Q=Cancel: ";
 
     /// <summary>
     /// Normalize only a single user-chosen menu letter. Enter, Escape,

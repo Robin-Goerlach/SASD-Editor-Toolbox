@@ -129,6 +129,13 @@ internal sealed class ConsoleFirstEdHost : IEditorInputPump
             return await ImportSelectedBlockAsync(cancellationToken)
                 .ConfigureAwait(false);
 
+        if (string.Equals(choice, "P", StringComparison.OrdinalIgnoreCase))
+            return await SwitchMicroStarFileAsync(
+                MicroStarOpenDisposition.SaveThenOpen, cancellationToken).ConfigureAwait(false);
+        if (string.Equals(choice, "A", StringComparison.OrdinalIgnoreCase))
+            return await SwitchMicroStarFileAsync(
+                MicroStarOpenDisposition.AbandonThenOpen, cancellationToken).ConfigureAwait(false);
+
         var binding = ConsoleMicroStarMenuPolicy.Resolve(choice);
         if (binding is null)
             return "Menu cancelled.";
@@ -140,6 +147,60 @@ internal sealed class ConsoleFirstEdHost : IEditorInputPump
         var executed = await _dispatcher.ExecuteAsync(request, cancellationToken)
             .ConfigureAwait(false);
         return executed ? null : "Menu command was not executed.";
+    }
+
+    /// <summary>
+    /// Ask for the replacement path without modifying document text.
+    /// Saving and explicit discard confirmation remain mutually exclusive
+    /// host-level choices; Core owns staged decoding and final reattachment.
+    /// </summary>
+    private async ValueTask<string?> SwitchMicroStarFileAsync(
+        MicroStarOpenDisposition disposition, CancellationToken cancellationToken)
+    {
+        var path = _renderer.BrowseMicroStarFile(Environment.CurrentDirectory);
+        if (string.IsNullOrWhiteSpace(path))
+            return "File switch cancelled.";
+
+        var window = _session.CurrentWindow;
+        var source = window.Document;
+        var version = source.Version;
+        var discardConfirmed = disposition == MicroStarOpenDisposition.AbandonThenOpen
+            && source.IsDirty && _renderer.ReadPrompt(
+                "Discard unsaved changes? Type DISCARD: ") == "DISCARD";
+
+        var plan = MicroStarOpenPolicy.Plan(
+            disposition, source.IsDirty, discardConfirmed);
+        if (!plan.MayOpen)
+            return "File switch cancelled; original preserved.";
+
+        var saved = false;
+        if (plan.MustSave)
+        {
+            // Reuse established Save File prompting and its overwrite guard.
+            var request = _prompts.Resolve(
+                new EditorCommandBinding(EditorCommandId.SaveFile),
+                _renderer.VisibleTextRows);
+            if (request is null)
+                return "File switch cancelled; save not approved.";
+            saved = await _dispatcher.ExecuteAsync(request, cancellationToken)
+                .ConfigureAwait(false);
+            if (!saved)
+                return "File switch cancelled; saving failed.";
+        }
+
+        // A different focused window or a newer source edit invalidates
+        // consent to switch. Core will perform its own post-read recheck.
+        if (_session.CurrentWindow.WindowId != window.WindowId ||
+            !ReferenceEquals(window.Document, source) ||
+            !MicroStarOpenPolicy.CanCommit(plan, version, source.Version,
+                source.IsDirty, saved))
+            return "File switch cancelled; document changed.";
+
+        var opened = await _session.Files.OpenReplacingCurrentWindowAsync(
+            path, allowDiscardDirty:
+                disposition == MicroStarOpenDisposition.AbandonThenOpen && discardConfirmed,
+            cancellationToken: cancellationToken).ConfigureAwait(false);
+        return opened ? "File opened." : "File switch cancelled; original preserved.";
     }
 
     /// <summary>
