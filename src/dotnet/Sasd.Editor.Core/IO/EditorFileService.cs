@@ -1,3 +1,4 @@
+using Sasd.Editor.Document;
 using Sasd.Editor.Editing;
 using Sasd.Editor.Model;
 
@@ -17,6 +18,86 @@ public sealed class EditorFileService
     {
         _session = session ?? throw new ArgumentNullException(nameof(session));
         _codec = codec ?? new FirstEdLegacyFileCodec();
+    }
+
+    /// <summary>
+    /// Stage a complete replacement document, then reattach the initiating
+    /// editor window only after a successful, validated decoder result.
+    /// This is deliberately different from Read File, which inserts lines
+    /// into the existing document and creates an Undo transaction.
+    /// </summary>
+    /// <remarks>
+    /// Nothing about this method prompts the user or authorizes discarding
+    /// edits. The caller must make that decision explicitly. In particular
+    /// allowDiscardDirty is NOT implied by providing a path. The initiating
+    /// view, source document, version and exact source snapshot are captured
+    /// before awaiting I/O. If any of them change, commit is rejected instead
+    /// of replacing newer edits. Linked sibling windows keep displaying their
+    /// original document; the session owns orphaned Undo/marker cleanup.
+    ///
+    /// No new window is created and no temporary partial document is ever
+    /// published. The incoming document has no inherited Undo history.
+    /// </remarks>
+    public async ValueTask<bool> OpenReplacingCurrentWindowAsync(
+        string path, bool allowDiscardDirty = false,
+        CancellationToken cancellationToken = default)
+    {
+        ArgumentException.ThrowIfNullOrWhiteSpace(path);
+        var window = _session.CurrentWindow;
+        var original = window.Document;
+        var originalVersion = original.Version;
+        var originalDirty = original.IsDirty;
+        var originalSnapshot = original.Buffer.Snapshot();
+
+        if (originalDirty && !allowDiscardDirty)
+            return false;
+
+        // Read and validate entirely before touching a visible document.
+        // The codec can be replaced by callers, so malformed provider
+        // records must not be trusted merely because the built-in codec is
+        // known to return valid logical lines.
+        var decoded = await _session.Interruption.RunInterruptibleAsync(
+            token => _codec.ReadAsync(path, token), cancellationToken)
+            .ConfigureAwait(false);
+        if (decoded is null)
+            throw new IOException("The file codec returned no line collection.");
+
+        var lines = decoded.ToArray();
+        const EditorLineFlags allowed = EditorLineFlags.Wrapped |
+            EditorLineFlags.InBlock | EditorLineFlags.UserColored;
+        foreach (var line in lines)
+        {
+            cancellationToken.ThrowIfCancellationRequested();
+            if (line is null || line.Text is null ||
+                line.Text.Contains('\\r') || line.Text.Contains('\\n') ||
+                line.Text.Contains('\\u008D') ||
+                (line.Flags & ~allowed) != EditorLineFlags.None)
+                throw new IOException("Invalid decoded logical line.");
+        }
+
+        // Imported selection coloring is session state and must never be
+        // inherited from a different document. Keep word-wrap boundaries
+        // but strip the transient InBlock presentation bit on replacement.
+        var cleanLines = lines.Select(line => new EditorLineSnapshot(
+            line.Text, line.Flags & ~EditorLineFlags.InBlock)).ToArray();
+        var incoming = new EditorDocument(new LinkedLineTextBuffer(cleanLines));
+        incoming.MarkSaved(path);
+
+        // Version alone cannot prove that linked views or custom buffers
+        // did not mutate the text. Compare the full original snapshot too.
+        // Validate this window is still attached to its original document.
+        if (!_session.Windows.Any(candidate => candidate.WindowId == window.WindowId) ||
+            window.Document.DocumentId != original.DocumentId ||
+            original.Version != originalVersion ||
+            original.IsDirty != originalDirty ||
+            !original.Buffer.Snapshot().SequenceEqual(originalSnapshot))
+            return false;
+
+        _session.AttachWindowDocument(window, incoming);
+        window.Cursor = new TextPosition(0, 0);
+        window.TopLine = 0;
+        window.LeftColumn = 0;
+        return true;
     }
 
     /// <summary>
