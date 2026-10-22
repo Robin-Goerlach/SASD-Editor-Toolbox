@@ -58,7 +58,25 @@ internal sealed class MicroStarPrintJob : IEditorBackgroundTask
     {
         ArgumentNullException.ThrowIfNull(records);
         _sink = sink ?? throw new ArgumentNullException(nameof(sink));
-        _typedRecords = records.ToArray();
+        // Treat all print instructions as untrusted input at the boundary.
+        // Validate the complete snapshot BEFORE scheduling: otherwise a bad
+        // record in the middle of a job could leave a partially emitted
+        // output file while reporting an avoidable programming error.
+        //
+        // This constructor does not own the sink until validation succeeds.
+        // The caller must dispose it if constructing the job throws.
+        var snapshot = records.ToArray();
+        foreach (var record in snapshot)
+        {
+            if (record.Kind == MicroStarPrintRecordKind.Text && record.Text is null)
+                throw new ArgumentException("Text record must contain text.", nameof(records));
+            if (record.Kind == MicroStarPrintRecordKind.PageBreak &&
+                record.Text != string.Empty)
+                throw new ArgumentException("Page break cannot contain text.", nameof(records));
+            if (record.Kind is not (MicroStarPrintRecordKind.Text or MicroStarPrintRecordKind.PageBreak))
+                throw new ArgumentException("Unknown print record kind.", nameof(records));
+        }
+        _typedRecords = snapshot;
         _lines = [];
         if (_typedRecords.Length == 0)
             CloseSink();
