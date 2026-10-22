@@ -34,3 +34,15 @@ A deterministic test simulates cancellation from inside the sink and
 asserts handle cleanup, zero additional output records and no
 automatic retry. This is a modern resource-safety guarantee, not
 historical DOS printer compatibility.
+
+## Empty job and output ownership
+
+An empty print job never receives a scheduler callback. Its constructor
+therefore closes an owned output sink immediately. Cleanup now has an
+idempotent guard: completion, cancellation and error handling can converge
+without disposing the same sink more than once. A completed or failed job
+cannot subsequently be changed into a cancelled job by a late host action.
+
+These are explicitly modern resource-lifecycle guarantees, not historical
+claims about Borland printer device ownership. Deterministic tests verify
+zero-line handling and disposal exactly once after normal completion.
