@@ -92,3 +92,12 @@ comes after the host cancellation policy so cancellation remains dominant.
 A headless parameterized regression test covers both raw representations.
 Real terminal smoke testing and historical DOS `EditAskfor` parity remain
 separate acceptance tasks.
+
+## Tab handling in command-line prompts
+
+Both named Tab and raw horizontal-tab (`0x09`) input are ignored by
+`ConsolePromptEditor`. The console prompt edits a filename or search term,
+not document indentation, so hidden tabs must not enter command arguments.
+A parameterized, headless test protects the behavior on terminal drivers
+with and without `ConsoleKey.Tab` identification. This is a modern host
+policy and does not imply complete historical `EditAskfor` acceptance.
