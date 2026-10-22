@@ -213,3 +213,23 @@ An executable round-trip audit of the `EditFileWrite` / `EditFileRead` / `EditRe
 `FirstEdLegacyFileCodec.Encode` now emits an additional outgoing **CR/LF** for an explicitly blank last descriptor; an explicitly final blank `Wrapped` descriptor still emits 0x8D instead. A foreign file ending with only a single CR/LF continues to decode without a fabricated extra blank line, and an empty physical file continues to import zero lines. The distinction is an explicitly documented **SASD round-trip policy** for ambiguous 8-bit data, **not a claim about undocumented Pascal writer internals**.
 
 Seven new direct .NET cases test exact legacy bytes, repeated trailing blanks, sole blank versus zero physical input, trailing soft boundary, unchanged externally terminated text, full Read File/Undo, and rejection before writing malformed trailing content. These strengthen already implemented and linked file operations; **254 portable V1 fixtures and 103/123 directly linked handbook routines** remain unchanged. Manual Windows/Linux terminal work and the remaining historical behavioral audits are still separate V1 gates.
+
+## Reproducible machine-readable traceability report
+
+Run `python3 tools/report_handbook_traceability.py --output report.json`.
+The report joins **all indexed routines** to the portable fixture IDs declared
+in the shared conformance manifest. It shows each routine's printed page,
+existing documentation link, conceptual classification and actual fixture
+links, plus linked/unlinked totals. A missing or duplicate fixture reference
+causes an error rather than silently inflating coverage.
+
+The repository-contract workflow executes the report and its dedicated
+standard-library unit tests. The generated JSON is intentionally not checked
+in: it reflects the current inventory and case manifest.
+
+**Important:** Portable fixture linkage, a classification of `implemented`,
+and successful GitHub Actions are separate from historical acceptance.
+This report therefore explicitly sets `projectParityEstablished: false` and
+`historicallyAccepted: false` until a distinct evidence-backed review
+mechanism exists. Supplementary historical names beyond the printed 123
+remain separately inventoried.
