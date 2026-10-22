@@ -75,3 +75,14 @@ when all applicable gates are satisfied:
 This gate is a **review policy**, not an assertion that the listed
 features have already passed historical acceptance. The separate
 handbook procedure index still requires its own coverage audit.
+
+## Machine-readable acceptance gap reporting
+
+`MicroStarAcceptanceReport.Missing` returns named, ordered evidence gaps
+(handbook, implementation, tests, conditional real-terminal check,
+divergences and final reviewer sign-off). This pure function never executes
+tests or assumes that green CI establishes historical fidelity. Its
+`IsReady` decision mirrors `MicroStarAcceptancePolicy`, and unit tests
+protect the absent-evidence and terminal-check cases. The report is a
+building block for later per-feature acceptance records, **not** a
+completed assessment of the original 123 indexed routines.
