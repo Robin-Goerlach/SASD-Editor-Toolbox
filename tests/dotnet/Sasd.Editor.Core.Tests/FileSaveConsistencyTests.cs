@@ -237,6 +237,76 @@ public sealed class FileSaveConsistencyTests
         }
     }
 
+    [Theory]
+    [InlineData(false)]
+    [InlineData(true)]
+    public async Task Save_ProviderIoFailurePreservesDocumentAndFileAssociation(
+        bool existingAssociation)
+    {
+        // Unlike a cancelled filename prompt, this failure happens AFTER
+        // the user has authorized a Save and the file provider has been
+        // called. Only a completed write may acknowledge a saved snapshot.
+        // The injected failing codec reproduces I/O errors deterministically
+        // without relying on OS-specific permissions or real user files.
+        var codec = new FailingWriteCodec();
+        var session = new EditorSession(fileCodec: codec);
+        var window = session.CreateDocument("original");
+        var document = window.Document;
+        var attemptedPath = Path.Combine(Path.GetTempPath(),
+            "sasd-io-failure-" + Guid.NewGuid().ToString("N") + ".txt");
+
+        // An existing association is installed using the public model
+        // acknowledgement method, not by mutating a read-only property.
+        // This deliberately tests both Save As and Save to an existing name.
+        string? previousPath = null;
+        if (existingAssociation)
+        {
+            document.MarkSaved(attemptedPath);
+            previousPath = document.FilePath;
+        }
+        session.Engine.InsertText("edited ");
+        var previousLines = document.Buffer.Snapshot();
+        var previousVersion = document.Version;
+        var previousCursor = window.Cursor;
+        var previousUndoCount = session.Undo.Count;
+
+        await Assert.ThrowsAsync<IOException>(async () =>
+            await session.Files.SaveCurrentWindowAsync(
+                existingAssociation ? null : attemptedPath));
+
+        Assert.Equal(1, codec.Attempts);
+        Assert.Equal(previousLines, document.Buffer.Snapshot());
+        Assert.Equal(previousVersion, document.Version);
+        Assert.Equal(previousCursor, window.Cursor);
+        Assert.Equal(previousUndoCount, session.Undo.Count);
+        Assert.Equal(previousPath, document.FilePath);
+        Assert.True(document.IsDirty);
+    }
+
+    /// <summary>
+    /// A storage boundary that fails only when asked to write. The failure
+    /// is intentionally independent of access permissions, filesystems and
+    /// CI platform, so the test proves editor state semantics rather than
+    /// an incidental operating-system error message.
+    /// </summary>
+    private sealed class FailingWriteCodec : IEditorFileCodec
+    {
+        internal int Attempts { get; private set; }
+
+        public ValueTask<IReadOnlyList<EditorLineSnapshot>> ReadAsync(
+            string path, CancellationToken cancellationToken = default) =>
+            ValueTask.FromResult<IReadOnlyList<EditorLineSnapshot>>(
+                Array.Empty<EditorLineSnapshot>());
+
+        public ValueTask WriteAsync(
+            string path, IReadOnlyList<EditorLineSnapshot> lines,
+            CancellationToken cancellationToken = default)
+        {
+            Attempts++;
+            throw new IOException("Injected write failure.");
+        }
+    }
+
     private sealed class PausingWriteCodec : IEditorFileCodec
     {
         private readonly TaskCompletionSource _started =
