@@ -106,6 +106,34 @@ public sealed class ConsoleFirstEdSearchOptionsTests
     }
 
     [Fact]
+    public async Task EmptyFindPromptRetainsWrapAroundOptionAcrossDocumentEnd()
+    {
+        var session = new EditorSession();
+        var view = session.CreateDocument("alpha beta alpha");
+        var dispatcher = new EditorCommandDispatcher(session);
+        view.Cursor = new TextPosition(0, 8);
+
+        var initial = ConsoleFirstEdSearchOptionsPolicy.Attach(
+            new EditorCommandRequest(EditorCommandId.FindNext, Text: "alpha"), "R");
+        Assert.NotNull(initial);
+        Assert.True(await dispatcher.ExecuteAsync(initial));
+        Assert.Equal(new TextPosition(0, 11), view.Cursor);
+
+        // A repeated search starts after the previous hit. Because the
+        // original request explicitly enabled modern wrap-around, reaching
+        // the end must continue at the start of the same document. Replacing
+        // the remembered options with the host defaults would lose this hit.
+        // This verifies the public command boundary, not the undocumented
+        // historical Optstr grammar.
+        Assert.True(await dispatcher.ExecuteAsync(
+            new EditorCommandRequest(EditorCommandId.FindNext, Text: string.Empty)));
+        Assert.Equal(new TextPosition(0, 0), view.Cursor);
+        Assert.Equal("alpha", session.Search.LastPattern);
+        Assert.False(view.Document.IsDirty);
+        Assert.Equal(0, session.Undo.Count);
+    }
+
+    [Fact]
     public async Task SemanticReplaceHonorsWholeWordOptionsAndCanUndo()
     {
         var session = new EditorSession();
