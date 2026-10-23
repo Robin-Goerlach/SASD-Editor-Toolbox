@@ -146,7 +146,7 @@ public sealed class ConsoleFirstEdSavePromptTests
     [InlineData(null)]
     [InlineData("")]
     [InlineData("NO")]
-    [InlineData("yes")]
+    [InlineData("MAYBE")]
     public async Task ExistingFirstSaveTargetRequiresExactApprovalBeforeDispatch(
         string? answer)
     {
@@ -179,8 +179,11 @@ public sealed class ConsoleFirstEdSavePromptTests
         Assert.Equal(initialUndo, session.Undo.Count);
     }
 
-    [Fact]
-    public async Task ApprovedFirstSaveRetainsFilenameAndNextSaveNeedsNoNewApproval()
+    [Theory]
+    [InlineData("YES")]
+    [InlineData("yes")]
+    [InlineData(" Yes ")]
+    public async Task ApprovedFirstSaveRetainsFilenameAndNextSaveNeedsNoNewApproval(string answer)
     {
         var codec = new RecordingCodec();
         var session = new EditorSession(fileCodec: codec);
@@ -191,11 +194,12 @@ public sealed class ConsoleFirstEdSavePromptTests
             binding, 10, window.Document.FilePath, "existing.txt");
         Assert.NotNull(first);
 
-        // An explicit uppercase YES is necessary for the *new* selected
-        // destination. The original semantic request must keep its Text
+        // An explicit YES confirmation is necessary for the *new* selected
+        // destination. The shared resolver intentionally accepts casing and
+        // surrounding spaces; it is not a case-sensitive secret token. The original semantic request must keep its Text
         // filename and PageSize when the user confirms overwriting.
         Assert.True(ConsoleFirstEdOverwritePolicy.RequiresConfirmation(first, true));
-        var approved = ConsoleFirstEdOverwritePolicy.Confirm(first, "YES");
+        var approved = ConsoleFirstEdOverwritePolicy.Confirm(first, answer);
         Assert.Same(first, approved);
         Assert.Equal("existing.txt", approved!.Text);
         Assert.Equal(10, approved.PageSize);
