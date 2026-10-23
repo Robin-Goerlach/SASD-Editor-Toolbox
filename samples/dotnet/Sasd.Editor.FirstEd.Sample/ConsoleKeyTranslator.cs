@@ -12,6 +12,27 @@ internal static class ConsoleKeyTranslator
     {
         var modifiers = TranslateModifiers(keyInfo.Modifiers);
 
+        // Windows often reports the right Alt key (AltGr) as Ctrl+Alt.
+        // On layouts such as German, AltGr+8 produces a printable '[' but
+        // FIRST-ED's key map correctly ignores Alt-modified *commands*.
+        // Recognize only an actual, printable symbol delivered by the console
+        // before the Ctrl+A..Z command-key branch. Do not broadly strip Ctrl
+        // and Alt: Ctrl+Alt+letters can be real shortcuts, and nonprintable
+        // combinations must never be converted into document text.
+        //
+        // This belongs to the terminal adapter, not EditorSession or the
+        // portable key map. A genuine command key still retains its modifiers.
+        var ctrlAlt = ConsoleModifiers.Control | ConsoleModifiers.Alt;
+        if ((keyInfo.Modifiers & ctrlAlt) == ctrlAlt
+            && keyInfo.KeyChar != '\0'
+            && !char.IsControl(keyInfo.KeyChar)
+            && !char.IsLetterOrDigit(keyInfo.KeyChar)
+            && !char.IsWhiteSpace(keyInfo.KeyChar))
+        {
+            return EditorKeyStroke.ForCharacter(
+                keyInfo.KeyChar, EditorKeyModifiers.None);
+        }
+
         // Prefer the ConsoleKey value for Ctrl+A..Z. Terminal implementations
         // often expose a control code in KeyChar rather than the original
         // printable letter.
