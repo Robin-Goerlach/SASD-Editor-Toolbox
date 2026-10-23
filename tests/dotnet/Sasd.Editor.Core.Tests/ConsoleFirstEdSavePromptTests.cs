@@ -142,6 +142,83 @@ public sealed class ConsoleFirstEdSavePromptTests
             ConsoleFirstEdSavePromptPolicy.Resolve(wrong, 10, null, "x.txt"));
     }
 
+    [Theory]
+    [InlineData(null)]
+    [InlineData("")]
+    [InlineData("NO")]
+    [InlineData("yes")]
+    public async Task ExistingFirstSaveTargetRequiresExactApprovalBeforeDispatch(
+        string? answer)
+    {
+        // This is a complete, headless route through the FIRST-ED Ctrl-K/S
+        // binding, Save As prompt policy, overwrite authorization and semantic
+        // dispatcher. A missing YES must prevent the dispatcher from ever
+        // reaching the codec; document identity, edits and Undo stay intact.
+        // The recording codec deliberately avoids touching user files.
+        var codec = new RecordingCodec();
+        var session = new EditorSession(fileCodec: codec);
+        var window = session.CreateDocument("original");
+        session.Engine.InsertText("changed ");
+        var initialUndo = session.Undo.Count;
+        var version = window.Document.Version;
+        var request = ConsoleFirstEdSavePromptPolicy.Resolve(
+            SaveBinding(), 10, window.Document.FilePath, "existing.txt");
+        Assert.NotNull(request);
+
+        // The console host reports existence; no File.Exists call is needed
+        // in this deterministic test. Confirmation is a prerequisite for
+        // dispatch, not a substitute request that could discard the path.
+        Assert.True(ConsoleFirstEdOverwritePolicy.RequiresConfirmation(
+            request, targetExists: true));
+        var authorized = ConsoleFirstEdOverwritePolicy.Confirm(request, answer);
+        Assert.Null(authorized);
+        Assert.Empty(codec.Writes);
+        Assert.Null(window.Document.FilePath);
+        Assert.True(window.Document.IsDirty);
+        Assert.Equal(version, window.Document.Version);
+        Assert.Equal(initialUndo, session.Undo.Count);
+    }
+
+    [Fact]
+    public async Task ApprovedFirstSaveRetainsFilenameAndNextSaveNeedsNoNewApproval()
+    {
+        var codec = new RecordingCodec();
+        var session = new EditorSession(fileCodec: codec);
+        var window = session.CreateDocument("original");
+        session.Engine.InsertText("first ");
+        var binding = SaveBinding();
+        var first = ConsoleFirstEdSavePromptPolicy.Resolve(
+            binding, 10, window.Document.FilePath, "existing.txt");
+        Assert.NotNull(first);
+
+        // An explicit uppercase YES is necessary for the *new* selected
+        // destination. The original semantic request must keep its Text
+        // filename and PageSize when the user confirms overwriting.
+        Assert.True(ConsoleFirstEdOverwritePolicy.RequiresConfirmation(first, true));
+        var approved = ConsoleFirstEdOverwritePolicy.Confirm(first, "YES");
+        Assert.Same(first, approved);
+        Assert.Equal("existing.txt", approved!.Text);
+        Assert.Equal(10, approved.PageSize);
+        Assert.True(await new EditorCommandDispatcher(session).ExecuteAsync(approved));
+        Assert.False(window.Document.IsDirty);
+        Assert.Single(codec.Writes);
+
+        // A subsequent Ctrl-K/S uses this document's established file
+        // association; an unrelated filename from an earlier dialog must
+        // not redirect an ordinary Save to a different destination.
+        session.Engine.InsertText("second ");
+        var next = ConsoleFirstEdSavePromptPolicy.Resolve(
+            binding, 10, window.Document.FilePath, "unwanted.txt");
+        Assert.NotNull(next);
+        Assert.Null(next.Text);
+        Assert.False(ConsoleFirstEdOverwritePolicy.RequiresConfirmation(next, true));
+        Assert.True(await new EditorCommandDispatcher(session).ExecuteAsync(next));
+        Assert.Equal(2, codec.Writes.Count);
+        Assert.Equal(Path.GetFullPath("existing.txt"), codec.Writes[1].Path);
+        Assert.Equal(Path.GetFullPath("existing.txt"), window.Document.FilePath);
+        Assert.False(window.Document.IsDirty);
+    }
+
     private static EditorCommandBinding SaveBinding()
     {
         var keyMap = new FirstEdKeyMap();
