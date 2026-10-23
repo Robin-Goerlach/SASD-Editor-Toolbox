@@ -41,9 +41,16 @@ internal sealed class ConsoleMicroStarMenuNavigation
         ConsoleKey key, char character = '\0',
         ConsoleModifiers modifiers = 0)
     {
-        if (key == ConsoleKey.Escape
-            || (modifiers.HasFlag(ConsoleModifiers.Control)
-                && key == ConsoleKey.U))
+        // Raw ESC (0x1B) and Ctrl-U (0x15) are common in Linux PTYs and
+        // occasionally arrive without a named ConsoleKey on Windows.
+        // Apply the same cancellation contract as the other modal prompts.
+        // AltGr may be reported as Ctrl+Alt: never mistake such a printable
+        // combination for the editor's Ctrl-U interrupt.
+        if (key == ConsoleKey.Escape || character == '\u001b'
+            || (!modifiers.HasFlag(ConsoleModifiers.Alt)
+                && (character == '\u0015'
+                    || (modifiers.HasFlag(ConsoleModifiers.Control)
+                        && key == ConsoleKey.U))))
             return new(MicroStarMenuResultKind.Cancel);
 
         // Treat Alt/Ctrl combinations as host/terminal shortcuts, not as

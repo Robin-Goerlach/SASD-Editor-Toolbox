@@ -44,6 +44,34 @@ public sealed class ConsoleMicroStarMenuNavigationTests
             menu.Handle(key, ch, modifiers).Kind);
     }
 
+    [Theory]
+    [InlineData(ConsoleKey.NoName, '\u001b', ConsoleModifiers.None)]
+    [InlineData(ConsoleKey.NoName, '\u0015', ConsoleModifiers.None)]
+    [InlineData(ConsoleKey.NoName, '\u0015', ConsoleModifiers.Control)]
+    public void RawTerminalControlCodesCancelTheMenuWithoutDispatch(
+        ConsoleKey key, char character, ConsoleModifiers modifiers)
+    {
+        // A PTY may expose the control byte while losing the virtual key.
+        // This should behave exactly like the named Escape/Ctrl-U gestures.
+        var menu = new ConsoleMicroStarMenuNavigation();
+        menu.Handle(ConsoleKey.DownArrow);
+        var result = menu.Handle(key, character, modifiers);
+        Assert.Equal(MicroStarMenuResultKind.Cancel, result.Kind);
+        Assert.Equal('R', menu.SelectedChoice);
+    }
+
+    [Fact]
+    public void AltModifiedCtrlUIsNotAccidentallyTreatedAsCancellation()
+    {
+        // AltGr is often represented by Ctrl+Alt. In particular a modified
+        // key must not turn into a destructive or cancellation menu action.
+        var menu = new ConsoleMicroStarMenuNavigation();
+        var result = menu.Handle(ConsoleKey.U, 'u',
+            ConsoleModifiers.Control | ConsoleModifiers.Alt);
+        Assert.Equal(MicroStarMenuResultKind.Ignored, result.Kind);
+        Assert.Equal('F', menu.SelectedChoice);
+    }
+
     [Fact]
     public void ExistingLetterShortcutsStillWork()
     {
