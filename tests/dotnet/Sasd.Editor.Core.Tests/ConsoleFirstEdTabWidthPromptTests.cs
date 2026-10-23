@@ -111,6 +111,48 @@ public sealed class ConsoleFirstEdTabWidthPromptTests
     }
 
     [Fact]
+    public async Task LinkedViewsKeepIndependentTabWidthsWhileSharingDocument()
+    {
+        var session = new EditorSession();
+        var source = session.CreateDocument("shared text");
+        var linked = session.LinkWindow(source);
+        var originalSourceWidth = source.Options.TabSize;
+
+        // Linked windows reference one document, but each owns its own
+        // cursor and view options. This deliberately differs from the
+        // historical global Tabsize setting: changing the active view must
+        // not silently change another window's tab stops.
+        Assert.Same(source.Document, linked.Document);
+        session.SetCurrentWindow(linked.WindowId);
+        linked.Cursor = new TextPosition(0, 6);
+        var request = ConsoleFirstEdTabWidthPromptPolicy.Resolve(
+            Binding(), visibleRows: 8, cursorColumn: linked.Cursor.Column,
+            answer: "");
+        Assert.NotNull(request);
+        Assert.True(await new EditorCommandDispatcher(session).ExecuteAsync(request));
+
+        Assert.Equal(6, linked.Options.TabSize);
+        Assert.Equal(originalSourceWidth, source.Options.TabSize);
+        Assert.Same(source.Document, linked.Document);
+        Assert.False(source.Document.IsDirty);
+        Assert.Equal(0, session.Undo.Count);
+
+        // Returning to the source and giving it a different interval must
+        // likewise leave the linked view's explicit setting intact. Neither
+        // action inserts literal tab characters or creates an Undo edit.
+        session.SetCurrentWindow(source.WindowId);
+        var sourceRequest = ConsoleFirstEdTabWidthPromptPolicy.Resolve(
+            Binding(), 8, source.Cursor.Column, "3");
+        Assert.NotNull(sourceRequest);
+        Assert.True(await new EditorCommandDispatcher(session).ExecuteAsync(sourceRequest));
+        Assert.Equal(3, source.Options.TabSize);
+        Assert.Equal(6, linked.Options.TabSize);
+        Assert.Equal("shared text", source.Document.Buffer.GetLine(0).Text);
+        Assert.False(source.Document.IsDirty);
+        Assert.Equal(0, session.Undo.Count);
+    }
+
+    [Fact]
     public void WrongBindingIsRejectedBeforeConstructingACommand()
     {
         Assert.Throws<ArgumentException>(() =>
