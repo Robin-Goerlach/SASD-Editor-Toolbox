@@ -18,7 +18,7 @@ internal sealed class ConsoleFirstEdHooks : IEditorHooks
         EditorError error,
         CancellationToken cancellationToken)
     {
-        _pendingMessage = $"{error.Code}: {error.Message}";
+        _pendingMessage = ConsoleFirstEdErrorPresentation.Format(error);
         return ValueTask.CompletedTask;
     }
 
