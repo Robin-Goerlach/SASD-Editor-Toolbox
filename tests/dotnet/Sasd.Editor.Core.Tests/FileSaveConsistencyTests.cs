@@ -347,8 +347,14 @@ public sealed class FileSaveConsistencyTests
             // A selected directory is not an output file. This also guards
             // the staged writer's cleanup path: failed writes must not remove
             // any pre-existing directory entries or acknowledge Save.
-            await Assert.ThrowsAnyAsync<IOException>(async () =>
+            // Windows commonly reports UnauthorizedAccessException for a
+            // directory target, while Unix reports IOException. Both mean
+            // the filesystem refused the output path. Assert the shared
+            // safety contract rather than a platform-specific subclass.
+            var error = await Record.ExceptionAsync(async () =>
                 await session.Files.SaveCurrentWindowAsync(root));
+            Assert.True(error is IOException or UnauthorizedAccessException,
+                $"Expected a filesystem write error, got: {error?.GetType().FullName ?? "no exception"}");
 
             Assert.True(Directory.Exists(root));
             Assert.Equal("must survive", File.ReadAllText(protectedFile));
