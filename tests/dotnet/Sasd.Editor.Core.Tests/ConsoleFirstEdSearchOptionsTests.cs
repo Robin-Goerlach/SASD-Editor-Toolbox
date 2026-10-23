@@ -82,6 +82,30 @@ public sealed class ConsoleFirstEdSearchOptionsTests
     }
 
     [Fact]
+    public async Task EmptyFindPromptRetainsPreviouslySelectedCaseSensitiveOption()
+    {
+        var session = new EditorSession();
+        var view = session.CreateDocument("Alpha alpha ALPHA alpha");
+        var dispatcher = new EditorCommandDispatcher(session);
+        var initial = ConsoleFirstEdSearchOptionsPolicy.Attach(
+            new EditorCommandRequest(EditorCommandId.FindNext, Text: "alpha"), "C");
+        Assert.NotNull(initial);
+        Assert.True(await dispatcher.ExecuteAsync(initial));
+        Assert.Equal(new TextPosition(0, 6), view.Cursor);
+
+        // The handbook's empty Find input repeats the previous search. The
+        // host's modern option prompt must not reinterpret that repeat as a
+        // fresh search with its default (case-insensitive) options.
+        // The next hit is the lower-case word, not the intervening "ALPHA".
+        Assert.True(await dispatcher.ExecuteAsync(
+            new EditorCommandRequest(EditorCommandId.FindNext, Text: "")));
+        Assert.Equal(new TextPosition(0, 18), view.Cursor);
+        Assert.Equal("alpha", session.Search.LastPattern);
+        Assert.False(view.Document.IsDirty);
+        Assert.Equal(0, session.Undo.Count);
+    }
+
+    [Fact]
     public async Task SemanticReplaceHonorsWholeWordOptionsAndCanUndo()
     {
         var session = new EditorSession();
