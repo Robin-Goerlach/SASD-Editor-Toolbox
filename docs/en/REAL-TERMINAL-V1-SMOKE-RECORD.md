@@ -1,0 +1,71 @@
+# FIRST-ED and MicroStar — real-terminal V1 smoke record
+
+Status: **manual verification required; not a historical parity certificate**.
+
+## Purpose and safety
+
+Run the *same* `Sasd.Editor.FirstEd.Sample` executable for FIRST-ED and for the MicroStar-inspired F10 menu. The menu is sample-host behavior; it is not an independent executable or an exact reproduction of the 1985 menu layout. Use disposable files only: the historical save codec uses an 8-bit format and 0x8D soft-line markers, not general UTF-8 persistence. Never test overwriting important data.
+
+Run each session in a real interactive Windows Terminal/PowerShell window and a native Linux PTY (e.g. GNOME Terminal, Konsole or xterm). WSL may be tested additionally but does not replace the native Linux run. Suggested dimensions: at least 100 columns by 35 rows; record the actual dimensions.
+
+## Build and launch (repository root)
+
+```sh
+dotnet --info
+dotnet restore Sasd.Editor.Toolbox.slnx
+dotnet build Sasd.Editor.Toolbox.slnx -c Release
+dotnet test Sasd.Editor.Toolbox.slnx -c Release --no-build
+dotnet run --project samples/dotnet/Sasd.Editor.FirstEd.Sample -c Release --no-build -- --demo
+```
+
+Do not pipe or redirect the interactive editor's standard streams; `--help` may be used without a terminal. `Ctrl-K, X` means Ctrl-K followed by X, not a simultaneous chord. Exit using Ctrl-K, X and answer `YES`.
+
+## Record this environment for each run
+
+- Date / tester:
+- OS and version:
+- Native or WSL:
+- Terminal emulator and version:
+- Font / encoding / keyboard layout:
+- Width x height:
+- `dotnet --version`:
+- Git `rev-parse HEAD`:
+- Build/test result:
+- Evidence reference (screenshots/logs stored outside the repository unless deliberately reviewed):
+
+## FIRST-ED observation checklist
+
+Mark each **PASS / FAIL / BLOCKED**, and attach exact keystrokes plus expected/actual result for failures.
+
+1. Demo starts with editable NONAME content and intact status/cursor.
+2. Arrow, Home, End, Page Up/Down navigation and viewport/status updates remain aligned.
+3. Text insertion followed by Escape restores the previous text via Undo.
+4. Ctrl-Q, F, enter `WIDGET`, Enter: a matching occurrence is selected; Ctrl-L repeats the search.
+5. Ctrl-K, B and Ctrl-K, K mark a whole-line block; Ctrl-K, C copies it; Undo restores the prior state.
+6. Ctrl-K, 1 sets a marker; Ctrl-Q, 1 navigates to it.
+7. In a tall terminal, Ctrl-O, O creates a stacked window; Ctrl-O, J links views of one document. Different cursors must not imply different document text.
+8. The demo line containing a literal ESC followed by `[2J` is displayed inertly as `^[[2J`: screen/status are not cleared. Optionally test Ctrl-P then `[` followed by printable `[2J` in disposable text.
+9. Resize with stacked windows; report missing or overwritten status lines, cursor displacement or unexpected terminal scroll.
+10. With a disposable filename, Ctrl-K, S saves; Ctrl-K, W writes without associating the export path with the document. Verify overwrite prompts and cancel paths before confirming writes.
+11. Ctrl-K, X exits only after `YES`; negative/cancel responses do not end the session.
+
+For C0/C1 control symbols, grapheme-width and Unicode projection, also use `docs/en/TERMINAL-OUTPUT-V1-ACCEPTANCE.md`.
+
+## MicroStar F10 observation checklist
+
+1. F10 opens the popup without altering document text or Undo.
+2. Arrow navigation changes highlight only; Home/End, Enter and directly typed command letters act as indicated.
+3. Escape, Ctrl-U, or menu Q cancels without dispatching a destructive command.
+4. F=Find, R=Replace and G=Goto show prompts and perform their documented semantic commands; cancel must leave document unchanged.
+5. S=Save, W=Write and I=Read use only disposable paths; verify overwrite confirmation and cancel/recovery.
+6. B/E/C/M/D exercise block marking, copying, moving and deleting only on disposable in-memory text; Undo restores expected edits.
+7. T=Write Block and L=Read Block round-trip a disposable block file; verify selection and cursor state.
+8. P=Save & Open and A=Abandon & Open: test both cancel and confirmed paths, with special attention to modified documents. Do not point either command at valuable files.
+9. H=Print, J=Status and K=Stop Print: use print-to-file and verify output/status/cancellation; this does **not** prove physical printer or exact historical PrintNext parity.
+10. Check that popup redraw, focus and status recover after each action, especially cancellation and window changes.
+
+## Result and release gate
+
+For every step capture: **PASS / FAIL / BLOCKED**, actual behavior, target behavior and environment. Attach a screenshot only when useful; never include sensitive user data. Record differences as one of: implementation defect, terminal-specific behavior, intentional modern divergence, or historical behavior not established by the handbook.
+
+A successful automated CI build, or passing this small manual checklist, does **not** by itself mean that all 123 indexed historical procedures, 20 supplemental names, or complete MicroStar behavior are accepted. No V1.0 release/tag until the separate historical acceptance review.
