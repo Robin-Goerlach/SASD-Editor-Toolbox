@@ -72,6 +72,33 @@ public sealed class ConsoleMicroStarMenuNavigationTests
         Assert.Equal('F', menu.SelectedChoice);
     }
 
+    [Theory]
+    [InlineData(ConsoleKey.NoName, '\u001b', ConsoleModifiers.None, true)]
+    [InlineData(ConsoleKey.NoName, '\u0015', ConsoleModifiers.None, true)]
+    [InlineData(ConsoleKey.U, '\u0015', ConsoleModifiers.Control, true)]
+    [InlineData(ConsoleKey.U, 'u', ConsoleModifiers.Control | ConsoleModifiers.Alt, false)]
+    [InlineData(ConsoleKey.NoName, '\u0015', ConsoleModifiers.Alt, false)]
+    [InlineData(ConsoleKey.F, 'f', ConsoleModifiers.None, false)]
+    public void SharedPromptAndMenuCancellationPoliciesAgree(
+        ConsoleKey key, char character, ConsoleModifiers modifiers, bool expected)
+    {
+        // The same physical event passes through different UI surfaces.
+        // All must agree about aborting; otherwise a host-specific terminal
+        // event could close a file prompt but accidentally accept a menu item.
+        var physical = new ConsoleKeyInfo(character, key,
+            (modifiers & ConsoleModifiers.Shift) != 0,
+            (modifiers & ConsoleModifiers.Alt) != 0,
+            (modifiers & ConsoleModifiers.Control) != 0);
+        Assert.Equal(expected, ConsolePromptKeyPolicy.IsCancellation(physical));
+        Assert.Equal(expected,
+            ConsolePromptKeyPolicy.IsCancellation(key, character, modifiers));
+
+        var navigation = new ConsoleMicroStarMenuNavigation();
+        Assert.Equal(expected,
+            navigation.Handle(key, character, modifiers).Kind
+                == MicroStarMenuResultKind.Cancel);
+    }
+
     [Fact]
     public void ExistingLetterShortcutsStillWork()
     {
