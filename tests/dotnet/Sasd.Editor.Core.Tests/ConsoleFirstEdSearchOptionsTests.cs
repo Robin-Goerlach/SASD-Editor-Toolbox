@@ -134,6 +134,32 @@ public sealed class ConsoleFirstEdSearchOptionsTests
     }
 
     [Fact]
+    public async Task EmptyFindPromptRetainsWholeWordOptionAcrossEmbeddedMatches()
+    {
+        var session = new EditorSession();
+        var view = session.CreateDocument("cat scatter cat");
+        var dispatcher = new EditorCommandDispatcher(session);
+        var initial = ConsoleFirstEdSearchOptionsPolicy.Attach(
+            new EditorCommandRequest(EditorCommandId.FindNext, Text: "cat"), "W");
+        Assert.NotNull(initial);
+        Assert.True(await dispatcher.ExecuteAsync(initial));
+        Assert.Equal(new TextPosition(0, 0), view.Cursor);
+
+        // The empty FIRST-ED Find prompt is a repeat of the previous search,
+        // not a new request with default options. If WholeWord were lost, the
+        // suffix of "scatter" at column 5 would be accepted as the next hit.
+        // The public dispatcher must instead skip it and select the final
+        // standalone "cat" at column 12. This asserts modern W-option policy
+        // without claiming the undocumented historical Optstr key grammar.
+        Assert.True(await dispatcher.ExecuteAsync(
+            new EditorCommandRequest(EditorCommandId.FindNext, Text: string.Empty)));
+        Assert.Equal(new TextPosition(0, 12), view.Cursor);
+        Assert.Equal("cat", session.Search.LastPattern);
+        Assert.False(view.Document.IsDirty);
+        Assert.Equal(0, session.Undo.Count);
+    }
+
+    [Fact]
     public async Task SemanticReplaceHonorsWholeWordOptionsAndCanUndo()
     {
         var session = new EditorSession();
