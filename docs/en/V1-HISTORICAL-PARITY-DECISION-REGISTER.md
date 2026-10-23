@@ -12,8 +12,10 @@ case links and **20** do not. Neither classification nor link existence
 proves complete equivalence to the 1985 implementation.
 
 A **separate supplemental inventory** records **20** additional historical
-names: 7 implemented, 5 modern replacements, 4 host replacements,
-1 handbook-only example and 3 entries still classified `sample-missing`.
+names: 7 implemented, 6 modern replacements, 6 host replacements,
+1 handbook-only example. The three previously `sample-missing` items are now
+included in the modern/host replacement counts; they still lack historical
+parity sign-off.
 Its scope is explicitly non-exhaustive. Original Pascal source/API parity
 and DOS hardware compatibility are NOT claimed.
 
@@ -25,8 +27,8 @@ and DOS hardware compatibility are NOT claimed.
 | HP-02 | `EDITERR.MSG`, `EditMessage`, `EditErrormsg` | Typed `EditorErrorCatalog` and FIRST-ED host presentation | Approve loss of historical numeric message-file customization, or implement an explicitly specified compatibility adapter |
 | HP-03 | Global `Tabsize` / `EditDefineTab` | Per-window tab width, recorded in handbook index | Approve modern per-window policy with tests showing linked and independent views retain intended widths |
 | HP-04 | DOS assembler/video-memory routines | `EditUpdrowasm`, `MoveFromScreen`, `MoveToScreen` marked non-applicable; model-based repaint/overlay stack exists | Accept observable redraw/restore equivalence rather than literal BIOS/video-memory access, with terminal scenarios |
-| HP-05 | MicroStar `MakeWindow` and `RestoreWindow` | Current host has `ConsoleMicroStarOverlayStack`, `ConsoleMicroStarPopupLayout`, renderer and headless overlay tests | Reconcile outdated `sample-missing` supplemental mapping with current implementation, compare historical behavior, and record actual terminal results |
-| HP-06 | MicroStar `PrintNext` | Modern print-to-file queue/pagination is documented; supplemental inventory still says `sample-missing` | Inspect source and tests, decide if generic queued printing is sufficient functional replacement; physical DOS printing is not claimed |
+| HP-05 | MicroStar `MakeWindow` and `RestoreWindow` | Current host has `ConsoleMicroStarOverlayStack`, `ConsoleMicroStarPopupLayout`, renderer and headless overlay tests | Inventory classification reconciled; compare historical behavior and record actual terminal results before signing off |
+| HP-06 | MicroStar `PrintNext` | Modern print-to-file queue/pagination is documented; supplemental inventory now records a modern replacement | Review whether the documented queued print-to-file replacement meets the V1 functional goal; physical DOS printing is not claimed |
 | HP-07 | MicroStar Lightning spell-check integration | `HANDBOOK-SUPPLEMENT-V1.md` explicitly says not implemented, historically separate integration | Decide optional/out-of-scope versus required MicroStar parity; never quietly claim full MicroStar equivalence |
 | HP-08 | FIRST-ED interactive prompts and command-row editing | `HOST-COMMAND-LINE-V1-AUDIT.md`; `EditAppchar`, `EditAppcmdnam`, `EditAskfor`, `EditZapcmdnam` host-mapped | Review original recall/typeahead, display width and Ctrl-U cancellation differences with real-terminal observations |
 | HP-09 | Legacy file encoding and safe Save/Write operations | `FirstEdLegacyFileCodec`, staged file writer and focused regression tests | Confirm 8-bit roundtrip and cancellation/overwrite under terminal interaction; distinguish modern Unicode editing from legacy output |
@@ -56,9 +58,9 @@ Before tagging V1.0:
 
 ## Next implementation/review slices
 
-1. **HP-05/HP-06 evidence reconciliation:** inspect and test existing popup
-   restoration and print scheduler behavior before changing the supplemental
-   inventory's stale `sample-missing` states.
+1. **HP-05/HP-06 historical acceptance:** the stale supplemental flags are
+   reconciled to existing host replacements; run and record focused real-terminal
+   popup and printing scenarios before approving functional equivalence.
 2. **HP-03:** add focused regression evidence for per-window tab-width
    independence (including linked-document views) and capture the divergence
    decision.

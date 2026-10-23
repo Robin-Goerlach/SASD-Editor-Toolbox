@@ -28,8 +28,8 @@ unmodified in their own ordered inventory.
 | Find/Replace with options and `Optstr` | back cover, variable p. 113 | Core options now exposed via modern C/W/R host prompt; original `Optstr` grammar remains unverified |
 | `EDITERR.MSG` customizable numeric message file | p. 54 | Deliberately replaced by typed/localizable error catalog; legacy file interchange not implemented |
 | MicroStar F10 pull-down menus | pp. 42, 44-52 | Partial: F10 popup, keyboard navigation and commands in console sample; historical interaction and real terminals not fully accepted |
-| MicroStar pop-ups `MakeWindow` / `RestoreWindow` | p. 53 | Partial: redraw-based overlays and restoration with deterministic tests; original DOS cell buffering not reproduced |
-| MicroStar incremental background printing `PrintNext` | p. 53 | Partial: print-to-file, pagination and status implemented; exact historical printer behavior remains unverified |
+| MicroStar pop-ups `MakeWindow` / `RestoreWindow` | p. 53 | **Modern host replacement present:** popup rectangles, overlay ownership, redraw and deterministic tests; original DOS cell buffering and final interactive parity remain open |
+| MicroStar incremental background printing `PrintNext` | p. 53 | **Modern replacement present:** cooperative scheduled print records, print-to-file, pagination, cancellation/status tests; original DOS printer timing and device behavior remain unverified |
 | MicroStar directory browser and file rename/copy/delete | p. 42 | Partial: safe browse/copy/rename/delete sample workflows and tests; historic UI fidelity not accepted |
 | MicroStar Read Block / Write Block | p. 45 | Partial: F10 T/L block-specific file workflows and tests; final historical acceptance open |
 | MicroStar Save & Open / Abandon & Open | p. 45 | Partial: F10 P/A staged document replacement with save/discard policy and tests; interactive acceptance open |
@@ -111,3 +111,23 @@ newlines and Unicode whitespace are rejected; the search command is not
 created on invalid input. Headless tests guard these cases while preserving
 existing case-sensitive, whole-word and wrap semantics. Exact historical
 `Optstr` syntax and behavior remain unverified.
+
+## October 2026 supplemental-inventory reconciliation
+
+The three previously classified `sample-missing` entries (`MakeWindow`,
+`RestoreWindow`, `PrintNext`) were rechecked against the current sample
+sources and focused tests. They are now explicitly recorded as modern
+host/replacement responsibilities in the [supplemental JSON](../handbook-supplemental-symbols-v1.json).
+This corrects stale *inventory metadata*, not historical source signatures.
+
+- `MakeWindow`: `ConsoleMicroStarPopupLayout`, `ConsoleFirstEdRenderer`,
+  `ConsoleMicroStarPopupLayoutTests`.
+- `RestoreWindow`: `ConsoleMicroStarOverlayStack`, redraw in
+  `ConsoleFirstEdRenderer`, `ConsoleMicroStarOverlayStackTests`.
+- `PrintNext`: `MicroStarPrintJob` and `MicroStarPrintQueue`,
+  `MicroStarPrintJobTests`, and file-sink tests.
+
+No real-terminal sign-off, original video-memory preservation, physical DOS
+printer emulation, or exact historical procedure contract is asserted by
+these classification updates. The independent MicroStar acceptance gates
+above remain mandatory for V1.

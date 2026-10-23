@@ -144,25 +144,25 @@
       "name": "MakeWindow",
       "handbookPage": 53,
       "layer": "microstar-sample",
-      "status": "sample-missing",
-      "evidence": "docs/en/HANDBOOK-SUPPLEMENT-V1.md",
-      "note": "MicroStar pop-up utility draws a temporary dialog area, preserving the underlying screen."
+      "status": "host-replacement",
+      "evidence": "samples/dotnet/Sasd.Editor.FirstEd.Sample/ConsoleMicroStarPopupLayout.cs",
+      "note": "Modern console popup rectangle and renderer stand in for MicroStar MakeWindow. Tests cover layout, focus and nested overlay lifetime; original DOS screen-cell save and exact historical user interaction are not reproduced or signed off."
     },
     {
       "name": "RestoreWindow",
       "handbookPage": 53,
       "layer": "microstar-sample",
-      "status": "sample-missing",
-      "evidence": "docs/en/HANDBOOK-SUPPLEMENT-V1.md",
-      "note": "MicroStar pop-up utility restores the underlying screen region."
+      "status": "host-replacement",
+      "evidence": "samples/dotnet/Sasd.Editor.FirstEd.Sample/ConsoleMicroStarOverlayStack.cs",
+      "note": "Host reconstructs the editor and surviving parent overlays instead of restoring saved DOS video-memory cells. Stack, selection and redraw tests exist; real-terminal interaction and exact historical parity remain open."
     },
     {
       "name": "PrintNext",
       "handbookPage": 53,
       "layer": "microstar-sample",
-      "status": "sample-missing",
-      "evidence": "docs/en/HANDBOOK-SUPPLEMENT-V1.md",
-      "note": "MicroStar cooperative printing slice; the generic scheduler exists, but no sample print spooler has been added."
+      "status": "modern-replacement",
+      "evidence": "samples/dotnet/Sasd.Editor.FirstEd.Sample/MicroStarPrintJob.cs",
+      "note": "Cooperative scheduler executes at most one snapshot print record per idle slice, with cancellation, failure and file-sink tests. Original PrintNext scheduling, DOS printer control bytes and hardware printing are not claimed."
     }
   ]
 }
