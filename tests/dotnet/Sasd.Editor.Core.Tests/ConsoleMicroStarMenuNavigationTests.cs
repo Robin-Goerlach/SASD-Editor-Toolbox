@@ -108,6 +108,40 @@ public sealed class ConsoleMicroStarMenuNavigationTests
         Assert.Equal('T', result.Choice);
     }
 
+    [Theory]
+    [InlineData('\u017F')] // long s: Unicode uppercase is ASCII S
+    [InlineData('\u212A')] // Kelvin sign: visually resembles Latin K
+    [InlineData('\u0131')] // dotless i: not an ASCII I
+    [InlineData('\u00E9')] // ordinary accented input is not a shortcut
+    public void NonAsciiTextCannotSelectOrExecuteMenuCommands(char character)
+    {
+        // F10 is a command menu, not a case-insensitive Unicode search.
+        // No Unicode lookalike or locale-specific uppercase conversion may
+        // silently trigger Save, Write, Delete, or any other operation.
+        var menu = new ConsoleMicroStarMenuNavigation();
+        Assert.False(ConsoleMicroStarPopupLayout.IsMenuChoice(character));
+        Assert.Equal(MicroStarMenuResultKind.Ignored,
+            menu.Handle(ConsoleKey.NoName, character).Kind);
+        Assert.Equal('F', menu.SelectedChoice);
+    }
+
+    [Theory]
+    [InlineData('s', 'S')]
+    [InlineData('w', 'W')]
+    [InlineData('q', 'Q')]
+    [InlineData('F', 'F')]
+    public void AsciiShortcutNormalizationRemainsStable(char input, char expected)
+    {
+        Assert.True(ConsoleMicroStarPopupLayout.TryNormalizeMenuChoice(input, out var choice));
+        Assert.Equal(expected, choice);
+        var result = new ConsoleMicroStarMenuNavigation().Handle(ConsoleKey.NoName, input);
+        Assert.Equal(expected == 'Q'
+            ? MicroStarMenuResultKind.Cancel
+            : MicroStarMenuResultKind.Accept, result.Kind);
+        if (expected != 'Q')
+            Assert.Equal(expected, result.Choice);
+    }
+
     [Fact]
     public void ModifiedAndUnsupportedKeysAreIgnored()
     {

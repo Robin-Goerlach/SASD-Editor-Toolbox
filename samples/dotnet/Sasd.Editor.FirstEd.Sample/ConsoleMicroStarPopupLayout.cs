@@ -110,6 +110,28 @@ internal sealed class ConsoleMicroStarPopupLayout
         return "| " + content.PadRight(Width - 4) + " |";
     }
 
+    /// <summary>
+    /// Accept only the documented single-byte ASCII menu alphabet. Unicode
+    /// case conversion is intentionally not used: a non-ASCII character that
+    /// uppercases to a Latin letter must never launch a potentially destructive
+    /// block, file or open operation from a terminal menu.
+    /// </summary>
     internal static bool IsMenuChoice(char letter) =>
-        "FRGUSWINBECMDTLPAQHKJ".Contains(char.ToUpperInvariant(letter));
+        TryNormalizeMenuChoice(letter, out _);
+
+    internal static bool TryNormalizeMenuChoice(char input, out char choice)
+    {
+        // The menu is a fixed ASCII command vocabulary, not a locale-aware
+        // text search. Preserve lowercase shortcuts without allowing Unicode
+        // compatibility folds or alternative alphabets to match a command.
+        choice = input is >= 'a' and <= 'z'
+            ? (char)(input - ('a' - 'A'))
+            : input;
+        if (choice is >= 'A' and <= 'Z'
+            && "FRGUSWINBECMDTLPAQHKJ".Contains(choice))
+            return true;
+
+        choice = '\0';
+        return false;
+    }
 }

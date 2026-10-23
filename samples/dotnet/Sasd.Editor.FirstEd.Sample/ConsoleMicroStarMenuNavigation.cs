@@ -78,8 +78,10 @@ internal sealed class ConsoleMicroStarMenuNavigation
 
         // Retain the existing one-keystroke menu shortcuts. Invalid letters
         // remain inert; they never fall through to ordinary editor insertion.
-        var letter = char.ToUpperInvariant(character);
-        if (!ConsoleMicroStarPopupLayout.IsMenuChoice(letter))
+        // Menu shortcuts are an explicit ASCII command vocabulary. Delegating
+        // the normalization to the popup policy keeps displayed choices and
+        // accepted keys identical, including rejection of Unicode lookalikes.
+        if (!ConsoleMicroStarPopupLayout.TryNormalizeMenuChoice(character, out var letter))
             return new(MicroStarMenuResultKind.Ignored);
         return letter == 'Q'
             ? new(MicroStarMenuResultKind.Cancel)
