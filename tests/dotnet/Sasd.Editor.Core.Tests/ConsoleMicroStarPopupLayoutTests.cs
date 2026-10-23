@@ -34,6 +34,23 @@ public sealed class ConsoleMicroStarPopupLayoutTests
             width, height, ConsoleMicroStarPopupLayout.MenuLines));
     }
 
+    [Theory]
+    [InlineData(100, 30, true)]
+    [InlineData(99, 30, true)]
+    [InlineData(30, 30, false)]
+    [InlineData(100, 12, false)]
+    [InlineData(0, 0, false)]
+    public void ExistingPopupIsRevalidatedAfterTerminalResize(
+        int width, int height, bool expected)
+    {
+        // A popup created on a large terminal can outlive a resize event.
+        // Validate its original position against the new physical bounds
+        // before ANY SetCursorPosition or Console.Write operation.
+        var popup = ConsoleMicroStarPopupLayout.Create(
+            100, 30, ConsoleMicroStarPopupLayout.MenuLines)!;
+        Assert.Equal(expected, popup.Fits(width, height));
+    }
+
     [Fact]
     public void BorderAndChoiceMappingRemainStable()
     {

@@ -177,6 +177,13 @@ internal sealed class ConsoleFirstEdRenderer(EditorSession session)
     private static void DrawMicroStarPopup(
         ConsoleMicroStarPopupLayout layout, char? selected = null)
     {
+        // The rectangle was calculated before the user could resize the
+        // terminal. Skip stale coordinates instead of throwing while a modal
+        // dialog is trying to restore its parent window. The next full
+        // Render pass reconstructs the editor from its model.
+        if (!layout.Fits(Console.WindowWidth, Console.WindowHeight))
+            return;
+
         for (var row = 0; row < layout.Height; row++)
         {
             var line = layout.GetRow(row, selected);

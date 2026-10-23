@@ -74,6 +74,19 @@ internal sealed class ConsoleMicroStarPopupLayout
     }
 
     /// <summary>
+    /// Checks an already-created popup against the CURRENT terminal geometry.
+    /// A console may shrink while a menu is waiting for keyboard input. Never
+    /// trust creation-time coordinates after that point: even one off-screen
+    /// SetCursorPosition can throw before the enclosing finally restores the
+    /// editor. Reserve the final physical column and command row as usual.
+    /// </summary>
+    internal bool Fits(int terminalWidth, int terminalHeight) =>
+        terminalWidth > 0 && terminalHeight > 0
+        && Left >= 0 && Top >= 0
+        && (long)Left + Width < terminalWidth
+        && (long)Top + Height < terminalHeight - 1;
+
+    /// <summary>
     /// Render one complete row; padding is deterministic and cannot leak any
     /// previous popup's content into the terminal. The renderer never writes
     /// beyond the exclusive Right boundary.
