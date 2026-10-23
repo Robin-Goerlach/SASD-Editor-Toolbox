@@ -256,3 +256,11 @@ classifies every historical index routine without a linked portable case
 and names the next evidence review. Host/sample and DOS-only mappings do
 not automatically require new portable cases. This worklist is not
 historical parity certification.
+
+
+## V1 historical parity release decisions
+
+The [historical parity decision register](V1-HISTORICAL-PARITY-DECISION-REGISTER.md)
+tracks the original index alongside the separate supplemental MicroStar
+features and explicit modern divergences. It is an **open release gate**,
+not a claim of full Borland compatibility.
