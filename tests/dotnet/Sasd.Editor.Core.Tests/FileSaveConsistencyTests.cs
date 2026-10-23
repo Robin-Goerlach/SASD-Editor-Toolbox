@@ -370,6 +370,60 @@ public sealed class FileSaveConsistencyTests
         }
     }
 
+    [Fact]
+    public async Task LegacySave_UnencodableEditPreservesPreviousAssociatedFile()
+    {
+        var root = Path.Combine(Path.GetTempPath(),
+            "sasd-legacy-encoding-" + Guid.NewGuid().ToString("N"));
+        Directory.CreateDirectory(root);
+        try
+        {
+            var target = Path.Combine(root, "existing.txt");
+            var session = new EditorSession();
+            var window = session.CreateDocument("ASCII original");
+            var document = window.Document;
+
+            // Establish a REAL prior successful save with the production
+            // 1985-compatible file codec. This is deliberately not a mock:
+            // we want to verify the bytes previously persisted on disk.
+            Assert.True(await session.Files.SaveCurrentWindowAsync(target));
+            var savedBytes = await File.ReadAllBytesAsync(target);
+            Assert.NotEmpty(savedBytes);
+            Assert.False(document.IsDirty);
+            Assert.Equal(Path.GetFullPath(target), document.FilePath);
+
+            // The editor model supports Unicode, but the historical 8-bit
+            // export format cannot encode U+20AC (EURO SIGN). A subsequent
+            // ordinary Save must reject this new text BEFORE replacing the
+            // previous valid file. The new unsaved edit must remain in memory.
+            session.Engine.InsertText("€");
+            Assert.True(document.IsDirty);
+            var lines = document.Buffer.Snapshot();
+            var version = document.Version;
+            var cursor = window.Cursor;
+            var undo = session.Undo.Count;
+
+            await Assert.ThrowsAsync<EncoderFallbackException>(async () =>
+                await session.Files.SaveCurrentWindowAsync());
+
+            // A failed Save cannot "acknowledge" a document snapshot, move
+            // the cursor, clear Undo or silently detach the existing name.
+            // Most importantly, it must leave the user's older on-disk copy
+            // byte-for-byte intact.
+            Assert.Equal(savedBytes, await File.ReadAllBytesAsync(target));
+            Assert.Equal(lines, document.Buffer.Snapshot());
+            Assert.Equal(version, document.Version);
+            Assert.Equal(cursor, window.Cursor);
+            Assert.Equal(undo, session.Undo.Count);
+            Assert.Equal(Path.GetFullPath(target), document.FilePath);
+            Assert.True(document.IsDirty);
+        }
+        finally
+        {
+            Directory.Delete(root, recursive: true);
+        }
+    }
+
     /// <summary>
     /// A storage boundary that fails only when asked to write. The failure
     /// is intentionally independent of access permissions, filesystems and
