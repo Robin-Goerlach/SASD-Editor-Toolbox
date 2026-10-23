@@ -283,6 +283,87 @@ public sealed class FileSaveConsistencyTests
         Assert.True(document.IsDirty);
     }
 
+    [Fact]
+    public async Task LegacySave_ToMissingParentDirectory_LeavesDocumentDirty()
+    {
+        // Exercise the REAL staged legacy file writer rather than an injected
+        // codec. The parent folder is intentionally absent: the writer must
+        // propagate its filesystem error and must not interpret an attempted
+        // Save As as a successful document association.
+        var root = Path.Combine(Path.GetTempPath(),
+            "sasd-save-missing-" + Guid.NewGuid().ToString("N"));
+        var target = Path.Combine(root, "absent", "editor.txt");
+        try
+        {
+            Directory.CreateDirectory(root);
+            var session = new EditorSession();
+            var window = session.CreateDocument("original");
+            session.Engine.InsertText("changed ");
+            var document = window.Document;
+            var before = document.Buffer.Snapshot();
+            var version = document.Version;
+            var cursor = window.Cursor;
+            var undo = session.Undo.Count;
+
+            await Assert.ThrowsAnyAsync<IOException>(async () =>
+                await session.Files.SaveCurrentWindowAsync(target));
+
+            // Never create parent directories as an implicit side effect of
+            // Save. Failed persistence must not clear Dirty or change the
+            // association, even though encoding the text itself succeeded.
+            Assert.False(Directory.Exists(Path.GetDirectoryName(target)));
+            Assert.False(File.Exists(target));
+            Assert.Equal(before, document.Buffer.Snapshot());
+            Assert.Equal(version, document.Version);
+            Assert.Equal(cursor, window.Cursor);
+            Assert.Equal(undo, session.Undo.Count);
+            Assert.True(document.IsDirty);
+            Assert.Null(document.FilePath);
+        }
+        finally
+        {
+            if (Directory.Exists(root))
+                Directory.Delete(root, recursive: true);
+        }
+    }
+
+    [Fact]
+    public async Task LegacySave_ToExistingDirectory_DoesNotReplaceItsContents()
+    {
+        var root = Path.Combine(Path.GetTempPath(),
+            "sasd-save-directory-" + Guid.NewGuid().ToString("N"));
+        try
+        {
+            Directory.CreateDirectory(root);
+            var protectedFile = Path.Combine(root, "keep.txt");
+            File.WriteAllText(protectedFile, "must survive");
+
+            var session = new EditorSession();
+            var window = session.CreateDocument("original");
+            session.Engine.InsertText("changed ");
+            var originalVersion = window.Document.Version;
+            var originalUndo = session.Undo.Count;
+
+            // A selected directory is not an output file. This also guards
+            // the staged writer's cleanup path: failed writes must not remove
+            // any pre-existing directory entries or acknowledge Save.
+            await Assert.ThrowsAnyAsync<IOException>(async () =>
+                await session.Files.SaveCurrentWindowAsync(root));
+
+            Assert.True(Directory.Exists(root));
+            Assert.Equal("must survive", File.ReadAllText(protectedFile));
+            Assert.True(window.Document.IsDirty);
+            Assert.Null(window.Document.FilePath);
+            Assert.Equal(originalVersion, window.Document.Version);
+            Assert.Equal(originalUndo, session.Undo.Count);
+        }
+        finally
+        {
+            if (Directory.Exists(root))
+                Directory.Delete(root, recursive: true);
+        }
+    }
+
     /// <summary>
     /// A storage boundary that fails only when asked to write. The failure
     /// is intentionally independent of access permissions, filesystems and
