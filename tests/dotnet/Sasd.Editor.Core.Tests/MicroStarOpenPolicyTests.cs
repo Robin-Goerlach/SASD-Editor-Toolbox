@@ -71,6 +71,37 @@ public sealed class MicroStarOpenPolicyTests
     }
 
     [Fact]
+    public void CleanPreflightCannotAuthorizeDiscardOfNewUnsavedChanges()
+    {
+        // The user chose Abandon & Open while the source was clean, so no
+        // destructive DISCARD confirmation was requested. A host extension
+        // might later flag the document dirty without increasing its version.
+        // Checking only the version would incorrectly reuse an authorization
+        // that was never given for discarding any edits.
+        var plan = MicroStarOpenPolicy.Plan(
+            MicroStarOpenDisposition.AbandonThenOpen,
+            isDirty: false, discardWasExplicitlyConfirmed: false);
+        Assert.True(plan.MayOpen);
+        Assert.False(plan.RequiresExplicitDiscardConfirmation);
+
+        // The same version is intentional: the dirty-state transition must
+        // independently prevent replacing the current document. The editor
+        // file service performs a further exact-snapshot concurrency check.
+        Assert.False(MicroStarOpenPolicy.CanCommit(
+            plan, versionAtPreflight: 12, currentVersion: 12,
+            currentDirty: true, saveCompletedSuccessfully: false));
+
+        // Merely marking the document dirty does not permit a Save & Open
+        // either: a completed save still has to leave the source clean.
+        var savePlan = MicroStarOpenPolicy.Plan(
+            MicroStarOpenDisposition.SaveThenOpen,
+            isDirty: false, discardWasExplicitlyConfirmed: false);
+        Assert.False(MicroStarOpenPolicy.CanCommit(
+            savePlan, versionAtPreflight: 12, currentVersion: 12,
+            currentDirty: true, saveCompletedSuccessfully: true));
+    }
+
+    [Fact]
     public void InvalidDispositionDoesNotDefaultToDiscard()
     {
         Assert.Throws<ArgumentOutOfRangeException>(() =>
