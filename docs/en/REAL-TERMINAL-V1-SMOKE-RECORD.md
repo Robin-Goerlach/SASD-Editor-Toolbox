@@ -2,6 +2,60 @@
 
 Status: **manual verification required; not a historical parity certificate**.
 
+## Confirmed hands-on state (2026-10-23)
+
+Development feedback confirms that the interactive FIRST-ED/MicroStar
+sample host has been started and tried on **Windows** and **Debian**.
+Debian 12 machine `dev102` also reports .NET SDK `10.0.402`.
+A real Windows editor screenshot confirmed the printable AltGr-character
+fix; a two-window layout and linked document views were observed with
+Ctrl-O/O followed by Ctrl-O/J.
+
+These observations **do not imply** that all 11 FIRST-ED or all 10
+MicroStar checklist entries have passed. Per-command Save/Open cancel paths,
+file operations, print, resize and other detailed cases require individual
+evidence. Record whether the Linux session was native or WSL explicitly;
+a reported successful launch does not establish every terminal-specific
+interaction in either environment.
+
+## Explicit Debian 12 launch
+
+Install the **.NET 10 SDK** for Debian 12 (Bookworm) from Microsoft's
+official APT package feed if `dotnet --version` is not available. The
+`packages-microsoft-prod.deb` repository package must be installed
+before `dotnet-sdk-10.0` can be resolved by APT. Install system packages
+as administrator, but perform restore/build/test/run as the ordinary user
+to avoid root-owned build outputs.
+
+Run in the existing repository root:
+
+```bash
+dotnet --version
+git switch main
+git pull --ff-only origin main
+dotnet restore Sasd.Editor.Toolbox.slnx
+dotnet build Sasd.Editor.Toolbox.slnx -c Release
+dotnet test Sasd.Editor.Toolbox.slnx -c Release --no-build
+dotnet run --project samples/dotnet/Sasd.Editor.FirstEd.Sample -c Release --no-build -- --demo
+```
+
+Use a **real interactive terminal**, not redirected input/output. Press
+F10 for MicroStar inside the **same** editor executable. Exit with Ctrl-K,
+then X and the explicit `YES` confirmation. SDK installation alone does
+not count as a successful terminal smoke test.
+
+## Historical V1 release gate
+
+The printed historical handbook index has **123 mapped procedures**;
+**103 have links to specific portable conformance cases** (see
+`docs/en/HANDBOOK-PROCEDURE-INDEX-AUDIT.md`). The remaining **20 index
+entries without direct portable case links** are evidence gaps, not
+necessarily missing implementations. The separately catalogued
+supplementary routines and the MicroStar feature inventory require
+their own acceptance decisions. A successful build, green CI and the
+confirmed Windows/Debian starts **must not** be represented as an
+entire V1.0 historical parity sign-off.
+
 ## Purpose and safety
 
 Run the *same* `Sasd.Editor.FirstEd.Sample` executable for FIRST-ED and for the MicroStar-inspired F10 menu. The menu is sample-host behavior; it is not an independent executable or an exact reproduction of the 1985 menu layout. Use disposable files only: the historical save codec uses an 8-bit format and 0x8D soft-line markers, not general UTF-8 persistence. Never test overwriting important data.

@@ -2,6 +2,67 @@
 
 Status: **Manuelle Prüfung erforderlich; kein Nachweis vollständiger historischer Gleichwertigkeit**.
 
+## Bestätigter Praxisstand (23.10.2026)
+
+Die manuellen Rückmeldungen aus der Entwicklung bestätigen, dass der interaktive
+FIRST-ED-/MicroStar-Sample-Host unter **Windows** und **Debian** gestartet und
+ausprobiert wurde. Auf Debian 12 `dev102` ist außerdem das .NET-10-SDK
+`10.0.402` installiert; die Windows-AltGr-Korrektur für druckbare Zeichen
+wurde mit einem echten Editor-Screenshot bestätigt. Zwei angezeigte Fenster
+und die Verknüpfung mittels `Strg-O/O` und `Strg-O/J` wurden unter
+Windows ebenfalls beobachtet.
+
+**Wichtig für die Abnahme:** Die Rückmeldungen belegen die genannten
+Praxisbeobachtungen, **nicht** automatisch alle 11 FIRST-ED- und 10
+MicroStar-Einzelprüfungen. In den nachfolgenden Listen nicht ausdrücklich
+belegte Einzelpunkte bleiben offen; insbesondere sind Save/Open-Abbrüche,
+Dateioperationen, Druck und längere Fenster-/Resize-Szenarien noch nicht
+vollständig einzeln protokolliert. Die genannte Debian-Rückmeldung ist
+kein unabhängiger Nachweis für jede Terminalfunktion oder die genaue
+Unterscheidung eines nativen Hosts von WSL; dies ist bei der Abnahme
+jeweils unter »Nativ oder WSL« einzutragen.
+
+## Reproduzierbarer Start auf Debian 12
+
+Auf Debian 12 (Bookworm) zunächst das **.NET 10 SDK** installieren. Wenn
+`dotnet --version` noch `command not found` meldet, ist das Microsoft-APT-
+Repository über das offizielle Debian-12-Paket
+`packages-microsoft-prod.deb` einzurichten; erst danach steht
+`dotnet-sdk-10.0` zur Verfügung. Installation systemweit als Administrator,
+aber **Restore, Build, Tests und Editorstart als normaler Benutzer**
+ausführen, um Root-eigene Build-Artefakte zu vermeiden.
+
+Im bestehenden Repository-Verzeichnis:
+
+```bash
+dotnet --version
+git switch main
+git pull --ff-only origin main
+dotnet restore Sasd.Editor.Toolbox.slnx
+dotnet build Sasd.Editor.Toolbox.slnx -c Release
+dotnet test Sasd.Editor.Toolbox.slnx -c Release --no-build
+dotnet run --project samples/dotnet/Sasd.Editor.FirstEd.Sample -c Release --no-build -- --demo
+```
+
+Dieser Start gilt für ein **echtes interaktives Terminal** ohne Pipes oder
+Ein-/Ausgabeumleitung. `F10` öffnet das MicroStar-Menü in **demselben**
+FIRST-ED-Prozess. Zum Beenden `Strg-K`, anschließend `X` und `YES`.
+Eine erfolgreiche SDK-Installation allein ist kein bestandener Editortest.
+
+## Historischer V1-Freigabestand
+
+Die Zuordnung des gedruckten Handbuchindexes umfasst **123 Routinen**,
+davon **103 mit Verweisen auf konkrete portable Konformitätsfälle**
+(siehe `docs/en/HANDBOOK-PROCEDURE-INDEX-AUDIT.md`). Konzeptionelle
+Zuordnung, erfolgreiches CI und erfolgreiche Starts sind jeweils
+unterschiedliche Evidenzarten. Die übrigen **20 Indexroutinen ohne
+direkt verknüpften portablen Fall** sind nicht gleichbedeutend mit
+20 fehlenden Implementierungen; sie benötigen eine explizite
+Evidenz-/Abweichungsprüfung. Die separat inventarisierten
+Handbuchergänzungen und die MicroStar-Features erfordern ebenfalls
+eine eigenständige fachliche Abnahme. **Kein V1.0-Release allein
+auf Grundlage dieses Smoke-Tests.**
+
 ## Zweck und Sicherheit
 
 FIRST-ED und das von MicroStar inspirierte F10-Menü laufen im **selben** Programm `Sasd.Editor.FirstEd.Sample`. MicroStar ist hier ein Sample-Host-Menü, keine eigene ausführbare Anwendung und keine exakte Rekonstruktion der Menügestaltung von 1985. Ausschließlich entbehrliche Testdateien verwenden. Das historische Dateiformat benutzt 8-Bit-Zeichen und 0x8D-Markierungen, nicht die allgemeine moderne UTF-8-Speicherung.
