@@ -247,3 +247,12 @@ These additional fields are **coverage planning aids**, not passing test
 results. An unlinked item is not automatically unimplemented, and a
 linked item is not automatically historically accepted. The complete
 123-entry inventory remains authoritative for the scope of this report.
+
+
+## Direct-link evidence triage for the remaining 20 entries
+
+The [20-entry review worklist](HANDBOOK-UNLINKED-INDEX-V1-REVIEW.md)
+classifies every historical index routine without a linked portable case
+and names the next evidence review. Host/sample and DOS-only mappings do
+not automatically require new portable cases. This worklist is not
+historical parity certification.
