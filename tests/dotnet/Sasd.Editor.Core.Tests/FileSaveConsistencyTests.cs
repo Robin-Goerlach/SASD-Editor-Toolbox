@@ -172,6 +172,42 @@ public sealed class FileSaveConsistencyTests
     }
 
     [Fact]
+    public async Task DirectWriteFile_ExternalCancellationPreservesDocumentState()
+    {
+        using var cancellation = new CancellationTokenSource();
+        var codec = new PausingWriteCodec();
+        var session = new EditorSession(fileCodec: codec);
+        var window = session.CreateDocument("before");
+        session.Engine.InsertText("new ");
+        var document = window.Document;
+        var originalLines = document.Buffer.Snapshot();
+        var originalVersion = document.Version;
+        var originalCursor = window.Cursor;
+        var originalUndoCount = session.Undo.Count;
+
+        // Unlike modern Save, historical direct Write File never acknowledges
+        // a saved snapshot or changes the document identity. Cancellation must
+        // preserve that invariant as well, even after the provider has received
+        // an immutable copy of the outgoing text.
+        var pending = session.Files.WriteCurrentWindowAsync(
+            "cancelled-direct-write.txt", cancellation.Token).AsTask();
+        await codec.Started;
+        Assert.Equal("new before", Assert.Single(codec.WrittenLines!).Text);
+        cancellation.Cancel();
+
+        // The injected codec waits on the passed cancellation token. This
+        // reproduces a slow provider deterministically without touching disk.
+        await Assert.ThrowsAnyAsync<OperationCanceledException>(
+            async () => await pending);
+        Assert.Equal(originalLines, document.Buffer.Snapshot());
+        Assert.Equal(originalVersion, document.Version);
+        Assert.Equal(originalCursor, window.Cursor);
+        Assert.Equal(originalUndoCount, session.Undo.Count);
+        Assert.True(document.IsDirty);
+        Assert.Null(document.FilePath);
+    }
+
+    [Fact]
     public async Task ModernUtf8Storage_PreservesCrlfAndAcknowledgesWrittenSnapshot()
     {
         var path = Path.Combine(Path.GetTempPath(), $"sasd-utf8-{Guid.NewGuid():N}.txt");
