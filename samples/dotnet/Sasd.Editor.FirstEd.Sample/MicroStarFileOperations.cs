@@ -60,13 +60,32 @@ internal static class MicroStarFileOperations
     {
         ArgumentException.ThrowIfNullOrWhiteSpace(path);
         var fullPath = Path.GetFullPath(path);
-        var attributes = File.GetAttributes(fullPath);
-        if ((attributes & (FileAttributes.Directory | FileAttributes.ReparsePoint)) != 0)
-            throw new IOException("Only regular, non-linked files may be deleted.");
+        // Use the same regular-file boundary as Copy and Rename. Only the
+        // caller's user-confirmation requirements differ across operations.
+        ValidateRegularFile(fullPath);
 
         // The host must never invoke this after a denied confirmation.
         // We intentionally do not recursively delete directories.
         File.Delete(fullPath);
+    }
+
+    /// <summary>
+    /// One conservative file-kind boundary for all mutating MicroStar file
+    /// operations. A reparse point or directory must never acquire different
+    /// permissions merely because the caller chose Copy, Rename or Delete.
+    /// </summary>
+    private static void ValidateRegularFile(string fullPath)
+    {
+        // File.GetAttributes checks the entry's metadata (including the
+        // reparse-point flag) rather than treating File.Exists as evidence
+        // that an entry is an ordinary file. File.Exists may follow links.
+        //
+        // This preflight check is not an atomic guarantee: another process
+        // could replace an entry before File.Copy, File.Move or File.Delete.
+        // The host does not claim race-free filesystem authority.
+        var attributes = File.GetAttributes(fullPath);
+        if ((attributes & (FileAttributes.Directory | FileAttributes.ReparsePoint)) != 0)
+            throw new IOException("Only regular, non-linked files are supported.");
     }
 
     private static (string Source, string Destination) Validate(
@@ -99,9 +118,7 @@ internal static class MicroStarFileOperations
         // file actions share one conservative source-ownership contract.
         // This is a preflight safeguard; filesystem races still require
         // stronger handle-based operations in a future hardening phase.
-        var attributes = File.GetAttributes(source);
-        if ((attributes & (FileAttributes.Directory | FileAttributes.ReparsePoint)) != 0)
-            throw new IOException("Only regular, non-linked source files are supported.");
+        ValidateRegularFile(source);
 
         if (Directory.Exists(destination))
             throw new IOException("Destination is an existing directory.");

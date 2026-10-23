@@ -124,6 +124,74 @@ public sealed class MicroStarFileOperationsTests
         finally { Directory.Delete(root, recursive: true); }
     }
 
+    [Fact]
+    public void DeleteRemovesOnlyTheRequestedRegularFile()
+    {
+        var root = NewDirectory();
+        try
+        {
+            var kept = Path.Combine(root, "keep.txt");
+            var removed = Path.Combine(root, "remove.txt");
+            File.WriteAllText(kept, "must survive");
+            File.WriteAllText(removed, "disposable");
+
+            // Confirmation belongs to the UI, not this service. This test
+            // calls the operation directly after intentionally selecting
+            // an expendable path; unrelated siblings must remain unchanged.
+            MicroStarFileOperations.Delete(removed);
+            Assert.False(File.Exists(removed));
+            Assert.Equal("must survive", File.ReadAllText(kept));
+        }
+        finally { Directory.Delete(root, recursive: true); }
+    }
+
+    [Fact]
+    public void DeleteNeverRecursivelyDeletesADirectory()
+    {
+        var root = NewDirectory();
+        try
+        {
+            var directory = Directory.CreateDirectory(Path.Combine(root, "folder"));
+            var child = Path.Combine(directory.FullName, "protected.txt");
+            File.WriteAllText(child, "must survive");
+
+            Assert.Throws<IOException>(() =>
+                MicroStarFileOperations.Delete(directory.FullName));
+            Assert.Equal("must survive", File.ReadAllText(child));
+        }
+        finally { Directory.Delete(root, recursive: true); }
+    }
+
+    [Fact]
+    public void DeleteRejectsSymbolicLinkWithoutTouchingItsTarget()
+    {
+        var root = NewDirectory();
+        try
+        {
+            var target = Path.Combine(root, "target.txt");
+            var link = Path.Combine(root, "link.txt");
+            File.WriteAllText(target, "protected");
+            try
+            {
+                File.CreateSymbolicLink(link, target);
+            }
+            catch (Exception error) when (error is UnauthorizedAccessException
+                or PlatformNotSupportedException or IOException)
+            {
+                // A Windows runner without symlink privileges cannot create
+                // this fixture. Native Linux typically supports it.
+                return;
+            }
+
+            // A symbolic link must not count as an ordinary source file,
+            // even if its target exists and can be read successfully.
+            Assert.Throws<IOException>(() => MicroStarFileOperations.Delete(link));
+            Assert.Equal("protected", File.ReadAllText(target));
+            Assert.True(File.Exists(link));
+        }
+        finally { Directory.Delete(root, recursive: true); }
+    }
+
     private static string NewDirectory()
     {
         var path = Path.Combine(Path.GetTempPath(), "sasd-fileops-" + Guid.NewGuid().ToString("N"));
