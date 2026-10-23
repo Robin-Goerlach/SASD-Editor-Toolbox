@@ -98,6 +98,12 @@ internal sealed class MicroStarFileBrowser
             // Selection IDs are full paths supplied by the read-only catalog;
             // never parse a screen caption into a filesystem path.
             var entry = _entries.First(item => item.FullPath == selected.Id);
+            // A link must never become a navigable directory nor an
+            // implicit file-open target. The browser only returns ordinary
+            // entries; linked paths require a separately reviewed policy.
+            if (entry.IsLink)
+                return new(MicroStarBrowserResultKind.Ignored);
+
             if (entry.IsDirectory)
             {
                 Navigate(entry.FullPath);

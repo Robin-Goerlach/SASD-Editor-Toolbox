@@ -4,7 +4,8 @@ namespace Sasd.Editor.FirstEd.Sample;
 /// One immutable filesystem entry for the MicroStar browser. The full path
 /// is an identity returned by enumeration; the UI caption is only a label.
 /// </summary>
-internal sealed record MicroStarDirectoryEntry(string FullPath, string Name, bool IsDirectory);
+internal sealed record MicroStarDirectoryEntry(
+    string FullPath, string Name, bool IsDirectory, bool IsLink = false);
 
 /// <summary>
 /// Read-only filesystem discovery for the MicroStar sample application.
@@ -39,8 +40,14 @@ internal static class MicroStarDirectoryCatalog
         {
             var attributes = File.GetAttributes(path);
             var isDirectory = (attributes & FileAttributes.Directory) != 0;
+            var isLink = (attributes & FileAttributes.ReparsePoint) != 0;
+
+            // Keep linked entries visible for diagnosis, but mark them
+            // explicitly. Treating an OS-reported linked directory as an
+            // ordinary directory would let Enter escape the intended
+            // non-recursive, no-link-following browser contract.
             results.Add(new MicroStarDirectoryEntry(
-                path, Path.GetFileName(path), isDirectory));
+                path, Path.GetFileName(path), isDirectory, isLink));
         }
 
         return results
@@ -61,7 +68,7 @@ internal static class MicroStarDirectoryCatalog
         ArgumentNullException.ThrowIfNull(entries);
         return new MicroStarSelectionList(
             entries.Select(entry => new MicroStarListItem(
-                entry.FullPath, (entry.IsDirectory ? "[DIR] " : "      ") + entry.Name)),
+                entry.FullPath, (entry.IsLink ? "[LNK] " : entry.IsDirectory ? "[DIR] " : "      ") + entry.Name)),
             visibleRows);
     }
 }

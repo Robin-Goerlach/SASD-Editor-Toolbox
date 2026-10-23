@@ -77,6 +77,57 @@ public sealed class MicroStarFileBrowserTests
     }
 
     [Fact]
+    public void LinkedDirectoryAndFileRemainVisibleButCannotBeOpened()
+    {
+        var root = Path.Combine(Path.GetTempPath(),
+            "sasd-browser-links-" + Guid.NewGuid().ToString("N"));
+        Directory.CreateDirectory(root);
+        try
+        {
+            var directory = Directory.CreateDirectory(Path.Combine(root, "real-dir"));
+            var file = Path.Combine(root, "real-file.txt");
+            File.WriteAllText(file, "protected");
+            try
+            {
+                Directory.CreateSymbolicLink(Path.Combine(root, "linked-dir"), directory.FullName);
+                File.CreateSymbolicLink(Path.Combine(root, "linked-file.txt"), file);
+            }
+            catch (Exception error) when (error is IOException
+                or UnauthorizedAccessException or PlatformNotSupportedException)
+            {
+                // Symlink creation requires special privileges on some
+                // Windows runners. Linux runners exercise this fixture.
+                return;
+            }
+
+            var browser = new MicroStarFileBrowser(root, 10);
+            var linked = browser.VisibleEntries.Where(entry => entry.IsLink).ToArray();
+            Assert.Equal(2, linked.Length);
+
+            // Selection navigates one entry at a time. Linked entries are
+            // visible, but Enter may neither traverse them nor choose them
+            // as file-open destinations, even when the targets are valid.
+            for (var i = 0; i < browser.TotalEntries; i++)
+            {
+                var selected = browser.SelectedEntry!;
+                if (selected.IsLink)
+                {
+                    Assert.Equal(MicroStarBrowserResultKind.Ignored,
+                        browser.Handle(ConsoleKey.Enter).Kind);
+                    Assert.Null(MicroStarFileActionPolicy.Resolve(
+                        ConsoleKey.F5, ConsoleModifiers.None, selected));
+                    Assert.Equal(root, browser.CurrentDirectory);
+                }
+                if (i < browser.TotalEntries - 1)
+                    browser.Handle(ConsoleKey.DownArrow);
+            }
+            Assert.Equal("protected", File.ReadAllText(file));
+            Assert.True(Directory.Exists(directory.FullName));
+        }
+        finally { Directory.Delete(root, recursive: true); }
+    }
+
+    [Fact]
     public void ArrowNavigationNeverChoosesFileByItself()
     {
         var root = Path.Combine(Path.GetTempPath(), "sasd-browser-" + Guid.NewGuid().ToString("N"));

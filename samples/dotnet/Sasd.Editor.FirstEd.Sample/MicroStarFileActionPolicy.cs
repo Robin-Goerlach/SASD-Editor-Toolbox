@@ -17,7 +17,7 @@ internal static class MicroStarFileActionPolicy
         ConsoleKey key, ConsoleModifiers modifiers,
         MicroStarDirectoryEntry? entry)
     {
-        if (entry is null || entry.IsDirectory ||
+        if (entry is null || entry.IsDirectory || entry.IsLink ||
             (modifiers & (ConsoleModifiers.Alt | ConsoleModifiers.Control)) != 0)
             return null;
 
