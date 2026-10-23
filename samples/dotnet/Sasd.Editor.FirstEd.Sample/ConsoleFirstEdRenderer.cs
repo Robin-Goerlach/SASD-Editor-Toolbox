@@ -64,13 +64,13 @@ internal sealed class ConsoleFirstEdRenderer(EditorSession session)
             var windowNumber = GetWindowNumber(window.WindowId);
             var current = window.WindowId == session.CurrentWindow.WindowId;
 
-            var mode = viewport.Status.InsertMode ? "INS" : "OVR";
-            var dirty = viewport.Status.IsDirty ? " *" : string.Empty;
-            var active = current ? ">" : " ";
+            // Keep the terminal-host status vocabulary in a pure policy.
+            // The reusable viewport already supplies document-specific
+            // values; only this renderer knows which window is active.
             WriteRow(
                 frame.TopRow,
-                $"{active}W{windowNumber} {viewport.Status.FileName}  Ln {viewport.Status.Line}  Col {viewport.Status.Column}  {mode}" +
-                $"  WW:{OnOff(viewport.Status.WordWrap)} AI:{OnOff(viewport.Status.AutoIndent)}{dirty}",
+                ConsoleFirstEdStatusLinePolicy.Format(
+                    viewport.Status, windowNumber, current),
                 width,
                 role: FirstEdColorRole.Status);
 
