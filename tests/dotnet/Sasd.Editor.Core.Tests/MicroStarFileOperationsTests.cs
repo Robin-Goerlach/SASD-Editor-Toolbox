@@ -192,6 +192,57 @@ public sealed class MicroStarFileOperationsTests
         finally { Directory.Delete(root, recursive: true); }
     }
 
+    [Fact]
+    public void RenameMissingSourceDoesNotCreateDestination()
+    {
+        var root = NewDirectory();
+        try
+        {
+            var missing = Path.Combine(root, "missing.txt");
+            var destination = Path.Combine(root, "destination.txt");
+
+            // A file may disappear between its selection in the browser
+            // and confirmation in the terminal. Reject this condition
+            // without creating an empty replacement or changing siblings.
+            var preserved = Path.Combine(root, "preserved.txt");
+            File.WriteAllText(preserved, "original");
+            Assert.Throws<FileNotFoundException>(() =>
+                MicroStarFileOperations.Rename(missing, destination));
+
+            Assert.False(File.Exists(destination));
+            Assert.Equal("original", File.ReadAllText(preserved));
+        }
+        finally { Directory.Delete(root, recursive: true); }
+    }
+
+    [Fact]
+    public void CopyAndRenameNeverUseAnExistingDirectoryAsDestination()
+    {
+        var root = NewDirectory();
+        try
+        {
+            var source = Path.Combine(root, "source.txt");
+            var directory = Path.Combine(root, "destination");
+            var child = Path.Combine(directory, "protected.txt");
+            Directory.CreateDirectory(directory);
+            File.WriteAllText(source, "source content");
+            File.WriteAllText(child, "protected content");
+
+            // The target is intentionally a directory, not a filename.
+            // Neither operation may reinterpret it as a request to choose
+            // a filename inside the folder or to replace its contents.
+            Assert.Throws<IOException>(() =>
+                MicroStarFileOperations.Copy(source, directory));
+            Assert.Throws<IOException>(() =>
+                MicroStarFileOperations.Rename(source, directory));
+
+            Assert.Equal("source content", File.ReadAllText(source));
+            Assert.Equal("protected content", File.ReadAllText(child));
+            Assert.True(Directory.Exists(directory));
+        }
+        finally { Directory.Delete(root, recursive: true); }
+    }
+
     private static string NewDirectory()
     {
         var path = Path.Combine(Path.GetTempPath(), "sasd-fileops-" + Guid.NewGuid().ToString("N"));
