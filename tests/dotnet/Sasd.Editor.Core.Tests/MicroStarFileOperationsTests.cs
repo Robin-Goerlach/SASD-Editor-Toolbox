@@ -83,6 +83,47 @@ public sealed class MicroStarFileOperationsTests
         finally { Directory.Delete(root, recursive: true); }
     }
 
+    [Fact]
+    public void LinkedSourceCannotBeCopiedOrRenamed()
+    {
+        var root = NewDirectory();
+        try
+        {
+            var target = Path.Combine(root, "real.txt");
+            var link = Path.Combine(root, "link.txt");
+            var copy = Path.Combine(root, "copy.txt");
+            var renamed = Path.Combine(root, "renamed.txt");
+            File.WriteAllText(target, "protected target");
+
+            try
+            {
+                File.CreateSymbolicLink(link, target);
+            }
+            catch (Exception error) when (error is UnauthorizedAccessException
+                or PlatformNotSupportedException or IOException)
+            {
+                // Windows may require Developer Mode or a specific permission
+                // to create a symlink. Do not fail unrelated CI environments;
+                // native Linux runners normally exercise the actual link.
+                return;
+            }
+
+            // File.Exists follows the link, so only an explicit attributes
+            // check protects the regular-file-only contract. Reject both
+            // copy and rename *before* creating or moving a destination.
+            Assert.True(File.Exists(link));
+            Assert.Throws<IOException>(() =>
+                MicroStarFileOperations.Copy(link, copy));
+            Assert.Throws<IOException>(() =>
+                MicroStarFileOperations.Rename(link, renamed));
+            Assert.False(File.Exists(copy));
+            Assert.False(File.Exists(renamed));
+            Assert.Equal("protected target", File.ReadAllText(target));
+            Assert.True(File.Exists(link));
+        }
+        finally { Directory.Delete(root, recursive: true); }
+    }
+
     private static string NewDirectory()
     {
         var path = Path.Combine(Path.GetTempPath(), "sasd-fileops-" + Guid.NewGuid().ToString("N"));

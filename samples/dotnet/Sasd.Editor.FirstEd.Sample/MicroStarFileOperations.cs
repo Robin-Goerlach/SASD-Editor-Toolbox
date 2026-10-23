@@ -91,6 +91,18 @@ internal static class MicroStarFileOperations
         // File.Copy/Move subsequently perform authoritative OS checks.
         if (!File.Exists(source))
             throw new FileNotFoundException("Source must be an existing regular file.", source);
+
+        // The file manager deliberately works on regular files, not links.
+        // File.Exists follows a symbolic link and would otherwise let Copy
+        // read an unrelated linked target or Rename move the link itself.
+        // Use the same reparse-point boundary as Delete so all three public
+        // file actions share one conservative source-ownership contract.
+        // This is a preflight safeguard; filesystem races still require
+        // stronger handle-based operations in a future hardening phase.
+        var attributes = File.GetAttributes(source);
+        if ((attributes & (FileAttributes.Directory | FileAttributes.ReparsePoint)) != 0)
+            throw new IOException("Only regular, non-linked source files are supported.");
+
         if (Directory.Exists(destination))
             throw new IOException("Destination is an existing directory.");
 
