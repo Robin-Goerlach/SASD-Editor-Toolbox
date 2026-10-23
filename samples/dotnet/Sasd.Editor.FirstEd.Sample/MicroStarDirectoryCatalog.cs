@@ -58,6 +58,21 @@ internal static class MicroStarDirectoryCatalog
     }
 
     /// <summary>
+    /// The single presentation caption policy shared by the selectable
+    /// list model and the popup renderer. A link may also carry the OS
+    /// Directory attribute: link identity MUST take precedence over [DIR].
+    /// This returns a label only; filesystem operations use FullPath and
+    /// IsLink independently, never parse captions into authorization.
+    /// </summary>
+    internal static string Caption(MicroStarDirectoryEntry entry)
+    {
+        ArgumentNullException.ThrowIfNull(entry);
+        var prefix = entry.IsLink ? "[LNK] "
+            : entry.IsDirectory ? "[DIR] " : "      ";
+        return prefix + entry.Name;
+    }
+
+    /// <summary>
     /// Adapt discovery results to a UI list. IDs are full paths rather than
     /// display names: a file and directory in different folders can share a
     /// basename, and user-visible labels must not be trusted as identities.
@@ -68,7 +83,7 @@ internal static class MicroStarDirectoryCatalog
         ArgumentNullException.ThrowIfNull(entries);
         return new MicroStarSelectionList(
             entries.Select(entry => new MicroStarListItem(
-                entry.FullPath, (entry.IsLink ? "[LNK] " : entry.IsDirectory ? "[DIR] " : "      ") + entry.Name)),
+                entry.FullPath, Caption(entry))),
             visibleRows);
     }
 }

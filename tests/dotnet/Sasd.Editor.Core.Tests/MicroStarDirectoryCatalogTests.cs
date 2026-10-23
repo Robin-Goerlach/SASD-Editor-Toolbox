@@ -39,6 +39,24 @@ public sealed class MicroStarDirectoryCatalogTests
         }
     }
 
+    [Theory]
+    [InlineData(false, false, "      normal.txt")]
+    [InlineData(true, false, "[DIR] normal.txt")]
+    [InlineData(false, true, "[LNK] normal.txt")]
+    [InlineData(true, true, "[LNK] normal.txt")]
+    public void ListAndPopupCaptionShareLinkFirstPrecedence(
+        bool isDirectory, bool isLink, string expected)
+    {
+        // Directory symlinks may have BOTH Directory and ReparsePoint
+        // attributes. Rendering the list and popup independently used to
+        // contradict the browser's refusal to traverse these links.
+        var entry = new MicroStarDirectoryEntry(
+            "/virtual/normal.txt", "normal.txt", isDirectory, isLink);
+        var list = MicroStarDirectoryCatalog.CreateList([entry], 1);
+        Assert.Equal(expected, MicroStarDirectoryCatalog.Caption(entry));
+        Assert.Equal(expected, Assert.Single(list.Visible).Caption);
+    }
+
     [Fact]
     public void MissingDirectoryIsReportedInsteadOfPretendingToBeEmpty()
     {

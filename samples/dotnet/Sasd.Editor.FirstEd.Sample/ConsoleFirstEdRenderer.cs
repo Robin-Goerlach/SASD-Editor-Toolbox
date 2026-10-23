@@ -284,7 +284,10 @@ internal sealed class ConsoleFirstEdRenderer(EditorSession session)
             foreach (var entry in visible)
             {
                 var selected = browser.Selection.Selected?.Id == entry.FullPath;
-                var label = (entry.IsDirectory ? "[DIR] " : "      ") + entry.Name;
+                // Reuse the directory catalog's caption policy. In particular,
+                // directory symlinks must show [LNK], not [DIR], because
+                // the browser deliberately refuses to enter linked targets.
+                var label = MicroStarDirectoryCatalog.Caption(entry);
                 label = MicroStarBrowserDisplay.SafeLabel(label, 50);
                 content.Add((selected ? "> " : "  ") + label);
                 index++;
