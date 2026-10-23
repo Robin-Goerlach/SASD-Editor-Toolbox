@@ -115,7 +115,7 @@ internal sealed class ConsoleFirstEdRenderer(EditorSession session)
 
         // Recompose nested overlays from the model rather than terminal cells.
         foreach (var overlay in _overlays.Active)
-            DrawMicroStarPopup(overlay);
+            DrawMicroStarPopup(overlay, _overlays.SelectionOf(overlay));
         if (_overlays.Count == 0)
             PositionCursor(textWidth);
         Console.CursorVisible = _overlays.Count == 0;
@@ -149,6 +149,7 @@ internal sealed class ConsoleFirstEdRenderer(EditorSession session)
         try
         {
             Render();
+            _overlays.SetSelection(layout, navigation.SelectedChoice);
             DrawMicroStarPopup(layout, navigation.SelectedChoice);
             while (true)
             {
@@ -163,7 +164,12 @@ internal sealed class ConsoleFirstEdRenderer(EditorSession session)
                 // editor remains the source of truth and is never edited by
                 // navigating a menu.
                 if (result.Kind == MicroStarMenuResultKind.SelectionChanged)
+                {
+                    // Persist the selection for subsequent full redraws, not
+                    // just for this immediate incremental popup painting.
+                    _overlays.SetSelection(layout, navigation.SelectedChoice);
                     DrawMicroStarPopup(layout, navigation.SelectedChoice);
+                }
             }
         }
         finally
@@ -232,6 +238,7 @@ internal sealed class ConsoleFirstEdRenderer(EditorSession session)
         try
         {
             Render();
+            _overlays.SetSelection(layout, focus.FocusedId == "no" ? 'N' : 'Y');
             DrawMicroStarPopup(layout, focus.FocusedId == "no" ? 'N' : 'Y');
             while (true)
             {
@@ -250,7 +257,10 @@ internal sealed class ConsoleFirstEdRenderer(EditorSession session)
                 if (result == MicroStarDialogNavigationResult.Activate)
                     return focus.FocusedId == "yes";
                 if (result == MicroStarDialogNavigationResult.FocusChanged)
+                {
+                    _overlays.SetSelection(layout, focus.FocusedId == "no" ? 'N' : 'Y');
                     DrawMicroStarPopup(layout, focus.FocusedId == "no" ? 'N' : 'Y');
+                }
             }
         }
         finally

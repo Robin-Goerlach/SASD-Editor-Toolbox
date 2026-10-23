@@ -61,6 +61,44 @@ public sealed class ConsoleMicroStarOverlayStackTests
     }
 
     [Fact]
+    public void NestedSelectionRestoresParentAndDoesNotLeakToNextPopup()
+    {
+        var stack = new ConsoleMicroStarOverlayStack();
+        var parent = Popup("F Find  R Replace");
+        var child = Popup("N No  Y Yes");
+
+        using (stack.Push(parent))
+        {
+            stack.SetSelection(parent, 'R');
+            using (stack.Push(child))
+            {
+                stack.SetSelection(child, 'Y');
+                Assert.Equal('R', stack.SelectionOf(parent));
+                Assert.Equal('Y', stack.SelectionOf(child));
+            }
+
+            // Closing a child retains its parent's choice for a full model
+            // redraw; the completed child's focus must be discarded.
+            Assert.Equal('R', stack.SelectionOf(parent));
+            Assert.Null(stack.SelectionOf(child));
+        }
+
+        using (stack.Push(child))
+            Assert.Null(stack.SelectionOf(child));
+    }
+
+    [Fact]
+    public void SelectionCanOnlyChangeOnAnActivePopup()
+    {
+        var stack = new ConsoleMicroStarOverlayStack();
+        var popup = Popup("F Find");
+        Assert.Throws<InvalidOperationException>(() => stack.SetSelection(popup, 'F'));
+        using (stack.Push(popup))
+            stack.SetSelection(popup, 'F');
+        Assert.Throws<InvalidOperationException>(() => stack.SetSelection(popup, 'F'));
+    }
+
+    [Fact]
     public void NullPopupIsRejected()
     {
         var stack = new ConsoleMicroStarOverlayStack();
