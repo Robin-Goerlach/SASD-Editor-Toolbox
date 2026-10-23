@@ -101,6 +101,57 @@ public sealed class ConsoleFirstEdStatusLineTests
     }
 
     [Fact]
+    public void RejectedTerminalResizePreservesFramesAndDisplayedStatus()
+    {
+        var session = new EditorSession();
+        var first = session.CreateDocument("first document");
+        var second = session.CreateDocument("second document");
+        Assert.True(session.WindowLayout.Configure(12));
+        session.SetCurrentWindow(second.WindowId);
+        second.Cursor = new TextPosition(0, 4);
+
+        var builder = new EditorViewportBuilder(session);
+        var beforeFrames = session.WindowLayout.Frames.ToArray();
+        var beforeHeaders = beforeFrames.Select((frame, index) =>
+        {
+            var window = session.Windows[index];
+            return ConsoleFirstEdStatusLinePolicy.Format(
+                builder.Build(window, frame.TextRows, 30).Status,
+                index + 1, window.WindowId == session.CurrentWindow.WindowId);
+        }).ToArray();
+        var originalUndo = session.Undo.Count;
+
+        // Each window needs at least three terminal rows. A six-row workspace
+        // is legal for two windows, but five rows cannot accommodate both.
+        // Rejection must be atomic: if a partial shrink escaped, the host
+        // could repaint a header over another window's document area.
+        Assert.False(session.WindowLayout.ResizeWorkspace(5));
+        Assert.Equal(12, session.WindowLayout.TotalRows);
+        Assert.Equal(beforeFrames, session.WindowLayout.Frames);
+
+        var afterHeaders = session.WindowLayout.Frames.Select((frame, index) =>
+        {
+            var window = session.Windows[index];
+            return ConsoleFirstEdStatusLinePolicy.Format(
+                builder.Build(window, frame.TextRows, 30).Status,
+                index + 1, window.WindowId == session.CurrentWindow.WindowId);
+        }).ToArray();
+
+        // Preserve both the exact physical header strings and the distinct
+        // view/document identities; a refused host resize must never become
+        // an editor command, cursor edit, dirty change, or Undo transaction.
+        Assert.Equal(beforeHeaders, afterHeaders);
+        Assert.StartsWith(" W1 ", afterHeaders[0]);
+        Assert.StartsWith(">W2 ", afterHeaders[1]);
+        Assert.Contains("Col 5", afterHeaders[1]);
+        Assert.Same(first, session.Windows[0]);
+        Assert.Same(second, session.CurrentWindow);
+        Assert.False(first.Document.IsDirty);
+        Assert.False(second.Document.IsDirty);
+        Assert.Equal(originalUndo, session.Undo.Count);
+    }
+
+    [Fact]
     public void DirtyMarkerIsSharedByLinkedViewsWithoutChangingUndo()
     {
         var session = new EditorSession();
