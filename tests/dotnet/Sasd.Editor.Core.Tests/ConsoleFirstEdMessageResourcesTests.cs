@@ -82,6 +82,23 @@ public sealed class ConsoleFirstEdMessageResourcesTests
     }
 
     [Theory]
+    [InlineData("\u202E")] // Right-to-left override can spoof error-code order.
+    [InlineData("\u200B")] // Zero-width space is invisible formatting.
+    public void UnicodeFormatCharactersInvalidateEntireResourceFile(string invisible)
+    {
+        var path = Path.GetTempFileName();
+        try
+        {
+            var payload = "{\"Editor.Errors.Operation.Aborted\":\"Valid\","
+                + "\"Editor.Errors.File.IoFailed\":\"unsafe"
+                + invisible + "\"}";
+            File.WriteAllText(path, payload, new UTF8Encoding(false));
+            Assert.Empty(ConsoleFirstEdMessageResources.Load(path));
+        }
+        finally { File.Delete(path); }
+    }
+
+    [Theory]
     [InlineData("{")]
     [InlineData("[]")]
     [InlineData("{\"Editor.Errors.Operation.Aborted\": 1}")]

@@ -78,6 +78,20 @@ public sealed class ConsoleFirstEdErrorPresentationTests
             ConsoleFirstEdErrorPresentation.Format(error, resources));
     }
 
+    [Theory]
+    [InlineData("\u202E")]
+    [InlineData("\u200B")]
+    public void DirectHostOverrideRejectsInvisibleUnicodeFormatting(string invisible)
+    {
+        var error = EditorErrorCatalog.OperationAborted();
+        var messages = new Dictionary<string, string>
+        {
+            [error.ResourceKey] = "edited" + invisible + "text"
+        };
+        Assert.Equal($"{error.Code}: {error.Message}",
+            ConsoleFirstEdErrorPresentation.Format(error, messages));
+    }
+
     [Fact]
     public void OtherTypedErrorsRetainCatalogFallback()
     {

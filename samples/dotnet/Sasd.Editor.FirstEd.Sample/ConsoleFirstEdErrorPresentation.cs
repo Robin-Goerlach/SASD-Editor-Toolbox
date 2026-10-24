@@ -1,3 +1,4 @@
+using System.Globalization;
 using System.Text;
 using Sasd.Editor.Hooks;
 
@@ -69,10 +70,13 @@ internal static class ConsoleFirstEdErrorPresentation
             return false;
 
         // CR/LF, ESC, C1 controls and DEL can manipulate terminal state.
+        // Unicode format characters such as U+202E can also visually reorder
+        // the immutable error-code prefix. Refuse them even when an override
+        // dictionary was supplied directly rather than loaded from JSON.
         // Reject these entirely, rather than attempting lossy sanitation of
         // a potentially externally supplied localization value.
         foreach (var character in text)
-            if (char.IsControl(character) || character is >= '\u007f' and <= '\u009f')
+            if (char.IsControl(character) || character is >= '\u007f' and <= '\u009f' || char.GetUnicodeCategory(character) == UnicodeCategory.Format)
                 return false;
         return true;
     }

@@ -1,3 +1,4 @@
+using System.Globalization;
 using System.Text;
 using System.Text.Json;
 using Sasd.Editor.Hooks;
@@ -48,9 +49,13 @@ internal static class ConsoleFirstEdMessageResources
                 var knownKey = Enum.GetValues<EditorErrorId>()
                     .Any(id => EditorErrorCatalog.Describe(id).ResourceKey == property.Name);
                 var value = property.Value.GetString();
+                // Unicode format characters (notably bidi overrides) can
+                // reorder the visible error code without being classified
+                // as ordinary control characters. No such invisible
+                // formatting is needed in this single-line host resource.
                 if (!knownKey || string.IsNullOrWhiteSpace(value)
                     || value.Length > 240 || value.Any(char.IsControl)
-                    || value.Any(c => c is >= '\u007f' and <= '\u009f')
+                    || value.Any(c => c is >= '\u007f' and <= '\u009f' || char.GetUnicodeCategory(c) == UnicodeCategory.Format)
                     || !messages.TryAdd(property.Name, value))
                     return new Dictionary<string, string>();
             }
