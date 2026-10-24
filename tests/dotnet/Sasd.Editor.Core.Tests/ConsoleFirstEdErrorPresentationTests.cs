@@ -46,6 +46,39 @@ public sealed class ConsoleFirstEdErrorPresentationTests
     }
 
     [Fact]
+    public void HostResourceOverridesGeneralErrorWithoutChangingStableCode()
+    {
+        var error = EditorErrorCatalog.Create(EditorErrorId.OperationAborted);
+        var resources = new Dictionary<string, string>
+        {
+            [error.ResourceKey] = "Vorgang abgebrochen."
+        };
+
+        var displayed = ConsoleFirstEdErrorPresentation.Format(error, resources);
+        Assert.Equal($"{error.Code}: Vorgang abgebrochen.", displayed);
+        Assert.Equal("Editor.Errors.Operation.Aborted", error.ResourceKey);
+        Assert.Equal(EditorErrorId.OperationAborted, error.Id);
+    }
+
+    [Theory]
+    [InlineData("bad\nline")]
+    [InlineData("bad\rline")]
+    [InlineData("bad\u001b[2J")]
+    [InlineData("bad\u009b2J")]
+    [InlineData("   ")]
+    public void UnsafeHostResourceFallsBackWithoutTerminalControls(string value)
+    {
+        var error = EditorErrorCatalog.Create(EditorErrorId.OperationAborted);
+        var resources = new Dictionary<string, string>
+        {
+            [error.ResourceKey] = value
+        };
+
+        Assert.Equal($"{error.Code}: {error.Message}",
+            ConsoleFirstEdErrorPresentation.Format(error, resources));
+    }
+
+    [Fact]
     public void OtherTypedErrorsRetainCatalogFallback()
     {
         var error = EditorErrorCatalog.Create(EditorErrorId.OperationAborted);

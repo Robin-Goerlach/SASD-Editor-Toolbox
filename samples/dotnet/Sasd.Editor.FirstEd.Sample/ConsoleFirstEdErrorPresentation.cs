@@ -17,7 +17,14 @@ namespace Sasd.Editor.FirstEd.Sample;
 /// </remarks>
 internal static class ConsoleFirstEdErrorPresentation
 {
-    internal static string Format(EditorError error)
+    /// <summary>
+    /// Formats an error with optional host-owned resource overrides. Keys are
+    /// the stable EditorError.ResourceKey values, not historical numeric DOS
+    /// message identifiers. Loading and validating an actual resource file
+    /// belongs to a future host adapter, never to the portable Core.
+    /// </summary>
+    internal static string Format(
+        EditorError error, IReadOnlyDictionary<string, string>? resources = null)
     {
         ArgumentNullException.ThrowIfNull(error);
 
@@ -30,6 +37,19 @@ internal static class ConsoleFirstEdErrorPresentation
             return $"{error.Code}: Text contains characters unsupported by the legacy file format.";
         }
 
+        // A host may localize a semantic resource key, but resource data
+        // must not be allowed to inject cursor-control bytes or newlines into
+        // a one-line terminal status area. Ignore malformed entries rather
+        // than risking display corruption; retaining the stable machine code
+        // allows diagnostics even when a translation is unavailable.
+        //
+        // Encoding failures keep their explicit diagnostic so the user is
+        // told about actual format limitations instead of generic I/O.
+        if (resources is not null
+            && resources.TryGetValue(error.ResourceKey, out var translated)
+            && IsSafeSingleLine(translated))
+            return $"{error.Code}: {translated}";
+
         // A denied file operation is distinct from a malformed encoding.
         // Do not expose exception.Message: OS diagnostics may include paths,
         // usernames, internal server addresses or other private details.
@@ -41,5 +61,19 @@ internal static class ConsoleFirstEdErrorPresentation
 
         // Preserve the catalog's general, safe default for non-file errors.
         return $"{error.Code}: {error.Message}";
+    }
+
+    private static bool IsSafeSingleLine(string? text)
+    {
+        if (string.IsNullOrWhiteSpace(text))
+            return false;
+
+        // CR/LF, ESC, C1 controls and DEL can manipulate terminal state.
+        // Reject these entirely, rather than attempting lossy sanitation of
+        // a potentially externally supplied localization value.
+        foreach (var character in text)
+            if (char.IsControl(character) || character is >= '\u007f' and <= '\u009f')
+                return false;
+        return true;
     }
 }

@@ -65,3 +65,21 @@ The original exception remains attached for diagnostics. A host should not autom
 Shared conformance cases may assert an error `id`, `code` and `resourceKey`. The .NET adapter captures errors through `IEditorHooks`; C++ and Java should map the same portable values to idiomatic native enums/resources rather than reproducing the C# type layout.
 
 This keeps error semantics portable while allowing each host and language to choose its own presentation and localization mechanism.
+
+## Optional host-owned message overrides (modern replacement)
+
+The FIRST-ED console presentation adapter accepts an optional read-only
+mapping from **stable `ResourceKey` to a one-line display message**. This is
+an explicit injection point for future localization or configuration; it
+does not parse, load or claim binary/text compatibility with Borland's
+`EDITERR.MSG`. The semantic `EditorErrorId` and `Code` are unchanged.
+A missing, empty, or terminal-control-containing translation falls back
+to the safe English catalog message. Encoder failures use a specific safe
+diagnostic instead of a generic translated I/O message, and exception
+messages are never used as display resources. Loading an external resource
+file or choosing a language remains a separate host responsibility.
+
+Covered by `ConsoleFirstEdErrorPresentationTests` for normal overrides,
+missing entries, unsafe control characters and unchanged error identity.
+This is not historical numeric-message-file parity or a completed release
+sign-off for HP-02.
