@@ -12,13 +12,19 @@ namespace Sasd.Editor.FirstEd.Sample;
 internal sealed class ConsoleFirstEdHooks : IEditorHooks
 {
     private string? _pendingMessage;
+    private readonly IReadOnlyDictionary<string, string> _resources;
+
+    internal ConsoleFirstEdHooks(IReadOnlyDictionary<string, string>? resources = null)
+    {
+        _resources = resources ?? new Dictionary<string, string>();
+    }
 
     public ValueTask OnErrorAsync(
         EditorSession session,
         EditorError error,
         CancellationToken cancellationToken)
     {
-        _pendingMessage = ConsoleFirstEdErrorPresentation.Format(error);
+        _pendingMessage = ConsoleFirstEdErrorPresentation.Format(error, _resources);
         return ValueTask.CompletedTask;
     }
 

@@ -31,7 +31,12 @@ if (Console.IsInputRedirected || Console.IsOutputRedirected)
 
 Console.OutputEncoding = Encoding.UTF8;
 
-var hooks = new ConsoleFirstEdHooks();
+// Localization is an opt-in terminal-host concern. No environment value
+// means the original built-in messages remain unchanged. An invalid file
+// yields a safe empty dictionary; no paths or JSON diagnostics are printed.
+var messageResources = ConsoleFirstEdMessageResources.Load(
+    Environment.GetEnvironmentVariable(ConsoleFirstEdMessageResources.EnvironmentVariable));
+var hooks = new ConsoleFirstEdHooks(messageResources);
 var session = new EditorSession(hooks);
 
 // --demo is a real, editable document in the normal public model. It uses
