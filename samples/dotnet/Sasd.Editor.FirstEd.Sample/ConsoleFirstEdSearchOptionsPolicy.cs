@@ -49,7 +49,14 @@ internal static class ConsoleFirstEdSearchOptionsPolicy
             if (char.IsControl(raw) || char.IsWhiteSpace(raw))
                 return null;
 
-            var option = char.ToUpperInvariant(raw);
+            // This is a deliberately ASCII-only host vocabulary, not the
+            // undocumented Borland Optstr grammar. Normalize lowercase ASCII
+            // explicitly rather than applying Unicode case folding. A pasted
+            // lookalike or non-ASCII letter must not silently authorize a
+            // different search than the operator requested.
+            var option = raw is >= 'a' and <= 'z'
+                ? (char)(raw - ('a' - 'A'))
+                : raw;
             if (option is not ('C' or 'W' or 'R') || !seen.Add(option))
                 return null;
 

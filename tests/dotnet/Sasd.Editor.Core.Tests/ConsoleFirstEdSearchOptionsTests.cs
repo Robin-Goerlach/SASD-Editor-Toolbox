@@ -60,6 +60,25 @@ public sealed class ConsoleFirstEdSearchOptionsTests
         Assert.Null(request.Options); // never mutate an incoming request
     }
 
+    [Theory]
+    [InlineData("Ｃ")] // Fullwidth Latin C is not the ASCII shortcut.
+    [InlineData("K")] // Compatibility characters do not belong to this grammar.
+    [InlineData("c\u200Bw")] // Invisible formatting character between options.
+    [InlineData("C,C")] // Repeating one option is a malformed request.
+    public void NonAsciiOrDuplicateOptionsDoNotDispatchOrMutateRequest(string answer)
+    {
+        var request = new EditorCommandRequest(
+            EditorCommandId.FindNext, Text: "needle");
+        var rejected = ConsoleFirstEdSearchOptionsPolicy.Attach(request, answer);
+
+        // Only a fully parsed option string may produce a new semantic
+        // request. Neither invalid input nor partial recognition of an
+        // initial valid letter may mutate the caller's record.
+        Assert.Null(rejected);
+        Assert.Null(request.Options);
+        Assert.Equal("needle", request.Text);
+    }
+
     [Fact]
     public async Task SemanticFindHonorsOptionsAndRemembersThemForFindAgain()
     {
