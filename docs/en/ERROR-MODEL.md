@@ -83,3 +83,14 @@ Covered by `ConsoleFirstEdErrorPresentationTests` for normal overrides,
 missing entries, unsafe control characters and unchanged error identity.
 This is not historical numeric-message-file parity or a completed release
 sign-off for HP-02.
+
+## HP-02 implementation verification
+
+The optional UTF-8 JSON resource file is now wired through the FIRST-ED
+host's real error hook at startup. The headless integration test
+`LoadedResourceFlowsThroughActualHostHookAndKeepsFallback` verifies that a
+loaded German message reaches the pending terminal message and that another
+untranslated error retains its typed English fallback. It also verifies that
+consuming a pending message clears it, without changing the editor core.
+The separate HP-02 decision register chooses this **modern substitute** for
+V1; it does not imply compatibility with original `EDITERR.MSG` files.

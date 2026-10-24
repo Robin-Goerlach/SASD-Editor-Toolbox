@@ -24,7 +24,7 @@ and DOS hardware compatibility are NOT claimed.
 | Decision ID | Historical feature | Current evidence | Release decision still required |
 |---|---|---|---|
 | HP-01 | Original `Optstr` find/replace options | Modern C/W/R terminal grammar and core search options documented in `HANDBOOK-SUPPLEMENT-V1.md` | Approve documented UI divergence or implement verified original semantics; do not invent original grammar |
-| HP-02 | `EDITERR.MSG`, `EditMessage`, `EditErrormsg` | Typed `EditorErrorCatalog` and FIRST-ED host presentation | Approve loss of historical numeric message-file customization, or implement an explicitly specified compatibility adapter |
+| HP-02 | `EDITERR.MSG`, `EditMessage`, `EditErrormsg` | Typed `EditorErrorCatalog`; validated optional JSON resource file; safe FIRST-ED host presentation; headless hook integration tests | **Modernization decision recorded:** use stable resource keys and optional JSON instead of the unverified Borland numeric-message format. Original `EDITERR.MSG` file interchange remains unsupported; interactive release acceptance is still OPEN. |
 | HP-03 | Global `Tabsize` / `EditDefineTab` | Per-window tab width, recorded in handbook index | Approve modern per-window policy with tests showing linked and independent views retain intended widths |
 | HP-04 | DOS assembler/video-memory routines | `EditUpdrowasm`, `MoveFromScreen`, `MoveToScreen` marked non-applicable; model-based repaint/overlay stack exists | Accept observable redraw/restore equivalence rather than literal BIOS/video-memory access, with terminal scenarios |
 | HP-05 | MicroStar `MakeWindow` and `RestoreWindow` | Current host has `ConsoleMicroStarOverlayStack`, `ConsoleMicroStarPopupLayout`, renderer and headless overlay tests | Inventory classification reconciled; compare historical behavior and record actual terminal results before signing off |
@@ -72,3 +72,23 @@ Before tagging V1.0:
 This register is a review/work-planning artifact; it is **not** an
 implementation certificate or an assertion that the historical source
 can be reconstructed solely from handbook descriptions.
+
+## HP-02 — documented modernization decision (2026-10-24)
+
+**Implementation policy: modern substitute selected; historical compatibility
+not certified.** FIRST-ED uses the portable typed `EditorErrorId`, stable
+`Code` and `ResourceKey`, with an optional UTF-8 JSON file selected by
+`SASD_FIRSTED_MESSAGES_JSON`. The sample contains `messages.de.json` with
+all eight current catalog keys. Host-only loading, validation and formatting
+are isolated from the editor core. Invalid resources fail back to the built-in
+catalog; error codes survive translation unchanged.
+
+Evidence: `ConsoleFirstEdMessageResourcesTests`, including the end-to-end
+file → loader → `ConsoleFirstEdHooks.OnErrorAsync` → displayed message path;
+`ConsoleFirstEdErrorPresentationTests`; `docs/en/ERROR-MODEL.md`.
+
+**Explicitly not claimed:** numeric `EDITERR.MSG` message IDs, original file
+syntax, byte-for-byte wording, original DOS runtime loading semantics, or
+all historical user-interaction details. The final interactive Windows/Linux
+review and overall V1 sign-off remain OPEN. This is a product design decision,
+not a passing historical parity result.

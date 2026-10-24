@@ -38,6 +38,37 @@ public sealed class ConsoleFirstEdMessageResourcesTests
     }
 
     [Fact]
+    public async Task LoadedResourceFlowsThroughActualHostHookAndKeepsFallback()
+    {
+        var path = Path.GetTempFileName();
+        try
+        {
+            // Test the real boundary rather than formatting a dictionary
+            // directly: the host's OnErrorAsync callback must actually use
+            // resources returned by the file loader. A partial translation
+            // retains the built-in fallback for a different error category.
+            File.WriteAllText(path,
+                "{\\"Editor.Errors.Operation.Aborted\\":\\"Vorgang abgebrochen.\\"}",
+                new UTF8Encoding(false));
+            var hooks = new ConsoleFirstEdHooks(
+                ConsoleFirstEdMessageResources.Load(path));
+            var session = new Sasd.Editor.Editing.EditorSession(hooks);
+            var translated = EditorErrorCatalog.OperationAborted();
+
+            await hooks.OnErrorAsync(session, translated, CancellationToken.None);
+            Assert.Equal($"{translated.Code}: Vorgang abgebrochen.",
+                hooks.TakeMessage());
+            Assert.Null(hooks.TakeMessage()); // One-shot host status.
+
+            var untranslated = EditorErrorCatalog.Create(EditorErrorId.CommandRejected);
+            await hooks.OnErrorAsync(session, untranslated, CancellationToken.None);
+            Assert.Equal($"{untranslated.Code}: {untranslated.Message}",
+                hooks.TakeMessage());
+        }
+        finally { File.Delete(path); }
+    }
+
+    [Fact]
     public void DuplicateResourceKeysInvalidateTheWholeFile()
     {
         // JSON allows repeated property names syntactically, but accepting
