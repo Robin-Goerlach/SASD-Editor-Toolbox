@@ -1,0 +1,10 @@
+{
+  "Editor.Errors.Command.InvalidArgument": "Ungültige Argumente für den Editorbefehl.",
+  "Editor.Errors.Command.Rejected": "Der Editorbefehl ist im aktuellen Zustand nicht möglich.",
+  "Editor.Errors.Operation.Failed": "Der Editorvorgang konnte nicht abgeschlossen werden.",
+  "Editor.Errors.File.IoFailed": "Die Dateioperation konnte nicht abgeschlossen werden.",
+  "Editor.Errors.Access.Denied": "Zugriff auf die angeforderte Ressource verweigert.",
+  "Editor.Errors.Operation.Unsupported": "Dieser Editorvorgang wird nicht unterstützt.",
+  "Editor.Errors.Input.TypeaheadOverflow": "Der Eingabepuffer ist übergelaufen; ausstehende Eingaben wurden gelöscht.",
+  "Editor.Errors.Operation.Aborted": "Der Editorvorgang wurde abgebrochen."
+}

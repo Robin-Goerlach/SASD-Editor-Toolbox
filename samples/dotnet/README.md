@@ -54,6 +54,33 @@ dotnet run --project samples/dotnet/Sasd.Editor.FirstEd.Sample -- --help
 The `--help` option also works when input or output is redirected. The editor
 modes require a real interactive terminal.
 
+## Optional German error messages
+
+FIRST-ED can load **host-only** error translations from the supplied
+[`messages.de.json`](Sasd.Editor.FirstEd.Sample/messages.de.json).
+This changes error messages, **not** menus, prompts, or the full editor UI.
+The file uses the stable modern resource keys; it is **not** the historical
+Borland `EDITERR.MSG` format.
+
+From the repository root, set the environment variable before launching:
+
+```powershell
+$env:SASD_FIRSTED_MESSAGES_JSON = (Resolve-Path 'samples/dotnet/Sasd.Editor.FirstEd.Sample/messages.de.json').Path
+dotnet run --project samples/dotnet/Sasd.Editor.FirstEd.Sample -- --demo
+```
+
+```bash
+export SASD_FIRSTED_MESSAGES_JSON="$PWD/samples/dotnet/Sasd.Editor.FirstEd.Sample/messages.de.json"
+dotnet run --project samples/dotnet/Sasd.Editor.FirstEd.Sample -- --demo
+```
+
+Unset `SASD_FIRSTED_MESSAGES_JSON` to return to built-in English messages.
+The host loads resources once at startup. Missing, malformed, oversized, or
+unsafe files are ignored as a whole; no partial translation is installed.
+Use UTF-8 JSON with one known resource key per property and a short,
+single-line string as the value. Do not treat the example as historical
+message-number compatibility.
+
 ## Suggested first session
 
 The `--demo` mode uses a genuine `EditorSession` and a normal editable

@@ -54,6 +54,36 @@ dotnet run --project samples/dotnet/Sasd.Editor.FirstEd.Sample -- --help
 Die Option `--help` funktioniert auch bei umgeleiteter Ein- oder Ausgabe. Die
 Editor-Modi benötigen ein echtes interaktives Terminal.
 
+## Optionale deutsche Fehlermeldungen
+
+FIRST-ED kann über die mitgelieferte Datei
+[`messages.de.json`](Sasd.Editor.FirstEd.Sample/messages.de.json)
+**Fehlermeldungen** auf Deutsch anzeigen. Menüs, Eingabedialoge und die
+restliche Oberfläche werden dadurch **nicht** übersetzt. Die Datei
+verwendet moderne Ressourcenschlüssel; sie ist **nicht** kompatibel mit
+Borlands historischem `EDITERR.MSG`-Dateiformat.
+
+Vom Repository-Hauptverzeichnis aus unter PowerShell:
+
+```powershell
+$env:SASD_FIRSTED_MESSAGES_JSON = (Resolve-Path 'samples/dotnet/Sasd.Editor.FirstEd.Sample/messages.de.json').Path
+dotnet run --project samples/dotnet/Sasd.Editor.FirstEd.Sample -- --demo
+```
+
+Unter Bash:
+
+```bash
+export SASD_FIRSTED_MESSAGES_JSON="$PWD/samples/dotnet/Sasd.Editor.FirstEd.Sample/messages.de.json"
+dotnet run --project samples/dotnet/Sasd.Editor.FirstEd.Sample -- --demo
+```
+
+Ohne die Umgebungsvariable werden die integrierten englischen Meldungen
+verwendet. Der Host liest die Datei beim Start einmal ein. Fehlt die
+Datei oder enthält sie ungültige, überlange oder unsichere Einträge,
+bleiben alle integrierten Meldungen aktiv. JSON-Dateien müssen UTF-8
+verwenden; erlaubt sind bekannte Ressourcenschlüssel mit kurzen,
+einzeiligen Texten.
+
 ## Empfohlene erste Sitzung
 
 Der Modus `--demo` verwendet eine echte `EditorSession` und ein normales
