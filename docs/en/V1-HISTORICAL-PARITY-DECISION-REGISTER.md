@@ -25,7 +25,7 @@ and DOS hardware compatibility are NOT claimed.
 |---|---|---|---|
 | HP-01 | Original `Optstr` find/replace options | Modern C/W/R terminal grammar and core search options documented in `HANDBOOK-SUPPLEMENT-V1.md` | Approve documented UI divergence or implement verified original semantics; do not invent original grammar |
 | HP-02 | `EDITERR.MSG`, `EditMessage`, `EditErrormsg` | Typed `EditorErrorCatalog`; validated optional JSON resource file; safe FIRST-ED host presentation; headless hook integration tests | **Modernization decision recorded:** use stable resource keys and optional JSON instead of the unverified Borland numeric-message format. Original `EDITERR.MSG` file interchange remains unsupported; interactive release acceptance is still OPEN. |
-| HP-03 | Global `Tabsize` / `EditDefineTab` | Per-window tab width, recorded in handbook index | Approve modern per-window policy with tests showing linked and independent views retain intended widths |
+| HP-03 | Global `Tabsize` / `EditDefineTab` | Per-window `TabSize`; independent and linked-view prompt/dispatcher regression tests | **Modernization selected:** preserve each window's tab width rather than recreating global Pascal `Tabsize`; original global-setting parity is not claimed. Manual terminal sign-off remains OPEN. |
 | HP-04 | DOS assembler/video-memory routines | `EditUpdrowasm`, `MoveFromScreen`, `MoveToScreen` marked non-applicable; model-based repaint/overlay stack exists | Accept observable redraw/restore equivalence rather than literal BIOS/video-memory access, with terminal scenarios |
 | HP-05 | MicroStar `MakeWindow` and `RestoreWindow` | Current host has `ConsoleMicroStarOverlayStack`, `ConsoleMicroStarPopupLayout`, renderer and headless overlay tests | Inventory classification reconciled; compare historical behavior and record actual terminal results before signing off |
 | HP-06 | MicroStar `PrintNext` | Modern print-to-file queue/pagination is documented; supplemental inventory now records a modern replacement | Review whether the documented queued print-to-file replacement meets the V1 functional goal; physical DOS printing is not claimed |
@@ -92,3 +92,23 @@ syntax, byte-for-byte wording, original DOS runtime loading semantics, or
 all historical user-interaction details. The final interactive Windows/Linux
 review and overall V1 sign-off remain OPEN. This is a product design decision,
 not a passing historical parity result.
+
+## HP-03 — per-window tab-width modernization (2026-10-26)
+
+**Implementation decision: preserve the modern per-window setting.** The
+historical `EditDefineTab` / global `Tabsize` behavior differs from SASD's
+`EditorWindow.Options.TabSize`. Two linked windows can show the same document
+while retaining independent tab intervals. The FIRST-ED host's empty Enter
+special case derives the new width from the initiating window's zero-based
+cursor column; cancelling does not apply a command, and a zero-width default
+at column zero is rejected. Explicit numeric input uses the shared semantic
+command path, not a new host-specific mutation.
+
+**Automated evidence:** `ConsoleFirstEdTabWidthPromptTests` exercises linked
+and independent windows, the empty-input convention, explicit numeric widths,
+cancellation, invalid input, unchanged text/Dirty state, and Undo isolation.
+
+**Remaining evidence:** a real-terminal Windows/Debian run must verify visible
+tab-stop behavior and prompt cancellation across window switches. The result
+must be recorded before HP-03 receives historical V1 acceptance. Choosing a
+modern per-view policy is not proof of identical 1985 global-state behavior.

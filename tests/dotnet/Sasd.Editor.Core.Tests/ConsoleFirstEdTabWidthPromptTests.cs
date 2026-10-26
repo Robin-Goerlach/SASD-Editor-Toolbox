@@ -152,6 +152,37 @@ public sealed class ConsoleFirstEdTabWidthPromptTests
         Assert.Equal(0, session.Undo.Count);
     }
 
+    [Theory]
+    [InlineData(null)]
+    [InlineData(" ")]
+    [InlineData("not a number")]
+    public void InvalidLinkedViewTabPromptPreservesBothWindowOptions(string? answer)
+    {
+        var session = new EditorSession();
+        var source = session.CreateDocument("shared");
+        var linked = session.LinkWindow(source);
+        session.SetCurrentWindow(linked.WindowId);
+
+        // The prompt is resolved before a semantic command is dispatched.
+        // An invalid or cancelled response must therefore not touch the
+        // linked document, either view's configuration, or the Undo stack.
+        // That remains important because the historical Tabsize was global,
+        // whereas SASD intentionally uses per-window settings.
+        var originalSourceWidth = source.Options.TabSize;
+        var originalLinkedWidth = linked.Options.TabSize;
+        var request = ConsoleFirstEdTabWidthPromptPolicy.Resolve(
+            Binding(), visibleRows: 8, cursorColumn: 5, answer: answer);
+
+        Assert.Null(request);
+
+        Assert.Equal(originalSourceWidth, source.Options.TabSize);
+        Assert.Equal(originalLinkedWidth, linked.Options.TabSize);
+        Assert.Same(source.Document, linked.Document);
+        Assert.Equal("shared", source.Document.Buffer.GetLine(0).Text);
+        Assert.False(source.Document.IsDirty);
+        Assert.Equal(0, session.Undo.Count);
+    }
+
     [Fact]
     public void WrongBindingIsRejectedBeforeConstructingACommand()
     {
