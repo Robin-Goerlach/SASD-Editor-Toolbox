@@ -47,8 +47,10 @@ public sealed class ConsoleFirstEdMessageResourcesTests
             // directly: the host's OnErrorAsync callback must actually use
             // resources returned by the file loader. A partial translation
             // retains the built-in fallback for a different error category.
+            // Raw C# string literals keep JSON quoting separate from C#
+            // escaping and avoid accidental malformed test source.
             File.WriteAllText(path,
-                "{\\"Editor.Errors.Operation.Aborted\\":\\"Vorgang abgebrochen.\\"}",
+                """{"Editor.Errors.Operation.Aborted":"Vorgang abgebrochen."}""",
                 new UTF8Encoding(false));
             var hooks = new ConsoleFirstEdHooks(
                 ConsoleFirstEdMessageResources.Load(path));
