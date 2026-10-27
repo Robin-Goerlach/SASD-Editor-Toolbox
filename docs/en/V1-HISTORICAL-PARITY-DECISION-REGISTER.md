@@ -34,6 +34,10 @@ and DOS hardware compatibility are NOT claimed.
 | HP-09 | Legacy file encoding and safe Save/Write operations | `FirstEdLegacyFileCodec`, staged file writer and focused regression tests | Confirm 8-bit roundtrip and cancellation/overwrite under terminal interaction; distinguish modern Unicode editing from legacy output |
 | HP-10 | Full 123-entry behavior and 20 supplemental names | `HANDBOOK-PROCEDURE-INDEX-AUDIT.md` and `HANDBOOK-UNLINKED-INDEX-V1-REVIEW.md` | Record exact evidence and reviewer result per applicable operation; portable links alone are insufficient |
 
+See [V1 release-candidate gate](V1-RELEASE-CANDIDATE-GATE.md) for the
+centralized entry/exit checklist, evidence fields and explicit unresolved
+manual verification requirements.
+
 ## Release evidence gates
 
 For each decision, write **PASS**, **FAIL**, **BLOCKED** or
