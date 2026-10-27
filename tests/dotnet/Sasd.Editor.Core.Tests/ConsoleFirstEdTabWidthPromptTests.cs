@@ -56,6 +56,45 @@ public sealed class ConsoleFirstEdTabWidthPromptTests
         Assert.Equal(previous, view.Options.TabSize);
     }
 
+    [Fact]
+    public async Task LinkedViewTabWidthsSurviveRepeatedFocusChanges()
+    {
+        var session = new EditorSession();
+        var first = session.CreateDocument("shared text");
+        var second = session.LinkWindow(first);
+        var dispatcher = new EditorCommandDispatcher(session);
+
+        // Settings live on views, not documents or the active-session slot.
+        // Repeated focus changes therefore must not propagate TabSize from
+        // the window being activated to the window being deactivated.
+        session.SetCurrentWindow(first.WindowId);
+        var firstRequest = ConsoleFirstEdTabWidthPromptPolicy.Resolve(
+            Binding(), visibleRows: 8, cursorColumn: 2, answer: "3");
+        Assert.NotNull(firstRequest);
+        Assert.True(await dispatcher.ExecuteAsync(firstRequest));
+
+        session.SetCurrentWindow(second.WindowId);
+        var secondRequest = ConsoleFirstEdTabWidthPromptPolicy.Resolve(
+            Binding(), visibleRows: 8, cursorColumn: 5, answer: "6");
+        Assert.NotNull(secondRequest);
+        Assert.True(await dispatcher.ExecuteAsync(secondRequest));
+
+        for (var pass = 0; pass < 3; pass++)
+        {
+            session.SetCurrentWindow(first.WindowId);
+            Assert.Equal(3, session.CurrentWindow.Options.TabSize);
+            session.SetCurrentWindow(second.WindowId);
+            Assert.Equal(6, session.CurrentWindow.Options.TabSize);
+        }
+
+        // A shared document must never be marked as edited merely because
+        // its separate windows use different tab-stop configurations.
+        Assert.Same(first.Document, second.Document);
+        Assert.Equal("shared text", first.Document.Buffer.GetLine(0).Text);
+        Assert.False(first.Document.IsDirty);
+        Assert.Equal(0, session.Undo.Count);
+    }
+
     [Theory]
     [InlineData(null)]
     [InlineData(" ")]
