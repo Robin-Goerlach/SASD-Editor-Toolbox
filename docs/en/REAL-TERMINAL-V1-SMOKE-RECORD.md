@@ -105,6 +105,53 @@ Mark each **PASS / FAIL / BLOCKED**, and attach exact keystrokes plus expected/a
 
 For C0/C1 control symbols, grapheme-width and Unicode projection, also use `docs/en/TERMINAL-OUTPUT-V1-ACCEPTANCE.md`.
 
+## HP-03: manual tab-width and linked-view acceptance (separate result per OS)
+
+This protocol verifies the **chosen modern per-window** tab-width policy,
+not byte-for-byte fidelity to Borland's global `Tabsize`. Use the normal
+FIRST-ED terminal application and a disposable demo document. Record exact
+keypresses because terminal emulators may handle control sequences differently.
+
+1. Run `--demo` and note the original tab interval and active window.
+   Press **Ctrl-K, T** to open the tab-width prompt. Enter **3** and confirm.
+   Expected: the active window now uses width 3; the document text and Undo
+   history are unchanged. Note any visible difference in tab-stop behavior.
+2. In a sufficiently tall terminal, create a second displayed window using
+   **Ctrl-O, O**, then link it to the first document using **Ctrl-O, J**
+   according to the host's prompts. Make sure the windows display the same
+   document but have individually identifiable focus.
+3. In the linked active window, press **Ctrl-K, T** and enter **6**.
+   Expected: that view uses width 6; the other view still uses width 3.
+   Switch focus between views several times and record how you switched.
+   Expected: neither view silently inherits the other's tab width.
+4. Open **Ctrl-K, T** again and cancel the prompt with its documented
+   cancel key. Repeat with an invalid non-numeric answer if permitted by
+   the input UI. Expected: no change to either tab width, document content,
+   Dirty state or Undo history.
+5. Test **Ctrl-K, T** followed by an **empty Enter** while the cursor is
+   at a nonzero, known column. Expected: the selected view receives that
+   zero-based cursor column as its interval; the other view does not change.
+   At the first column, an empty Enter must **not** install interval zero.
+6. Exit normally with **Ctrl-K, X** and the confirmation described above.
+   Reopen only if necessary to inspect saved files. Tab-width changes are
+   configuration operations, not text edits; do not assume they are persisted
+   across process restarts.
+
+| Field | Windows run | Native Debian/Linux run |
+| --- | --- | --- |
+| Date, OS, terminal, dimensions, Git SHA | NOT RUN | NOT RUN |
+| Numeric width 3 in first view | NOT RUN | NOT RUN |
+| Linked view retains width 6 while first retains 3 | NOT RUN | NOT RUN |
+| Focus changes preserve separate widths | NOT RUN | NOT RUN |
+| Cancel / invalid input preserves state | NOT RUN | NOT RUN |
+| Empty Enter and first-column guard | NOT RUN | NOT RUN |
+| Reviewer verdict (PASS / FAIL / BLOCKED) and evidence | NOT RUN | NOT RUN |
+
+Automated evidence is in `ConsoleFirstEdTabWidthPromptTests`, including
+linked views, repeated focus changes and prompt cancellation. It does **not**
+replace this manual observation. Leave HP-03 release acceptance **OPEN** until
+actual results for both platforms are recorded and assessed.
+
 ## MicroStar F10 observation checklist
 
 1. F10 opens the popup without altering document text or Undo.
