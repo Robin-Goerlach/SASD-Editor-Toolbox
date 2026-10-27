@@ -22,13 +22,13 @@ CI workflow is necessary but not sufficient to publish a V1.0 tag.
 | --- | --- | --- |
 | RC-01: reproducible source | Pin exact commit SHA; clean checkout; document SDK/OS | OPEN |
 | RC-02: automated validation | Both CI workflows successful for the **proposed** release SHA | BASELINE PASS; release SHA pending |
-| RC-03: public API integration | Build a disposable consumer against the library; edit/search/undo/save safely | OPEN |
+| RC-03: public API integration | Execute independent Core-only consumer (edit/find/undo/disposable export) on Windows and Linux CI | PENDING NEW CI |
 | RC-04: FIRST-ED terminal | Record all 11 checks from `REAL-TERMINAL-V1-SMOKE-RECORD.md` on Windows and native Linux | OPEN |
 | RC-05: MicroStar terminal | Record all 10 F10 checks, including popup and print-to-file, on Windows and native Linux | OPEN |
 | RC-06: HP-03 view-local tabs | Run the dedicated numeric/cancel/focus/empty-Enter protocol on both terminals | OPEN |
 | RC-07: historical scope | Each HP-01..HP-10 has reviewer verdict + evidence; explicitly accept or block modern divergences | OPEN |
 | RC-08: safe legacy file I/O | Confirm disposable overwrite/cancel, encoding errors and roundtrip; never use real data | OPEN |
-| RC-09: package and documentation | Version, license, usage examples, migration caveats, changelog and artifact smoke | OPEN |
+| RC-09: package and documentation | CI pack test + license/metadata; later actual NuGet package-consumer and release notes | PARTIAL; release approval OPEN |
 | RC-10: final sign-off | Named reviewer, evidence references and exact green release SHA | OPEN |
 
 Do not turn `BASELINE PASS` into a release PASS when new commits have
@@ -73,3 +73,17 @@ are explicit. The final V1.0 release requires all mandatory gates above to
 have an outcome, the product scope to be agreed, and the historical register
 to identify approved divergences rather than open questions. Never infer
 manual verification or an approval from a passing GitHub Actions run.
+
+## Automated RC evidence added after initial gate definition
+
+The `dotnet` workflow now **runs** `Sasd.Editor.Consumer.Sample` after a
+Release build on Windows and Ubuntu. That program uses only the public Core
+project reference and checks insert/find/undo/disposable file export.
+The workflow also produces and checks a local `1.0.0-rc.1` **test** NuGet
+package, without publishing it. The version is a provisional CI artifact
+label, not a V1.0 release announcement or completed packaging sign-off.
+
+A later RC-09 gate must still verify installation/consumption from an
+actual .nupkg in an independent project (rather than a source ProjectReference),
+as well as versioning and release documentation. Record the final CI SHA and
+results before turning the above provisional entries into PASS.

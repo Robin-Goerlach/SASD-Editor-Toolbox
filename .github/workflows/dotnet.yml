@@ -41,3 +41,20 @@ jobs:
       # terminal for visual/key-delivery sign-off.
       - name: Developer demo CLI help smoke
         run: dotnet run --project samples/dotnet/Sasd.Editor.FirstEd.Sample --configuration Release --no-build -- --help
+      # RC-03 must run, not merely compile: this standalone application
+      # references only Sasd.Editor.Core and checks insert/find/undo/export.
+      - name: Independent public Core consumer smoke
+        run: dotnet run --project samples/dotnet/Sasd.Editor.Consumer.Sample --configuration Release --no-build
+      # Validate package production on BOTH operating systems without
+      # publishing anything. An explicit prerelease version prevents this
+      # CI artifact from being mistaken for an approved V1.0 release.
+      - name: Build Core prerelease NuGet package
+        run: dotnet pack src/dotnet/Sasd.Editor.Core/Sasd.Editor.Core.csproj --configuration Release --no-build --output ./artifacts/rc-package -p:PackageVersion=1.0.0-rc.1
+      - name: Check expected package artifact
+        shell: pwsh
+        run: |
+          $expected = 'artifacts/rc-package/Sasd.Editor.Core.1.0.0-rc.1.nupkg'
+          if (-not (Test-Path -LiteralPath $expected -PathType Leaf)) {
+            throw "RC package is missing: $expected"
+          }
+          Write-Output "RC package produced: $expected"
