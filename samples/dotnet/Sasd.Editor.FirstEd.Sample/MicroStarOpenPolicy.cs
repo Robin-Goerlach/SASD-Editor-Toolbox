@@ -23,8 +23,8 @@ internal sealed record MicroStarOpenPlan(
     bool MayOpen);
 
 /// <summary>
-/// Pure application policy for the original MicroStar-style Save & Open and
-/// Abandon & Open workflows. This intentionally does NOT read files, move
+/// Pure application policy for the original MicroStar-style Save &amp; Open and
+/// Abandon &amp; Open workflows. This intentionally does NOT read files, move
 /// windows, prompt users or mutate EditorSession.
 /// </summary>
 /// <remarks>

@@ -6,6 +6,10 @@
     <Deterministic>true</Deterministic>
     <ContinuousIntegrationBuild Condition="'$(CI)' == 'true'">true</ContinuousIntegrationBuild>
     <GenerateDocumentationFile>true</GenerateDocumentationFile>
+    <!-- Malformed XML comments hide API documentation from consumers and
+         should fail CI, even while optional missing-doc comments (CS1591)
+         remain temporarily suppressed during the V1 stabilization phase. -->
+    <WarningsAsErrors>$(WarningsAsErrors);CS1570</WarningsAsErrors>
     <NoWarn>$(NoWarn);1591</NoWarn>
   </PropertyGroup>
 </Project>
