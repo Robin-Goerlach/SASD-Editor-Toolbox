@@ -58,6 +58,49 @@ jobs:
             throw "RC package is missing: $expected"
           }
           Write-Output "RC package produced: $expected"
+      # Inspect the actual ZIP-based NuGet artifact. Successful packing alone
+      # does not prove that license, version, repository and the offline README
+      # reached the manifest/content visible to an external package consumer.
+      # pwsh runs unchanged on both hosted runner operating systems.
+      - name: Validate Core package manifest and README
+        shell: pwsh
+        run: |
+          $package = 'artifacts/rc-package/Sasd.Editor.Core.1.0.0-rc.1.nupkg'
+          $archive = [System.IO.Compression.ZipFile]::OpenRead((Resolve-Path $package).Path)
+          try {
+            $manifestEntry = $archive.Entries | Where-Object { $_.FullName -eq 'Sasd.Editor.Core.nuspec' } | Select-Object -First 1
+            $readmeEntry = $archive.Entries | Where-Object { $_.FullName -eq 'README.md' } | Select-Object -First 1
+            if ($null -eq $manifestEntry -or $null -eq $readmeEntry) {
+              throw 'Core NuGet package must contain its nuspec and root README.md'
+            }
+            $reader = [System.IO.StreamReader]::new($manifestEntry.Open())
+            try {
+              [xml]$manifest = $reader.ReadToEnd()
+            } finally {
+              $reader.Dispose()
+            }
+            $metadata = $manifest.package.metadata
+            $checks = @{
+              'id' = @($metadata.id, 'Sasd.Editor.Core')
+              'version' = @($metadata.version, '1.0.0-rc.1')
+              'authors' = @($metadata.authors, 'SASD-GmbH')
+              'license' = @($metadata.license.InnerText, 'MIT')
+              'readme' = @($metadata.readme, 'README.md')
+              'repository' = @($metadata.repository.url, 'https://github.com/Robin-Goerlach/SASD-Editor-Toolbox')
+            }
+            foreach ($name in $checks.Keys) {
+              $actual, $expected = $checks[$name]
+              if ([string]$actual -cne $expected) {
+                throw "Invalid NuGet $name : expected '$expected', found '$actual'"
+              }
+            }
+            if ($metadata.license.type -ne 'expression') {
+              throw 'Expected SPDX expression for NuGet package license'
+            }
+            Write-Output 'Core RC NuGet manifest and embedded README: PASS'
+          } finally {
+            $archive.Dispose()
+          }
       # An external project must restore the assembled NuGet artifact rather
       # than accidentally compile against Core's source ProjectReference.
       # Keep this consumer out of the normal solution: restore happens only
