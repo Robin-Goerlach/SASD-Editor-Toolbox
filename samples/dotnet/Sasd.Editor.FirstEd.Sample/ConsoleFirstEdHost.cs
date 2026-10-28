@@ -17,6 +17,7 @@ internal sealed class ConsoleFirstEdHost : IEditorInputPump
     private readonly ConsoleFirstEdHooks _hooks;
     private readonly EditorCommandDispatcher _dispatcher;
     private readonly FirstEdKeyMap _keyMap = new();
+    private readonly ConsoleTerminalSizeTracker _terminalSize = new();
     private readonly ConsoleFirstEdRenderer _renderer;
     private readonly ConsoleFirstEdPromptService _prompts;
     private readonly MicroStarPrintQueue _printQueue;
@@ -31,7 +32,14 @@ internal sealed class ConsoleFirstEdHost : IEditorInputPump
         _printQueue = new MicroStarPrintQueue(session);
     }
 
-    public void Render(string? message = null) => _renderer.Render(message);
+    public void Render(string? message = null)
+    {
+        _renderer.Render(message);
+        // Remember the dimensions used for the last successful full paint.
+        // The idle input loop can then detect terminal resize without requiring
+        // a key press. This state is host-only, never part of EditorSession.
+        _terminalSize.Observe(Console.WindowWidth, Console.WindowHeight);
+    }
 
     public void Shutdown() => _renderer.Shutdown();
 
@@ -46,6 +54,16 @@ internal sealed class ConsoleFirstEdHost : IEditorInputPump
         {
             if (!Console.KeyAvailable)
             {
+                // Windows Terminal does not necessarily deliver a keystroke
+                // on resize. Poll its dimensions while idle and repaint the
+                // entire model before accepting further document input.
+                // This is a host presentation event, not an editing command.
+                if (_terminalSize.Observe(Console.WindowWidth, Console.WindowHeight))
+                {
+                    Render();
+                    return true;
+                }
+
                 await Task.Delay(15, cancellationToken).ConfigureAwait(false);
                 return false;
             }
