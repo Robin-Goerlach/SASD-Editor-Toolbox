@@ -13,15 +13,17 @@ implementations**. Reusable editing behavior belongs in
 desktop, and other UI-specific code belongs here or in another host-facing
 project.
 
-## Available sample
+## Available samples
 
 | Project | Type | Purpose |
 | --- | --- | --- |
-| [`Sasd.Editor.FirstEd.Sample`](./Sasd.Editor.FirstEd.Sample/) | Interactive console application | Demonstrates the public .NET editor API through a FIRST-ED-compatible terminal host, including editing, search, blocks, markers, stacked windows, historical file handling, a MicroStar-inspired menu, and cooperative background printing. |
+| [`Sasd.Editor.FirstEd.Sample`](./Sasd.Editor.FirstEd.Sample/) | Interactive console host | FIRST-ED-compatible editing and MicroStar-inspired workflows. |
+| [`Sasd.Editor.Consumer.Sample`](./Sasd.Editor.Consumer.Sample/) | Public-API example | Edits, finds, undoes and exports through a Core project reference. |
+| [`Sasd.Editor.PackageConsumer.Sample`](./Sasd.Editor.PackageConsumer.Sample/) | NuGet consumer | Repeats the same scenario using only the provisional RC package; restore after packing. |
 
-The FIRST-ED sample is currently the only executable .NET host in this
-directory. A graphical sample may be added later, but no WinForms, WPF, MAUI,
-or web host is implemented here yet.
+FIRST-ED remains the only interactive editor host. The two consumer samples
+are independent command-line integration checks, not additional editor UIs.
+No WinForms, WPF, MAUI or web host is implemented here yet.
 
 ## Requirements
 

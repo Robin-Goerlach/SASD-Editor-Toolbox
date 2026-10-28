@@ -280,3 +280,19 @@ Dieses Beispiel ist eine ausführbare Entwicklerreferenz und Abnahmehilfe für
 die aktuelle .NET-Implementierung. Für sich allein belegt es weder vollständige
 historische Gleichwertigkeit noch die abschließende manuelle Terminalabnahme
 oder ein veröffentlichtes V1.0-Paket.
+
+## Unabhängige Core-Integrationsbeispiele (V1-Release-Candidate)
+
+Zusätzlich zur interaktiven FIRST-ED-Anwendung gibt es zwei eigenständige
+Konsolenprogramme. Sie sind **keine** grafischen Editoroberflächen:
+
+- [`Sasd.Editor.Consumer.Sample`](Sasd.Editor.Consumer.Sample/): bindet
+  die öffentliche Core-Bibliothek per Projektverweis ein und prüft Bearbeiten,
+  Suchen, Undo und einen temporären Datei-Export.
+- [`Sasd.Editor.PackageConsumer.Sample`](Sasd.Editor.PackageConsumer.Sample/):
+  bindet stattdessen ausschließlich das noch **nicht veröffentlichte**
+  `Sasd.Editor.Core`-NuGet-Testpaket `1.0.0-rc.1` ein.
+
+Die Beispiele werden unter Windows und Ubuntu in GitHub Actions geprüft.
+Die NuGet-Testversion ist keine abgeschlossene V1.0-Freigabe und behauptet
+keine vollständige historische Borland-Kompatibilität.

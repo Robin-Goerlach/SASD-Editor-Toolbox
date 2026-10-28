@@ -8,5 +8,16 @@
     <Authors>SASD-GmbH</Authors>
     <RepositoryUrl>https://github.com/Robin-Goerlach/SASD-Editor-Toolbox</RepositoryUrl>
     <PackageLicenseExpression>MIT</PackageLicenseExpression>
+    <!-- Version is intentionally supplied by the pack command for prerelease
+         artifacts. This source baseline is not an approved V1.0 release. -->
+    <Version Condition="'$(Version)' == ''">0.0.0-development</Version>
+    <PackageTags>editor;text-editing;sasd;headless</PackageTags>
+    <PackageReadmeFile>README.md</PackageReadmeFile>
+    <RepositoryType>git</RepositoryType>
   </PropertyGroup>
+  <ItemGroup>
+    <!-- Embed the maintained repository overview in the nupkg so package
+         consumers can discover supported scope and limitations offline. -->
+    <None Include="../../../README.md" Pack="true" PackagePath="/" />
+  </ItemGroup>
 </Project>
