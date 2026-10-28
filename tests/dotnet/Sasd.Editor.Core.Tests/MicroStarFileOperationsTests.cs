@@ -193,6 +193,42 @@ public sealed class MicroStarFileOperationsTests
     }
 
     [Fact]
+    public void CopyAndRenamePreserveExactLegacyBytesWithoutTextConversion()
+    {
+        var root = NewDirectory();
+        try
+        {
+            var source = Path.Combine(root, "legacy-source.txt");
+            var copied = Path.Combine(root, "legacy-copy.txt");
+            var renamed = Path.Combine(root, "legacy-moved.txt");
+
+            // MicroStar's file manager operates on files, not decoded editor
+            // buffers. In particular, 0x8D is a historical soft-line marker
+            // and must not be normalized to a host newline or UTF-8 sequence.
+            // Include a high-byte character and both kinds of line endings
+            // to make accidental text conversion immediately visible.
+            var original = new byte[]
+            {
+                0x41, 0x8D, 0xE9, 0x0D, 0x0A, 0x42, 0x0A, 0x43
+            };
+            File.WriteAllBytes(source, original);
+
+            MicroStarFileOperations.Copy(source, copied);
+            Assert.Equal(original, File.ReadAllBytes(source));
+            Assert.Equal(original, File.ReadAllBytes(copied));
+
+            // Renaming the copied file must preserve the physical byte stream
+            // and leave the unrelated original source intact. This test does
+            // not depend on a particular filesystem's inode or rename model.
+            MicroStarFileOperations.Rename(copied, renamed);
+            Assert.False(File.Exists(copied));
+            Assert.Equal(original, File.ReadAllBytes(renamed));
+            Assert.Equal(original, File.ReadAllBytes(source));
+        }
+        finally { Directory.Delete(root, recursive: true); }
+    }
+
+    [Fact]
     public void RenameMissingSourceDoesNotCreateDestination()
     {
         var root = NewDirectory();
