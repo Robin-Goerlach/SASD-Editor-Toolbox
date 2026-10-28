@@ -97,3 +97,19 @@ then restores this separate application exclusively from the local package
 feed. It replays the public insert/find/undo/disposable export scenario on
 Windows and Ubuntu. A successful result confirms consumption of the built
 NuGet artifact, not publication, manual terminal checks or historical parity.
+
+## Retrieve CI-validated package for isolated evaluation
+
+Once the exact commit's Windows and Ubuntu `dotnet` jobs succeed, open its
+GitHub Actions `dotnet` workflow run and download either
+`editor-core-rc-package-windows-latest` or
+`editor-core-rc-package-ubuntu-latest` under **Artifacts**. Each ZIP
+contains the same provisional NuGet package name
+`Sasd.Editor.Core.1.0.0-rc.1.nupkg`. Record the source commit and job URL
+when sharing test results; artifacts are retained for 14 days.
+
+To test the downloaded package, extract its ZIP into a **dedicated temporary
+folder**, then point a separate .NET application's NuGet package source at
+that folder. Do not upload to nuget.org or treat the RC as a V1.0 release.
+The automated source-project and package-reference consumer checks provide
+CI evidence, but they cannot replace Windows/Debian interactive acceptance.

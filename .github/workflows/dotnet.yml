@@ -109,3 +109,13 @@ jobs:
         run: dotnet restore samples/dotnet/Sasd.Editor.PackageConsumer.Sample/Sasd.Editor.PackageConsumer.Sample.csproj --source ./artifacts/rc-package
       - name: Run independent NuGet package consumer
         run: dotnet run --project samples/dotnet/Sasd.Editor.PackageConsumer.Sample --configuration Release --no-restore
+      # Keep the inspected test package available for reviewers. Artifact names
+      # include the runner OS to avoid collisions between matrix jobs.
+      # Publishing a CI artifact is NOT publishing to NuGet or approving V1.0.
+      - name: Upload verified RC package for manual integration tests
+        uses: actions/upload-artifact@v4
+        with:
+          name: editor-core-rc-package-${{ matrix.os }}
+          path: artifacts/rc-package/Sasd.Editor.Core.1.0.0-rc.1.nupkg
+          if-no-files-found: error
+          retention-days: 14
