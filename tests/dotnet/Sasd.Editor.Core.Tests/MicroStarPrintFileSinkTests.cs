@@ -137,6 +137,45 @@ public sealed class MicroStarPrintFileSinkTests
     }
 
     [Fact]
+    public void ExistingSymbolicLinkDestinationCannotRedirectPrintOutput()
+    {
+        var root = Path.Combine(Path.GetTempPath(),
+            "sasd-print-" + Guid.NewGuid().ToString("N"));
+        Directory.CreateDirectory(root);
+        try
+        {
+            var protectedTarget = Path.Combine(root, "protected.txt");
+            var printPath = Path.Combine(root, "print-link.txt");
+            var original = new byte[] { 0x41, 0x8D, 0x42 };
+            File.WriteAllBytes(protectedTarget, original);
+
+            try
+            {
+                File.CreateSymbolicLink(printPath, protectedTarget);
+            }
+            catch (Exception error) when (error is UnauthorizedAccessException
+                or PlatformNotSupportedException or IOException)
+            {
+                // Some Windows runners cannot create symlinks without the
+                // relevant privilege. Linux CI still exercises this path.
+                return;
+            }
+
+            // FileMode.CreateNew must reject an existing directory entry
+            // even when that entry is a link to a writable real file.
+            // This protects the output contract against accidental redirection
+            // to data that the user never selected for printing.
+            Assert.Throws<IOException>(() => new MicroStarPrintFileSink(printPath));
+            Assert.Equal(original, File.ReadAllBytes(protectedTarget));
+            Assert.True(File.Exists(printPath));
+        }
+        finally
+        {
+            Directory.Delete(root, recursive: true);
+        }
+    }
+
+    [Fact]
     public async Task CancellationClosesPartialOutputAndPreventsFurtherLines()
     {
         var root = Path.Combine(Path.GetTempPath(), "sasd-print-" + Guid.NewGuid().ToString("N"));
