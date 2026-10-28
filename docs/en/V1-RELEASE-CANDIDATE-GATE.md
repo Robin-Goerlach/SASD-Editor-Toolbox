@@ -126,3 +126,14 @@ See `REAL-TERMINAL-V1-SMOKE-RECORD.md` for the precise supported evidence.
 This establishes a **partial Windows terminal smoke result** only. RC-04,
 RC-05, RC-06 and final V1 sign-off remain open pending complete recorded
 scenarios and native Debian verification.
+
+## WSL Debian evidence recorded 2026-10-28
+
+Windows Terminal hosting Debian WSL successfully ran FIRST-ED, displayed two
+linked windows and preserved status bars after resizing. A reported local
+Release build succeeded with 1,063 passing tests, using source `53bccd5`.
+This is useful **WSL-specific** evidence, but does not establish independent
+native Debian coverage or a complete manual MicroStar/file I/O sign-off.
+The shared Windows checkout showed cross-platform Git index/permission
+issues; future independent Linux acceptance should use a dedicated checkout.
+See `REAL-TERMINAL-V1-SMOKE-RECORD.md` for evidence and limits.

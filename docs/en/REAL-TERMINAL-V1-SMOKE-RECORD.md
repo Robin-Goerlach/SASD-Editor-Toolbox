@@ -48,6 +48,35 @@ SHA. The actual local source SHA in the screenshot was not provided.
 This entry is an incremental manual observation, **not** historical-parity
 approval or a V1.0 release sign-off.
 
+## WSL Debian manual observation — 2026-10-28
+
+**Environment:** Debian in WSL on Windows Terminal, running the application
+from a shared Windows NTFS checkout under `/mnt/c`. This is **not** a native
+Debian virtual console or an independently checked-out Linux filesystem.
+
+- **PASS (reported and screenshot-backed):** FIRST-ED starts in an interactive
+  WSL terminal. Two linked windows display the same edited text
+  (`::: Hallo :::`), with independently positioned cursors and visible
+  status bars.
+- **PASS (user-reported):** resizing the terminal both smaller and larger
+  redraws window boundaries and status bars without the earlier corruption.
+- **PASS (reported command output):** `dotnet restore`, Release build and
+  `dotnet test --no-build` ran; 1,063 tests succeeded, zero failed and
+  zero skipped on the then-local source revision `53bccd5`. That build
+  reported two XML documentation warnings, addressed in a later source commit.
+- **Environment warning:** WSL Git reported changed file modes and the
+  attempted fast-forward conflicted with the shared Windows checkout.
+  Windows PowerShell completed the fast-forward to `01d7dcc`. For future
+  WSL checks, use a separate checkout in the Linux filesystem rather than
+  treating the shared `/mnt/c` directory as independent evidence.
+- **NOT VERIFIED:** native Debian terminal operation; the complete MicroStar
+  checklist; the entire FIRST-ED file/cancellation matrix; a clean WSL build
+  of the eventual V1 release commit.
+
+These are limited, dated observations from user-supplied screenshots and
+terminal output. They must not be converted into approval for every RC-04,
+RC-05 or RC-08 test.
+
 ## Explicit Debian 12 launch
 
 Install the **.NET 10 SDK** for Debian 12 (Bookworm) from Microsoft's
