@@ -176,6 +176,37 @@ public sealed class MicroStarPrintFileSinkTests
     }
 
     [Fact]
+    public void ExistingDirectoryDestinationIsRejectedWithoutChangingItsContents()
+    {
+        var root = Path.Combine(Path.GetTempPath(),
+            "sasd-print-" + Guid.NewGuid().ToString("N"));
+        Directory.CreateDirectory(root);
+        try
+        {
+            var outputDirectory = Path.Combine(root, "output.txt");
+            Directory.CreateDirectory(outputDirectory);
+            var protectedFile = Path.Combine(outputDirectory, "protected.txt");
+            var original = new byte[] { 0x41, 0x8D, 0x42 };
+            File.WriteAllBytes(protectedFile, original);
+
+            // Directory targets are a deterministic cross-platform failure
+            // case, unlike symbolic links whose creation can require special
+            // Windows privileges. A print path must designate a new FILE;
+            // it must never be reinterpreted as a directory or overwrite
+            // unrelated content already stored beneath that directory.
+            Assert.ThrowsAny<IOException>(() => new MicroStarPrintFileSink(outputDirectory));
+            Assert.True(Directory.Exists(outputDirectory));
+            Assert.Equal(original, File.ReadAllBytes(protectedFile));
+            Assert.Equal(new[] { "protected.txt" },
+                Directory.GetFiles(outputDirectory).Select(Path.GetFileName));
+        }
+        finally
+        {
+            Directory.Delete(root, recursive: true);
+        }
+    }
+
+    [Fact]
     public async Task CancellationClosesPartialOutputAndPreventsFurtherLines()
     {
         var root = Path.Combine(Path.GetTempPath(), "sasd-print-" + Guid.NewGuid().ToString("N"));
