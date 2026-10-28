@@ -87,3 +87,13 @@ A later RC-09 gate must still verify installation/consumption from an
 actual .nupkg in an independent project (rather than a source ProjectReference),
 as well as versioning and release documentation. Record the final CI SHA and
 results before turning the above provisional entries into PASS.
+
+## Independent NuGet-consumer gate (pending new CI)
+
+The `Sasd.Editor.PackageConsumer.Sample` project deliberately contains only
+`PackageReference Include="Sasd.Editor.Core"` at `1.0.0-rc.1`. It is **not**
+part of `Sasd.Editor.Toolbox.slnx`, because the CI first packs Core and only
+then restores this separate application exclusively from the local package
+feed. It replays the public insert/find/undo/disposable export scenario on
+Windows and Ubuntu. A successful result confirms consumption of the built
+NuGet artifact, not publication, manual terminal checks or historical parity.

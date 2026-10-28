@@ -58,3 +58,11 @@ jobs:
             throw "RC package is missing: $expected"
           }
           Write-Output "RC package produced: $expected"
+      # An external project must restore the assembled NuGet artifact rather
+      # than accidentally compile against Core's source ProjectReference.
+      # Keep this consumer out of the normal solution: restore happens only
+      # AFTER the RC package has been built on this runner.
+      - name: Restore independent NuGet package consumer
+        run: dotnet restore samples/dotnet/Sasd.Editor.PackageConsumer.Sample/Sasd.Editor.PackageConsumer.Sample.csproj --source ./artifacts/rc-package
+      - name: Run independent NuGet package consumer
+        run: dotnet run --project samples/dotnet/Sasd.Editor.PackageConsumer.Sample --configuration Release --no-restore
