@@ -128,6 +128,41 @@ public sealed class StagedFileWriteTests
     }
 
     [Fact]
+    public async Task LegacyCodec_PreCancelledOverwritePreservesOriginalBytes()
+    {
+        var directory = CreateDirectory();
+        try
+        {
+            var target = Path.Combine(directory, "legacy.txt");
+            // A real FIRST-ED stream may contain a wrapped-line marker.
+            // Preserve its exact bytes, not merely decoded Unicode text:
+            // rewriting 0x8D as CR/LF would silently damage legacy data.
+            var original = new byte[] { 0x41, 0x8D, 0x42, 0x0D, 0x0A };
+            await File.WriteAllBytesAsync(target, original);
+            using var cancellation = new CancellationTokenSource();
+            cancellation.Cancel();
+
+            // Cancellation is already requested before the codec stages
+            // its replacement. The existing file must remain untouched,
+            // and no temporary staging artifact may escape the writer.
+            var codec = new FirstEdLegacyFileCodec();
+            await Assert.ThrowsAnyAsync<OperationCanceledException>(
+                async () => await codec.WriteAsync(
+                    target,
+                    [new EditorLineSnapshot("replacement")],
+                    cancellation.Token));
+
+            Assert.Equal(original, await File.ReadAllBytesAsync(target));
+            Assert.Equal(new[] { "legacy.txt" },
+                Directory.GetFiles(directory).Select(Path.GetFileName));
+        }
+        finally
+        {
+            Directory.Delete(directory, recursive: true);
+        }
+    }
+
+    [Fact]
     public async Task ModernStorage_PreCancelledSavePreservesExistingBytesAndDirtyState()
     {
         var directory = CreateDirectory();
