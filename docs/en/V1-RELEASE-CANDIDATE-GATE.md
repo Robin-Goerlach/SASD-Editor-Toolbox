@@ -113,3 +113,16 @@ folder**, then point a separate .NET application's NuGet package source at
 that folder. Do not upload to nuget.org or treat the RC as a V1.0 release.
 The automated source-project and package-reference consumer checks provide
 CI evidence, but they cannot replace Windows/Debian interactive acceptance.
+
+## Windows observation recorded 2026-10-28
+
+The user confirmed that the resize/repaint defect no longer reproduces in
+Windows Terminal and supplied a screenshot with three correctly arranged
+editor windows. Linked-document behavior was also demonstrated earlier.
+The same message reported success in the last portions of manual testing,
+but did not provide a complete per-step HP-03 or MicroStar acceptance matrix.
+See `REAL-TERMINAL-V1-SMOKE-RECORD.md` for the precise supported evidence.
+
+This establishes a **partial Windows terminal smoke result** only. RC-04,
+RC-05, RC-06 and final V1 sign-off remain open pending complete recorded
+scenarios and native Debian verification.

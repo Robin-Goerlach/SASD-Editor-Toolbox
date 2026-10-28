@@ -18,6 +18,36 @@ evidence. Record whether the Linux session was native or WSL explicitly;
 a reported successful launch does not establish every terminal-specific
 interaction in either environment.
 
+## Windows manual evidence — 2026-10-28
+
+**Observed user report (Windows Terminal / PowerShell):** a real editor
+session showed three separate windows with independent text after earlier
+linked-view tests. The user confirmed that the previous screen corruption
+following terminal resize was fixed, and reported that the last portions of
+the acceptance exercise completed successfully. Evidence: screenshots and
+user feedback supplied in the development conversation.
+
+- **PASS (reported):** terminal redraw after resizing without the earlier
+  need to press Enter; the earlier reproduction is no longer observed.
+- **PASS (observed):** three window status bars and the command bar remain
+  visibly aligned in the supplied screenshot; the three document regions show
+  distinct text.
+- **PASS (previously reported):** linked windows display edits to their
+  shared document.
+- **PARTIAL / not separately documented:** HP-03 per-view tab stop values
+  and focus/cancel/empty-Enter scenarios. The user reported that the last
+  test portions worked, but no complete per-step results or terminal logs were
+  supplied. Do not promote the whole HP-03 matrix to PASS from one screenshot.
+- **NOT VERIFIED:** the full FIRST-ED 11-case and MicroStar 10-case
+  checklists, detailed file/print/overwrite behavior and native Debian
+  re-test at the final source SHA.
+
+The verified CI source at recording time was `53bccd5f3c933ae1a6e06b1512fadbc4eea61d58`; both
+`repository-contract` and `dotnet` completed successfully for that
+SHA. The actual local source SHA in the screenshot was not provided.
+This entry is an incremental manual observation, **not** historical-parity
+approval or a V1.0 release sign-off.
+
 ## Explicit Debian 12 launch
 
 Install the **.NET 10 SDK** for Debian 12 (Bookworm) from Microsoft's
