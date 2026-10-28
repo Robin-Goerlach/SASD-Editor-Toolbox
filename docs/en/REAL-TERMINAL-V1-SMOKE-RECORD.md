@@ -99,7 +99,7 @@ Mark each **PASS / FAIL / BLOCKED**, and attach exact keystrokes plus expected/a
 6. Ctrl-K, 1 sets a marker; Ctrl-Q, 1 navigates to it.
 7. In a tall terminal, Ctrl-O, O creates a stacked window; Ctrl-O, J links views of one document. Different cursors must not imply different document text.
 8. The demo line containing a literal ESC followed by `[2J` is displayed inertly as `^[[2J`: screen/status are not cleared. Optionally test Ctrl-P then `[` followed by printable `[2J` in disposable text.
-9. Resize with stacked windows; report missing or overwritten status lines, cursor displacement or unexpected terminal scroll.
+9. Resize with stacked windows **without pressing a key** afterward; expect an automatic full redraw. Repeat while typing or while input is queued; report missing or overwritten status lines, cursor displacement or unexpected terminal scroll. Take before/after screenshots and record the exact Git SHA. A clean static screenshot alone does not prove a resize-triggered redraw.
 10. With a disposable filename, Ctrl-K, S saves; Ctrl-K, W writes without associating the export path with the document. Verify overwrite prompts and cancel paths before confirming writes.
 11. Ctrl-K, X exits only after `YES`; negative/cancel responses do not end the session.
 

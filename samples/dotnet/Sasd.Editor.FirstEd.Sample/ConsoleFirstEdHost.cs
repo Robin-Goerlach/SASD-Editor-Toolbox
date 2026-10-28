@@ -47,6 +47,17 @@ internal sealed class ConsoleFirstEdHost : IEditorInputPump
         EditorSession session,
         CancellationToken cancellationToken = default)
     {
+        // Resize is a presentation event, not an input event. Check before
+        // consuming queued typeahead OR reading the keyboard: otherwise a
+        // busy input stream can postpone repainting until the next idle gap.
+        // Keep the event entirely in the console host; it must not mutate
+        // the shared document, the current window, or Undo history.
+        if (_terminalSize.Observe(Console.WindowWidth, Console.WindowHeight))
+        {
+            Render();
+            return true;
+        }
+
         // The historical kernel consumed the editor's own typeahead buffer before
         // doing background work. Macro-injected input therefore has exactly the
         // same path through the key map and command dispatcher as keyboard input.
@@ -54,16 +65,6 @@ internal sealed class ConsoleFirstEdHost : IEditorInputPump
         {
             if (!Console.KeyAvailable)
             {
-                // Windows Terminal does not necessarily deliver a keystroke
-                // on resize. Poll its dimensions while idle and repaint the
-                // entire model before accepting further document input.
-                // This is a host presentation event, not an editing command.
-                if (_terminalSize.Observe(Console.WindowWidth, Console.WindowHeight))
-                {
-                    Render();
-                    return true;
-                }
-
                 await Task.Delay(15, cancellationToken).ConfigureAwait(false);
                 return false;
             }
