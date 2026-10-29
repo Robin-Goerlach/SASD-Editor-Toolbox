@@ -120,7 +120,33 @@ jobs:
           $hash = (Get-FileHash -LiteralPath $package -Algorithm SHA256).Hash.ToLowerInvariant()
           $sidecar = "$package.sha256"
           "$hash  Sasd.Editor.Core.1.0.0-rc.1.nupkg" | Set-Content -LiteralPath $sidecar -Encoding ascii
-          Write-Output "Verified RC package SHA-256: $hash"
+          # Verify the saved sidecar as a separate readback step instead of
+          # trusting the string we just wrote. This is the same parsing
+          # contract used by reviewers of the downloaded Windows artifact.
+          # Fail CI before upload if the recorded filename/hash is malformed.
+          $record = (Get-Content -LiteralPath $sidecar -Raw).Trim()
+          if ($record -notmatch '^([a-f0-9]{64})  Sasd\\.Editor\\.Core\\.1\\.0\\.0-rc\\.1\\.nupkg
+      # Keep the inspected test package available for reviewers. Artifact names
+      # include the runner OS to avoid collisions between matrix jobs.
+      # Publishing a CI artifact is NOT publishing to NuGet or approving V1.0.
+      - name: Upload verified RC package for manual integration tests
+        uses: actions/upload-artifact@v4
+        with:
+          name: editor-core-rc-package-${{ matrix.os }}
+          path: |
+            artifacts/rc-package/Sasd.Editor.Core.1.0.0-rc.1.nupkg
+            artifacts/rc-package/Sasd.Editor.Core.1.0.0-rc.1.nupkg.sha256
+          if-no-files-found: error
+          retention-days: 14
+) {
+            throw "Malformed NuGet package SHA-256 sidecar: $record"
+          }
+          $recordedHash = $Matches[1]
+          $actualHash = (Get-FileHash -LiteralPath $package -Algorithm SHA256).Hash
+          if ($actualHash -ine $recordedHash) {
+            throw 'NuGet RC SHA-256 sidecar mismatch'
+          }
+          Write-Output "Verified RC package SHA-256: $actualHash"
       # Keep the inspected test package available for reviewers. Artifact names
       # include the runner OS to avoid collisions between matrix jobs.
       # Publishing a CI artifact is NOT publishing to NuGet or approving V1.0.

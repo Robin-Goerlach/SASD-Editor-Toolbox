@@ -146,7 +146,7 @@ From the directory containing both files, run one of the following:
 # Windows PowerShell or cross-platform PowerShell 7.
 # Compare the content of the sidecar with the actual NuGet archive bytes.
 $package = 'Sasd.Editor.Core.1.0.0-rc.1.nupkg'
-$expected = ((Get-Content -LiteralPath "$package.sha256" -Raw).Trim() -split '\\s+')[0]
+$expected = ((Get-Content -LiteralPath "$package.sha256" -Raw).Trim() -split '\s+')[0]
 $actual = (Get-FileHash -LiteralPath $package -Algorithm SHA256).Hash
 if ($actual -ine $expected) { throw 'NuGet RC SHA-256 mismatch' }
 Write-Output 'NuGet RC package checksum: PASS'
