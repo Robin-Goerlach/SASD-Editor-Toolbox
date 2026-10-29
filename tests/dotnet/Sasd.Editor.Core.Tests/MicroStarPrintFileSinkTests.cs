@@ -194,7 +194,13 @@ public sealed class MicroStarPrintFileSinkTests
             // Windows privileges. A print path must designate a new FILE;
             // it must never be reinterpreted as a directory or overwrite
             // unrelated content already stored beneath that directory.
-            Assert.ThrowsAny<IOException>(() => new MicroStarPrintFileSink(outputDirectory));
+            // On Unix a directory-as-file attempt fails with IOException;
+            // Windows can instead report UnauthorizedAccessException from
+            // CreateFile. Both represent a rejected operation, and neither
+            // may damage the existing directory or its contents.
+            var error = Record.Exception(() => new MicroStarPrintFileSink(outputDirectory));
+            Assert.True(error is IOException or UnauthorizedAccessException,
+                $"Expected a rejected directory print target; actual: {error}");
             Assert.True(Directory.Exists(outputDirectory));
             Assert.Equal(original, File.ReadAllBytes(protectedFile));
             Assert.Equal(new[] { "protected.txt" },
