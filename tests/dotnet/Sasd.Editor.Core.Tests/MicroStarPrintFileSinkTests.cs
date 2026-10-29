@@ -213,6 +213,41 @@ public sealed class MicroStarPrintFileSinkTests
     }
 
     [Fact]
+    public async Task PreCancelledPrintRecordsDoNotWriteAnyBytes()
+    {
+        var root = Path.Combine(Path.GetTempPath(),
+            "sasd-print-" + Guid.NewGuid().ToString("N"));
+        Directory.CreateDirectory(root);
+        try
+        {
+            var output = Path.Combine(root, "cancelled.txt");
+            using var cancellation = new CancellationTokenSource();
+            cancellation.Cancel();
+
+            // Both the original string-oriented adapter and the newer typed
+            // print API must reject an already-cancelled operation BEFORE
+            // writing text or a form feed. Print-to-file deliberately keeps
+            // a partial file after mid-job cancellation; this different
+            // pre-cancel case must leave the newly created file empty.
+            using (var sink = new MicroStarPrintFileSink(output))
+            {
+                await Assert.ThrowsAnyAsync<OperationCanceledException>(
+                    async () => await sink.WriteLineAsync("unwanted",
+                        cancellation.Token));
+                await Assert.ThrowsAnyAsync<OperationCanceledException>(
+                    async () => await sink.WriteRecordAsync(
+                        MicroStarPrintRecord.Break(), cancellation.Token));
+            }
+
+            Assert.Empty(await File.ReadAllBytesAsync(output));
+        }
+        finally
+        {
+            Directory.Delete(root, recursive: true);
+        }
+    }
+
+    [Fact]
     public async Task CancellationClosesPartialOutputAndPreventsFurtherLines()
     {
         var root = Path.Combine(Path.GetTempPath(), "sasd-print-" + Guid.NewGuid().ToString("N"));
