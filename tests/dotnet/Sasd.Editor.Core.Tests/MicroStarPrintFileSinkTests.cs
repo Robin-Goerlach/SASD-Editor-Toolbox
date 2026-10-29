@@ -248,6 +248,42 @@ public sealed class MicroStarPrintFileSinkTests
     }
 
     [Fact]
+    public async Task DisposedPrintSinkRejectsFurtherOutputWithoutReopeningFile()
+    {
+        var root = Path.Combine(Path.GetTempPath(),
+            "sasd-print-" + Guid.NewGuid().ToString("N"));
+        Directory.CreateDirectory(root);
+        try
+        {
+            var output = Path.Combine(root, "finished.txt");
+            var sink = new MicroStarPrintFileSink(output);
+            await sink.WriteRecordAsync(
+                MicroStarPrintRecord.Line("completed"), CancellationToken.None);
+            sink.Dispose();
+
+            // Disposal is the final ownership boundary for the print file.
+            // Neither the legacy string API nor the typed API may silently
+            // reopen or append to a completed job; repeated disposal must
+            // also remain safe for host cleanup and cancellation paths.
+            sink.Dispose();
+            await Assert.ThrowsAsync<ObjectDisposedException>(
+                async () => await sink.WriteLineAsync("late", CancellationToken.None));
+            await Assert.ThrowsAsync<ObjectDisposedException>(
+                async () => await sink.WriteRecordAsync(
+                    MicroStarPrintRecord.Break(), CancellationToken.None));
+
+            Assert.Equal(new[] { "completed" },
+                await File.ReadAllLinesAsync(output));
+            Assert.Equal(new[] { "finished.txt" },
+                Directory.GetFiles(root).Select(Path.GetFileName));
+        }
+        finally
+        {
+            Directory.Delete(root, recursive: true);
+        }
+    }
+
+    [Fact]
     public async Task CancellationClosesPartialOutputAndPreventsFurtherLines()
     {
         var root = Path.Combine(Path.GetTempPath(), "sasd-print-" + Guid.NewGuid().ToString("N"));
