@@ -127,3 +127,30 @@ for HP-02 and HP-03 remain in place. The other historical dispositions
 still require evidence/explicit scope review; manual terminal acceptance
 and final release approval remain OPEN. Details:
 [V1 product scope](V1-PRODUCT-SCOPE-PROPOSAL.md).
+
+## Separation of product-policy decisions and acceptance evidence (2026-10-29)
+
+The product owner reaffirmed the modern, independent V1 product direction.
+The following **policy choices** follow from that direction, subject to the
+exact in-scope behavioral contract and independent licensing review. These
+choices are **not historical-parity findings** and do not waive manual checks.
+
+| ID | V1 policy within confirmed modernized scope | Evidence still required |
+| --- | --- | --- |
+| HP-01 | Modern search grammar, not unverified original `Optstr` syntax | In-scope search/replace checks and documented options |
+| HP-02 | Typed errors and JSON resources, not original `EDITERR.MSG` interchange | Host error presentation and safe fallback terminal checks |
+| HP-03 | Per-view tabs, not DOS-global `Tabsize` | Linked-window and cancelled-prompt terminal checks |
+| HP-04 | Portable renderer, not DOS video-memory or assembler access | Terminal redraw and restore behavior |
+| HP-05 | Portable overlay stack instead of physical screen-memory snapshots | MicroStar popup navigation, resize and restoration |
+| HP-06 | Print-to-file, not physical DOS printer `PrintNext` | MicroStar print queue/output/cancellation |
+| HP-07 | Standalone Lightning integration excluded from V1 | README/release note exclusion consistency; do not claim spell checking |
+| HP-08 | Host-native interactive prompts instead of a Pascal console ABI | Prompt editing, cancellation and typeahead terminal behavior |
+| HP-09 | Explicit modern Unicode/legacy-8-bit codec boundary | Disposable file roundtrip and cancelled/denied overwrite |
+| HP-10 | Modern functional foundation, not complete 1985 API/ABI parity | Per-applicable-operation evidence and final gap review |
+
+**Review discipline:** A confirmed policy answers **what V1 intends to
+ship**, not **whether it works**. Every behavioral obligation above retains
+its release gate until the exact candidate build is observed/tested. Any
+newly found release-significant gap must be resolved or separately accepted;
+this table alone does not authorize V1 tagging, publication, or a historical
+equivalence claim.

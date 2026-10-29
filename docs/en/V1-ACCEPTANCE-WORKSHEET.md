@@ -93,7 +93,7 @@ from executable tests alone. See
 [V1-HISTORICAL-PARITY-DECISION-REGISTER.md](V1-HISTORICAL-PARITY-DECISION-REGISTER.md)
 for evidence and historical differences.
 
-| Decision | Proposed disposition — requires owner approval | Owner verdict |
+| Decision | Confirmed V1 policy direction (not parity approval) | Acceptance evidence |
 | --- | --- | --- |
 | HP-01 | Accept modern search-option grammar, no original Optstr claim | OPEN |
 | HP-02 | Accept typed errors/JSON resources, no EDITERR.MSG file parity | OPEN |
@@ -105,6 +105,13 @@ for evidence and historical differences.
 | HP-08 | Accept modern host prompts after interactive checks | OPEN |
 | HP-09 | Accept codec modernization after disposable IO checks | OPEN |
 | HP-10 | Release scope is behavioral modernization, not total historical parity | OPEN |
+
+The modernized policy direction across HP-01..HP-10 was reaffirmed by the
+product owner on 2026-10-29. `OPEN` in the last column means **evidence and
+release acceptance are still outstanding**, not that the project must choose
+between DOS parity and modernization again. See the
+[policy/evidence distinction](V1-HISTORICAL-PARITY-DECISION-REGISTER.md#separation-of-product-policy-decisions-and-acceptance-evidence-2026-10-29).
+
 
 ## Candidate approval (RC-01, RC-02, RC-03, RC-09, RC-10)
 
