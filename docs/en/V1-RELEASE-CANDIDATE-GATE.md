@@ -148,3 +148,10 @@ now run under the Windows/Ubuntu `dotnet` workflow. Both workflows passed
 for inspected main `11e07c709d3e066c42fb9cb354d69938514acaf6`, but release verification requires the
 *eventual frozen candidate SHA*. Do not mark manual and owner-approval gates
 complete merely because CI is green.
+
+## Execution worksheet
+
+Use the [V1 acceptance worksheet](V1-ACCEPTANCE-WORKSHEET.md) to record each
+FIRST-ED, MicroStar, tab-width and legacy-I/O manual result by environment.
+Its unexecuted fields intentionally remain `NOT RUN`; previous partial
+Windows/WSL observations are not an unconditional release PASS.
