@@ -112,3 +112,10 @@ Source-of-truth detail:
 
 **This is a gap assessment, not an acceptance certificate or a request to
 publish an artifact.**
+
+## Proposed product scope — owner decision pending
+
+A concrete V1 in-scope/out-of-scope definition and HP-01..HP-10 proposed
+outcomes are available in [V1 product scope proposal](V1-PRODUCT-SCOPE-PROPOSAL.md).
+This is an approval request, not a sign-off. In particular, out-of-scope
+historical integration does not waive in-scope file safety or terminal tests.
