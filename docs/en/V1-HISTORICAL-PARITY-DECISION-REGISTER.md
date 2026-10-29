@@ -116,3 +116,14 @@ cancellation, invalid input, unchanged text/Dirty state, and Undo isolation.
 tab-stop behavior and prompt cancellation across window switches. The result
 must be recorded before HP-03 receives historical V1 acceptance. Choosing a
 modern per-view policy is not proof of identical 1985 global-state behavior.
+
+## Product direction confirmation — 2026-10-29
+
+The product owner explicitly agreed to **modern functional reconstruction
+with documented historical deviations** as the intended V1.0 identity.
+This resolves the *high-level choice of product direction*, not individual
+HP-01..HP-10 release verdicts. Previously recorded modernization policies
+for HP-02 and HP-03 remain in place. The other historical dispositions
+still require evidence/explicit scope review; manual terminal acceptance
+and final release approval remain OPEN. Details:
+[V1 product scope](V1-PRODUCT-SCOPE-PROPOSAL.md).

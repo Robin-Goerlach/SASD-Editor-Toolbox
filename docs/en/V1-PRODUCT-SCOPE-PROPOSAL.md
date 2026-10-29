@@ -1,11 +1,11 @@
-# V1.0 product scope and historical divergence — approval proposal
+# V1.0 product scope and historical divergence — approved direction
 
-**State: PROPOSAL — awaiting product-owner approval.**  
+**State: PRODUCT DIRECTION CONFIRMED by owner on 2026-10-29; terminal acceptance and release approval OPEN.**  
 **Reviewed baseline:** `997a675fb6be9b5c4830e6be9b9145e9c6df099f` on `main` (both Actions workflows
 `repository-contract` and `dotnet` completed successfully at review).
 **Not** a release authorization or historical parity certificate.
 
-## Proposed release identity
+## Confirmed release identity
 
 SASD Editor Toolbox V1.0 is an independently implemented, modern,
 reusable editor *foundation* with observable FIRST-ED/MicroStar-inspired
@@ -31,7 +31,7 @@ documented differences*, not *100% faithful reproduction*.
   a reproducible prerelease package for evaluation.
 - Clear API, test, compatibility and user-facing release documentation.
 
-### Out of scope for V1.0 — propose explicit exclusions
+### Out of scope for V1.0 — agreed direction
 
 - Exact Pascal API/ABI, Pascal memory layout, DOS assembler and direct
   screen-memory access; original source/published manual redistribution.
@@ -48,7 +48,7 @@ documented differences*, not *100% faithful reproduction*.
 These boundaries do not waive defects in *in-scope* documented behavior,
 data integrity or user-facing terminal flows.
 
-## Proposed decisions for HP-01 through HP-10
+## Historical dispositions under the confirmed product direction
 
 | ID | Proposed V1 disposition | Acceptance still needed |
 | --- | --- | --- |
@@ -63,9 +63,12 @@ data integrity or user-facing terminal flows.
 | HP-09 | **MODERN CODEC BOUNDARY**: explicit historical 8-bit import/export | Disposable roundtrip, unsupported-character and cancellation tests |
 | HP-10 | **SCOPED ACCEPTANCE**: covered modern behaviors with evidence; no blanket 123+20 routine parity promise | Review unresolved release-significant gaps and owner scope approval |
 
-**Important:** These are *proposed*, not approved, owner decisions. In
-particular, accepting a modern policy never retroactively changes an
-unexecuted manual test into PASS.
+**Decision boundary:** The owner confirmed the overall direction of a modern
+functional library with documented historical differences on 2026-10-29.
+The individual HP rows above remain proposals for concrete acceptance
+until corresponding evidence and scope review are recorded. This broad
+approval is not a blanket certification of all ten historical features,
+not a terminal acceptance result and not permission to publish V1.0.
 
 ## Blocking acceptance and publication rule
 
