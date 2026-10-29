@@ -137,3 +137,14 @@ native Debian coverage or a complete manual MicroStar/file I/O sign-off.
 The shared Windows checkout showed cross-platform Git index/permission
 issues; future independent Linux acceptance should use a dedicated checkout.
 See `REAL-TERMINAL-V1-SMOKE-RECORD.md` for evidence and limits.
+
+## Consolidated gap review — 2026-10-29
+
+See [V1 release-gap analysis](V1-RELEASE-GAP-ANALYSIS.md) for the
+prioritized RC-01..RC-10 evidence matrix and dependency-ordered closure plan.
+Earlier table cells such as `PENDING NEW CI` are **historical baseline
+snapshots**, not current assertions: independent source and package consumers
+now run under the Windows/Ubuntu `dotnet` workflow. Both workflows passed
+for inspected main `11e07c709d3e066c42fb9cb354d69938514acaf6`, but release verification requires the
+*eventual frozen candidate SHA*. Do not mark manual and owner-approval gates
+complete merely because CI is green.
