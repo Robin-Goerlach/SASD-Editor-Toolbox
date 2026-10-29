@@ -114,6 +114,7 @@ for evidence and historical differences.
 | Both Actions workflows successful for that **same** SHA | OPEN |
 | Independent project- and package-reference consumer results for that SHA | OPEN |
 | Packaged NuGet artifact identity, manifest and README | OPEN |
+| Downloaded NuGet package SHA-256 and matching `.nupkg.sha256` sidecar | OPEN |
 | Release notes and selected publication destination | OPEN |
 | All terminal, I/O and HP decisions resolved or expressly waived | OPEN |
 | Reviewer / date / APPROVE or BLOCK | OPEN |
@@ -130,3 +131,32 @@ parity before the recorded owner decision and exact-SHA release gates.**
 - These observations relate to earlier source revisions and do **not** fill
   the complete final-SHA matrix. See
   [real-terminal smoke record](REAL-TERMINAL-V1-SMOKE-RECORD.md).
+
+## Check downloaded RC package checksum (RC-09)
+
+Do these steps only on the **candidate's matching CI artifact**. The package
+and its `.sha256` sidecar are emitted together by the Windows and Ubuntu CI
+jobs. The two runner artifacts are independently built, so their hashes need
+not be identical. Copy the hash and workflow-run URL into the candidate table
+above; do not treat a previous commit's package as the final V1 artifact.
+
+From the directory containing both files, run one of the following:
+
+```powershell
+# Windows PowerShell or cross-platform PowerShell 7.
+# Compare the content of the sidecar with the actual NuGet archive bytes.
+$package = 'Sasd.Editor.Core.1.0.0-rc.1.nupkg'
+$expected = ((Get-Content -LiteralPath "$package.sha256" -Raw).Trim() -split '\\s+')[0]
+$actual = (Get-FileHash -LiteralPath $package -Algorithm SHA256).Hash
+if ($actual -ine $expected) { throw 'NuGet RC SHA-256 mismatch' }
+Write-Output 'NuGet RC package checksum: PASS'
+```
+
+```bash
+# Native Linux, from the extracted CI artifact directory.
+sha256sum -c Sasd.Editor.Core.1.0.0-rc.1.nupkg.sha256
+```
+
+A matching SHA-256 proves that downloaded bytes match the recorded hash;
+**it does not authenticate the publisher** and does not replace dependency
+review, licensing review, manual terminal tests or release approval.

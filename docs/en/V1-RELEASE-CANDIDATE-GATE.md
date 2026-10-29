@@ -185,3 +185,12 @@ package in each downloadable CI artifact. Check the fingerprint using
 SHA-256 verifies integrity only; it is **not** a signature, security audit,
 historical-parity sign-off or publication permission. Record the frozen
 candidate commit SHA and package checksum in the acceptance worksheet.
+
+## Manual checksum verification reference
+
+Use the cross-platform commands in
+[V1 acceptance worksheet](V1-ACCEPTANCE-WORKSHEET.md#check-downloaded-rc-package-checksum-rc-09)
+when evaluating a downloaded CI package. Record the resulting hash, source SHA
+and workflow job URL for the final release candidate; do not compare hashes
+between independently built Windows and Ubuntu packages as if identical
+output were guaranteed.
