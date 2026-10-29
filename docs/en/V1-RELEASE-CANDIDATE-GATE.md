@@ -155,3 +155,11 @@ Use the [V1 acceptance worksheet](V1-ACCEPTANCE-WORKSHEET.md) to record each
 FIRST-ED, MicroStar, tab-width and legacy-I/O manual result by environment.
 Its unexecuted fields intentionally remain `NOT RUN`; previous partial
 Windows/WSL observations are not an unconditional release PASS.
+
+## V1 release notes draft (RC-09)
+
+The [V1 release notes draft](V1-RELEASE-NOTES-DRAFT.md) describes the Core
+scope, samples, modern historical divergences, and currently incomplete
+acceptance. It deliberately contains no publication assertion, final artifact
+checksum or release approval. Update it at the frozen candidate SHA and
+obtain explicit owner authorization before tagging or distributing V1.0.
