@@ -213,3 +213,13 @@ and embedded README alone cannot demonstrate a usable runtime library.
 The independent project/package consumers still provide the stronger
 executable integration evidence. This check does not imply interactive
 terminal acceptance or release approval.
+
+## Candidate build provenance (RC-01 / RC-09)
+
+Each Windows and Ubuntu RC artifact now also includes
+`rc-build-evidence.txt`, recording the exact `github.sha`, runner OS,
+workflow-run URL, package filename and SHA-256 calculated from the validated
+package. When reviewing an artifact, compare its source SHA with the candidate
+commit and its checksum with the accompanying `.sha256` sidecar. This
+plain-text record is **not a cryptographically signed attestation**: it is
+traceability metadata, not authorization to tag or publish V1.0.

@@ -155,6 +155,27 @@ jobs:
           $actual = (Get-FileHash -LiteralPath $package -Algorithm SHA256).Hash
           if ($actual -ine $parts[0]) { throw 'RC package checksum mismatch' }
           Write-Output "RC checksum readback: PASS ($actual)"
+      # Bind each evaluated package to its exact source commit and runner.
+      # This machine-readable provenance is evidence for a human reviewer;
+      # it is NOT a signed attestation or a publication authorization.
+      - name: Record RC build provenance
+        shell: pwsh
+        env:
+          SOURCE_SHA: ${{ github.sha }}
+          RUNNER_OS: ${{ matrix.os }}
+          RUN_URL: ${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}
+        run: |
+          $package = 'artifacts/rc-package/Sasd.Editor.Core.1.0.0-rc.1.nupkg'
+          $hash = (Get-FileHash -LiteralPath $package -Algorithm SHA256).Hash.ToLowerInvariant()
+          $evidence = @(
+            "source_sha=$env:SOURCE_SHA"
+            "runner_os=$env:RUNNER_OS"
+            "workflow_run=$env:RUN_URL"
+            "package_file=Sasd.Editor.Core.1.0.0-rc.1.nupkg"
+            "sha256=$hash"
+          )
+          $evidence | Set-Content -LiteralPath 'artifacts/rc-package/rc-build-evidence.txt' -Encoding utf8
+          Write-Output "RC evidence recorded for $env:SOURCE_SHA on $env:RUNNER_OS"
       # Keep the inspected test package available for reviewers. Artifact names
       # include the runner OS to avoid collisions between matrix jobs.
       # Publishing a CI artifact is NOT publishing to NuGet or approving V1.0.
@@ -165,5 +186,6 @@ jobs:
           path: |
             artifacts/rc-package/Sasd.Editor.Core.1.0.0-rc.1.nupkg
             artifacts/rc-package/Sasd.Editor.Core.1.0.0-rc.1.nupkg.sha256
+            artifacts/rc-package/rc-build-evidence.txt
           if-no-files-found: error
           retention-days: 14
