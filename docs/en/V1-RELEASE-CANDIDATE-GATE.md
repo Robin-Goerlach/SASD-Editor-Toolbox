@@ -204,3 +204,12 @@ prevents a globally cached package with the same provisional
 The restore source remains the locally generated package feed. This is
 **automated package-consumption evidence**, not terminal acceptance or
 authorization to distribute the release.
+
+## Packaged Core assembly verification (RC-09)
+
+The NuGet CI inspection now also requires a **nonempty**
+`lib/net10.0/Sasd.Editor.Core.dll` inside the actual `.nupkg`. A manifest
+and embedded README alone cannot demonstrate a usable runtime library.
+The independent project/package consumers still provide the stronger
+executable integration evidence. This check does not imply interactive
+terminal acceptance or release approval.

@@ -70,6 +70,17 @@ jobs:
           try {
             $manifestEntry = $archive.Entries | Where-Object { $_.FullName -eq 'Sasd.Editor.Core.nuspec' } | Select-Object -First 1
             $readmeEntry = $archive.Entries | Where-Object { $_.FullName -eq 'README.md' } | Select-Object -First 1
+            # A valid nuspec and README are not sufficient for a usable
+            # library package. Assert that NuGet carries the actual Core
+            # assembly at the TFM path expected by external .NET 10 hosts.
+            # This also guards against accidentally packing only sources
+            # or the terminal sample instead of the UI-neutral Core.
+            $coreAssembly = $archive.Entries | Where-Object {
+              $_.FullName -eq 'lib/net10.0/Sasd.Editor.Core.dll'
+            } | Select-Object -First 1
+            if ($null -eq $coreAssembly -or $coreAssembly.Length -le 0) {
+              throw 'Core NuGet package lacks a nonempty net10.0 Core assembly'
+            }
             if ($null -eq $manifestEntry -or $null -eq $readmeEntry) {
               throw 'Core NuGet package must contain its nuspec and root README.md'
             }
