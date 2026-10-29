@@ -194,3 +194,13 @@ when evaluating a downloaded CI package. Record the resulting hash, source SHA
 and workflow job URL for the final release candidate; do not compare hashes
 between independently built Windows and Ubuntu packages as if identical
 output were guaranteed.
+
+## Independent NuGet consumer cache isolation
+
+The package-reference sample's restore and execution use a dedicated
+`NUGET_PACKAGES` folder under the GitHub runner temporary directory. This
+prevents a globally cached package with the same provisional
+`1.0.0-rc.1` version from being mistaken for the newly packed archive.
+The restore source remains the locally generated package feed. This is
+**automated package-consumption evidence**, not terminal acceptance or
+authorization to distribute the release.

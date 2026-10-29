@@ -105,9 +105,18 @@ jobs:
       # than accidentally compile against Core's source ProjectReference.
       # Keep this consumer out of the normal solution: restore happens only
       # AFTER the RC package has been built on this runner.
+      # NuGet's global package cache can retain an older artifact with the
+      # same provisional version. Isolate the package folder for BOTH restore
+      # and execution, so this check cannot silently reuse a prior package.
+      # This is different from --no-cache, which alone does not guarantee an
+      # empty global-packages directory.
       - name: Restore independent NuGet package consumer
+        env:
+          NUGET_PACKAGES: ${{ runner.temp }}/sasd-editor-rc-packages
         run: dotnet restore samples/dotnet/Sasd.Editor.PackageConsumer.Sample/Sasd.Editor.PackageConsumer.Sample.csproj --source ./artifacts/rc-package
       - name: Run independent NuGet package consumer
+        env:
+          NUGET_PACKAGES: ${{ runner.temp }}/sasd-editor-rc-packages
         run: dotnet run --project samples/dotnet/Sasd.Editor.PackageConsumer.Sample --configuration Release --no-restore
       # Record a cryptographic fingerprint of the exact package bytes
       # consumed and uploaded by this operating-system-specific job.
