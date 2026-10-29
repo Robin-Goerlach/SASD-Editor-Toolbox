@@ -99,6 +99,34 @@ public sealed class ConsoleMicroStarOverlayStackTests
     }
 
     [Fact]
+    public void ReopeningSameActiveLayoutDoesNotCorruptParentSelection()
+    {
+        var stack = new ConsoleMicroStarOverlayStack();
+        var sharedLayout = Popup("F Find  R Replace");
+
+        using (stack.Push(sharedLayout))
+        {
+            stack.SetSelection(sharedLayout, 'R');
+
+            // Two simultaneous leases for one layout would share a single
+            // selection-map key. Rejecting the second lease must not
+            // erase the already visible parent's current menu choice.
+            Assert.Throws<InvalidOperationException>(() => stack.Push(sharedLayout));
+            Assert.Single(stack.Active);
+            Assert.Equal('R', stack.SelectionOf(sharedLayout));
+        }
+
+        // Once the first lease is disposed, reusing this layout later is
+        // valid. It starts without stale selection from the former dialog.
+        using (stack.Push(sharedLayout))
+        {
+            Assert.Null(stack.SelectionOf(sharedLayout));
+            stack.SetSelection(sharedLayout, 'F');
+        }
+        Assert.Empty(stack.Active);
+    }
+
+    [Fact]
     public void NullPopupIsRejected()
     {
         var stack = new ConsoleMicroStarOverlayStack();

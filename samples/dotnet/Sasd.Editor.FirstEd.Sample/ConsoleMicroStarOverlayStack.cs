@@ -45,6 +45,14 @@ internal sealed class ConsoleMicroStarOverlayStack
     internal IDisposable Push(ConsoleMicroStarPopupLayout layout)
     {
         ArgumentNullException.ThrowIfNull(layout);
+        // The selection map is keyed by layout identity. Reusing the exact
+        // object for a nested popup would overwrite the parent's selection,
+        // and closing the child would delete the parent's entry altogether.
+        // Distinct layout instances may display identical text; only the
+        // same object must never own two simultaneous popup leases.
+        if (_active.Any(item => ReferenceEquals(item, layout)))
+            throw new InvalidOperationException(
+                "An active popup layout cannot be pushed a second time.");
         _active.Add(layout);
         _selections[layout] = null;
         return new Lease(this, layout);
