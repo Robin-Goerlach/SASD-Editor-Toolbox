@@ -121,37 +121,20 @@ jobs:
           $sidecar = "$package.sha256"
           "$hash  Sasd.Editor.Core.1.0.0-rc.1.nupkg" | Set-Content -LiteralPath $sidecar -Encoding ascii
           Write-Output "Verified RC package SHA-256: $hash"
-      # Read the checksum back before uploading it. SHA-256 verifies that
-      # the sidecar corresponds to the package bytes just tested; it is
-      # neither a signature nor a substitute for release approval.
+      # Read the generated sidecar from disk to verify that it matches the
+      # package bytes after integration tests. This does not sign the artifact.
       - name: Verify RC package checksum sidecar
         shell: pwsh
         run: |
           $package = 'artifacts/rc-package/Sasd.Editor.Core.1.0.0-rc.1.nupkg'
-          $sidecar = "$package.sha256"
-          $record = (Get-Content -LiteralPath $sidecar -Raw).Trim()
-          $expectedFilename = 'Sasd.Editor.Core.1.0.0-rc.1.nupkg'
-          $parts = $record -split '  ', 2
-          if ($parts.Count -ne 2 -or $parts[1] -cne $expectedFilename -or $parts[0] -notmatch '^[a-f0-9]{64} Artifact names
-      # include the runner OS to avoid collisions between matrix jobs.
-      # Publishing a CI artifact is NOT publishing to NuGet or approving V1.0.
-      - name: Upload verified RC package for manual integration tests
-        uses: actions/upload-artifact@v4
-        with:
-          name: editor-core-rc-package-${{ matrix.os }}
-          path: |
-            artifacts/rc-package/Sasd.Editor.Core.1.0.0-rc.1.nupkg
-            artifacts/rc-package/Sasd.Editor.Core.1.0.0-rc.1.nupkg.sha256
-          if-no-files-found: error
-          retention-days: 14
-) {
-            throw "Malformed NuGet package checksum record: $record"
+          $record = (Get-Content -LiteralPath "$package.sha256" -Raw).Trim()
+          $parts = $record.Split(@('  '), 2, [System.StringSplitOptions]::None)
+          if ($parts.Count -ne 2 -or $parts[1] -cne 'Sasd.Editor.Core.1.0.0-rc.1.nupkg' -or $parts[0].Length -ne 64) {
+            throw "Malformed RC checksum sidecar: $record"
           }
           $actual = (Get-FileHash -LiteralPath $package -Algorithm SHA256).Hash
-          if ($actual -ine $parts[0]) {
-            throw 'NuGet RC SHA-256 mismatch'
-          }
-          Write-Output "NuGet RC checksum readback: PASS ($actual)"
+          if ($actual -ine $parts[0]) { throw 'RC package checksum mismatch' }
+          Write-Output "RC checksum readback: PASS ($actual)"
       # Keep the inspected test package available for reviewers. Artifact names
       # include the runner OS to avoid collisions between matrix jobs.
       # Publishing a CI artifact is NOT publishing to NuGet or approving V1.0.
