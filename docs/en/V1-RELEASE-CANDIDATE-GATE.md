@@ -163,3 +163,14 @@ scope, samples, modern historical divergences, and currently incomplete
 acceptance. It deliberately contains no publication assertion, final artifact
 checksum or release approval. Update it at the frozen candidate SHA and
 obtain explicit owner authorization before tagging or distributing V1.0.
+
+## Verified CI checkpoint — source snapshot only (2026-10-29)
+
+For source `6ea4ec193c10fd1e4d1bfd44dd61a5cba3bc0dab`, GitHub Actions reported **completed/success**:
+
+- [repository-contract run 40958293906](https://github.com/Robin-Goerlach/SASD-Editor-Toolbox/actions/runs/40958293906)
+- [dotnet run 40958295294](https://github.com/Robin-Goerlach/SASD-Editor-Toolbox/actions/runs/40958295294)
+
+This checkpoint makes automated evidence independently traceable and closes
+no manual acceptance item. The V1 tag requires **new verification for the
+final frozen SHA**, an inspected package and explicit owner approval.

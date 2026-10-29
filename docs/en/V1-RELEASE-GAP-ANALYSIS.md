@@ -113,12 +113,14 @@ Source-of-truth detail:
 **This is a gap assessment, not an acceptance certificate or a request to
 publish an artifact.**
 
-## Proposed product scope — owner decision pending
+## Confirmed overall product direction — detailed approvals outstanding
 
-A concrete V1 in-scope/out-of-scope definition and HP-01..HP-10 proposed
-outcomes are available in [V1 product scope proposal](V1-PRODUCT-SCOPE-PROPOSAL.md).
-This is an approval request, not a sign-off. In particular, out-of-scope
-historical integration does not waive in-scope file safety or terminal tests.
+The owner confirmed V1 as a modern functional editor foundation with
+documented historical differences. The [product scope statement](V1-PRODUCT-SCOPE-PROPOSAL.md)
+records that direction and proposes HP-01..HP-10 dispositions. Individual
+historical behavior and release-significant deviations still need evidence
+and explicit review; out-of-scope integrations never waive in-scope file
+safety or terminal acceptance.
 
 ## Owner confirmation of overall V1 direction — 2026-10-29
 
