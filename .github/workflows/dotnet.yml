@@ -109,6 +109,18 @@ jobs:
         run: dotnet restore samples/dotnet/Sasd.Editor.PackageConsumer.Sample/Sasd.Editor.PackageConsumer.Sample.csproj --source ./artifacts/rc-package
       - name: Run independent NuGet package consumer
         run: dotnet run --project samples/dotnet/Sasd.Editor.PackageConsumer.Sample --configuration Release --no-restore
+      # Record a cryptographic fingerprint of the exact package bytes
+      # consumed and uploaded by this operating-system-specific job.
+      # SHA-256 is an integrity identifier, NOT a signature or release
+      # authorization. We calculate it after the package consumer completes.
+      - name: Record RC NuGet package SHA-256
+        shell: pwsh
+        run: |
+          $package = 'artifacts/rc-package/Sasd.Editor.Core.1.0.0-rc.1.nupkg'
+          $hash = (Get-FileHash -LiteralPath $package -Algorithm SHA256).Hash.ToLowerInvariant()
+          $sidecar = "$package.sha256"
+          "$hash  Sasd.Editor.Core.1.0.0-rc.1.nupkg" | Set-Content -LiteralPath $sidecar -Encoding ascii
+          Write-Output "Verified RC package SHA-256: $hash"
       # Keep the inspected test package available for reviewers. Artifact names
       # include the runner OS to avoid collisions between matrix jobs.
       # Publishing a CI artifact is NOT publishing to NuGet or approving V1.0.
@@ -116,6 +128,8 @@ jobs:
         uses: actions/upload-artifact@v4
         with:
           name: editor-core-rc-package-${{ matrix.os }}
-          path: artifacts/rc-package/Sasd.Editor.Core.1.0.0-rc.1.nupkg
+          path: |
+            artifacts/rc-package/Sasd.Editor.Core.1.0.0-rc.1.nupkg
+            artifacts/rc-package/Sasd.Editor.Core.1.0.0-rc.1.nupkg.sha256
           if-no-files-found: error
           retention-days: 14

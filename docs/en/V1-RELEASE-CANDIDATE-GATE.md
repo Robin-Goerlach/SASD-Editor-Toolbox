@@ -174,3 +174,14 @@ For source `6ea4ec193c10fd1e4d1bfd44dd61a5cba3bc0dab`, GitHub Actions reported *
 This checkpoint makes automated evidence independently traceable and closes
 no manual acceptance item. The V1 tag requires **new verification for the
 final frozen SHA**, an inspected package and explicit owner approval.
+
+## Package integrity checkpoint (RC-09)
+
+The `dotnet` workflow now generates a lowercase SHA-256 fingerprint of the
+**actual locally tested** `Sasd.Editor.Core.1.0.0-rc.1.nupkg` separately on
+Windows and Ubuntu. Its `.nupkg.sha256` sidecar is included alongside the
+package in each downloadable CI artifact. Check the fingerprint using
+`Get-FileHash -Algorithm SHA256` (PowerShell) or `sha256sum` (Linux).
+SHA-256 verifies integrity only; it is **not** a signature, security audit,
+historical-parity sign-off or publication permission. Record the frozen
+candidate commit SHA and package checksum in the acceptance worksheet.
