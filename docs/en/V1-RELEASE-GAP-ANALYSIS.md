@@ -129,3 +129,38 @@ documented historical differences. This removes the open binary choice
 between modernized V1 and literal DOS/Pascal parity. It does **not** sign off
 individual historical divergences, missing manual evidence, the frozen RC
 SHA, or publication. See [confirmed product direction](V1-PRODUCT-SCOPE-PROPOSAL.md).
+
+## V1 closure mode — feature freeze (2026-10-30)
+
+**Product-owner direction:** Finish the existing modern V1 scope rather than
+continue an open-ended sequence of minor improvements. The project is now in
+**release closure mode**, not in a new-feature milestone. This is a planning
+freeze; it does not assert that an immutable RC SHA has been selected.
+
+1. **Manual terminal evidence (P0):** execute the existing
+   [acceptance worksheet](V1-ACCEPTANCE-WORKSHEET.md) on Windows Terminal and
+   native Debian. Group FIRST-ED (11), MicroStar (10), tabs (5), and legacy
+   I/O (5) by session. Previously recorded WSL observations remain partial.
+2. **Historical review (P0):** reconcile HP-01..HP-10 with the agreed modern
+   policy, recording any remaining functional gap rather than requiring DOS
+   ABI/physical printer parity.
+3. **Defect-only fixes (conditional):** reproduce a failing acceptance case,
+   correct the smallest responsible component, add regression coverage and
+   repeat the affected manual observations on the new commit.
+4. **Candidate freeze (P0/P1):** choose an exact SHA, check both workflows on
+   that SHA, retrieve and verify the packaged NuGet artifact, and complete
+   the release notes/evidence matrix.
+5. **Owner approval and publication (P0):** publish/tag V1.0 only after an
+   explicit approval tied to the accepted SHA and remaining documented
+   limitations.
+
+**Expected remaining execution:** four principal phases when tests pass
+(manual acceptance, historical review, RC verification, owner release), or
+five to six work packages if defect fixes or separate platform sessions are
+required. These are dependencies and evidence gates, not a calendar forecast.
+
+**Stop rule:** Do not add a new feature, cosmetic refactor, speculative
+hardening test or package-metadata extension unless a reproducible V1 blocker
+requires it. Do not mark any manual result PASS without an actual reviewer
+observation. Core-only V1 remains distinct from the future Editor-Toolkit
+migration, and UI Toolkit remains a separate project.
