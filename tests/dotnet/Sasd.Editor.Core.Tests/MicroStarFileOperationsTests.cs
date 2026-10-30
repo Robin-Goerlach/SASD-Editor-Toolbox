@@ -125,6 +125,48 @@ public sealed class MicroStarFileOperationsTests
     }
 
     [Fact]
+    public void CopyAndRenameRefuseLinkedDestinationWithoutChangingItsTarget()
+    {
+        var root = NewDirectory();
+        try
+        {
+            var source = Path.Combine(root, "source.txt");
+            var protectedTarget = Path.Combine(root, "protected.txt");
+            var destinationLink = Path.Combine(root, "destination-link.txt");
+            File.WriteAllText(source, "incoming content");
+            File.WriteAllText(protectedTarget, "must survive");
+
+            try
+            {
+                File.CreateSymbolicLink(destinationLink, protectedTarget);
+            }
+            catch (Exception error) when (error is UnauthorizedAccessException
+                or PlatformNotSupportedException or IOException)
+            {
+                // Creating links is not available to every Windows runner.
+                // Linux generally exercises this exact filesystem case.
+                return;
+            }
+
+            // A destination that is a link is already occupied even when
+            // the editor user sees it as just another filename. The
+            // no-overwrite contract must apply to the directory entry AND
+            // to the unrelated file that the link resolves to.
+            Assert.ThrowsAny<IOException>(() =>
+                MicroStarFileOperations.Copy(source, destinationLink));
+            Assert.ThrowsAny<IOException>(() =>
+                MicroStarFileOperations.Rename(source, destinationLink));
+
+            // Rejecting the destination must leave all three entries
+            // intact, including the source used by a subsequent retry.
+            Assert.Equal("incoming content", File.ReadAllText(source));
+            Assert.Equal("must survive", File.ReadAllText(protectedTarget));
+            Assert.NotNull(new FileInfo(destinationLink).LinkTarget);
+        }
+        finally { Directory.Delete(root, recursive: true); }
+    }
+
+    [Fact]
     public void DeleteRemovesOnlyTheRequestedRegularFile()
     {
         var root = NewDirectory();
