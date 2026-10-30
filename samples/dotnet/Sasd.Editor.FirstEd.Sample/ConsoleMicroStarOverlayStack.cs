@@ -14,8 +14,18 @@ internal sealed class ConsoleMicroStarOverlayStack
 {
     private readonly List<ConsoleMicroStarPopupLayout> _active = [];
 
-    /// <summary>Returns a snapshot, not the mutable ownership list.</summary>
-    internal IReadOnlyList<ConsoleMicroStarPopupLayout> Active => _active.ToArray();
+    /// <summary>
+    /// Returns a read-only snapshot of the current overlay order.
+    /// </summary>
+    /// <remarks>
+    /// Exposing an array as IReadOnlyList alone does not prevent callers
+    /// from casting it back to an array and replacing elements. A read-only
+    /// wrapper makes the ownership contract explicit: renderers may inspect
+    /// the snapshot but cannot modify its entries, even by casting to IList.
+    /// The snapshot remains stable when child popups open or close.
+    /// </remarks>
+    internal IReadOnlyList<ConsoleMicroStarPopupLayout> Active =>
+        Array.AsReadOnly(_active.ToArray());
     internal int Count => _active.Count;
 
     // Selection belongs to a particular overlay instance, never to the

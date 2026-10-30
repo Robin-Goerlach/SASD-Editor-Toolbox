@@ -61,6 +61,34 @@ public sealed class ConsoleMicroStarOverlayStackTests
     }
 
     [Fact]
+    public void ActiveSnapshotRejectsMutationAndPreservesOverlayOrder()
+    {
+        var stack = new ConsoleMicroStarOverlayStack();
+        var parent = Popup("parent");
+        var replacement = Popup("replacement");
+        using (stack.Push(parent))
+        {
+            var snapshot = stack.Active;
+
+            // IReadOnlyList is a compile-time interface, not an immutable
+            // runtime container. A raw array would allow callers to cast
+            // and overwrite an element without touching the real stack.
+            // The public-facing snapshot must reject this write instead.
+            var writableView = Assert.IsAssignableFrom<IList<ConsoleMicroStarPopupLayout>>(snapshot);
+            Assert.Throws<NotSupportedException>(() => writableView[0] = replacement);
+            Assert.Same(parent, stack.Active[0]);
+
+            using (stack.Push(replacement))
+            {
+                Assert.Equal(new[] { parent, replacement }, stack.Active);
+                Assert.Equal(new[] { parent }, snapshot);
+            }
+            Assert.Equal(new[] { parent }, stack.Active);
+        }
+        Assert.Empty(stack.Active);
+    }
+
+    [Fact]
     public void NestedSelectionRestoresParentAndDoesNotLeakToNextPopup()
     {
         var stack = new ConsoleMicroStarOverlayStack();
