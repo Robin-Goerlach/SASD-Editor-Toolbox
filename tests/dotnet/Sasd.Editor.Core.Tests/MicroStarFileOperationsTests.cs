@@ -189,12 +189,13 @@ public sealed class MicroStarFileOperationsTests
                 return;
             }
 
-            // A dangling link is an existing directory entry even though
-            // File.Exists follows its absent target and therefore returns
-            // false. Neither Copy nor Rename may mistake that entry for a
-            // free output name. File.Copy/File.Move with overwrite:false
-            // must make the final authoritative decision at the OS level.
-            Assert.False(File.Exists(destinationLink));
+            // A dangling link is still an occupied filesystem entry.
+            // File.Exists is NOT a portable test of link existence: some
+            // .NET/OS combinations report true for the entry even when its
+            // target is absent. Inspect the link itself and keep the safety
+            // assertions focused on the real operation contract instead.
+            // Copy/Move with overwrite:false must reject the existing link.
+            Assert.False(File.Exists(missingTarget));
             Assert.NotNull(new FileInfo(destinationLink).LinkTarget);
             Assert.ThrowsAny<IOException>(() =>
                 MicroStarFileOperations.Copy(source, destinationLink));
