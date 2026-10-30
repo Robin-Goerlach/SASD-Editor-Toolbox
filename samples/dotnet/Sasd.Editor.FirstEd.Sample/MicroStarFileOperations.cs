@@ -123,6 +123,16 @@ internal static class MicroStarFileOperations
         if (Directory.Exists(destination))
             throw new IOException("Destination is an existing directory.");
 
+        // A dangling symbolic link can look like a free destination to
+        // File.Exists. On Windows, Copy with overwrite:false may still
+        // follow that link and create its previously missing target.
+        // Inspect the destination directory entry itself, including links
+        // whose targets do not exist, before invoking the OS file operation.
+        // This is a defensive preflight, not an atomic race-free guarantee:
+        // another process can replace the entry after this check.
+        if (new FileInfo(destination).LinkTarget is not null)
+            throw new IOException("Destination must not be a symbolic link.");
+
         return (source, destination);
     }
 }
