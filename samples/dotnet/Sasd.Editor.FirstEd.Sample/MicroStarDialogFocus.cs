@@ -92,11 +92,20 @@ internal sealed class MicroStarDialogFocus
             (key == ConsoleKey.Tab && modifiers.HasFlag(ConsoleModifiers.Shift))
             ? -1 : 1;
 
+        var originalIndex = _focusedIndex;
         for (var scanned = 0; scanned < _controls.Length; scanned++)
         {
             _focusedIndex = (_focusedIndex + direction + _controls.Length) % _controls.Length;
             if (_controls[_focusedIndex].Enabled)
-                return MicroStarDialogNavigationResult.FocusChanged;
+            {
+                // A dialog may intentionally expose just one enabled field
+                // while displaying several disabled controls. Wrapping back
+                // to that same field is not a focus transition; reporting a
+                // change would trigger unnecessary host redraw/focus events.
+                return _focusedIndex == originalIndex
+                    ? MicroStarDialogNavigationResult.Ignored
+                    : MicroStarDialogNavigationResult.FocusChanged;
+            }
         }
 
         // The constructor guarantees at least one enabled item.

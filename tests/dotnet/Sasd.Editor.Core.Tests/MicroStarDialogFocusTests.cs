@@ -87,6 +87,34 @@ public sealed class MicroStarDialogFocusTests
     }
 
     [Fact]
+    public void NavigationWithOnlyOneEnabledControlDoesNotReportFocusChange()
+    {
+        var focus = new MicroStarDialogFocus([
+            new("disabled-before", MicroStarDialogControlKind.Choice, false),
+            new("active", MicroStarDialogControlKind.Input),
+            new("disabled-after", MicroStarDialogControlKind.Action, false)
+        ]);
+
+        // Scanning forward or backward wraps to the same enabled element.
+        // This must be an ignored navigation request, not a fabricated
+        // focus event that could cause a terminal redraw or commit.
+        Assert.Equal(MicroStarDialogNavigationResult.Ignored,
+            focus.Handle(ConsoleKey.Tab));
+        Assert.Equal(MicroStarDialogNavigationResult.Ignored,
+            focus.Handle(ConsoleKey.Tab, ConsoleModifiers.Shift));
+        Assert.Equal(MicroStarDialogNavigationResult.Ignored,
+            focus.Handle(ConsoleKey.UpArrow));
+        Assert.Equal(MicroStarDialogNavigationResult.Ignored,
+            focus.Handle(ConsoleKey.DownArrow));
+        Assert.Equal("active", focus.FocusedId);
+
+        // Enter still activates that field; the navigation fix must not
+        // disable the only input the user can interact with.
+        Assert.Equal(MicroStarDialogNavigationResult.Activate,
+            focus.Handle(ConsoleKey.Enter));
+    }
+
+    [Fact]
     public void UnrelatedKeysNeverActivateControl()
     {
         var focus = Create();
