@@ -167,6 +167,50 @@ public sealed class MicroStarFileOperationsTests
     }
 
     [Fact]
+    public void CopyAndRenameRefuseDanglingSymbolicLinkDestination()
+    {
+        var root = NewDirectory();
+        try
+        {
+            var source = Path.Combine(root, "source.txt");
+            var missingTarget = Path.Combine(root, "missing-target.txt");
+            var destinationLink = Path.Combine(root, "dangling-link.txt");
+            File.WriteAllText(source, "keep original bytes");
+
+            try
+            {
+                File.CreateSymbolicLink(destinationLink, missingTarget);
+            }
+            catch (Exception error) when (error is UnauthorizedAccessException
+                or PlatformNotSupportedException or IOException)
+            {
+                // Windows link creation can require additional privileges;
+                // the Linux runner normally covers this filesystem case.
+                return;
+            }
+
+            // A dangling link is an existing directory entry even though
+            // File.Exists follows its absent target and therefore returns
+            // false. Neither Copy nor Rename may mistake that entry for a
+            // free output name. File.Copy/File.Move with overwrite:false
+            // must make the final authoritative decision at the OS level.
+            Assert.False(File.Exists(destinationLink));
+            Assert.NotNull(new FileInfo(destinationLink).LinkTarget);
+            Assert.ThrowsAny<IOException>(() =>
+                MicroStarFileOperations.Copy(source, destinationLink));
+            Assert.ThrowsAny<IOException>(() =>
+                MicroStarFileOperations.Rename(source, destinationLink));
+
+            // Failed operations must preserve both the original file and
+            // the dangling link; they may not create its missing target.
+            Assert.Equal("keep original bytes", File.ReadAllText(source));
+            Assert.False(File.Exists(missingTarget));
+            Assert.NotNull(new FileInfo(destinationLink).LinkTarget);
+        }
+        finally { Directory.Delete(root, recursive: true); }
+    }
+
+    [Fact]
     public void DeleteRemovesOnlyTheRequestedRegularFile()
     {
         var root = NewDirectory();
