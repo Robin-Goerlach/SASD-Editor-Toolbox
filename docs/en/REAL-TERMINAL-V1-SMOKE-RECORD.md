@@ -211,6 +211,68 @@ linked views, repeated focus changes and prompt cancellation. It does **not**
 replace this manual observation. Leave HP-03 release acceptance **OPEN** until
 actual results for both platforms are recorded and assessed.
 
+## November 2026 V1 closure: reported interactive acceptance evidence
+
+This record transcribes **product-owner-reported interactive observations**, not
+an automated test run or a claim of independent observation by CI. Exact
+Windows-terminal source SHA was not supplied; **do not** attach the Windows
+results to the Debian/WSL SHA without a new explicit Windows checkout check.
+
+### FIRST-ED on Windows
+
+Owner reported FE-01..FE-07 and FE-09..FE-11 **PASS**. FE-08 was initially
+marked FAIL because pressing Escape and typing `[2J` produced `O[2J`.
+This is **not** a valid control-character insertion test: bare Escape is
+mapped to Undo. The supplied screenshot showed the **existing** demo's
+`^[[2J` projection displayed inertly, without a cleared screen. Record
+FE-08 as **PASS for the preloaded-demo display observation only**; the
+optional manual insertion path was not executed. Windows HEAD and full
+console build output for this particular session remain unspecified.
+
+### FIRST-ED on Debian in WSL (not native Debian)
+
+Owner created a **fresh clone in the Linux filesystem** after observing
+many dirty entries in an older WSL working tree (a shared-tree/index issue).
+The clean clone reported exact SHA
+`adc3d813e7620dd5c93d7d98a98fa66992332452`, .NET SDK
+`10.0.402`, successful clean/restore/Release build, and **1074/1074**
+passing .NET tests. Both GitHub workflows also completed/success for
+this same SHA.
+
+Owner reported FE-01..FE-02 and FE-04..FE-06 and FE-08..FE-11 **PASS**;
+FE-03 and FE-07 were initially FAIL, then specifically retested and
+reported **PASS**:
+- FE-03: repeated Escape undid each character of `TEST123` until all
+  inserted text was gone; one Escape only undoes the last editing step.
+- FE-07: the owner used `Ctrl-Q, 1/2` (numbered **markers**) initially.
+  Retesting with `Ctrl-O, 1/2` (numbered **windows**) worked, and the
+  screenshot showed separate W1 and W2 status bars.
+
+Consequently **FE-01 through FE-11 were reported PASS on Debian/WSL**,
+with the precise correction history preserved. This is WSL evidence and
+**must not be labeled a native Debian terminal acceptance**.
+
+### MicroStar on Windows and Debian/WSL
+
+Both target sessions are reported to have:
+- **MS-01 PARTIAL**: F10 displayed the menu. The no-document-mutation
+  and no-Undo-mutation checks were **not independently confirmed**.
+- **MS-02 PASS (reported)**: arrow/Home/End menu navigation and Escape
+  cancellation. Enter and command-letter actions received further
+  practical coverage in MS-04/05.
+- **MS-03 PASS (reported)**: Ctrl-U and Q menu cancellation; normal editor
+  interaction continued.
+- **MS-04 PASS (reported)**: Find, Replace, Goto and cancelling dialog
+  without changing the text.
+- **MS-05 PASS (reported)**: Save, Write, Read, overwrite-denial and
+  cancellation, using disposable files.
+
+**MS-06 through MS-10 are NOT RUN / not reported** in these sessions.
+The detailed HP-03 tab-width protocol and native Debian checks remain
+open. These partial confirmations do not imply overall V1 release sign-off.
+
+---
+
 ## MicroStar F10 observation checklist
 
 1. F10 opens the popup without altering document text or Undo.
