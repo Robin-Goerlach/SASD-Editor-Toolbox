@@ -4,6 +4,10 @@
 
 The long-term goal is broader than a stand-alone text editor: the toolbox should provide reusable document, buffer, command, search, block, window, undo, rendering-model and extension infrastructure that can be embedded in SASD Workbench applications.
 
+## Development roadmap
+
+The current implementation status, V1.0 acceptance gates, and post-V1 Editor Toolkit direction are documented in the **[English roadmap](docs/en/ROADMAP.md)** and **[deutschen Roadmap](docs/de/ROADMAP.md)**. A working feature or a passing CI job does not by itself mean that V1.0 has been released.
+
 ## Editor UI preview (concept)
 
 ![SASD Editor Toolbox — FIRST-ED-inspired UI concept](docs/assets/editor-toolbox-concept.svg)
