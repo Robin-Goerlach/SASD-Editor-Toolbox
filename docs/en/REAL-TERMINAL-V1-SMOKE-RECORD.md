@@ -291,3 +291,46 @@ open. These partial confirmations do not imply overall V1 release sign-off.
 For every step capture: **PASS / FAIL / BLOCKED**, actual behavior, target behavior and environment. Attach a screenshot only when useful; never include sensitive user data. Record differences as one of: implementation defect, terminal-specific behavior, intentional modern divergence, or historical behavior not established by the handbook.
 
 A successful automated CI build, or passing this small manual checklist, does **not** by itself mean that all 123 indexed historical procedures, 20 supplemental names, or complete MicroStar behavior are accepted. No V1.0 release/tag until the separate historical acceptance review.
+
+## Subsequent owner-reported terminal acceptance (2026-11-06)
+
+These are reported real-terminal observations following the earlier partial
+record. They supersede **only the earlier NOT RUN statements for the named
+cases**, not the source-SHA uncertainty, native-Debian gate, or any other
+release criterion. Windows and Debian-under-WSL were the two reported test
+environments. The exact source SHA for each later interactive session was not
+independently captured; do not silently attribute these observations to this
+documentation commit or to a future final RC.
+
+- **MicroStar MS-06 PASS (reported on both):** B/E/C/M/D block mark/copy/move/
+  delete and Undo, five user-confirmed steps without unexpected behavior.
+- **MS-07 PASS (reported on both):** T/L write/read block file roundtrip,
+  including import Undo, with disposable data.
+- **MS-08 PASS (reported on both):** P/A Save & Open / Abandon & Open, all four
+  confirmed/cancelled scenarios without unintended persistence.
+- **MS-09 PASS (reported on both, scoped):** H print-to-file and its text
+  output, J status and K cancellation interface; the user saw
+  `Background print cancelled.` but **did not directly observe interruption
+  of an in-progress job** because the work finished too quickly. This is
+  not physical-printer or historic LPT1 parity.
+- **MS-10 PASS (reported on both):** all five popup/redraw/focus/terminal
+  integrity observations completed without anomalies.
+- **MS-01 supplementary PASS (reported; specific environment not restated):**
+  F10 open/close did not alter `TEST123`, and subsequent repeated Escape
+  undid the inserted characters normally. The last message did not
+  explicitly identify which OS was used for this supplementary test.
+
+### HP-03 — view-local tab settings
+
+The owner reported **TAB-01 through TAB-05 PASS on both Windows and
+Debian/WSL**. View 1 retained tab width 3 and linked view 2 width 6;
+repeated focus changes preserved the separate values. Prompt cancellation
+preserved them. The dialog accepted typed `abc` as text, but Enter returned
+`Command cancelled` rather than installing a nonnumeric width. Empty Enter
+at a known nonzero column and the first-column guard were both reported
+PASS. This validates the chosen modern view-local behavior, **not** the
+1985 global-tab setting or a native-Debian session.
+
+**Outstanding:** record exact SHA/terminal details for any final candidate
+rerun; native Debian manual evidence if still required; separate IO-01..05
+codec/error/safety checks; HP-01..10 disposition and final owner sign-off.
