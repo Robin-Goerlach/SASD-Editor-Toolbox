@@ -334,3 +334,24 @@ PASS. This validates the chosen modern view-local behavior, **not** the
 **Outstanding:** record exact SHA/terminal details for any final candidate
 rerun; native Debian manual evidence if still required; separate IO-01..05
 codec/error/safety checks; HP-01..10 disposition and final owner sign-off.
+
+## Legacy file I/O owner acceptance — 2026-11-07
+
+These are **user-reported manual acceptance results** on Windows Terminal
+and Debian/WSL. The later-session exact source SHAs are not explicitly
+captured, so these observations must not be silently attributed to the
+latest documentation commit or to native Debian.
+
+| Check | Windows | Debian/WSL | Evidence and limits |
+| --- | --- | --- | --- |
+| IO-01 legacy 8-bit/0x8D import | PASS (reported) | PASS (reported) | User imported the disposable synthetic `ABC 0x8D DEF CR/LF GHI` sample and reported correct interpretation. |
+| IO-02 cancelled Save/Write | PASS (owner reconfirmation) | PASS (owner reconfirmation) | Based on prior FIRST-ED/MicroStar file-operation exercises. No new byte-for-byte evidence submitted in this turn. |
+| IO-03 overwrite denial | PASS (owner reconfirmation) | PASS (owner reconfirmation) | Existing disposable destination preserved when overwrite was denied, as previously reported. |
+| IO-04 unsupported Unicode | PASS (reported for rejection) | PASS (reported for rejection) | Screenshots show `Unicode-Test: Euro € und Pfeil →` and `EDITOR_FILE_IO_FAILED: Text contains characters unsupported by the legacy file format.`; document remains editable/dirty. **Existing-destination byte preservation after an explicitly confirmed overwrite has not yet been independently reported.** |
+| IO-05 Write document identity | PASS (owner reconfirmation) | PASS (owner reconfirmation) | Previous tests indicated export did not re-associate the active document. |
+
+**Scope:** IO-04 correctly rejects unrepresentable code points for the legacy
+Latin-1 codec, without implying that the library's independent UTF-8 storage
+cannot represent them. The remaining existing-destination byte-preservation
+spot check is advisable before final data-safety sign-off. No manual result
+constitutes approval of full historic DOS parity or of V1.0 release.
