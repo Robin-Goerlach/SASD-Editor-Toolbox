@@ -355,3 +355,21 @@ Latin-1 codec, without implying that the library's independent UTF-8 storage
 cannot represent them. The remaining existing-destination byte-preservation
 spot check is advisable before final data-safety sign-off. No manual result
 constitutes approval of full historic DOS parity or of V1.0 release.
+
+## Follow-up: Windows existing-file preservation on Unicode rejection
+
+The owner reported attempting to overwrite disposable
+`C:\\Temp\\SASD-Editor-Test\\unicode-io04.txt` with a document containing
+`€` and `→` in the legacy codec. The editor displayed
+`EDITOR_FILE_IO_FAILED: Text contains characters unsupported by the legacy file format.`
+The test file's initial content was `ORIGINAL`. A later explicit
+`type` command printed `ORIGINAL` again, and the user supplied the same
+SHA-256 fingerprint before and after the session:
+`962F85A27854336F3286AD54B49321F62525043B5F3508B2ECC887FDD6E7550E`.
+The command combining `Get-Content` and `Get-FileHash` in one PowerShell
+statement emitted a positional-argument error, but it did not alter the
+file. **Owner verdict: PASS for Windows overwrite-preservation spot check.**
+This is user-reported interactive evidence, not an independently recorded
+terminal trace; the matching full source SHA for this session was not supplied.
+No separate existing-file Unicode overwrite-preservation test has yet been
+reported for native Debian or Debian/WSL.

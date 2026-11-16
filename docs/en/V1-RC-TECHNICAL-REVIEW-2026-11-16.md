@@ -98,3 +98,53 @@ Retain these limitations:
 
 No source code or existing historical acceptance outcomes were modified as
 part of the technical inspection.
+
+## Post-review release-repository and licensing decision — 2026-11-16
+
+**Owner-selected release direction (not yet executed):** retain the current
+MIT license in `Robin-Goerlach/SASD-Editor-Toolbox` as a development/debug
+repository; prepare the official V1.0 source release in the separate SASD
+organization repository under **AGPL-3.0-only**, with possible commercial
+licensing considered only later. The owner has not approved a V1.0 tag or
+publication. The contemplated `SASDGmbH/SASD-Editor-Toolbox` repository was
+not accessible through the connected GitHub account at inspection time;
+verify the exact owner/repository name and permissions before attempting a
+release transfer. An earlier discussion mentioned a differently named
+`SASDGMBH/Editor-Toolbox` repository; these identifiers must not be assumed
+to designate the same remote repository.
+
+**Licensing caveat:** Two repositories do not create distinct exclusive
+rights in identical source code. Code legitimately offered under MIT remains
+available under its already granted MIT terms, notwithstanding an additional
+AGPL version. A separately distributed AGPL version must retain required
+existing copyright/permission notices as applicable, and must not falsely
+advertise exclusive AGPL obligations over identical MIT-available material.
+Before publication, establish the rights holder(s), third-party contributions,
+and legal authority to license the intended package under AGPL. In particular,
+the current `LICENSE` and `PackageLicenseExpression` **remain MIT** in the
+development repository, and the existing `1.0.0-rc.1` CI NuGet artifacts
+**must not be relabeled as AGPL**. Prepare consistent AGPL source/package
+metadata in a reviewed release working tree only after that rights review.
+
+### Remaining work ordered by release risk
+
+1. **Historical scope closure (HP-01..HP-10):** use the existing selected
+   modern policies and owner-reported FE/MS/TAB/IO observations to produce
+   explicit per-feature verdicts; leave unknown source-parity and incomplete
+   procedure evidence as limitations, not inferred PASS. This is not a
+   request to implement 1985 DOS or Lightning behavior.
+2. **Terminal acceptance provenance:** decide explicitly whether native
+   Debian and exact-candidate-SHA interactive retest remain mandatory; if
+   required, execute them. Windows/WSL observations are not native Debian.
+3. **Release provenance/licensing:** verify target repository identity and
+   rights ownership, reconcile legacy MIT grants, and prepare an AGPL-only
+   distribution snapshot with consistent license and NuGet metadata.
+4. **Final artifact gate:** freeze the release snapshot SHA, run Windows and
+   Ubuntu CI against it, inspect its distributable package, record package
+   SHA-256 and version. Do not use older MIT-labeled RC packages as AGPL
+   release evidence.
+5. **Owner sign-off:** approve explicit source SHA, license, destination,
+   documented limitations and release notes before any tag or upload.
+
+**No change to the development repository's MIT license is authorized by this
+record. No package has been published.**
