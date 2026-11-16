@@ -13,15 +13,28 @@ Editor-Implementierungen**. Wiederverwendbares Editorverhalten gehört nach
 Konsolen-, Desktop- und anderer oberflächenspezifischer Code gehört hierher
 oder in ein anderes Host-Projekt.
 
-## Verfügbares Beispiel
+## Mit welchem Beispiel beginnen?
+
+Für die **Bibliotheksintegration** zuerst
+`Sasd.Editor.Consumer.Sample` (öffentliche Projekt-API)
+und `Sasd.Editor.PackageConsumer.Sample` (echtes NuGet-Paket,
+in CI überprüft) ansehen. FIRST-ED/MicroStar demonstrieren
+anschließend einen umfangreicheren interaktiven Host, sind aber
+nicht das Hauptprodukt.
+[Primäre Bibliotheksabnahme](../../docs/de/BIBLIOTHEK-ZUERST-V1-ABNAHME.md).
+
+## Verfügbare Beispiele
 
 | Projekt | Typ | Zweck |
 | --- | --- | --- |
-| [`Sasd.Editor.FirstEd.Sample`](./Sasd.Editor.FirstEd.Sample/) | Interaktive Konsolenanwendung | Demonstriert die öffentliche .NET-Editor-API durch einen FIRST-ED-kompatiblen Terminal-Host, einschließlich Bearbeitung, Suche, Blöcken, Marken, gestapelten Fenstern, historischer Dateiverarbeitung, einem von MicroStar inspirierten Menü und kooperativem Hintergrunddruck. |
+| [`Sasd.Editor.FirstEd.Sample`](./Sasd.Editor.FirstEd.Sample/) | Interaktive Konsolenanwendung | FIRST-ED-/MicroStar-inspirierter Referenzhost für die öffentliche API. |
+| [`Sasd.Editor.Consumer.Sample`](./Sasd.Editor.Consumer.Sample/) | Public-API-Consumer | Bearbeiten, Suche, Undo und Export über die Core-Projektreferenz. |
+| [`Sasd.Editor.PackageConsumer.Sample`](./Sasd.Editor.PackageConsumer.Sample/) | NuGet-Consumer | Dieselben Kernfunktionen ausschließlich über ein zuvor erzeugtes RC-NuGet-Paket. |
 
-Das FIRST-ED-Beispiel ist derzeit der einzige ausführbare .NET-Host in diesem
-Verzeichnis. Ein grafisches Beispiel kann später hinzukommen; ein
-WinForms-, WPF-, MAUI- oder Web-Host ist hier noch nicht implementiert.
+FIRST-ED bleibt die einzige **interaktive Editor-Oberfläche**. Die beiden
+anderen ausführbaren Projekte sind Bibliotheks-Consumer und keine
+weiteren Editoren. WinForms-, WPF-, MAUI- oder Web-Hosts gehören
+nicht zu V1 und sind hier noch nicht implementiert.
 
 ## Voraussetzungen
 

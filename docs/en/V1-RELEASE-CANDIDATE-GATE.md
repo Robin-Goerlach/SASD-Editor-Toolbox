@@ -5,6 +5,19 @@ This record separates a repeatable .NET library milestone from a claim of
 complete Borland Turbo Editor Toolbox 1.0 (1985) compatibility. A passing
 CI workflow is necessary but not sufficient to publish a V1.0 tag.
 
+## Precedence: primary library acceptance before sample completeness
+
+The principal V1 release product is `Sasd.Editor.Core`, **not**
+FIRST-ED or MicroStar as a completed end-user editor. The reference
+applications demonstrate the public API in practice. The
+[library-first acceptance protocol](LIBRARY-FIRST-V1-ACCEPTANCE.md)
+defines mandatory external-consumer/API/package/documentation review.
+The historic host checks remain *separate scoped integration gates*;
+they must not substitute for library review and must not be waived
+without explicit owner decision. The earlier table below records
+historical gate status at its baseline and must not be silently
+rewritten as a final-SHA result.
+
 ## Snapshot and reproducible evidence
 
 - Baseline `main`: `cde1b5b137ea9959cba3da979f47d9513211086e`.
@@ -20,6 +33,7 @@ CI workflow is necessary but not sufficient to publish a V1.0 tag.
 
 | Gate | Evidence to collect | Status at baseline |
 | --- | --- | --- |
+| RC-LIB: reusable public library | Review LIB-01..08: API/lifecycle, independent consumers, UI independence, conformance, developer docs, package and distribution rights | NEW PRIMARY GATE; reviewer sign-off OPEN |
 | RC-01: reproducible source | Pin exact commit SHA; clean checkout; document SDK/OS | OPEN |
 | RC-02: automated validation | Both CI workflows successful for the **proposed** release SHA | BASELINE PASS; release SHA pending |
 | RC-03: public API integration | Execute independent Core-only consumer (edit/find/undo/disposable export) on Windows and Linux CI | PENDING NEW CI |

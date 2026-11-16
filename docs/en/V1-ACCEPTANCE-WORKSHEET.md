@@ -5,6 +5,18 @@
 explains why each gap matters. Never convert CI success, a previously reported
 launch, or an unannotated screenshot into an individual manual PASS.
 
+## Primary product acceptance: public library
+
+This worksheet retains the existing terminal evidence protocol, but
+**the V1 product is a library**. FIRST-ED and MicroStar are reference
+applications. Complete the [LIB-01..08 public API, consumer and package
+acceptance protocol](LIBRARY-FIRST-V1-ACCEPTANCE.md) **first** for the
+frozen release SHA; record its reviewer verdict alongside the current
+reference-host worksheets. Passing FE/MS interactions alone must not
+close public-API, documentation or NuGet integration gates. Previous
+host test observations stay intact; any change to mandatory terminal
+scope requires an explicit owner decision, not an unrecorded waiver.
+
 ## How to use this worksheet
 
 Copy the empty environment table and relevant test tables **for each run**;

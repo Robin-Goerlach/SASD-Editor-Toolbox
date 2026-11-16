@@ -5,6 +5,21 @@ product scope, not a completed acceptance or an available V1.0 download.
 Version and publication details are intentionally unset pending final
 candidate review and explicit product-owner authorization.
 
+## Primary deliverable — public developer library first
+
+V1.0 plans to ship **Sasd.Editor.Core as a reusable,
+UI-independent library**. FIRST-ED and MicroStar are reference
+applications, not promised complete end-user editor products.
+API usability, independent project/package consumers, portable
+correctness, data integrity and developer documentation take
+precedence over terminal presentation completeness. See
+[LIB-01..08 primary acceptance](LIBRARY-FIRST-V1-ACCEPTANCE.md).
+
+The existing development artifacts are MIT-labeled; an intended
+AGPL-3.0-only organization release requires a separate reviewed
+distribution snapshot and rights/license metadata verification.
+Do not relabel the existing MIT packages.
+
 ## Overview
 
 SASD Editor Toolbox is a modern, independently developed, reusable editor

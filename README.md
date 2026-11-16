@@ -4,6 +4,15 @@
 
 The long-term goal is broader than a stand-alone text editor: the toolbox should provide reusable document, buffer, command, search, block, window, undo, rendering-model and extension infrastructure that can be embedded in SASD Workbench applications.
 
+> **Library-first product priority (16 November 2026):** The deliverable is
+> the documented, embeddable **public editor Core library**. FIRST-ED and
+> MicroStar are **reference implementations/integration demos**, not
+> independent finished end-user editor products. API quality, reusable
+> behavior, independent package consumption and developer documentation
+> take precedence over perfecting terminal menus or DOS presentation.
+> [V1 library acceptance](docs/en/LIBRARY-FIRST-V1-ACCEPTANCE.md) ·
+> [V1-Bibliotheksabnahme](docs/de/BIBLIOTHEK-ZUERST-V1-ABNAHME.md).
+
 ## Development roadmap
 
 The current implementation status, V1.0 acceptance gates, and post-V1 Editor Toolkit direction are documented in the **[English roadmap](docs/en/ROADMAP.md)** and **[deutschen Roadmap](docs/de/ROADMAP.md)**. A working feature or a passing CI job does not by itself mean that V1.0 has been released.
@@ -24,9 +33,11 @@ settings through the semantic command; the sample's C/W/R option letters are
 cover these additions. See the [rendering audit](docs/en/FIRST-ED-PRESENTATION-V1.md),
 [search options](docs/en/FIRST-ED-SEARCH-OPTIONS-V1.md) and
 [supplemental symbol/feature inventory](docs/en/HANDBOOK-SUPPLEMENT-V1.md).
-MicroStar-specific menus, pop-ups, printing, file utilities, block-file
-commands and optional spell-check integration remain separate unfinished
-sample features; V1 is **not** historically signed off.
+MicroStar menus, pop-ups, print-to-file and block/file workflows belong
+in the reference host rather than the reusable Core. Substantial Windows/WSL
+manual success has been reported, but exact-candidate/native-Linux evidence
+and historical V1 sign-off remain open. Lightning spell integration is
+excluded from V1.
 
 
 Version 1 uses the functional scope of Borland's historical **Turbo Editor Toolbox 1.0 (1985)** as a compatibility/reference milestone. This is a **clean-room reimplementation**: the historical handbook is treated as a behavioral requirements source; historical source code is not copied.

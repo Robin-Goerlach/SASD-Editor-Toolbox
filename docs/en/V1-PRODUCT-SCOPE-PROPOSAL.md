@@ -15,6 +15,20 @@ identical historical screen operation, or an endorsed Borland product.
 All wording should consistently say *functional modernization with
 documented differences*, not *100% faithful reproduction*.
 
+### Release hierarchy: library first (owner reaffirmation, 2026-11-16)
+
+The principal acceptance object is the **public, reusable Core library**,
+its independent integration/extension contract, developer documentation and
+the distributable NuGet package. FIRST-ED and MicroStar are intentionally
+real reference programs, not the product or a mandate to perfect a
+complete terminal editor. They provide **supporting host-level evidence**
+and retain explicitly agreed in-scope terminal checks; neither all DOS
+presentation details nor every historical MicroStar feature is required.
+See the [primary library acceptance protocol](LIBRARY-FIRST-V1-ACCEPTANCE.md).
+The feature freeze and previously recorded evidence remain intact.
+Reconsider historic HP-01..HP-10 by **Core responsibility versus host
+example** rather than by a demand to recreate an end-user editor.
+
 ### In scope — the V1 deliverable
 
 - UI-independent `Sasd.Editor.Core`: document and view identity,

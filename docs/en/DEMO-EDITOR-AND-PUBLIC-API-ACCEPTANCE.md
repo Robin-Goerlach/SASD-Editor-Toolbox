@@ -2,6 +2,15 @@
 
 **Status (October 2026):** First executable acceptance slice. No V1.0 release/tag/package, no claim of complete manual terminal sign-off.
 
+## Acceptance precedence: library first
+
+**The product is the public Core library**, not the FIRST-ED/MicroStar
+terminal application. These are valuable reference hosts demonstrating
+integration, not complete end-user editors. Review
+[LIB-01..08: API, package, independent consumer and developer docs]
+(LIBRARY-FIRST-V1-ACCEPTANCE.md) before relying on the demo checklist.
+Already recorded host acceptance retains its scope and provenance.
+
 ## Decision: reuse the editor core, demonstrate the host
 
 The existing interactive FIRST-ED sample at `samples/dotnet/Sasd.Editor.FirstEd.Sample` is our first **real demo editor and developer template**. It uses the public `EditorSession`, `EditorCommandDispatcher`, view/document model, file codec and Undo path. No sample-specific editing engine, buffer or persistence layer has been introduced.

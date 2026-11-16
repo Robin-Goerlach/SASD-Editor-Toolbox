@@ -9,6 +9,25 @@ interactive evidence, and product-owner decisions. A historical inventory entry,
 a source file, a test name, or a successful build must **never** be promoted
 automatically into historical behavioral parity or final release approval.
 
+## Product-priority correction — 2026-11-16
+
+The owner reaffirmed the original **toolbox/library purpose**: a
+collection of reusable developer building blocks, not a finished
+editor product. FIRST-ED and MicroStar are reference hosts. This
+clarifies, rather than replaces, the already approved UI-independent
+Core architecture and does not add new V1 features.
+
+**Current release decision order:** (1) public Core API, lifecycle,
+extension boundaries and developer usability; (2) independent
+ProjectReference and actual NuGet package consumers, conformance,
+safety, documentation and package provenance; (3) explicitly scoped
+reference-host evidence; (4) historic HP-01..HP-10 modern deviations
+and owners' approvals; (5) final candidate/license/release sign-off.
+See [LIBRARY-FIRST-V1-ACCEPTANCE.md](LIBRARY-FIRST-V1-ACCEPTANCE.md)
+for the LIB-01..08 review. Existing legacy terminal test gates
+remain effective until explicitly decided; older next-step notes
+that prioritize MicroStar UI completion are superseded by this order.
+
 ## Executive conclusion
 
 The reusable .NET Core and its integration/package-distribution path are

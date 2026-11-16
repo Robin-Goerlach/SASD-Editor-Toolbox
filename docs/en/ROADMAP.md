@@ -6,6 +6,21 @@
 
 This roadmap consolidates work already spread across the architecture, compatibility matrix, release-gap assessment, acceptance worksheet and release-candidate gate. It is **a direction and evidence-based work plan, not a publication schedule**. M0–M5 are retrospective groupings of delivered work, **not claims that historical GitHub milestones with those names existed**. Later phases are proposals and must not silently extend the frozen V1 scope.
 
+## Product priority — library first (owner confirmation, 2026-11-16)
+
+V1 delivers **the public UI-independent Core library**, not a finished
+end-user editor. FIRST-ED and MicroStar are **reference hosts**. This
+reflects the 1985 toolbox's developer-building-block purpose without
+copying historical source. Order release work as follows:
+**API/lifecycle → independent package consumers → correctness, portable
+conformance, docs and provenance → scoped reference-host evidence →
+historical presentation details**.
+
+The feature freeze stands; this change of emphasis neither authorizes
+new features nor silently waives already agreed tests.
+[Primary library acceptance](LIBRARY-FIRST-V1-ACCEPTANCE.md) ·
+[Deutsch](../de/BIBLIOTHEK-ZUERST-V1-ABNAHME.md).
+
 ## How to read the status
 
 - `[x]` means the **specific item** is evidenced by an existing implementation, checked-in document/test, completed CI observation or explicitly qualified owner report. It is **not** a blanket declaration of historical equivalence.
@@ -115,9 +130,26 @@ This roadmap consolidates work already spread across the architecture, compatibi
 
 **Exit criterion:** reproducible automated project/package consumption on the two CI operating systems. **Foundation met; publication gate not met.**
 
-## M6 — V1.0 interactive and historical acceptance (current priority)
+## M6 — Library-first V1.0 acceptance and reference-host verification
 
 **Objective:** close the release gate instead of indefinitely expanding the feature list. The feature freeze has applied since 30 October 2026: fix only a **reproduced V1 blocker**, with a regression test and retest.
+
+### M6.0 — Primary reusable library gate
+
+- [x] Existing .NET CI builds Core and executes independent source/project-
+  reference and NuGet package-reference consumers on Windows and Ubuntu.
+  This does not yet sign off the final candidate.
+- [ ] Audit the **public Core API** and independently usable document/view
+  lifecycle, editing, search, Undo, storage, errors, cancellation and hooks.
+- [ ] Verify API documentation/examples, actual downloadable NuGet package,
+  external consumer experience, provenance and portable conformance against
+  the final frozen source SHA.
+- [ ] Record the [library-first acceptance matrix](LIBRARY-FIRST-V1-ACCEPTANCE.md);
+  fix or explicitly disposition any **library** release-significant gap.
+
+**M6.0 exit criterion:** an independent .NET developer can consume the
+documented public Core from the tested package without borrowing sample
+internals. **Final candidate review OPEN.**
 
 ### M6.1 — Hands-on FIRST-ED and MicroStar
 
@@ -140,7 +172,7 @@ This roadmap consolidates work already spread across the architecture, compatibi
 
 **Deliberate V1 boundaries:** no historical `Optstr` parser claim, no binary `EDITERR.MSG` equivalence, no global tab-size parity, no DOS screen-memory/assembler code, no physical printer, no Lightning spell-check integration, no original Pascal ABI. Modern replacements must still pass their *in-scope* acceptance checks.
 
-**M6 exit criterion:** M6.1 observations and M6.2 decisions are traceably recorded for the accepted source revision, with every release-significant failure fixed or explicitly handled. **OPEN.**
+**M6 exit criterion:** M6.0 library evidence, scoped M6.1 reference-host observations and M6.2 historical decisions must all be traceable for the agreed candidate.  M6.1 observations and M6.2 decisions are traceably recorded for the accepted source revision, with every release-significant failure fixed or explicitly handled. **OPEN.**
 
 ## M7 — Reproducible release candidate and final evidence
 
@@ -203,7 +235,7 @@ The long-term product destination is **[SASD Editor Toolkit](https://github.com/
 
 ## Next practical action and release discipline
 
-**Next work item:** consolidate the reported MS-06 observations into the acceptance record (platforms, reviewer, exact SHA and five subchecks), then execute **MS-07 block-file Read/Write** on disposable data. Continue MS-08..MS-10, TAB and I/O checks, with a **separate native Debian run**. Do not add a new editor feature while these gates remain open.
+**Next work item (re-prioritized 2026-11-16):** complete M6.0 public API and library-consumer review first; then review HP-01..HP-10 by Core vs. reference-host responsibility. Previously reported FE-01..11, MS-01..10, TAB-01..05 and IO-01..05 Windows/WSL results remain evidence but not native Debian or final-SHA verification. Do not add new editor UI features.
 
 Every milestone closes only on its **stated evidence**, not on a percentage estimate. For each implementation or defect fix, preserve architecture boundaries, meaningful comments, regression coverage and English/German documentation. If the accepted candidate SHA changes, reassess affected manual evidence and both workflows.
 

@@ -6,6 +6,16 @@ SASD Editor Toolbox is an embeddable editor kernel, not a single desktop editor.
 
 This separation lets WPF, WinForms, terminal and web hosts reuse the same core without importing another UI framework.
 
+## Primary product boundary
+
+**Core is the shipped developer library; FIRST-ED and MicroStar are
+reference hosts, not standalone V1 end-user products.** A host depends
+on public Core APIs, never vice versa. API/lifecycle, editing and search
+without keyboard simulation, storage, failures and extension hooks must
+work in a separate consumer. The [library-first acceptance protocol]
+(LIBRARY-FIRST-V1-ACCEPTANCE.md) is the primary V1 quality gate; terminal
+scenarios are supporting integration evidence.
+
 ## Dependency direction
 
 ```text
@@ -62,6 +72,6 @@ See [MULTI-LANGUAGE-DEVELOPMENT.md](MULTI-LANGUAGE-DEVELOPMENT.md) for source-of
 
 ## Current V1 gate and deliberate deferrals
 
-The FIRST-ED/WordStar key mapping, prefix dispatcher and interactive terminal reference host are already implemented. The remaining reusable V1 release gate is the [handbook procedure/function index audit](HANDBOOK-PROCEDURE-INDEX-AUDIT.md), which distinguishes observable gaps from obsolete Pascal/DOS mechanisms.
+The FIRST-ED/WordStar key mapping, prefix dispatcher and interactive terminal reference host are already implemented. The next V1 gate is the [public library API/consumer/package review](LIBRARY-FIRST-V1-ACCEPTANCE.md). The [historical procedure/function audit](HANDBOOK-PROCEDURE-INDEX-AUDIT.md) remains important for tracing reusable responsibilities and documented host/DOS exceptions.
 
 MicroStar-style menus, pop-up helpers and background-printing demonstrations remain host/sample work. Piece Table/Rope backends and speculative optimization are deferred until measurable need is established.

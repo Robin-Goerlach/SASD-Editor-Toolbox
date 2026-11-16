@@ -2,6 +2,16 @@
 
 **Stand (Oktober 2026):** Erste ausführbare Abnahmestufe. Noch keine V1.0-Freigabe und keine vollständige interaktive Terminalabnahme.
 
+## Abnahmepriorität: Bibliothek zuerst
+
+**Das Produkt ist die öffentliche Core-Bibliothek**, nicht das
+FIRST-ED-/MicroStar-Terminalprogramm. Die Programme sind wertvolle
+Referenzhosts für die Integration, keine vollständigen
+Endanwender-Editoren. Zuerst
+[LIB-01..08: API, Paket, unabhängiger Consumer und Entwicklermaterial]
+(BIBLIOTHEK-ZUERST-V1-ABNAHME.md) prüfen; die Demo-Tests bleiben
+ergänzende Nachweise mit ihren bisherigen Einschränkungen.
+
 ## Architekturentscheidung: keinen zweiten Editor-Kern entwickeln
 
 Das bereits vorhandene FIRST-ED-Terminalprogramm unter `samples/dotnet/Sasd.Editor.FirstEd.Sample` ist unsere erste **echte Demo und Vorlage für andere Entwickler**. Es nutzt die öffentlichen Bausteine `EditorSession`, `EditorCommandDispatcher`, Dokument/Fenster, Datei-Codec und Undo. Wir bauen kein getrenntes Textmodell, keinen künstlichen Editor und keinen zusätzlichen Persistenzweg für die Demo.

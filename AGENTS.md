@@ -14,6 +14,35 @@ The Editor Toolbox is a reusable, UI-agnostic editor foundation. C#/.NET is the 
 
 ## 2. Mission and current V1 target
 
+### Library-first product rule — reaffirmed 2026-11-16
+
+**The product is a reusable developer library, NOT a complete end-user editor.**
+The historical Borland Turbo Editor Toolbox provided reusable source modules
+and building blocks; SASD modernizes that developer-facing purpose independently.
+
+When objectives compete, follow this order:
+
+1. Public, embeddable Core API: text buffers, document/view lifecycle,
+   editing, navigation, blocks, search, Undo, storage, typed errors,
+   commands and extensibility.
+2. Library correctness and delivery: stable contracts, regression and
+   portable conformance tests, independent source and package consumers,
+   package integrity and developer documentation.
+3. FIRST-ED and MicroStar as **reference applications**: real-world
+   integration and interaction evidence using the public Core, with
+   terminal UI, keyboard bindings, menus and dialogs kept in the host.
+4. Historical presentation details only within explicitly accepted scope.
+   Do not turn complete 1985 DOS UI or an end-user editor into a V1 goal.
+
+A sample failure is a release blocker only for a specifically accepted
+in-scope host obligation, for data integrity, or when it exposes a reusable
+Core defect. Green reference-editor tests alone do not certify a good
+public API. The primary review is
+`docs/en/LIBRARY-FIRST-V1-ACCEPTANCE.md`
+and `docs/de/BIBLIOTHEK-ZUERST-V1-ABNAHME.md`.
+
+
+
 The immediate product goal is a clean-room modern implementation of the observable functional scope of Borland's historical **Turbo Editor Toolbox 1.0 (1985)**.
 
 The historical handbook is a **behavioral requirements/reference source only**.
@@ -199,46 +228,51 @@ The .NET code may be consulted as an executable reference, but ports should impl
 
 ## 7. Current V1 work priority
 
-When the user says only “continue”, “keep going” or asks Codex to work autonomously, take the first unfinished item below unless current repository evidence shows it is already complete.
+**V1 feature freeze remains in force.** If the user asks to "continue",
+select the first incomplete **library release gate** below, not the
+next FIRST-ED or MicroStar UI enhancement.
 
-### P0 - V1 release-gate work
+### P0 — Primary library release acceptance
 
-The independent block-endpoint, command-validation, typed-error, interruptibility and compound-undo audits are implemented. The **123-entry handbook procedure/function inventory** in `docs/handbook-procedure-index-v1.json` has also received its first-pass classification, with zero entries still marked `needs-review`. In particular, `EditGenlineno` uses indexed per-window line numbers and `EditHscroll` now has a host-neutral all-window horizontal visibility rule. **Zero unclassified entries is not the same as V1 behavioral acceptance.**
+1. **Public API and lifecycle.** Inspect externally accessible Core contracts
+   and documentation: creation/loading, document and independent view
+   identity, commands/editing/search/blocks/Undo, validation, persistence,
+   typed failures, cancellation, extension hooks and compatibility risk.
+   Test from an independently compiled consumer without internal helpers.
+2. **Independent consumption and distribution.** Confirm the standalone
+   ProjectReference and actual NuGet PackageReference consumers on
+   Windows/Ubuntu, package contents, metadata, version, license,
+   provenance and SHA-256 for the **exact candidate SHA**.
+3. **Portability and quality.** Verify `spec/`, `conformance/`,
+   deterministic regressions, host-free Core dependencies, reproducible
+   build, and English/German developer-facing docs. .NET is a reference
+   implementation, not a required runtime for C++/Java future ports.
+4. **Historical review by responsibility.** Map HP-01..HP-10 and the
+   indexed/supplemental routines to reusable Core, host-only or excluded
+   DOS-specific behavior. Record modern divergences and evidence precisely,
+   without asserting historical Pascal API or DOS fidelity.
+5. **Record library-first outcome** using
+   `docs/en/LIBRARY-FIRST-V1-ACCEPTANCE.md` and its German companion.
+   Only fix reproduced in-scope release blockers with targeted tests.
 
-1. **Final V1 mapping-to-regression evidence review**
-   - Recheck each historical row against its actual handbook description, the portable contract, production code and *executable* tests. A status of `implemented` in the inventory is a hypothesis about observable coverage, not conformance evidence by itself.
-   - Prioritize historical helper commands and host/sample classifications with weak test coverage. Confirm the modern replacements are intentional; do not add pointer-shaped or screen-memory APIs.
-   - For genuine behavioral gaps, add narrowly scoped, well-commented implementation and deterministic regression tests; update `spec/` and `conformance/` when portable behavior changes.
-   - Keep `docs/en/HANDBOOK-PROCEDURE-INDEX-AUDIT.md`, `docs/de/HANDBUCH-PROZEDURENINDEX-AUDIT.md` and the bilingual compatibility matrix synchronized. Record remaining evidence gaps explicitly instead of claiming V1 from inventory counts.
-2. **V1 release-readiness gate**
-   - Review public API and persistence compatibility, undo/anchor consistency, terminal smoke behavior, and CI diagnostics after the evidence audit.
-   - Publish no release or package without explicit user approval.
-### P1 - Sample breadth after the reusable V1 gate
+### P1 — Reference-host evidence (supporting V1 gate)
 
-Only after the reusable V1 release gate is in good shape, or when explicitly requested:
+FIRST-ED/MicroStar validate the library in real applications. Preserve
+the Windows/WSL FE/MS/TAB/IO observations and explicitly agreed checks,
+but do not infer native Debian, exact-candidate-SHA acceptance or historical
+parity from them. Decide remaining host checks by **actual accepted V1 scope**;
+only the owner can approve a waiver or scope reduction. Do not repeatedly
+add editor UI features to substitute for library acceptance.
 
-- MicroStar-style pull-down menu sample;
-- pop-up helpers;
-- cooperative/background printing sample;
-- other host demonstrations.
+### P2 — Deferred until after V1
 
-These are samples/hosts. They must not become dependencies of the reusable core.
-
-### Explicitly defer unless requested
-
-Do not autonomously start:
-
-- Rope/Piece Table rewrites;
-- lock-free queues;
-- SIMD search;
-- native backends;
-- GUI frameworks;
-- plugin systems;
-- arbitrary script execution;
-- full implementation work for additional language ports unless the user explicitly requests that language; repository scaffolding and shared-contract maintenance are allowed;
-- package publication/release automation.
-
-The repository already has stable seams for later optimization and ports. Finish behavior first.
+No new MicroStar UI polish, desktop/WinForms/WPF hosts, arbitrary
+plugins, Rope/Piece Table, speculative optimization, full C++/Java/Python
+implementations, or commercial licensing absent an explicit owner request.
+This development repository retains MIT; planned AGPL-3.0-only release
+distribution in a separate organization repository needs separate
+rights/license/metadata and publication approval. Do not publish or tag
+without authorization.
 
 ## 8. Historical-behavior transfer workflow
 
@@ -457,4 +491,4 @@ A work item is complete only when all applicable conditions are met:
 
 Once this file is present, a continuation prompt can be intentionally short:
 
-> Continue autonomously with the next unfinished V1 release-gate item from AGENTS.md. Inspect the current repository first. Preserve clean-room behavior, architecture invariants and bilingual documentation. Add regression tests, avoid premature optimization, commit a green checkpoint directly to main, verify GitHub Actions, and stop only for a documented stop condition.
+> Continue autonomously with the next unfinished **library-first** V1 release-gate item from AGENTS.md and the library-first acceptance protocol. Keep FIRST-ED and MicroStar as reference hosts, not the product. Inspect the current repository first. Preserve clean-room behavior, architecture invariants and bilingual documentation. Add regression tests, avoid premature optimization, commit a green checkpoint directly to main, verify GitHub Actions, and stop only for a documented stop condition.

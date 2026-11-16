@@ -11,6 +11,15 @@ Dieses Verzeichnis enthält die aktive **C#/.NET-Referenzimplementierung** der S
 
 Die .NET-Implementierung ist derzeit die am weitesten entwickelte ausführbare Implementierung im Repository. Sie dient zur Entwicklung, Erprobung und Überprüfung der Editorarchitektur, ist aber **nicht selbst die sprachneutrale Spezifikation**. Plattformübergreifend beobachtbares Verhalten wird unter `spec/` festgelegt; gemeinsam nutzbare Konformitätsfälle befinden sich unter `conformance/`.
 
+## Produktpriorität: Bibliothek zuerst
+
+Das Produkt ist die wiederverwendbare **öffentliche Core-Bibliothek**;
+FIRST-ED/MicroStar sind **Referenzhosts**, keine fertigen
+Endanwender-Editoren. Vor dem UI-Feinschliff öffentliche APIs,
+Dokument-/Ansichtslebenszyklen, Speicherung, Fehler/Abbruch und
+echte unabhängige NuGet-Nutzung prüfen.
+[Primäre V1-Bibliotheksabnahme](../../docs/de/BIBLIOTHEK-ZUERST-V1-ABNAHME.md).
+
 ## Zweck dieses Verzeichnisses
 
 `src/dotnet` enthält ausschließlich **produktiven Quellcode** für die .NET-Implementierung.

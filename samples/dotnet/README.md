@@ -13,6 +13,15 @@ implementations**. Reusable editing behavior belongs in
 desktop, and other UI-specific code belongs here or in another host-facing
 project.
 
+## Which sample to use first?
+
+For **library integration**, start with
+`Sasd.Editor.Consumer.Sample` (public project-reference API)
+and `Sasd.Editor.PackageConsumer.Sample` (actual NuGet artifact
+validated in CI). FIRST-ED/MicroStar then demonstrate a richer
+interactive host. They are not the library's product objective.
+[Primary library review](../../docs/en/LIBRARY-FIRST-V1-ACCEPTANCE.md).
+
 ## Available samples
 
 | Project | Type | Purpose |

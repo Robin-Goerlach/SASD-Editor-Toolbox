@@ -6,6 +6,22 @@
 
 Diese Roadmap führt den bisher auf Architektur-, Kompatibilitäts-, Release-Gap-, Abnahme- und Release-Candidate-Dokumente verteilten Plan zusammen. Sie beschreibt **eine technische Richtung mit Nachweisen, keinen verbindlichen Veröffentlichungstermin**. M0–M5 ordnen bereits geleistete Arbeit *rückblickend* ein; es wird **nicht** behauptet, dass früher gleichnamige GitHub-Meilensteine existierten. Spätere Phasen sind Vorschläge und erweitern den eingefrorenen V1-Umfang nicht stillschweigend.
 
+## Produktpriorität – Bibliothek zuerst (Bestätigung vom 16.11.2026)
+
+V1 liefert **die öffentliche, UI-unabhängige Core-Bibliothek**, keinen
+fertigen Endanwender-Editor. FIRST-ED und MicroStar sind
+**Referenzanwendungen**. Wie die Toolbox von 1985 bieten wir
+Entwicklern wiederverwendbare Bausteine, jedoch als unabhängige
+moderne Implementierung. Reihenfolge der Freigabe:
+**API/Lebenszyklen → unabhängige Paket-Consumer → Korrektheit,
+sprachübergreifende Konformität, Doku und Herkunft → gezielte
+Referenzhost-Tests → historische Darstellungsdetails**.
+
+Der Feature-Freeze bleibt bestehen. Wir erfinden dadurch keine neuen
+Funktionen und heben bestehende Prüfpflichten nicht stillschweigend auf.
+[Primäre Bibliotheksabnahme](BIBLIOTHEK-ZUERST-V1-ABNAHME.md) ·
+[English](../en/LIBRARY-FIRST-V1-ACCEPTANCE.md).
+
 ## Bedeutung der Statusangaben
 
 - `[x]` bedeutet, dass **genau der jeweilige Punkt** durch Code, eingecheckte Tests/Dokumentation, einen erfolgreich beobachteten CI-Lauf oder ausdrücklich eingegrenzte Nutzerrückmeldung belegt ist. Daraus folgt **keine** pauschale historische Gleichwertigkeit.
@@ -115,9 +131,28 @@ Diese Roadmap führt den bisher auf Architektur-, Kompatibilitäts-, Release-Gap
 
 **Abnahmekriterium:** Automatisierte Builds, Tests und Projekt-/Paket-Consumer unter beiden CI-Systemen. **Technisches Fundament erfüllt; Veröffentlichungs-Gate offen.**
 
-## M6 – Interaktive und historische V1.0-Abnahme (aktuelle Priorität)
+## M6 – Bibliotheksorientierte V1.0-Abnahme und Referenzhost-Prüfung
 
 **Ziel:** die Freigabe abschließen, statt immer neue Funktionen hinzuzufügen. Seit 30. Oktober 2026 gilt Feature-Freeze: nur einen **reproduzierten V1-Blocker** beheben, mit Regressionstest und Nachprüfung.
+
+### M6.0 – Vorrangige Abnahme der wiederverwendbaren Bibliothek
+
+- [x] Bestehende .NET-CI baut Core und prüft auf Windows und Ubuntu
+  unabhängige Consumer per Projekt- und echter NuGet-Paketreferenz.
+  Das ist noch keine Abnahme des finalen Kandidaten.
+- [ ] **Öffentliche Core-API** und unabhängige Nutzung von Dokumenten,
+  Ansichten, Editieren, Suche, Undo, Speicherung, Fehlern, Abbruch und
+  Erweiterungspunkten überprüfen.
+- [ ] API-Doku/Beispiele, tatsächlich herunterladbares NuGet-Paket,
+  Consumer-Erfahrung, Herkunft und portables Verhalten anhand des
+  eingefrorenen SHA prüfen.
+- [ ] Die [Bibliothek-zuerst-Matrix](BIBLIOTHEK-ZUERST-V1-ABNAHME.md)
+  ausfüllen; bibliotheksrelevante Freigabelücken beheben oder ausdrücklich
+  entscheiden.
+
+**M6.0-Abnahme:** Ein unabhängiger .NET-Entwickler verwendet den
+dokumentierten öffentlichen Core aus dem geprüften Paket ohne
+Sample-Interna. **Finale Kandidatenprüfung OFFEN.**
 
 ### M6.1 – FIRST-ED und MicroStar in echten Terminals
 
@@ -140,7 +175,7 @@ Diese Roadmap führt den bisher auf Architektur-, Kompatibilitäts-, Release-Gap
 
 **Bewusst nicht V1:** originale `Optstr`-Grammatik, binäres `EDITERR.MSG`, globales `Tabsize` wie 1985, DOS-Bildschirmspeicher/Assembler, physischer Drucker, Lightning-Rechtschreibprüfung und originale Pascal-ABI. Die modernen Ersatzabläufe müssen ihre **tatsächlich zugesagten** Prüfungen dennoch bestehen.
 
-**M6-Abnahmekriterium:** Alle für die Freigabe nötigen M6.1-Beobachtungen und M6.2-Entscheidungen liegen mit nachvollziehbarem Quellstand vor; freigaberelevante Fehler sind behoben oder ausdrücklich entschieden. **OFFEN.**
+**M6-Abnahmekriterium:** M6.0-Bibliotheksnachweise, verbindliche M6.1-Referenzhost-Beobachtungen und M6.2-Historienentscheidungen müssen für den akzeptierten Kandidaten nachvollziehbar sein.  Alle für die Freigabe nötigen M6.1-Beobachtungen und M6.2-Entscheidungen liegen mit nachvollziehbarem Quellstand vor; freigaberelevante Fehler sind behoben oder ausdrücklich entschieden. **OFFEN.**
 
 ## M7 – Reproduzierbarer Release Candidate und abschließende Nachweise
 
@@ -203,7 +238,7 @@ Das langfristige Migrationsziel ist das **[SASD Editor Toolkit](https://github.c
 
 ## Nächster konkreter Schritt und Freigabedisziplin
 
-**Nächster Arbeitsschritt:** die bereits gemeldeten MS-06-Ergebnisse (Umgebungen, Prüfer, SHA und fünf Teilschritte) in den Abnahmenachweisen zusammenführen; anschließend **MS-07: Blockdatei schreiben/lesen** nur mit entbehrlichen Daten prüfen. Danach MS-08..MS-10, TAB- und I/O-Prüfungen bearbeiten, mit **gesondertem nativem Debian-Lauf**. Keine neue Editor-Funktion beginnen, während diese Gates offen sind.
+**Nächster Arbeitsschritt (neu priorisiert am 16.11.2026):** Zuerst M6.0 mit öffentlicher API und unabhängigen Bibliotheks-Consumern prüfen, danach HP-01..HP-10 nach Core-/Referenzhost-Verantwortung bewerten. Bereits gemeldete FE-01..11-, MS-01..10-, TAB-01..05- und IO-01..05-Ergebnisse unter Windows/WSL bleiben Belege, ersetzen aber weder natives Debian noch finale SHA-Prüfung. Keine neuen Editor-UI-Funktionen.
 
 Ein Meilenstein ist erst durch **seine dokumentierten Abnahmekriterien** abgeschlossen, nicht durch eine gefühlte Prozentzahl. Bei Implementierungen/Fehlerkorrekturen Architekturgrenzen, sinnvolle Kommentare, Regressionstests und englische/deutsche Dokumentation bewahren. Ändert sich der akzeptierte Commit, müssen die betroffenen manuellen Nachweise und beide CI-Läufe neu bewertet werden.
 

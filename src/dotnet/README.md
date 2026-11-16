@@ -11,6 +11,15 @@ This directory contains the active **C#/.NET reference implementation** of the S
 
 The .NET implementation is currently the most complete executable implementation in the repository. It is used to develop, exercise and verify the editor architecture, but it is **not** the language-neutral specification. Portable observable behavior belongs in `spec/` and shared conformance cases belong in `conformance/`.
 
+## Library-first product priority
+
+The shipped product is the reusable **public Core library**;
+FIRST-ED/MicroStar are **reference hosts**, not finished
+end-user-editor deliverables. Before UI refinement, validate
+external API usability, document/view lifecycle, storage,
+errors/cancellation and actual independent NuGet consumption.
+[Primary V1 library review](../../docs/en/LIBRARY-FIRST-V1-ACCEPTANCE.md).
+
 ## Purpose of this directory
 
 `src/dotnet` contains **production source code only** for the .NET implementation lane.

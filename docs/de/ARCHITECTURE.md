@@ -6,6 +6,17 @@ Die SASD Editor Toolbox ist ein **einbettbarer Editor-Kern** und nicht nur ein e
 
 Damit kann derselbe Kern später aus WPF, WinForms, Terminal- und Web-Oberflächen genutzt werden, ohne dass die Kernbibliothek von einem UI-Framework abhängt.
 
+## Primäre Produktgrenze
+
+**Core ist die ausgelieferte Entwicklerbibliothek; FIRST-ED und
+MicroStar sind Referenzhosts, keine eigenständigen V1-Endanwenderprodukte.**
+Hosts verwenden öffentliche Core-APIs, niemals umgekehrt. Lebenszyklen,
+Editieren/Suche ohne Tastatursimulation, Speicherung, Fehler und
+Erweiterungspunkte müssen aus einem unabhängigen Consumer nutzbar sein.
+Die [Bibliothek-zuerst-Abnahme](BIBLIOTHEK-ZUERST-V1-ABNAHME.md)
+bildet das vorrangige Qualitätsgate; Terminaltests sind ergänzende
+Integrationsnachweise.
+
 ## Textspeicher
 
 Die historische Toolbox arbeitete mit verketteten Zeilendeskriptoren. Die erste SASD-Implementierung übernimmt die zeilenorientierte Semantik mit `LinkedLineTextBuffer`, kapselt sie aber hinter `ITextBuffer`. Dadurch können wir später für große Dateien auf Piece Table oder Rope wechseln, ohne Befehle, Fensterlogik oder Anwendungen neu entwerfen zu müssen.
@@ -40,6 +51,6 @@ Weitere Regeln zu Source of Truth, Synchronisierung, CI und Portierung stehen in
 
 ## Aktueller V1-Abschluss und bewusste Verschiebungen
 
-Die FIRST-ED-/WordStar-Tastenzuordnung, der Prefix-Dispatcher und ein interaktiver Terminal-Referenzhost sind bereits implementiert. Als nächstes V1-Release-Gate folgt der [historische Prozeduren-/Funktionsindex-Audit](HANDBUCH-PROZEDURENINDEX-AUDIT.md), der echte beobachtbare Lücken von überholter Pascal-/DOS-Technik trennt.
+Die FIRST-ED-/WordStar-Tastenzuordnung, der Prefix-Dispatcher und ein interaktiver Terminal-Referenzhost sind bereits implementiert. Das nächste V1-Gate ist der [Review von Bibliotheks-API, Consumern und Paket](BIBLIOTHEK-ZUERST-V1-ABNAHME.md). Der [historische Prozeduren-/Funktionsindex-Audit](HANDBUCH-PROZEDURENINDEX-AUDIT.md) bleibt für Core-Verantwortung sowie Host-/DOS-Ausnahmen wichtig.
 
 MicroStar-Menüs, Pop-ups und Hintergrunddruck bleiben Host-/Sample-Aufgaben. Piece Table, Rope und spekulative Optimierung folgen erst bei nachgewiesenem Bedarf.
